@@ -1,0 +1,2 @@
+gov.hhs.onc.sdcct.context.MetadataInitializer=\
+    gov.hhs.onc.sdcct.web.gateway.context.impl.GatewayMetadataInitializer

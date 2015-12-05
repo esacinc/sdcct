@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    
+    <!--====================================================================================================
+    = SERVLETS
+    =====================================================================================================-->
+    <beans:bean id="servlet" class="javax.servlet.Servlet" abstract="true"/>
+    
+    <beans:bean id="servletHttp" class="javax.servlet.http.HttpServlet" parent="servlet" abstract="true"/>
+    
+    <!--====================================================================================================
+    = REGISTRATION BEANS: SERVLET
+    =====================================================================================================-->
+    <beans:bean id="regBeanServlet" class="org.springframework.boot.context.embedded.ServletRegistrationBean" parent="regBean" abstract="true"/>
+</beans:beans>

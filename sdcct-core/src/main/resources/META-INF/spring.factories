@@ -1,0 +1,6 @@
+org.springframework.boot.SpringApplicationRunListener=\
+    gov.hhs.onc.sdcct.context.impl.MetadataInitializerRunListener,\
+    gov.hhs.onc.sdcct.logging.impl.LoggingInitializerRunListener
+
+org.springframework.context.ApplicationListener=\
+    ch.qos.logback.ext.spring.ApplicationContextHolder

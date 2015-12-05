@@ -1,0 +1,13 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="%{project.name} Unit Tests Suite" verbose="1">
+    <test name="%{project.name} Unit Tests">
+        <groups>
+            <run>
+                <include name="sdcct\.test\.unit\.all"/>
+            </run>
+        </groups>
+        <packages>
+            <package name="%{project.java.package}.*"/>
+        </packages>
+    </test>
+</suite>

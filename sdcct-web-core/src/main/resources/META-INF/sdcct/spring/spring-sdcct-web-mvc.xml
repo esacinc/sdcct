@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+    
+    <!--====================================================================================================
+    = CONTEXT
+    =====================================================================================================-->
+    <mvc:annotation-driven conversion-service="conversionService"/>
+    
+    <!--====================================================================================================
+    = HANDLERS
+    =====================================================================================================-->
+    <mvc:default-servlet-handler/>
+    
+    <!--====================================================================================================
+    = INTERCEPTORS
+    =====================================================================================================-->
+    <beans:bean id="interceptorHandler" class="org.springframework.web.servlet.HandlerInterceptor" abstract="true"/>
+    
+    <beans:bean id="interceptorWebContent" class="org.springframework.web.servlet.mvc.WebContentInterceptor" parent="interceptorHandler"
+        p:cacheSeconds="0"
+        p:useCacheControlHeader="true"
+        p:useCacheControlNoStore="true"
+        p:useExpiresHeader="true"/>
+    
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <beans:ref bean="interceptorWebContent"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+    
+    <!--====================================================================================================
+    = VIEW RESOLVERS
+    =====================================================================================================-->
+    <mvc:view-resolvers>
+        <mvc:jsp prefix="/WEB-INF/views/" suffix=".jsp" view-class="org.springframework.web.servlet.view.JstlView"/>
+    </mvc:view-resolvers>
+    
+    <!--====================================================================================================
+    = SERVLETS
+    =====================================================================================================-->
+    <beans:bean id="servletDispatcher" class="org.springframework.web.servlet.DispatcherServlet" parent="servletHttp"/>
+    
+    <!--====================================================================================================
+    = REGISTRATION BEANS: SERVLET
+    =====================================================================================================-->
+    <beans:bean id="regBeanServletDispatcher" parent="regBeanServlet"
+        p:loadOnStartup="1"
+        p:name="dispatcherServlet"
+        p:servlet-ref="servletDispatcher">
+        <beans:property name="urlMappings">
+            <beans:list>
+                <beans:value>/</beans:value>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+</beans:beans>

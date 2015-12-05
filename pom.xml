@@ -1,0 +1,52 @@
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>gov.hhs.onc.sdcct</groupId>
+        <artifactId>sdcct-parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>sdcct-parent</relativePath>
+    </parent>
+    
+    <artifactId>sdcct-all</artifactId>
+    <packaging>pom</packaging>
+    
+    <description>Structured Data Capture Conformance Tool (SDCCT) aggregate Maven project.</description>
+    
+    <properties>
+        <!-- Project properties -->
+        <project.basedir.all>${project.basedir}</project.basedir.all>
+    </properties>
+    
+    <modules>
+        <module>sdcct-parent</module>
+        <module>sdcct-core</module>
+        <module>sdcct-web-parent</module>
+        <module>sdcct-web-core</module>
+        <module>sdcct-web-form-manager</module>
+        <module>sdcct-web-form-archiver</module>
+        <module>sdcct-web-form-receiver</module>
+        <module>sdcct-web-form-filler</module>
+        <module>sdcct-web-gateway</module>
+    </modules>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <id>enforce-java-version</id>
+                        <inherited>false</inherited>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
