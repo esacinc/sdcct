@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+    targetNamespace="http://healthIT.gov/sdc" xmlns="http://healthIT.gov/sdc">
+    <xs:annotation>
+        <xs:documentation>This schema supports the submission of form data based on the SDC form content </xs:documentation>
+        <xs:documentation>Version 2.0, Aug 5, 2015 R. Moldwin </xs:documentation>
+    </xs:annotation>
+
+
+    <xs:include schemaLocation="SDCFormDesign.xsd"/>
+    <xs:element name="Forms">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" name="FormResponsesPkg"
+                    type="FormResponsesPkgType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="FormResponsesPkgType">
+        <xs:complexContent>
+            <xs:extension base="ExtensionBaseType">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="Description"
+                        type="RichTextType">
+                        <xs:annotation>
+                            <xs:documentation>Any information about this data transmission may be entered here.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="DemogFormResponses" type="FormReponsesType" minOccurs="0"
+                        maxOccurs="1"/>
+                    <xs:element name="MainFormReponses" type="FormReponsesType" minOccurs="1"
+                        maxOccurs="1"/>
+                    <xs:element name="FormResponsesPkg" type="FormResponsesPkgType"
+                        maxOccurs="unbounded" minOccurs="0"> </xs:element>
+                </xs:sequence>
+                <xs:attribute name="formPackageID" use="required" type="URI_Stype"/>
+                <xs:attributeGroup ref="ResponseAttributes"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="FormReponsesType">
+        <xs:complexContent>
+            <xs:extension base="FormDesignType">
+                <xs:attributeGroup ref="ResponseAttributes"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+</xs:schema>

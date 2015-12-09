@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  IHE Retrieve Form for Data Capture (RFD) WSDL defintions for FormArchiver.
+  -->
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:rfd="urn:ihe:iti:rfd:2007"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap12/"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:wsaw="http://www.w3.org/2005/08/addressing"
+  name="RFDFormArchiver"
+  targetNamespace="urn:ihe:iti:rfd:2007">
+
+  <!-- Needed types only include definition of payload for SubmitForm -->
+  <types>
+    <xsd:schema targetNamespace="urn:ihe:iti:rfd:2007">
+      <xsd:include schemaLocation="RFD.xsd" />
+    </xsd:schema>
+  </types>
+
+  <!-- Message definitions -->
+  <message name="ArchiveFormRequest">
+    <documentation>
+      Payload is the XML instance data being submitted/archived.
+    </documentation>
+    <part name="Body" element="rfd:ArchiveFormRequest" />
+  </message>
+  <message name="ArchiveFormResponse">
+    <documentation>
+      Status of XML instance data submitted/archived.
+    </documentation>
+    <part name="Body" element="rfd:ArchiveFormResponse" />
+  </message>  
+  
+  <!-- Operation/transaction declarations -->
+  <portType name="RFDFormArchiver_PortType">
+    <operation name="ArchiveForm">
+      <documentation>
+        Corresponds to Transaction ITI-36 of the IHE Technical Framework
+      </documentation>
+      <input message="rfd:ArchiveFormRequest" 
+        wsaw:Action="urn:ihe:iti:2007:ArchiveForm"/>
+      <output message="rfd:ArchiveFormResponse"
+        wsaw:Action="urn:ihe:iti:2007:ArchiveFormResponse"/>
+    </operation>
+  </portType>
+
+  <!-- SOAP 1.2 Binding -->
+  <binding name="RFDFormArchiver_Binding_Soap12"
+    type="rfd:RFDFormArchiver_PortType">
+    <soap:binding style="document"
+      transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="ArchiveForm">
+      <soap:operation soapAction="urn:ihe:iti:2007:ArchiveForm" />
+      <input><soap:body use="literal" /></input>
+      <output><soap:body use="literal" /></output>
+    </operation>
+  </binding>
+
+  <!-- Service definition -->
+  <service name="RFDFormArchiver_Service">
+    <port binding="rfd:RFDFormArchiver_Binding_Soap12"
+      name="RFDFormArchiver_Port_Soap12">
+      <soap:address location="http://localhost/RFDFormArchiver" />
+    </port>
+  </service>
+</definitions>
