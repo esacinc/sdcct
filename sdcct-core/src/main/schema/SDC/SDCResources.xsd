@@ -4,582 +4,6 @@
 
 
     <xs:include schemaLocation="SDCDataTypes.xsd"/>
-    <xs:complexType name="DataTypesType">
-        <xs:annotation>
-            <xs:documentation>SDC datatypes, based mostly on W3C specifications. Uses baseAttributes
- and Extension capability to enhance the list of Data Types. **CHECK for ERRORS and
- completeness**</xs:documentation>
-        </xs:annotation>
-        <xs:complexContent>
-            <xs:extension base="ExtensionBaseType">
-                <xs:choice>
-                    <xs:element minOccurs="0" name="anyType" nillable="true" type="anyType_type"> </xs:element>
-                    <xs:element minOccurs="0" name="anyURI" nillable="true" type="anyURI_type"> </xs:element>
-                    <xs:element minOccurs="0" name="base64Binary" nillable="true"
-                        type="base64Binary_type">
-                        <xs:annotation>
-                            <xs:documentation>**SDC may need a valid list of MIME types.
- </xs:documentation>
-                        </xs:annotation>
-                    </xs:element>
-                    <xs:element minOccurs="0" name="boolean" nillable="true" type="boolean_type">
-                        <xs:annotation>
-                            <xs:documentation> </xs:documentation>
-                        </xs:annotation>
-                    </xs:element>
-                    <xs:element minOccurs="0" name="duration" nillable="true" type="duration_type">
-                        <xs:annotation>
-                            <xs:documentation source="http://www.w3schools.com/schema/schema_dtypes_date.asp">Duration Data Type The duration data type is used to specify a time
- interval. The time interval is specified in the following form
- "PnYnMnDTnHnMnS" where: P indicates the period (required) nY
- indicates the number of years nM indicates the number of months nD
- indicates the number of days T indicates the start of a time section
- (required if you are going to specify hours, minutes, or seconds) nH
- indicates the number of hours nM indicates the number of minutes nS
- indicates the number of seconds An element in your document might
- look like this: P5Y The example above indicates a
- period of five years. Or it might look like this:
- P5Y2M10D. The example above indicates a period
- of five years, two months, and 10 days. Or it might look like this:
-P5Y2M10DT15H. The example above indicates a
- period of five years, two months, 10 days, and 15 hours. Or it might
- look like this: PT15H.
-                            </xs:documentation>
-                        </xs:annotation>
-                    </xs:element>
-                    <xs:element minOccurs="0" name="int" nillable="true" type="int_type"> </xs:element>
-                    <xs:element minOccurs="0" name="integer" nillable="true" type="integer_type"> </xs:element>
-                    <xs:element minOccurs="0" name="byte" nillable="true" type="byte_type"> </xs:element>
-                    <xs:element minOccurs="0" name="date" nillable="true" type="date_type">
-                        <xs:annotation>
-                            <xs:documentation>**Does SDC need a list of valid patterns for all date/time types? </xs:documentation>
-                        </xs:annotation>
-                    </xs:element>
-                    <xs:element minOccurs="0" name="dateTimeStamp" nillable="true"
-                        type="dateTimeStamp_type">
-                        <xs:annotation>
-                            <xs:documentation> </xs:documentation>
-                        </xs:annotation>
-                    </xs:element>
-                    <xs:element minOccurs="0" name="decimal" nillable="true" type="decimal_type">
-                        <xs:annotation>
-                            <xs:documentation/>
-                        </xs:annotation>
-                    </xs:element>
-                    <xs:element minOccurs="0" name="dateTime" nillable="true"
-                        type="dateTimeStamp_type">
-                        <xs:annotation>
-                            <xs:documentation source="http://www.w3schools.com/schema/schema_dtypes_date.asp">DateTime Data Type The dateTime data type is used to specify a date
- and a time. The dateTime is specified in the following form
- "YYYY-MM-DDThh:mm:ss" where: YYYY indicates the year MM indicates
- the month DD indicates the day T indicates the start of the required
- time section hh indicates the hour mm indicates the minute ss
- indicates the second Time Zones To specify a time zone, you can
- either enter a time in UTC time by adding a "Z" behind the time -
- like this: 09:30:10Z or you can specify an offset
- from the UTC time by adding a positive or negative time behind the
- time - like this: 09:30:10-06:00 or
- 09:30:10+06:00.
-                            </xs:documentation>
-                        </xs:annotation>
-                    </xs:element>
-                    <xs:element minOccurs="0" name="double" nillable="true" type="double_type">
-                        <xs:annotation>
-                            <xs:documentation/>
-                        </xs:annotation>
-                    </xs:element>
-                    <xs:element minOccurs="0" name="float" nillable="true" type="float_type">
-                        <xs:annotation>
-                            <xs:documentation> </xs:documentation>
-                        </xs:annotation>
-                    </xs:element>
-                    <xs:element minOccurs="0" name="gDay" nillable="true" type="gDay_type">
-                        <xs:annotation>
-                            <xs:documentation/>
-                        </xs:annotation>
-                    </xs:element>
-                    <xs:element minOccurs="0" name="gMonth" nillable="true" type="gMonth_type">
-                        <xs:annotation>
-                            <xs:documentation/>
-                        </xs:annotation>
-                    </xs:element>
-                    <xs:element minOccurs="0" name="gMonthDay" nillable="true" type="gMonthDay_type">
-                        <xs:annotation>
-                            <xs:documentation> </xs:documentation>
-                        </xs:annotation>
-                    </xs:element>
-                    <xs:element minOccurs="0" name="gYear" nillable="true" type="gYear_type">
-                        <xs:annotation>
-                            <xs:documentation> </xs:documentation>
-                        </xs:annotation>
-                    </xs:element>
-                    <xs:element minOccurs="0" name="gYearMonth" nillable="true" type="gMonth_type">
-                        <xs:annotation>
-                            <xs:documentation/>
-                        </xs:annotation>
-                    </xs:element>
-                    <xs:element minOccurs="0" name="hexBinary" nillable="true" type="hexBinary_type">
-                        <xs:annotation>
-                            <xs:documentation>**Does SDC need list of valid MIME types?
-                            </xs:documentation>
-                        </xs:annotation>
-                    </xs:element>
-                    <xs:element minOccurs="0" name="HTML" nillable="true" type="HTML_type"> </xs:element>
-                    <xs:element minOccurs="0" name="long" nillable="true" type="long_type"> </xs:element>
-                    <xs:element minOccurs="0" name="negativeInteger" nillable="true"
-                        type="negativeInteger_type"> </xs:element>
-                    <xs:element minOccurs="0" name="nonNegativeInteger" nillable="true"
-                        type="nonNegativeInteger_type"> </xs:element>
-                    <xs:element minOccurs="0" name="nonPositiveInteger" nillable="true"
-                        type="nonPositiveInteger_type"> </xs:element>
-                    <xs:element minOccurs="0" name="positiveInteger" nillable="true"
-                        type="positiveInteger_type"> </xs:element>
-                    <xs:element minOccurs="0" name="short" nillable="true" type="short_type"> </xs:element>
-                    <xs:element minOccurs="0" name="string" nillable="true" type="string_type"> </xs:element>
-                    <xs:element minOccurs="0" name="time" nillable="true" type="time_type">
-                        <xs:annotation>
-                            <xs:documentation>**possibly "HH:MM:SS:ms am/pm 12/24"</xs:documentation>
-                        </xs:annotation>
-                    </xs:element>
-                    <xs:element minOccurs="0" name="unsignedByte" nillable="true"
-                        type="unsignedByte_type"> </xs:element>
-                    <xs:element minOccurs="0" name="unsignedInt" nillable="true"
-                        type="unsignedInt_type"> </xs:element>
-                    <xs:element minOccurs="0" name="unsignedLong" nillable="true"
-                        type="unsignedLong_type"> </xs:element>
-                    <xs:element minOccurs="0" name="unsignedShort" nillable="true"
-                        type="unsignedShort_type"> </xs:element>
-                    <xs:element minOccurs="0" name="XML" nillable="true" type="XML_type"> </xs:element>
-                    <xs:element name="yearMonthDuration" nillable="true"
-                        type="yearMonthDuration_type" minOccurs="0"> </xs:element>
-                </xs:choice>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:complexType name="DataTypesUntypedType">
-        <xs:annotation>
-            <xs:documentation>SDC datatypes, based mostly on W3C specifications. **CHECK for ERRORS and completeness**</xs:documentation>
-        </xs:annotation>
-        <xs:choice>
-            <xs:element minOccurs="0" name="anyType">
-                <xs:complexType>
-                    <xs:attribute name="length" type="xs:long"/>
-                    <xs:attribute name="minLength" type="xs:long"/>
-                    <xs:attribute name="maxLength" type="xs:long"/>
-                    <xs:attribute name="pattern" type="xs:string"/>
-                    <xs:attribute name="namespace" type="xs:string">
-                        <xs:annotation>
-                            <xs:documentation>Namespace used in an XML Schema file, if any, used to
- constrain and validate the the content of this field. This is
- similar to the use of namespaces with the xs:any element in XML
- Schemas. See: http://www.w3.org/TR/xmlschema-0/#any
- </xs:documentation>
-                        </xs:annotation>
-                    </xs:attribute>
-                    <xs:attribute name="type" type="xs:NMTOKENS">
-                        <xs:annotation>
-                            <xs:documentation>Purpose(s) for the element, chosen from a standardized list of terms.</xs:documentation>
-                        </xs:annotation>
-                    </xs:attribute>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="anyURI">
-                <xs:complexType>
-                    <xs:attribute name="length" type="xs:long"/>
-                    <xs:attribute name="minLength" type="xs:long"/>
-                    <xs:attribute name="maxLength" type="xs:long"/>
-                    <xs:attribute name="pattern" type="xs:string"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="base64Binary">
-                <xs:annotation>
-                    <xs:documentation>Binary Large Object (Blob) encoded in Base 64. We need a valid list of mime types - check Wikipedia </xs:documentation>
-                </xs:annotation>
-                <xs:complexType>
-                    <xs:attribute name="mimeType" type="xs:string" use="optional">
-                        <xs:annotation>
-                            <xs:documentation>TBD: Must be a valid MIME type - needs enumeration</xs:documentation>
-                        </xs:annotation>
-                    </xs:attribute>
-                    <xs:attribute name="blobType" type="xs:string" use="optional">
-                        <xs:annotation>
-                            <xs:documentation>Type of Blob if it does not have a @MIME_Type</xs:documentation>
-                        </xs:annotation>
-                    </xs:attribute>
-                    <xs:attribute name="length" type="xs:long"/>
-                    <xs:attribute name="minLength" type="xs:long"/>
-                    <xs:attribute name="maxLength" type="xs:long"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="boolean">
-                <xs:annotation>
-                    <xs:documentation> </xs:documentation>
-                </xs:annotation>
-            </xs:element>
-            <xs:element minOccurs="0" name="duration">
-                <xs:annotation>
-                    <xs:documentation source="http://www.w3schools.com/schema/schema_dtypes_date.asp">Duration
- Data Type The duration data type is used to specify a time interval. The
- time interval is specified in the following form "PnYnMnDTnHnMnS" where: P
- indicates the period (required) nY indicates the number of years nM
- indicates the number of months nD indicates the number of days T indicates
- the start of a time section (required if you are going to specify hours,
- minutes, or seconds) nH indicates the number of hours nM indicates the
- number of minutes nS indicates the number of seconds An element in your
- document might look like this: P5Y. The example above
- indicates a period of five years. Or it might look like this:
- P5Y2M10D. The example above indicates a period of five
- years, two months, and 10 days. Or it might look like this:
- P5Y2M10DT15H. The example above indicates a period of
- five years, two months, 10 days, and 15 hours. Or it might look like this:
- PT15H.
-                    </xs:documentation>
-                </xs:annotation>
-                <xs:complexType>
-                    <xs:attribute name="maxInclusive" type="xs:duration"/>
-                    <xs:attribute name="minInclusive" type="xs:duration"/>
-                    <xs:attribute name="minExclusive" type="xs:duration"/>
-                    <xs:attribute name="maxExclusive" type="xs:duration"/>
-                    <xs:attribute name="pattern" type="xs:string"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="int">
-                <xs:complexType>
-                    <xs:attribute name="minInclusive" type="xs:int"/>
-                    <xs:attribute name="maxInclusive" type="xs:int"/>
-                    <xs:attribute name="minExclusive" type="xs:int"/>
-                    <xs:attribute name="maxExclusive" type="xs:int"/>
-                    <xs:attribute name="totalDigits" type="xs:positiveInteger"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="integer">
-                <xs:complexType>
-                    <xs:attribute name="minExclusive" type="xs:integer"/>
-                    <xs:attribute name="maxExclusive" type="xs:integer"/>
-                    <xs:attribute name="minInclusive" type="xs:integer"/>
-                    <xs:attribute name="maxInclusive" type="xs:integer"/>
-                    <xs:attribute name="totalDigits" type="xs:positiveInteger"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="byte">
-                <xs:complexType>
-                    <xs:attribute name="minInclusive" type="xs:byte"/>
-                    <xs:attribute name="maxInclusive" type="xs:byte"/>
-                    <xs:attribute name="minExclusive" type="xs:byte"/>
-                    <xs:attribute name="maxExclusive" type="xs:byte"/>
-                    <xs:attribute name="totalDigits" type="xs:unsignedByte"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="decimal">
-                <xs:annotation>
-                    <xs:documentation>check w3c for additional decimal attributes
- </xs:documentation>
-                </xs:annotation>
-                <xs:complexType>
-                    <xs:attribute name="minInclusive" type="xs:decimal"/>
-                    <xs:attribute name="maxInclusive" type="xs:decimal"/>
-                    <xs:attribute name="minExclusive" type="xs:decimal"/>
-                    <xs:attribute name="maxExclusive" type="xs:decimal"/>
-                    <xs:attribute name="fractionDigits">
-                        <xs:simpleType>
-                            <xs:restriction base="xs:byte">
-                                <xs:maxInclusive value="18"/>
-                            </xs:restriction>
-                        </xs:simpleType>
-                    </xs:attribute>
-                    <xs:attribute name="totalDigits" type="xs:integer"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="dateTime">
-                <xs:annotation>
-                    <xs:documentation source="http://www.w3schools.com/schema/schema_dtypes_date.asp">DateTime
- Data Type The dateTime data type is used to specify a date and a time. The
- dateTime is specified in the following form "YYYY-MM-DDThh:mm:ss" where:
- YYYY indicates the year MM indicates the month DD indicates the day T
- indicates the start of the required time section hh indicates the hour mm
- indicates the minute ss indicates the second Time Zones To specify a time
- zone, you can either enter a time in UTC time by adding a "Z" behind the
- time - like this: 09:30:10Z. or you can specify an offset from
- the UTC time by adding a positive or negative time behind the time - like
- this: 09:30:10-06:00. or 09:30:10+06:00.
-                    </xs:documentation>
-                </xs:annotation>
-                <xs:complexType>
-                    <xs:attribute name="minInclusive" type="xs:dateTime"/>
-                    <xs:attribute name="maxInclusive" type="xs:dateTime"/>
-                    <xs:attribute name="minExclusive" type="xs:dateTime"/>
-                    <xs:attribute name="maxExclusive" type="xs:dateTime"/>
-                    <xs:attribute name="pattern" type="xs:string"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="double">
-                <xs:annotation>
-                    <xs:documentation>check w3c for additional decimal attributes
- </xs:documentation>
-                </xs:annotation>
-                <xs:complexType>
-                    <xs:attribute name="minInclusive" type="xs:double"/>
-                    <xs:attribute name="maxInclusive" type="xs:double"/>
-                    <xs:attribute name="minExclusive" type="xs:double"/>
-                    <xs:attribute name="maxExclusive" type="xs:double"/>
-                    <xs:attribute name="fractionDigits">
-                        <xs:simpleType>
-                            <xs:restriction base="xs:byte">
-                                <xs:maxInclusive value="18"/>
-                            </xs:restriction>
-                        </xs:simpleType>
-                    </xs:attribute>
-                    <xs:attribute name="totalDigits" type="xs:integer"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="date">
-                <xs:annotation>
-                    <xs:documentation>**Does SDC need a list of valid patterns for all date/time types?</xs:documentation>
-                </xs:annotation>
-                <xs:complexType>
-                    <xs:attribute name="minInclusive" type="xs:date"/>
-                    <xs:attribute name="maxInclusive" type="xs:date"/>
-                    <xs:attribute name="minExclusive" type="xs:date"/>
-                    <xs:attribute name="maxExclusive" type="xs:date"/>
-                    <xs:attribute name="pattern" type="xs:string"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="float">
-                <xs:annotation>
-                    <xs:documentation>check w3c for additional decimal attributes</xs:documentation>
-                </xs:annotation>
-                <xs:complexType>
-                    <xs:attribute name="minInclusive" type="xs:decimal"/>
-                    <xs:attribute name="maxInclusive" type="xs:float"/>
-                    <xs:attribute name="minExclusive" type="xs:float"/>
-                    <xs:attribute name="maxExclusive" type="xs:float"/>
-                    <xs:attribute name="fractionDigits">
-                        <xs:simpleType>
-                            <xs:restriction base="xs:byte">
-                                <xs:maxInclusive value="18"/>
-                            </xs:restriction>
-                        </xs:simpleType>
-                    </xs:attribute>
-                    <xs:attribute name="totalDigits" type="xs:integer"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="gDay">
-                <xs:annotation>
-                    <xs:documentation/>
-                </xs:annotation>
-                <xs:complexType>
-                    <xs:attribute name="minInclusive" type="xs:gDay"/>
-                    <xs:attribute name="maxInclusive" type="xs:gDay"/>
-                    <xs:attribute name="minExclusive" type="xs:gDay"/>
-                    <xs:attribute name="maxExclusive" type="xs:gDay"/>
-                    <xs:attribute name="pattern" type="xs:string"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="gMonth">
-                <xs:annotation>
-                    <xs:documentation/>
-                </xs:annotation>
-                <xs:complexType>
-                    <xs:attribute name="minInclusive" type="xs:gMonth"/>
-                    <xs:attribute name="maxInclusive" type="xs:gMonth"/>
-                    <xs:attribute name="minExclusive" type="xs:gMonth"/>
-                    <xs:attribute name="maxExclusive" type="xs:gMonth"/>
-                    <xs:attribute name="pattern" type="xs:string"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="gMonthDay">
-                <xs:annotation>
-                    <xs:documentation> </xs:documentation>
-                </xs:annotation>
-                <xs:complexType>
-                    <xs:attribute name="minInclusive" type="xs:gMonthDay"/>
-                    <xs:attribute name="maxInclusive" type="xs:gMonthDay"/>
-                    <xs:attribute name="minExclusive" type="xs:gMonthDay"/>
-                    <xs:attribute name="maxExclusive" type="xs:gMonthDay"/>
-                    <xs:attribute name="pattern" type="xs:string"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="gYear">
-                <xs:annotation>
-                    <xs:documentation> </xs:documentation>
-                </xs:annotation>
-                <xs:complexType>
-                    <xs:attribute name="minInclusive" type="xs:gYear"/>
-                    <xs:attribute name="maxInclusive" type="xs:gYear"/>
-                    <xs:attribute name="minExclusive" type="xs:gYear"/>
-                    <xs:attribute name="maxExclusive" type="xs:gYear"/>
-                    <xs:attribute name="pattern" type="xs:string"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="gYearMonth">
-                <xs:annotation>
-                    <xs:documentation> </xs:documentation>
-                </xs:annotation>
-                <xs:complexType>
-                    <xs:attribute name="minInclusive" type="xs:gYearMonth"/>
-                    <xs:attribute name="maxInclusive" type="xs:gYearMonth"/>
-                    <xs:attribute name="minExclusive" type="xs:gYearMonth"/>
-                    <xs:attribute name="maxExclusive" type="xs:gYearMonth"/>
-                    <xs:attribute name="pattern" type="xs:string"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="hexBinary">
-                <xs:annotation>
-                    <xs:documentation>**SDC may need a valid list of mime types. </xs:documentation>
-                </xs:annotation>
-                <xs:complexType>
-                    <xs:attribute name="mimeType" type="xs:string" use="optional">
-                        <xs:annotation>
-                            <xs:documentation>TBD: Must be a valid MIME type - needs enumeration</xs:documentation>
-                        </xs:annotation>
-                    </xs:attribute>
-                    <xs:attribute name="blobType" type="xs:string" use="optional">
-                        <xs:annotation>
-                            <xs:documentation>Type of Blob if it does not have a @MIME_Type</xs:documentation>
-                        </xs:annotation>
-                    </xs:attribute>
-                    <xs:attribute name="length" type="xs:long"/>
-                    <xs:attribute name="minLength" type="xs:long"/>
-                    <xs:attribute name="maxLength" type="xs:long"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="long">
-                <xs:complexType>
-                    <xs:attribute name="minInclusive" type="xs:long"/>
-                    <xs:attribute name="maxInclusive" type="xs:long"/>
-                    <xs:attribute name="minExclusive" type="xs:integer"/>
-                    <xs:attribute name="maxExclusive" type="xs:long"/>
-                    <xs:attribute name="totalDigits">
-                        <xs:simpleType>
-                            <xs:restriction base="xs:unsignedLong">
-                                <xs:maxInclusive value="18446744073709551615"/>
-                            </xs:restriction>
-                        </xs:simpleType>
-                    </xs:attribute>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="negativeInteger">
-                <xs:complexType>
-                    <xs:attribute name="minInclusive" type="xs:negativeInteger"/>
-                    <xs:attribute name="maxInclusive" type="xs:negativeInteger"/>
-                    <xs:attribute name="minExclusive" type="xs:negativeInteger"/>
-                    <xs:attribute name="maxExclusive" type="xs:negativeInteger"/>
-                    <xs:attribute name="totalDigits" type="xs:positiveInteger"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="nonNegativeInteger">
-                <xs:complexType>
-                    <xs:attribute name="minInclusive" type="xs:nonNegativeInteger"/>
-                    <xs:attribute name="maxInclusive" type="xs:nonNegativeInteger"/>
-                    <xs:attribute name="minExclusive" type="xs:nonNegativeInteger"/>
-                    <xs:attribute name="maxExclusive" type="xs:nonNegativeInteger"/>
-                    <xs:attribute name="totalDigits" type="xs:positiveInteger"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="nonPositiveInteger">
-                <xs:complexType>
-                    <xs:attribute name="minInclusive" type="xs:nonPositiveInteger"/>
-                    <xs:attribute name="maxInclusive" type="xs:nonPositiveInteger"/>
-                    <xs:attribute name="minExclusive" type="xs:nonPositiveInteger"/>
-                    <xs:attribute name="maxExclusive" type="xs:nonPositiveInteger"/>
-                    <xs:attribute name="totalDigits" type="xs:positiveInteger"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="positiveInteger">
-                <xs:complexType>
-                    <xs:attribute name="minInclusive" type="xs:positiveInteger"/>
-                    <xs:attribute name="maxInclusive" type="xs:positiveInteger"/>
-                    <xs:attribute name="minExclusive" type="xs:positiveInteger"/>
-                    <xs:attribute name="maxExclusive" type="xs:positiveInteger"/>
-                    <xs:attribute name="totalDigits" type="xs:positiveInteger"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="short">
-                <xs:complexType>
-                    <xs:attribute name="minInclusive" type="xs:short"/>
-                    <xs:attribute name="maxInclusive" type="xs:short"/>
-                    <xs:attribute name="minExclusive" type="xs:short"/>
-                    <xs:attribute name="maxExclusive" type="xs:short"/>
-                    <xs:attribute name="totalDigits" type="xs:unsignedShort"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="string">
-                <xs:complexType>
-                    <xs:attribute name="charEncoding" type="xs:NMTOKENS">
-                        <xs:annotation>
-                            <xs:documentation>Allows restriction to a subset of character encodings, e.g., UTF-7, UTF-8, ASCII. This is not a W3C
- specification.</xs:documentation>
-                        </xs:annotation>
-                    </xs:attribute>
-                    <xs:attribute name="length" type="xs:long"/>
-                    <xs:attribute name="minLength" type="xs:long"/>
-                    <xs:attribute name="maxLength" type="xs:long"/>
-                    <xs:attribute name="pattern" type="xs:string"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="time">
-                <xs:annotation>
-                    <xs:documentation>possibly "HH:MM:SS:ms am/pm 12/24"</xs:documentation>
-                </xs:annotation>
-                <xs:complexType>
-                    <xs:attribute name="minInclusive" type="xs:time"/>
-                    <xs:attribute name="maxInclusive" type="xs:time"/>
-                    <xs:attribute name="minExclusive" type="xs:time"/>
-                    <xs:attribute name="maxExclusive" type="xs:time"/>
-                    <xs:attribute name="pattern" type="xs:string"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="unsignedByte">
-                <xs:complexType>
-                    <xs:attribute name="minInclusive" type="xs:unsignedByte"/>
-                    <xs:attribute name="maxInclusive" type="xs:unsignedByte"/>
-                    <xs:attribute name="minExclusive" type="xs:unsignedByte"/>
-                    <xs:attribute name="maxExclusive" type="xs:unsignedByte"/>
-                    <xs:attribute name="totalDigits" type="xs:unsignedByte"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="unsignedInt">
-                <xs:complexType>
-                    <xs:attribute name="minInclusive" type="xs:unsignedInt"/>
-                    <xs:attribute name="maxInclusive" type="xs:unsignedInt"/>
-                    <xs:attribute name="minExclusive" type="xs:unsignedInt"/>
-                    <xs:attribute name="maxExclusive" type="xs:unsignedInt"/>
-                    <xs:attribute name="totalDigits" type="xs:unsignedInt"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="unsignedLong">
-                <xs:complexType>
-                    <xs:attribute name="minInclusive" type="xs:unsignedLong"/>
-                    <xs:attribute name="maxInclusive" type="xs:unsignedLong"/>
-                    <xs:attribute name="minExclusive" type="xs:unsignedLong"/>
-                    <xs:attribute name="maxExclusive" type="xs:unsignedLong"/>
-                    <xs:attribute name="totalDigits" type="xs:int"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element minOccurs="0" name="unsignedShort">
-                <xs:complexType>
-                    <xs:attribute name="minInclusive" type="xs:unsignedShort"/>
-                    <xs:attribute name="maxInclusive" type="xs:unsignedShort"/>
-                    <xs:attribute name="minExclusive" type="xs:unsignedShort"/>
-                    <xs:attribute name="maxExclusive" type="xs:unsignedShort"/>
-                    <xs:attribute name="totalDigits" type="xs:int"/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="yearMonthDuration">
-                <xs:complexType>
-                    <xs:simpleContent>
-                        <xs:extension base="xs:duration">
-                            <xs:attribute name="minInclusive" type="xs:duration"/>
-                            <xs:attribute name="maxInclusive" type="xs:duration"/>
-                            <xs:attribute name="minExclusive" type="xs:duration"/>
-                            <xs:attribute name="maxExclusive" type="xs:duration"/>
-                            <xs:attribute name="pattern" type="xs:string"/>
-                        </xs:extension>
-                    </xs:simpleContent>
-                </xs:complexType>
-            </xs:element>
-        </xs:choice>
-    </xs:complexType>
     <xs:complexType name="BlobType">
         <xs:annotation>
             <xs:documentation>Standard structure for including Binary Large Objects (Blobs) in XML
@@ -597,21 +21,21 @@ P5Y2M10DT15H. The example above indicates a
                         </xs:annotation>
                         <xs:complexType>
                             <xs:complexContent>
-                                <xs:extension base="Base64BinaryType">
+                                <xs:extension base="base64Binary_Stype">
                                     <xs:attribute name="hashAlgorithm" type="xs:string"/>
                                 </xs:extension>
                             </xs:complexContent>
                         </xs:complexType>
                     </xs:element>
                     <xs:choice>
-                        <xs:element name="BlobURI" type="URI_Type">
+                        <xs:element name="BlobURI" type="anyURI_Stype">
                             <xs:annotation>
                                 <xs:documentation>This URI should contain a URL or web service link
  to the Blob. It is used instead of incorporating the Blob
  directly into XML templates.</xs:documentation>
                             </xs:annotation>
                         </xs:element>
-                        <xs:element name="BinaryMediaBase64" type="Base64BinaryType">
+                        <xs:element name="BinaryMediaBase64" type="base64Binary_Stype">
                             <xs:annotation>
                                 <xs:documentation>Binary represeentation of the Blob data, encoded
  using a Base 64 transformation from the original source binary
@@ -646,7 +70,7 @@ P5Y2M10DT15H. The example above indicates a
             <xs:extension base="ExtensionBaseType">
                 <xs:sequence>
                     <xs:element maxOccurs="1" minOccurs="1" name="Code" nillable="true"
-                        type="TextType">
+                        type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>A standard code, or a local value from a custom coding system, that can be used to consistently identify, or provide a
  standard value for, the coded item.</xs:documentation>
@@ -668,7 +92,7 @@ P5Y2M10DT15H. The example above indicates a
                                 <xs:extension base="BaseType">
                                     <xs:sequence>
                                         <xs:element maxOccurs="1" minOccurs="0"
-                                            name="CodingMatchComment" type="TextType">
+                                            name="CodingMatchComment" type="string_Stype">
                                             <xs:annotation>
                                                 <xs:documentation>Comment about the degree of match between the mapped item and the assigned
  code.</xs:documentation>
@@ -699,7 +123,7 @@ P5Y2M10DT15H. The example above indicates a
                         </xs:complexType>
                     </xs:element>
                     <xs:element name="CodeSystem" type="CodeSystemType" minOccurs="0"> </xs:element>
-                    <xs:element maxOccurs="1" minOccurs="0" name="DataType" type="DataTypesType">
+                    <xs:element maxOccurs="1" minOccurs="0" name="DataType" type="DataTypes_SType">
                         <xs:annotation>
                             <xs:documentation>Data type enumeration derived from W3C XML Schema. If
  the code is derived from a local value system (e.g., numbered answer
@@ -725,30 +149,31 @@ P5Y2M10DT15H. The example above indicates a
         <xs:complexContent>
             <xs:extension base="ExtensionBaseType">
                 <xs:sequence>
-                    <xs:element maxOccurs="1" minOccurs="1" name="CodeSystemName" type="TextType">
+                    <xs:element maxOccurs="1" minOccurs="1" name="CodeSystemName"
+                        type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>The name of the coding system, as recommended by the
  coding system curators, or as recommended by the agency that creates
  standards for the code map in use.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element maxOccurs="1" minOccurs="0" name="ReleaseDate" type="DateTimeType">
+                    <xs:element maxOccurs="1" minOccurs="0" name="ReleaseDate" type="dateTime_Stype">
                         <xs:annotation>
                             <xs:documentation>The day that the selected version of the coding system was released for general use by the coding system curators.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element maxOccurs="1" minOccurs="0" name="Version" type="TextType">
+                    <xs:element maxOccurs="1" minOccurs="0" name="Version" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>Version of the coding system, using the version format defined by the coding system</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element maxOccurs="1" minOccurs="0" name="OID" type="TextType">
+                    <xs:element maxOccurs="1" minOccurs="0" name="OID" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>The ISO object identifier (OID) for the coding system, as found at the HL7 OID Registry: https://www.hl7.org/oid/index.cfm
  </xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element minOccurs="0" name="CodeSystemURI" type="URI_Type">
+                    <xs:element minOccurs="0" name="CodeSystemURI" type="anyURI_Stype">
                         <xs:annotation>
                             <xs:documentation>Web resource that uniquely identifies the coding system</xs:documentation>
                         </xs:annotation>
@@ -784,15 +209,16 @@ P5Y2M10DT15H. The example above indicates a
                         type="AddressType"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="Email" type="EmailType"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="Phone" type="PhoneType"/>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="WebURL" type="URL_Type"> </xs:element>
-                    <xs:element maxOccurs="1" minOccurs="0" name="Role" type="TextType">
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="WebURL"
+                        type="anyURI_Stype"> </xs:element>
+                    <xs:element maxOccurs="1" minOccurs="0" name="Role" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>Role of the person, e.g., creator, copyright holder, accreditor, certifier, curator, etc.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
                     <xs:element name="Identifier" type="IdentifierType" maxOccurs="unbounded"
                         minOccurs="0"/>
-                    <xs:element maxOccurs="1" minOccurs="0" name="Usage" type="TextType">
+                    <xs:element maxOccurs="1" minOccurs="0" name="Usage" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>When this person should be contacted.</xs:documentation>
                         </xs:annotation>
@@ -805,12 +231,13 @@ P5Y2M10DT15H. The example above indicates a
         <xs:complexContent>
             <xs:extension base="ExtensionBaseType">
                 <xs:sequence>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="JobTitle" type="TextType"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="JobTitle"
+                        type="string_Stype"/>
                     <xs:element maxOccurs="1" minOccurs="0" name="Organization"
                         type="OrganizationType"/>
-                    <xs:element minOccurs="0" name="StartDate" type="DateType"/>
-                    <xs:element minOccurs="0" name="StopDate" type="DateType"/>
-                    <xs:element maxOccurs="1" minOccurs="0" name="Description" type="TextType">
+                    <xs:element minOccurs="0" name="StartDate" type="date_Stype"/>
+                    <xs:element minOccurs="0" name="StopDate" type="date_Stype"/>
+                    <xs:element maxOccurs="1" minOccurs="0" name="Description" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>Job Description</xs:documentation>
                         </xs:annotation>
@@ -826,15 +253,16 @@ P5Y2M10DT15H. The example above indicates a
         <xs:complexContent>
             <xs:extension base="ExtensionBaseType">
                 <xs:sequence>
-                    <xs:element maxOccurs="1" minOccurs="1" name="OrgName" type="TextType"
+                    <xs:element maxOccurs="1" minOccurs="1" name="OrgName" type="string_Stype"
                         nillable="true"/>
-                    <xs:element maxOccurs="1" minOccurs="0" name="Department" type="TextType"/>
+                    <xs:element maxOccurs="1" minOccurs="0" name="Department" type="string_Stype"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="StreetAddress"
                         type="AddressType"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="Email" type="EmailType"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="Phone" type="PhoneType"/>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="WebURL" type="URI_Type"> </xs:element>
-                    <xs:element maxOccurs="unbounded" minOccurs="0" name="Role" type="TextType">
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="WebURL"
+                        type="anyURI_Stype"> </xs:element>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="Role" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>Role of the organization, e.g., creator, copyright
  holder, accreditor, certifier, curator, etc.</xs:documentation>
@@ -844,7 +272,7 @@ P5Y2M10DT15H. The example above indicates a
                         type="PersonType"/>
                     <xs:element name="Identifier" type="IdentifierType" maxOccurs="unbounded"
                         minOccurs="0"/>
-                    <xs:element maxOccurs="1" minOccurs="0" name="Usage" type="TextType">
+                    <xs:element maxOccurs="1" minOccurs="0" name="Usage" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>When this organization should be
  contacted.</xs:documentation>
@@ -861,44 +289,45 @@ P5Y2M10DT15H. The example above indicates a
         <xs:complexContent>
             <xs:extension base="ExtensionBaseType">
                 <xs:sequence>
-                    <xs:element maxOccurs="1" minOccurs="0" name="AddressType" type="TextType">
+                    <xs:element maxOccurs="1" minOccurs="0" name="AddressType" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>Type of address, e.g., home, office, etc</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element maxOccurs="10" minOccurs="0" name="InternalAddress" type="TextType">
+                    <xs:element maxOccurs="10" minOccurs="0" name="InternalAddress"
+                        type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>Address instructions for directing mail within an organizations buildings or corporate
  infrastructure.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element maxOccurs="10" minOccurs="0" name="AddressLine" type="TextType">
+                    <xs:element maxOccurs="10" minOccurs="0" name="AddressLine" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>Address instructions for directing mail to a street address.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element maxOccurs="1" minOccurs="0" name="City" type="TextType"/>
-                    <xs:element maxOccurs="1" minOccurs="0" name="Jurisdiction" type="TextType">
+                    <xs:element maxOccurs="1" minOccurs="0" name="City" type="string_Stype"/>
+                    <xs:element maxOccurs="1" minOccurs="0" name="Jurisdiction" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>Other optional locale identifier.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element maxOccurs="1" minOccurs="0" name="State" type="TextType">
+                    <xs:element maxOccurs="1" minOccurs="0" name="State" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>State, Province, etc.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element maxOccurs="1" minOccurs="0" name="PostalCode" type="TextType">
+                    <xs:element maxOccurs="1" minOccurs="0" name="PostalCode" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>Local postal code, e.g., zip code.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element maxOccurs="1" minOccurs="0" name="Country" type="TextType">
+                    <xs:element maxOccurs="1" minOccurs="0" name="Country" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>**Need list of official country codes or text?</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element maxOccurs="1" minOccurs="0" name="Usage" type="TextType">
+                    <xs:element maxOccurs="1" minOccurs="0" name="Usage" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>When this address should be used</xs:documentation>
                         </xs:annotation>
@@ -914,7 +343,7 @@ P5Y2M10DT15H. The example above indicates a
         <xs:complexContent>
             <xs:extension base="ExtensionBaseType">
                 <xs:sequence>
-                    <xs:element maxOccurs="1" minOccurs="0" name="PhoneType" type="TextType">
+                    <xs:element maxOccurs="1" minOccurs="0" name="PhoneType" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>Usage type of phone number, e.g., home, office, etc</xs:documentation>
                         </xs:annotation>
@@ -923,8 +352,9 @@ P5Y2M10DT15H. The example above indicates a
                         type="CountryCodeType"> </xs:element>
                     <xs:element maxOccurs="1" minOccurs="0" name="AreaCode" type="AreaCodeType"> </xs:element>
                     <xs:element name="PhoneNumber" type="PhoneNumberType"> </xs:element>
-                    <xs:element maxOccurs="1" minOccurs="0" name="PhoneExtension" type="TextType"/>
-                    <xs:element maxOccurs="1" minOccurs="0" name="Usage" type="TextType">
+                    <xs:element maxOccurs="1" minOccurs="0" name="PhoneExtension"
+                        type="string_Stype"/>
+                    <xs:element maxOccurs="1" minOccurs="0" name="Usage" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>When this phone number should be used</xs:documentation>
                         </xs:annotation>
@@ -942,12 +372,12 @@ P5Y2M10DT15H. The example above indicates a
                 <xs:sequence>
                     <xs:element maxOccurs="1" minOccurs="1" name="EmailAddress"
                         type="EmailAddressType"> </xs:element>
-                    <xs:element maxOccurs="1" minOccurs="0" name="EmailType" type="TextType">
+                    <xs:element maxOccurs="1" minOccurs="0" name="EmailType" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>Type of email, e.g., home, office, etc</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element maxOccurs="1" minOccurs="0" name="Usage" type="TextType">
+                    <xs:element maxOccurs="1" minOccurs="0" name="Usage" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>When this email should be used</xs:documentation>
                         </xs:annotation>
@@ -968,21 +398,21 @@ P5Y2M10DT15H. The example above indicates a
         <xs:complexContent>
             <xs:extension base="ExtensionBaseType">
                 <xs:sequence>
-                    <xs:element minOccurs="0" name="FileID" type="TextType">
+                    <xs:element minOccurs="0" name="FileID" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>Internal/local File ID, not necessarily in the format
  of the FileURI used for all SDC FormDesign items.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element minOccurs="1" name="FileURI" type="URI_Type"/>
-                    <xs:element name="DisplayName" type="TextType">
+                    <xs:element minOccurs="1" name="FileURI" type="anyURI_Stype"/>
+                    <xs:element name="DisplayName" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>Text to be displayed that encapulates the file
  contents. This may be the same as the internal Title of the
  file.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element name="Title" type="TextType" minOccurs="0">
+                    <xs:element name="Title" type="string_Stype" minOccurs="0">
                         <xs:annotation>
                             <xs:documentation>Official title of the file.</xs:documentation>
                         </xs:annotation>
@@ -992,12 +422,12 @@ P5Y2M10DT15H. The example above indicates a
                             <xs:documentation>File version</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element minOccurs="0" name="FileName" type="TextType">
+                    <xs:element minOccurs="0" name="FileName" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>The name of the file as saved on disk or other persistant storage.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element minOccurs="0" name="FileExtension" type="TextType">
+                    <xs:element minOccurs="0" name="FileExtension" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>The file type extension that describes the file's
  internal format. This is usually the 3-4 character text that appears
@@ -1005,21 +435,21 @@ P5Y2M10DT15H. The example above indicates a
  etc.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element minOccurs="0" name="FileClass" type="TextType">
+                    <xs:element minOccurs="0" name="FileClass" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>A short description of the class of file, such as "FormDesign XML"</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element minOccurs="0" name="FileSizeKB" type="PositiveIntegerType"> </xs:element>
+                    <xs:element minOccurs="0" name="FileSizeKB" type="positiveInteger_Stype"> </xs:element>
                     <xs:element maxOccurs="unbounded" name="Description" nillable="false"
-                        minOccurs="0" type="TextType">
+                        minOccurs="0" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>Any additional information about the template or file. The type of information should be specified in the @type
  attribute.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element minOccurs="0" name="Copyright" type="TextType"/>
-                    <xs:element minOccurs="0" name="TermsofUse" type="TextType"/>
+                    <xs:element minOccurs="0" name="Copyright" type="string_Stype"/>
+                    <xs:element minOccurs="0" name="TermsofUse" type="string_Stype"/>
                     <xs:element minOccurs="0" name="Usage">
                         <xs:annotation>
                             <xs:documentation>Guidenace for when this file should be used, and when it should not be used.</xs:documentation>
@@ -1041,7 +471,7 @@ P5Y2M10DT15H. The example above indicates a
                                             </xs:annotation>
                                         </xs:element>
                                         <xs:element maxOccurs="unbounded" name="Description"
-                                            nillable="false" minOccurs="0" type="TextType">
+                                            nillable="false" minOccurs="0" type="string_Stype">
                                             <xs:annotation>
                                                 <xs:documentation>Non-coded text describing usage criteria.</xs:documentation>
                                             </xs:annotation>
@@ -1084,7 +514,7 @@ P5Y2M10DT15H. The example above indicates a
                                         <xs:element maxOccurs="unbounded" name="ApprovalContact"
                                             type="ContactType" minOccurs="0"/>
                                         <xs:element maxOccurs="unbounded" name="Description"
-                                            nillable="false" minOccurs="0" type="TextType">
+                                            nillable="false" minOccurs="0" type="string_Stype">
                                             <xs:annotation>
                                                 <xs:documentation>Non-structured text describing file approval.</xs:documentation>
                                             </xs:annotation>
@@ -1097,7 +527,7 @@ P5Y2M10DT15H. The example above indicates a
                     <xs:element minOccurs="0" name="FileHash">
                         <xs:complexType>
                             <xs:complexContent>
-                                <xs:extension base="TextType">
+                                <xs:extension base="string_Stype">
                                     <xs:attribute name="hashType" type="xs:string"/>
                                 </xs:extension>
                             </xs:complexContent>
@@ -1150,7 +580,7 @@ P5Y2M10DT15H. The example above indicates a
 
                 <xs:sequence>
 
-                    <xs:element maxOccurs="1" minOccurs="0" name="Language" type="TextType">
+                    <xs:element maxOccurs="1" minOccurs="0" name="Language" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>The language used for text in SDC templates. </xs:documentation>
                         </xs:annotation>
@@ -1220,7 +650,7 @@ P5Y2M10DT15H. The example above indicates a
     </xs:complexType>
     <xs:complexType name="AcceptabilityType">
         <xs:complexContent>
-            <xs:restriction base="TextType">
+            <xs:restriction base="string_Stype">
                 <xs:attribute name="val" type="Acceptability_Stype" use="required"/>
             </xs:restriction>
         </xs:complexContent>
@@ -1255,9 +685,9 @@ P5Y2M10DT15H. The example above indicates a
                             <xs:attributeGroup ref="baseAttributes"/>
                         </xs:complexType>
                     </xs:element>
-                    <xs:element name="ChangedTo" type="DataTypesType"/>
-                    <xs:element name="ChangedFrom" type="DataTypesType" minOccurs="1"/>
-                    <xs:element maxOccurs="unbounded" name="ChangeType" type="TextType"/>
+                    <xs:element name="ChangedTo" type="DataTypes_SType"/>
+                    <xs:element name="ChangedFrom" type="DataTypes_SType" minOccurs="1"/>
+                    <xs:element maxOccurs="unbounded" name="ChangeType" type="string_Stype"/>
                     <xs:element name="Replaces" maxOccurs="1" minOccurs="0">
                         <xs:annotation>
                             <xs:documentation>The retired/deprecated item that is being replaced.</xs:documentation>
@@ -1266,14 +696,15 @@ P5Y2M10DT15H. The example above indicates a
                             <xs:complexContent>
                                 <xs:extension base="BaseType">
                                     <xs:sequence maxOccurs="unbounded">
-                                        <xs:element name="ReplacedID" type="URI_Type"> </xs:element>
+                                        <xs:element name="ReplacedID" type="anyURI_Stype">
+                                        </xs:element>
                                     </xs:sequence>
                                 </xs:extension>
                             </xs:complexContent>
                         </xs:complexType>
                     </xs:element>
-                    <xs:element name="ChangeDate" type="DateTimeType"> </xs:element>
-                    <xs:element name="ChangeDescription" type="TextType" minOccurs="0"/>
+                    <xs:element name="ChangeDate" type="dateTime_Stype"> </xs:element>
+                    <xs:element name="ChangeDescription" type="string_Stype" minOccurs="0"/>
                     <xs:element name="Editors" minOccurs="0">
                         <xs:complexType>
                             <xs:complexContent>
@@ -1292,7 +723,7 @@ P5Y2M10DT15H. The example above indicates a
                                 <xs:extension base="BaseType">
                                     <xs:sequence>
                                         <xs:element maxOccurs="unbounded" name="ChangeTrackingID"
-                                            type="TextType"/>
+                                            type="string_Stype"/>
                                     </xs:sequence>
                                 </xs:extension>
                             </xs:complexContent>
@@ -1313,7 +744,7 @@ P5Y2M10DT15H. The example above indicates a
                 </xs:annotation>
                 <xs:complexType>
                     <xs:complexContent>
-                        <xs:extension base="URI_Type">
+                        <xs:extension base="anyURI_Stype">
                             <xs:attribute name="targetItemText" type="xs:string">
                                 <xs:annotation>
                                     <xs:documentation>Displayed text on the targetted item.</xs:documentation>
@@ -1346,7 +777,7 @@ P5Y2M10DT15H. The example above indicates a
                 </xs:annotation>
                 <xs:complexType>
                     <xs:complexContent>
-                        <xs:extension base="TextType">
+                        <xs:extension base="string_Stype">
                             <xs:attribute name="targetItemText" type="xs:string">
                                 <xs:annotation>
                                     <xs:documentation>Displayed text on the targetted item.</xs:documentation>
@@ -1366,7 +797,7 @@ P5Y2M10DT15H. The example above indicates a
             <xs:extension base="ExtensionBaseType">
                 <xs:sequence>
                     <xs:group ref="ItemTarget"/>
-                    <xs:element name="NewValue" type="DataTypesType">
+                    <xs:element name="NewValue" type="DataTypes_SType">
                         <xs:annotation>
                             <xs:documentation>The new value that the targeted item's content is set to.</xs:documentation>
                         </xs:annotation>
@@ -1382,16 +813,16 @@ P5Y2M10DT15H. The example above indicates a
         <xs:complexContent>
             <xs:extension base="ExtensionBaseType">
                 <xs:sequence>
-                    <xs:element minOccurs="0" name="FileDate" type="DateTimeType"> </xs:element>
+                    <xs:element minOccurs="0" name="FileDate" type="dateTime_Stype"> </xs:element>
                     <xs:element minOccurs="0" name="PreviousRevisionDate" maxOccurs="unbounded"
-                        type="DateTimeType"> </xs:element>
-                    <xs:element minOccurs="0" name="ReleaseDate" type="DateTimeType"> </xs:element>
-                    <xs:element minOccurs="0" name="EffectiveDate" type="DateTimeType"> </xs:element>
-                    <xs:element minOccurs="0" name="FirstReleaseDate" type="DateTimeType"> </xs:element>
-                    <xs:element minOccurs="0" name="UsageStartDate" type="DateTimeType"> </xs:element>
-                    <xs:element minOccurs="0" name="RetirementDate" type="DateTimeType"> </xs:element>
+                        type="dateTime_Stype"> </xs:element>
+                    <xs:element minOccurs="0" name="ReleaseDate" type="dateTime_Stype"> </xs:element>
+                    <xs:element minOccurs="0" name="EffectiveDate" type="dateTime_Stype"> </xs:element>
+                    <xs:element minOccurs="0" name="FirstReleaseDate" type="dateTime_Stype"> </xs:element>
+                    <xs:element minOccurs="0" name="UsageStartDate" type="dateTime_Stype"> </xs:element>
+                    <xs:element minOccurs="0" name="RetirementDate" type="dateTime_Stype"> </xs:element>
                     <xs:element minOccurs="0" name="OtherDate" maxOccurs="unbounded"
-                        type="DateTimeType"> </xs:element>
+                        type="dateTime_Stype"> </xs:element>
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>
@@ -1406,95 +837,13 @@ P5Y2M10DT15H. The example above indicates a
         <xs:complexContent>
             <xs:extension base="ExtensionBaseType">
                 <xs:sequence>
-                    <xs:element maxOccurs="1" minOccurs="0" name="HTML" type="HTMLType">
+                    <xs:element maxOccurs="1" minOccurs="0" name="HTML" type="HTML_Stype">
                         <xs:annotation>
                             <xs:documentation>Contains optional HTML formatting. The HTML must reflect the contents of the UTF8Text element. (Future modelling may include a Schema to restrict the HTML formatting.) </xs:documentation>
                         </xs:annotation>
                     </xs:element>
                 </xs:sequence>
                 <xs:attribute name="val" type="xs:string" use="optional"/>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:complexType name="TextType">
-        <xs:annotation>
-            <xs:documentation>Representation of plain text, with optional BaseType metadata to aid programmatic manipulation.  Used for template design and template metadata, not for form reponses.  Use SDCDataTypes for form responses.</xs:documentation>
-        </xs:annotation>
-        <xs:complexContent>
-            <xs:extension base="BaseType">
-                <xs:attribute name="val" type="xs:string" use="required"/>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:complexType name="DateType">
-        <xs:annotation>
-            <xs:documentation>Representation of dates, with optional SDCBaseType metadata to aid programmatic manipulation.  Used for template design and template metadata, not for form reponses.  Use SDCDataTypes for form responses.</xs:documentation>
-        </xs:annotation>
-        <xs:complexContent>
-            <xs:extension base="BaseType">
-                <xs:attribute name="val" type="xs:date" use="optional"/>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:complexType name="DateTimeType">
-        <xs:annotation>
-            <xs:documentation>Representation of dateTime data, with optional SDCBaseType metadata to aid programmatic manipulation.  Used for template design and template metadata, not for form reponses.  Use SDCDataTypes for form responses.</xs:documentation>
-        </xs:annotation>
-        <xs:complexContent>
-            <xs:extension base="BaseType">
-                <xs:attribute name="val" type="xs:dateTime" use="optional"/>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:complexType name="TimeType">
-        <xs:annotation>
-            <xs:documentation>Representation of time data, with optional SDCBaseType metadata to aid programmatic manipulation.  Used for template design and template metadata, not for form reponses.  Use SDCDataTypes for form responses.</xs:documentation>
-        </xs:annotation>
-        <xs:complexContent>
-            <xs:extension base="BaseType">
-                <xs:attribute name="val" type="xs:time" use="optional"/>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:complexType name="PositiveIntegerType">
-        <xs:annotation>
-            <xs:documentation>Representation of integer data, with optional SDCBaseType metadata to aid programmatic manipulation.  Used for template design and template metadata, not for form reponses.  Use SDCDataTypes for form responses.</xs:documentation>
-        </xs:annotation>
-        <xs:complexContent>
-            <xs:extension base="BaseType">
-                <xs:attribute name="val" type="xs:positiveInteger" use="optional"/>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:complexType name="Base64BinaryType">
-        <xs:annotation>
-            <xs:documentation>Representation of integer data, with optional SDCBaseType metadata to aid programmatic manipulation.  Used for template design and template metadata, not for form reponses.  Use SDCDataTypes for form responses.</xs:documentation>
-        </xs:annotation>
-        <xs:complexContent>
-            <xs:extension base="BaseType">
-                <xs:attribute form="unqualified" name="mimeType" type="xs:string" use="optional">
-                    <xs:annotation>
-                        <xs:documentation>TBD: Must be a valid MIME type - needs
-                    enumeration</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute form="unqualified" name="blobType" type="xs:string" use="optional">
-                    <xs:annotation>
-                        <xs:documentation>Type of Blob if it does not have a @MIME_Type</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute name="length" type="xs:long"/>
-                <xs:attribute name="val" type="xs:base64Binary" use="optional"/>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:complexType name="IntegerType">
-        <xs:annotation>
-            <xs:documentation>Representation of integer data, with optional SDCBaseType metadata to aid programmatic manipulation.  Used for template design and template metadata, not for form reponses.  Use SDCDataTypes for form responses.</xs:documentation>
-        </xs:annotation>
-        <xs:complexContent>
-            <xs:extension base="BaseType">
-                <xs:attribute name="val" type="xs:integer" use="optional"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -1510,7 +859,7 @@ P5Y2M10DT15H. The example above indicates a
                             <xs:documentation>A description of the URI link, usually for display purposes.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element maxOccurs="1" minOccurs="1" name="LinkURI" type="URI_Type">
+                    <xs:element maxOccurs="1" minOccurs="1" name="LinkURI" type="anyURI_Stype">
                         <xs:annotation>
                             <xs:documentation>Link to external information.</xs:documentation>
                         </xs:annotation>
@@ -1531,7 +880,7 @@ P5Y2M10DT15H. The example above indicates a
             <xs:documentation>UnitsType represents the measurement standard and its abbreviated notation for quantifiable objects, e.g., miles, km, mm, cm, etc. The default system for standard notations is UCUM.</xs:documentation>
         </xs:annotation>
         <xs:complexContent>
-            <xs:extension base="TextType">
+            <xs:extension base="string_Stype">
                 <xs:attribute default="UCUM" name="unitSystem" type="xs:string" use="optional"/>
             </xs:extension>
         </xs:complexContent>
@@ -1549,11 +898,11 @@ P5Y2M10DT15H. The example above indicates a
                                 <xs:extension base="BaseType">
                                     <xs:sequence maxOccurs="1">
                                         <xs:element maxOccurs="1" minOccurs="1" name="Endpoint"
-                                            type="URI_Type"/>
+                                            type="anyURI_Stype"/>
                                         <xs:element maxOccurs="1" minOccurs="1"
-                                            name="EndpointDescription" type="TextType"/>
+                                            name="EndpointDescription" type="string_Stype"/>
                                         <xs:element maxOccurs="unbounded" minOccurs="0"
-                                            name="SubmissionTechnology" type="TextType"/>
+                                            name="SubmissionTechnology" type="string_Stype"/>
                                         <xs:element maxOccurs="1" minOccurs="0" name="Organization"
                                             type="OrganizationType"/>
                                     </xs:sequence>
@@ -1561,10 +910,10 @@ P5Y2M10DT15H. The example above indicates a
                             </xs:complexContent>
                         </xs:complexType>
                     </xs:element>
-                    <xs:element minOccurs="0" name="RuleDescription" type="TextType"/>
+                    <xs:element minOccurs="0" name="RuleDescription" type="string_Stype"/>
                 </xs:sequence>
-                <xs:attribute name="formID" type="URI_Stype"/>
-                <xs:attribute name="ruleID" type="URI_Stype" use="required"/>
+                <xs:attribute name="formID" type="URI_Atype"/>
+                <xs:attribute name="ruleID" type="URI_Atype" use="required"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -1575,12 +924,12 @@ P5Y2M10DT15H. The example above indicates a
         <xs:complexContent>
             <xs:extension base="ExtensionBaseType">
                 <xs:sequence>
-                    <xs:element maxOccurs="1" minOccurs="1" name="Description" type="TextType"/>
+                    <xs:element maxOccurs="1" minOccurs="1" name="Description" type="string_Stype"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="ComplianceOrganization"
                         type="OrganizationType"/>
                 </xs:sequence>
-                <xs:attribute name="ruleID" type="URI_Stype" use="required"/>
-                <xs:attribute name="formID" type="URI_Stype"/>
+                <xs:attribute name="ruleID" type="URI_Atype" use="required"/>
+                <xs:attribute name="formID" type="URI_Atype"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -1593,7 +942,7 @@ P5Y2M10DT15H. The example above indicates a
                 <xs:documentation>Globally unique identifier for this template</xs:documentation>
             </xs:annotation>
             <xs:simpleType>
-                <xs:restriction base="URI_Stype">
+                <xs:restriction base="URI_Atype">
                     <xs:minLength value="1"/>
                 </xs:restriction>
             </xs:simpleType>
@@ -1603,7 +952,7 @@ P5Y2M10DT15H. The example above indicates a
                 <xs:documentation>Globally unique identifier for the template targeted by this template</xs:documentation>
             </xs:annotation>
             <xs:simpleType>
-                <xs:restriction base="URI_Stype">
+                <xs:restriction base="URI_Atype">
                     <xs:minLength value="1"/>
                 </xs:restriction>
             </xs:simpleType>
@@ -1611,9 +960,9 @@ P5Y2M10DT15H. The example above indicates a
     </xs:attributeGroup>
     <xs:complexType name="EmailAddressType">
         <xs:complexContent>
-            <xs:restriction base="TextType">
+            <xs:extension base="BaseType">
                 <xs:attribute name="val" use="required" type="EmailAddress_Stype"> </xs:attribute>
-            </xs:restriction>
+            </xs:extension>
         </xs:complexContent>
     </xs:complexType>
     <xs:simpleType name="EmailAddress_Stype">
@@ -1623,9 +972,9 @@ P5Y2M10DT15H. The example above indicates a
     </xs:simpleType>
     <xs:complexType name="PhoneNumberType">
         <xs:complexContent>
-            <xs:restriction base="TextType">
+            <xs:extension base="BaseType">
                 <xs:attribute name="val" use="required" type="PhoneNumber_Stype"> </xs:attribute>
-            </xs:restriction>
+            </xs:extension>
         </xs:complexContent>
     </xs:complexType>
     <xs:simpleType name="PhoneNumber_Stype">
@@ -1657,49 +1006,10 @@ P5Y2M10DT15H. The example above indicates a
             <xs:maxInclusive value="99"/>
         </xs:restriction>
     </xs:simpleType>
-    <xs:complexType name="URI_Type">
-        <xs:annotation>
-            <xs:documentation>Representation of a URI identifier, with optional format metadata to aid XML readability and programmatic manipulation.</xs:documentation>
-        </xs:annotation>
-        <xs:complexContent>
-            <xs:extension base="BaseType">
-                <xs:attribute name="val" type="URI_Stype" use="required"> </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:simpleType name="URI_Stype" final="">
-        <xs:restriction base="xs:anyURI">
-            <xs:minLength value="1"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:complexType name="URL_Type">
-        <xs:complexContent>
-            <xs:extension base="BaseType">
-                <xs:attribute name="val" type="URL_Stype" use="required"> </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:simpleType name="URL_Stype" final="">
-        <xs:restriction base="xs:anyURI">
-            <!--<xs:pattern value="(http?s?\:\/\/)?[a-zA-Z0-9%/\s\-\.]+\.[a-zA-Z0-9%/\s\-\.]{1,}"/>-->
-            <xs:whiteSpace value="collapse"/>
-        </xs:restriction>
-    </xs:simpleType>
     <xs:complexType name="LanguageCode.ISO.639.3_Type">
         <xs:complexContent>
-            <xs:restriction base="TextType">
-                <xs:attribute name="val" use="required">
-                    <xs:simpleType>
-                        <xs:annotation>
-                            <xs:documentation> Based on ISO-639-3 Language Codes. See:
- https://en.wikipedia.org/wiki/ISO_639:e</xs:documentation>
-                        </xs:annotation>
-                        <xs:restriction base="xs:string">
-                            <xs:enumeration value="eng"/>
-                            <xs:enumeration value="esp"/>
-                            <xs:enumeration value="fra"/>
-                        </xs:restriction>
-                    </xs:simpleType>
+            <xs:restriction base="string_Stype">
+                <xs:attribute name="val" use="required" type="LanguageCode.ISO.639.3_Stype">
                 </xs:attribute>
             </xs:restriction>
         </xs:complexContent>
@@ -1715,14 +1025,6 @@ P5Y2M10DT15H. The example above indicates a
             <xs:enumeration value="fra"/>
         </xs:restriction>
     </xs:simpleType>
-    <xs:complexType name="HTMLType">
-        <xs:annotation>
-            <xs:documentation>Structure to contain XHTML.</xs:documentation>
-        </xs:annotation>
-        <xs:complexContent>
-            <xs:extension base="ExtensionType"> </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
     <xs:complexType name="NameType">
         <xs:annotation>
             <xs:documentation>Structure to define a person's name, including prefixes, suffixes, and degrees.</xs:documentation>
@@ -1730,18 +1032,18 @@ P5Y2M10DT15H. The example above indicates a
         <xs:complexContent>
             <xs:extension base="ExtensionBaseType">
                 <xs:sequence>
-                    <xs:element name="NamePrefix" type="TextType" minOccurs="0"/>
-                    <xs:element name="FirstName" type="TextType" nillable="true"/>
-                    <xs:element name="MiddleName" type="TextType" minOccurs="0"/>
-                    <xs:element name="LastName" type="TextType" nillable="true"/>
-                    <xs:element name="NameSuffix" type="TextType" minOccurs="0"/>
-                    <xs:element name="DegreeCert" type="TextType" maxOccurs="unbounded"
+                    <xs:element name="NamePrefix" type="string_Stype" minOccurs="0"/>
+                    <xs:element name="FirstName" type="string_Stype" nillable="true"/>
+                    <xs:element name="MiddleName" type="string_Stype" minOccurs="0"/>
+                    <xs:element name="LastName" type="string_Stype" nillable="true"/>
+                    <xs:element name="NameSuffix" type="string_Stype" minOccurs="0"/>
+                    <xs:element name="DegreeCert" type="string_Stype" maxOccurs="unbounded"
                         minOccurs="0">
                         <xs:annotation>
                             <xs:documentation>Acronyms for degrees and certifications, e.g., MD, PhD, FACP (repeat element for each acronym)</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element name="Title" type="TextType" minOccurs="0"/>
+                    <xs:element name="Title" type="string_Stype" minOccurs="0"/>
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>
@@ -1768,12 +1070,12 @@ P5Y2M10DT15H. The example above indicates a
         </xs:complexContent>
     </xs:complexType>
     <xs:attributeGroup name="IDAttributes">
-        <xs:attribute name="ID" type="URI_Stype" use="required">
+        <xs:attribute name="ID" type="URI_Atype" use="required">
             <xs:annotation>
                 <xs:documentation>A unique identifier for critical types in FormDesign.</xs:documentation>
             </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="baseURI" type="URI_Stype">
+        <xs:attribute name="baseURI" type="URI_Atype">
             <xs:annotation>
                 <xs:documentation>If the ID does not use the default base URI (namespace), then the local base URI goes here. Note that all IDs must be unique, even if they do not have the same base URI. </xs:documentation>
             </xs:annotation>
@@ -1846,17 +1148,10 @@ P5Y2M10DT15H. The example above indicates a
         <xs:complexContent>
             <xs:extension base="ExtensionBaseType">
                 <xs:sequence>
-                    <xs:element name="ChangeEditor">
-                        <xs:complexType>
-                            <xs:complexContent>
-                                <xs:extension base="PersonType">
-                                    <xs:attributeGroup ref="baseAttributes"/>
-                                </xs:extension>
-                            </xs:complexContent>
-                        </xs:complexType>
-                    </xs:element>
-                    <xs:element name="ChangeDateTime" type="DateTimeType"/>
-                    <xs:element name="ChangeComment" type="TextType" maxOccurs="1" minOccurs="0"> </xs:element>
+                    <xs:element name="ChangeEditor" type="PersonType"> </xs:element>
+                    <xs:element name="ChangeDateTime" type="dateTime_Stype"/>
+                    <xs:element name="ChangeComment" type="string_Stype" maxOccurs="1" minOccurs="0"
+                        > </xs:element>
                     <xs:element maxOccurs="1" minOccurs="0" name="ReplacedResponse"
                         type="ReplacedResponseType">
                         <xs:annotation>
@@ -1879,31 +1174,25 @@ P5Y2M10DT15H. The example above indicates a
         <xs:complexContent>
             <xs:extension base="ExtensionBaseType">
                 <xs:sequence>
-                    <xs:element name="ResponseComment" type="TextType" maxOccurs="1" minOccurs="0">
+                    <xs:element name="ResponseComment" type="string_Stype" maxOccurs="1"
+                        minOccurs="0">
                         <xs:annotation>
                             <xs:documentation>Comment on the replaced response at the time it was first entered.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element name="ResponseEditor" minOccurs="0">
+                    <xs:element name="ResponseEditor" minOccurs="0" type="PersonType">
                         <xs:annotation>
                             <xs:documentation>Editor of the replaced response when it was first entered.</xs:documentation>
                         </xs:annotation>
-                        <xs:complexType>
-                            <xs:complexContent>
-                                <xs:extension base="PersonType">
-                                    <xs:attributeGroup ref="baseAttributes"/>
-                                </xs:extension>
-                            </xs:complexContent>
-                        </xs:complexType>
                     </xs:element>
-                    <xs:element name="ResponseDateTime" type="DateTimeType" nillable="true">
+                    <xs:element name="ResponseDateTime" type="dateTime_Stype" nillable="true">
                         <xs:annotation>
                             <xs:documentation>Date/Time that the replaced response was first entered.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
                     <xs:choice>
-                        <xs:element minOccurs="1" name="Response" type="DataTypesType" maxOccurs="1"
-                            nillable="true">
+                        <xs:element minOccurs="1" name="Response" type="DataTypes_SType"
+                            maxOccurs="1" nillable="true">
                             <xs:annotation>
                                 <xs:documentation>If the question required a fill-in response, then the replaced response is recorded here.</xs:documentation>
                             </xs:annotation>
@@ -1937,41 +1226,17 @@ P5Y2M10DT15H. The example above indicates a
         </xs:complexContent>
     </xs:complexType>
     <xs:complexType name="ChangedListItemType">
-        <xs:annotation>
-            <xs:documentation>Supports documentation of changes to ListItemResponse objects.  </xs:documentation>
-        </xs:annotation>
         <xs:complexContent>
-            <xs:extension base="ExtensionBaseType">
+            <xs:extension base="IdentifiedExtensionType">
                 <xs:sequence>
-                    <xs:element minOccurs="0" name="ListItemResponse" type="DataTypesType"
+                    <xs:element minOccurs="0" name="ListItemResponse" type="DataTypes_SType"
                         maxOccurs="1">
                         <xs:annotation>
                             <xs:documentation>If the selected ListItem contained a fill-in Response, then the value is recorded here.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
                 </xs:sequence>
-                <xs:attributeGroup ref="IDAttributes"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:attributeGroup name="X_DockingAttributes">
-        <xs:attribute name="vertDock">
-            <xs:simpleType>
-                <xs:restriction base="xs:NMTOKEN">
-                    <xs:enumeration value="top"/>
-                    <xs:enumeration value="bottom"/>
-                    <xs:enumeration value="center"/>
-                </xs:restriction>
-            </xs:simpleType>
-        </xs:attribute>
-        <xs:attribute name="horizDock">
-            <xs:simpleType>
-                <xs:restriction base="xs:NMTOKEN">
-                    <xs:enumeration value="left"/>
-                    <xs:enumeration value="right"/>
-                    <xs:enumeration value="center"/>
-                </xs:restriction>
-            </xs:simpleType>
-        </xs:attribute>
-    </xs:attributeGroup>
 </xs:schema>

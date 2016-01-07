@@ -26,19 +26,19 @@
                             <xs:documentation>Any information about this data transmission may be entered here.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element name="DemogFormResponses" type="FormReponsesType" minOccurs="0"
+                    <xs:element name="DemogFormResponses" type="FormResponsesType" minOccurs="0"
                         maxOccurs="1"/>
-                    <xs:element name="MainFormReponses" type="FormReponsesType" minOccurs="1"
+                    <xs:element name="MainFormReponses" type="FormResponsesType" minOccurs="1"
                         maxOccurs="1"/>
                     <xs:element name="FormResponsesPkg" type="FormResponsesPkgType"
                         maxOccurs="unbounded" minOccurs="0"> </xs:element>
                 </xs:sequence>
-                <xs:attribute name="formPackageID" use="required" type="URI_Stype"/>
+                <xs:attribute name="formPackageID" use="required" type="URI_Atype"/>
                 <xs:attributeGroup ref="ResponseAttributes"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:complexType name="FormReponsesType">
+    <xs:complexType name="FormResponsesType">
         <xs:complexContent>
             <xs:extension base="FormDesignType">
                 <xs:attributeGroup ref="ResponseAttributes"/>

@@ -35,29 +35,29 @@
                         </xs:annotation>
                         <xs:complexType>
                             <xs:complexContent>
-                                <xs:extension base="TextType">
+                                <xs:extension base="string_Stype">
                                     <xs:attribute name="password" type="xs:string"/>
                                     <xs:attribute name="userName" type="xs:string"/>
                                 </xs:extension>
                             </xs:complexContent>
                         </xs:complexType>
                     </xs:element>
-                    <xs:element name="DataStoreLocation" type="TextType">
+                    <xs:element name="DataStoreLocation" type="string_Stype">
                         <xs:annotation>
                             <xs:documentation>The path to the database server.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element name="DatabaseSoftware" type="TextType" minOccurs="1"/>
-                    <xs:element name="DatabaseName" type="TextType"/>
-                    <xs:element name="ConnectiontonString" type="TextType"/>
-                    <xs:element name="OtherConnectionParameters" type="TextType" minOccurs="0"/>
+                    <xs:element name="DatabaseSoftware" type="string_Stype" minOccurs="1"/>
+                    <xs:element name="DatabaseName" type="string_Stype"/>
+                    <xs:element name="ConnectiontonString" type="string_Stype"/>
+                    <xs:element name="OtherConnectionParameters" type="string_Stype" minOccurs="0"/>
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
     <xs:complexType name="SQL_Type">
         <xs:complexContent>
-            <xs:extension base="TextType">
+            <xs:extension base="string_Stype">
                 <xs:attribute name="sqlDialect" type="xs:string"/>
                 <xs:attribute name="sqlDialectVersion" type="xs:string"/>
             </xs:extension>
@@ -65,14 +65,14 @@
     </xs:complexType>
     <xs:complexType name="XQueryType">
         <xs:complexContent>
-            <xs:extension base="TextType">
+            <xs:extension base="string_Stype">
                 <xs:attribute name="version" type="xs:string"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
     <xs:complexType name="XPathType">
         <xs:complexContent>
-            <xs:extension base="TextType">
+            <xs:extension base="string_Stype">
                 <xs:attribute name="version" type="xs:string"/>
             </xs:extension>
         </xs:complexContent>
@@ -117,7 +117,7 @@
                                 <xs:extension base="DataStoreType">
                                     <xs:choice>
                                         <xs:element name="XPath" type="XPathType"/>
-                                        <xs:element name="ItemID" type="TextType"/>
+                                        <xs:element name="ItemID" type="string_Stype"/>
                                         <xs:element name="SQL" type="SQL_Type"/>
                                         <xs:element name="XQuery" type="XQueryType"/>
                                     </xs:choice>
@@ -138,7 +138,7 @@
         <xs:complexContent>
             <xs:extension base="ExtensionBaseType">
                 <xs:sequence>
-                    <xs:element name="TargetItemID" type="URI_Type"> </xs:element>
+                    <xs:element name="TargetItemID" type="anyURI_Stype"> </xs:element>
                     <xs:element name="TargetDisplayText" maxOccurs="1" minOccurs="0"
                         type="RichTextType"/>
                 </xs:sequence>

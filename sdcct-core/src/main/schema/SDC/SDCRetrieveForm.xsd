@@ -185,7 +185,7 @@ FormPackageModules contains one FormDesignPkg (describes the form content), seve
                                             <xs:documentation>Globally unique identifier for the template targeted by this template</xs:documentation>
                                         </xs:annotation>
                                         <xs:simpleType>
-                                            <xs:restriction base="URI_Stype"> </xs:restriction>
+                                            <xs:restriction base="URI_Atype"> </xs:restriction>
                                         </xs:simpleType>
                                     </xs:attribute>
                                 </xs:extension>
@@ -253,7 +253,7 @@ It also allows for any number of nested child Packages.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
                 </xs:sequence>
-                <xs:attribute form="unqualified" name="packageID" type="URI_Stype" use="required"/>
+                <xs:attribute form="unqualified" name="packageID" type="URI_Atype" use="required"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

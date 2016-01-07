@@ -58,7 +58,7 @@
         <xs:complexContent>
             <xs:extension base="ExtensionBaseType">
                 <xs:choice>
-                    <xs:element name="RegistryName" type="TextType"/>
+                    <xs:element name="RegistryName" type="string_Stype"/>
                     <xs:element name="Contact" type="ContactType" maxOccurs="unbounded"
                         minOccurs="0">
                         <xs:annotation>
@@ -66,7 +66,7 @@
                         </xs:annotation>
                     </xs:element>
                     <xs:element maxOccurs="1" minOccurs="0" name="ReferenceStandardIdentifier"
-                        type="TextType"/>
+                        type="string_Stype"/>
                     <xs:element maxOccurs="1" minOccurs="0" name="ServiceLevelAgreement"
                         type="FileType"/>
                     <xs:element maxOccurs="1" minOccurs="0" name="RegistryPurpose" type="FileType">
@@ -130,16 +130,17 @@
                 <xs:sequence>
                     <xs:element name="Acceptability" type="AcceptabilityType"> </xs:element>
                     <xs:element maxOccurs="1" minOccurs="0" name="AdministrativeStatus"
-                        type="TextType"/>
+                        type="string_Stype"/>
                     <xs:element maxOccurs="1" minOccurs="0" name="AdministrativeNote"
-                        type="TextType"/>
+                        type="string_Stype"/>
                     <xs:element maxOccurs="1" minOccurs="1" name="RegistrationStatus"
-                        type="TextType"/>
+                        type="string_Stype"/>
                     <xs:element name="RegistrationStatusDate" minOccurs="0" maxOccurs="1"
-                        type="DateType"> </xs:element>
-                    <xs:element maxOccurs="1" minOccurs="0" name="EffectiveDate" type="DateType"> </xs:element>
-                    <xs:element maxOccurs="1" minOccurs="0" name="UntilDate" type="DateType"> </xs:element>
-                    <xs:element maxOccurs="1" minOccurs="0" name="PreviousStatus" type="TextType"/>
+                        type="date_Stype"> </xs:element>
+                    <xs:element maxOccurs="1" minOccurs="0" name="EffectiveDate" type="date_Stype"> </xs:element>
+                    <xs:element maxOccurs="1" minOccurs="0" name="UntilDate" type="date_Stype"> </xs:element>
+                    <xs:element maxOccurs="1" minOccurs="0" name="PreviousStatus"
+                        type="string_Stype"/>
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>
@@ -151,11 +152,11 @@
         <xs:complexContent>
             <xs:extension base="ExtensionBaseType">
                 <xs:sequence minOccurs="0">
-                    <xs:element maxOccurs="1" minOccurs="0" name="Identifer" type="TextType"/>
-                    <xs:element maxOccurs="1" minOccurs="0" name="InterfaceName" type="TextType"/>
-                    <xs:element maxOccurs="1" minOccurs="0" name="Description" type="TextType"/>
-                    <xs:element maxOccurs="1" minOccurs="0" name="URL" type="TextType"/>
-                    <xs:element maxOccurs="1" minOccurs="0" name="Version" type="TextType"/>
+                    <xs:element maxOccurs="1" minOccurs="0" name="Identifer" type="string_Stype"/>
+                    <xs:element maxOccurs="1" minOccurs="0" name="InterfaceName" type="string_Stype"/>
+                    <xs:element maxOccurs="1" minOccurs="0" name="Description" type="string_Stype"/>
+                    <xs:element maxOccurs="1" minOccurs="0" name="URL" type="string_Stype"/>
+                    <xs:element maxOccurs="1" minOccurs="0" name="Version" type="string_Stype"/>
                     <xs:element minOccurs="0" name="Fields">
                         <xs:complexType>
                             <xs:complexContent>
@@ -167,11 +168,11 @@
                                                   <xs:extension base="ExtensionBaseType">
                                                   <xs:sequence>
                                                   <xs:element minOccurs="0" name="Getter"
-                                                  type="TextType"> </xs:element>
+                                                  type="string_Stype"> </xs:element>
                                                   <xs:element minOccurs="0" name="Setter"
-                                                  type="TextType"> </xs:element>
+                                                  type="string_Stype"> </xs:element>
                                                   <xs:element minOccurs="0" name="Action"
-                                                  type="TextType"> </xs:element>
+                                                  type="string_Stype"> </xs:element>
                                                   </xs:sequence>
                                                   </xs:extension>
                                                 </xs:complexContent>

@@ -83,7 +83,7 @@
                     information content of a form.</xs:documentation>
             </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="styleClass" type="xs:string">
+        <xs:attribute name="styleClass" type="xs:NMTOKENS">
             <xs:annotation>
                 <xs:documentation>Developer assigned class name for display styling, generally for
                     use with an external style sheet.</xs:documentation>
