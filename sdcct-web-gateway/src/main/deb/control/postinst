@@ -1,0 +1,51 @@
+#!/bin/bash
+
+set -e
+
+adminGroup="adm"
+pkgName="%{project.artifactId}"
+pkgUser="%{project.artifactId}"
+pkgGroup="%{project.artifactId}"
+
+rootDir="$(pwd)"
+rootDir="${rootDir#*/}"
+
+case "$1" in
+    abort-deconfigure|abort-remove|abort-upgrade)
+        ;;
+    
+    configure)
+        cacheDir="${rootDir}/var/cache/${pkgName}"
+        logDir="${rootDir}/var/log/${pkgName}"
+        runDir="${rootDir}/var/run/${pkgName}"
+        shareDir="${rootDir}/usr/share/${pkgName}"
+        varDir="${rootDir}/var/lib/${pkgName}"
+        
+        users="$(cut -d ":" -f 1 <"${rootDir}/etc/passwd" | sort)"
+        groups="$(cut -d ":" -f 1 <"${rootDir}/etc/group" | sort)"
+        
+        [[ -n "$(printf "--" '%s\n%s' "${groups}" "${pkgGroup}" | sort | uniq -d)" ]] || \
+            groupadd \
+                -r \
+                "${pkgGroup}"
+        
+        [[ -n "$(printf "--" '%s\n%s' "${users}" "${pkgUser}" | sort | uniq -d)" ]] || \
+            useradd \
+                -d "${shareDir}" \
+                -g "${pkgGroup}" \
+                -M \
+                -N \
+                -r \
+                -s "/bin/false" \
+                "${pkgUser}"
+        
+        chown -R "${pkgUser}:${pkgGroup}" "${cacheDir}"
+        chown -R "${pkgUser}:${adminGroup}" "${logDir}"
+        chown -R "${pkgUser}:${pkgGroup}" "${runDir}"
+        chown -R "${pkgUser}:${pkgGroup}" "${varDir}"
+        
+        update-rc.d "${pkgName}" "defaults"
+        ;;
+esac
+
+exit 0

@@ -1,6 +1,8 @@
 package gov.hhs.onc.sdcct.context.impl;
 
+import gov.hhs.onc.sdcct.utils.SdcctResourceUtils;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.boot.Banner.Mode;
@@ -30,8 +32,10 @@ public abstract class SdcctApplicationConfiguration {
         }
     }
 
-    private final static String SRCS_RESOURCE_LOC_PATTERN = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "META-INF/sdcct/spring/spring-sdcct*.xml";
-    private final static String PROP_SRCS_RESOURCE_LOC_PATTERN = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "META-INF/sdcct/sdcct*.properties";
+    private final static String SRCS_RESOURCE_LOC_PATTERN = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + SdcctResourceUtils.META_INF_APP_PATH_PREFIX
+        + "spring/spring-sdcct*.xml";
+    private final static String PROP_SRCS_RESOURCE_LOC_PATTERN = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + SdcctResourceUtils.META_INF_APP_PATH_PREFIX
+        + "sdcct*.properties";
 
     private final static String PROP_SRC_NAME = "appProperties";
 
@@ -43,13 +47,14 @@ public abstract class SdcctApplicationConfiguration {
         ResourceLoader resourceLoader = new DefaultResourceLoader();
         ResourcePatternResolver resourcePatternResolver = ResourcePatternUtils.getResourcePatternResolver(resourceLoader);
 
-        SdcctApplication app = ((SdcctApplication) new SdcctApplicationBuilder(buildSources(resourcePatternResolver)).addCommandLineProperties(false)
-            .bannerMode(Mode.OFF).headless(true).resourceLoader(resourceLoader).application());
+        SdcctApplication app =
+            ((SdcctApplication) new SdcctApplicationBuilder(buildSources(resourcePatternResolver)).addCommandLineProperties(false).bannerMode(Mode.OFF)
+                .headless(true).resourceLoader(resourceLoader).application());
 
         app.setPropertySource(buildPropertySource(resourcePatternResolver));
 
-        app.setListeners(
-            app.getListeners().stream().filter((appListener -> !appListener.getClass().equals(LoggingApplicationListener.class))).collect(Collectors.toList()));
+        app.setListeners(app.getListeners().stream().filter((appListener -> !appListener.getClass().equals(LoggingApplicationListener.class)))
+            .collect(Collectors.toList()));
 
         return app;
     }
@@ -60,16 +65,18 @@ public abstract class SdcctApplicationConfiguration {
         try {
             propSrcResources = resourcePatternResolver.getResources(PROP_SRCS_RESOURCE_LOC_PATTERN);
         } catch (IOException e) {
-            throw new ApplicationContextException(
-                String.format("Unable to resolve application property source resource(s) for pattern: %s", PROP_SRCS_RESOURCE_LOC_PATTERN), e);
+            throw new ApplicationContextException(String.format("Unable to resolve application property source resource(s) for pattern: %s",
+                PROP_SRCS_RESOURCE_LOC_PATTERN), e);
         }
+
+        Arrays.sort(propSrcResources, SdcctResourceUtils.LOC_COMPARATOR);
 
         CompositePropertySource propSrc = new CompositePropertySource(PROP_SRC_NAME);
 
         for (Resource propSrcResource : propSrcResources) {
             try {
-                propSrc.addFirstPropertySource(
-                    new PropertiesPropertySource(propSrcResource.getURI().toString(), PropertiesLoaderUtils.loadProperties(propSrcResource)));
+                propSrc.addFirstPropertySource(new PropertiesPropertySource(propSrcResource.getURI().toString(), PropertiesLoaderUtils
+                    .loadProperties(propSrcResource)));
             } catch (IOException e) {
                 throw new ApplicationContextException(String.format("Unable to load application property source resource (fileName=%s, desc=%s).",
                     propSrcResource.getFilename(), propSrcResource.getDescription()), e);
@@ -81,8 +88,8 @@ public abstract class SdcctApplicationConfiguration {
 
     private static Object[] buildSources(ResourcePatternResolver resourcePatternResolver) {
         try {
-            return Stream.concat(Stream.of(SdcctApplicationConfiguration.class), Stream.of(resourcePatternResolver.getResources(SRCS_RESOURCE_LOC_PATTERN)))
-                .toArray(Object[]::new);
+            return Stream.concat(Stream.of(SdcctApplicationConfiguration.class),
+                Stream.of(resourcePatternResolver.getResources(SRCS_RESOURCE_LOC_PATTERN)).sorted(SdcctResourceUtils.LOC_COMPARATOR)).toArray(Object[]::new);
         } catch (IOException e) {
             throw new ApplicationContextException(String.format("Unable to resolve application source resource(s) for pattern: %s", SRCS_RESOURCE_LOC_PATTERN),
                 e);

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    
+    <!--====================================================================================================
+    = CONDUITS
+    =====================================================================================================-->
+    <beans:bean name="*.http-conduit" class="org.apache.cxf.transport.http.URLConnectionHTTPConduit" lazy-init="true"
+        c:b-ref="bus">
+        <beans:constructor-arg name="ei">
+            <beans:bean class="org.apache.cxf.service.model.EndpointInfo"/>
+        </beans:constructor-arg>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = JAX-RS CLIENTS
+    =====================================================================================================-->
+    <beans:bean id="clientJaxRs" class="gov.hhs.onc.sdcct.ws.impl.SdcctJaxRsClientFactoryBean" abstract="true"
+        p:bus-ref="bus">
+        <beans:property name="conduitSelector">
+            <beans:bean class="org.apache.cxf.endpoint.DeferredConduitSelector"/>
+        </beans:property>
+        <beans:property name="features">
+            <beans:list>
+                <beans:ref bean="featureLogging"/>
+                <beans:ref bean="featureSchemaValidation"/>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+    
+    <beans:bean id="clientFhir" parent="clientJaxRs" abstract="true"/>
+    
+    <!--====================================================================================================
+    = JAX-WS CLIENTS
+    =====================================================================================================-->
+    <beans:bean id="clientJaxWs" class="gov.hhs.onc.sdcct.ws.impl.SdcctJaxWsClientFactoryBean" abstract="true"
+        p:bindingConfig-ref="soapBindingConfig12"
+        p:bus-ref="bus">
+        <beans:property name="conduitSelector">
+            <beans:bean class="org.apache.cxf.endpoint.DeferredConduitSelector"/>
+        </beans:property>
+        <beans:property name="features">
+            <beans:list>
+                <beans:ref bean="featureLogging"/>
+                <beans:ref bean="featureSchemaValidation"/>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+    
+    <beans:bean id="clientRfd" parent="clientJaxWs" abstract="true"
+        p:dataBinding-ref="dataBindingJaxbRfd"/>
+</beans:beans>

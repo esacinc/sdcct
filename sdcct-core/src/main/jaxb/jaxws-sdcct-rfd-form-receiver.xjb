@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jaxws:bindings
+    jaxb:extensionBindingPrefixes="annox xjc"
+    version="2.0"
+    wsdlLocation="../wsdl/RFDFormReceiver.wsdl"
+    xmlns:annox="http://annox.dev.java.net"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    
+    <!--====================================================================================================
+    = GLOBAL
+    =====================================================================================================-->
+    <jaxws:bindings node="wsdl:definitions">
+        <jaxws:enableWrapperStyle>false</jaxws:enableWrapperStyle>
+        <jaxws:package name="gov.hhs.onc.sdcct.rfd"/>
+    </jaxws:bindings>
+    
+    <!--====================================================================================================
+    = PORT TYPES
+    =====================================================================================================-->
+    <jaxws:bindings node="wsdl:definitions/wsdl:portType[@name='RFDFormReceiver_PortType']">
+        <jaxws:class name="gov.hhs.onc.sdcct.rfd.RfdFormReceiverPortType"/>
+    </jaxws:bindings>
+    
+    <!--====================================================================================================
+    = PARAMETERS
+    =====================================================================================================-->
+    <jaxws:bindings node="wsdl:definitions/wsdl:portType[@name='RFDFormReceiver_PortType']/wsdl:operation[@name='RFDFormReceiver_SubmitForm']">
+        <jaxws:method name="submitForm"/>
+        <jaxws:parameter part="wsdl:definitions/wsdl:message[@name='SubmitForm_Message']/wsdl:part[@name='body']" name="reqParams"/>
+        <jaxws:parameter part="wsdl:definitions/wsdl:message[@name='SubmitFormResponse_Message']/wsdl:part[@name='body']" name="respParams"/>
+    </jaxws:bindings>
+</jaxws:bindings>

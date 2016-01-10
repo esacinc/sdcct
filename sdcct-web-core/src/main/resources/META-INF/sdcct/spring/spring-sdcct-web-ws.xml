@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    
+    <!--====================================================================================================
+    = CONTROLLERS
+    =====================================================================================================-->
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="controllerWs" class="gov.hhs.onc.sdcct.web.ws.impl.WebServiceController"
+        p:baseUrlPath="${sdcct.ws.base.url.path}"
+        p:bus-ref="bus"/>
+    
+    <!--====================================================================================================
+    = HANDLER MAPPINGS
+    =====================================================================================================-->
+    <beans:bean id="handlerMappingService" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping"
+        p:order="#{ T(org.springframework.core.Ordered).HIGHEST_PRECEDENCE + 1 }">
+        <beans:property name="urlMap">
+            <beans:map>
+                <!--suppress SpringPlaceholdersInspection -->
+                <beans:entry key="${sdcct.ws.base.url.path}/**" value-ref="controllerWs"/>
+            </beans:map>
+        </beans:property>
+    </beans:bean>
+</beans:beans>

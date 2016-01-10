@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jaxb:bindings
+    jaxb:extensionBindingPrefixes="annox xjc"
+    jaxb:version="2.0"
+    node="/xsd:schema"
+    schemaLocation="../schema/SDC/SDCRetrieveForm.xsd"
+    xmlns:annox="http://annox.dev.java.net"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    
+    <!--====================================================================================================
+    = COMPLEX TYPES
+    =====================================================================================================-->
+    <jaxb:bindings node="xsd:complexType[@name='PackageType']">
+        <annox:annotate target="class">
+            @javax.xml.bind.annotation.XmlRootElement(name = "Package")
+        </annox:annotate>
+    </jaxb:bindings>
+</jaxb:bindings>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    
+    <!--====================================================================================================
+    = MODULES
+    =====================================================================================================-->
+    <beans:bean id="moduleSimple" class="com.fasterxml.jackson.databind.module.SimpleModule" abstract="true">
+        <beans:constructor-arg name="version" value="#{ T(com.fasterxml.jackson.core.Version).unknownVersion() }"/>
+    </beans:bean>
+    
+    <beans:bean id="moduleJdk8" class="com.fasterxml.jackson.datatype.jdk8.Jdk8Module"/>
+    
+    <!--====================================================================================================
+    = OBJECT MAPPERS
+    =====================================================================================================-->
+    <beans:bean id="objMapper" class="gov.hhs.onc.sdcct.json.impl.SdcctObjectMapperFactoryBean"
+        p:autoDetectFields="false">
+        <beans:property name="features">
+            <beans:map>
+                <beans:entry key="#{ T(com.fasterxml.jackson.databind.MapperFeature).AUTO_DETECT_CREATORS }" value="false"/>
+                <beans:entry key="#{ T(com.fasterxml.jackson.databind.MapperFeature).AUTO_DETECT_IS_GETTERS }" value="false"/>
+            </beans:map>
+        </beans:property>
+        <beans:property name="modules">
+            <beans:list>
+                <beans:ref bean="moduleJdk8"/>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+    
+    <!--p:autoDetectGettersSetters="false"-->
+    
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="objMapperPretty" parent="objMapper"
+        p:indentOutput="true"
+        p:indentSpaces="${sdcct.json.render.format.indent.spaces}"/>
+    
+    <!--====================================================================================================
+    = RENDERERS
+    =====================================================================================================-->
+    <beans:bean id="rendererJson" class="gov.hhs.onc.sdcct.json.impl.JsonRenderer" parent="renderer"/>
+</beans:beans>

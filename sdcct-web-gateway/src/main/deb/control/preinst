@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -e
+
+pkgName="%{project.artifactId}"
+pkgUser="%{project.artifactId}"
+pkgGroup="%{project.artifactId}"
+
+rootDir="$(pwd)"
+rootDir="${rootDir#*/}"
+
+case "$1" in
+    abort-upgrade)
+        ;;
+    
+    install|upgrade)
+        ! service "${pkgName}" "status" &>"/dev/null" || service "${pkgName}" "stop"
+        ;;
+esac
+
+exit 0

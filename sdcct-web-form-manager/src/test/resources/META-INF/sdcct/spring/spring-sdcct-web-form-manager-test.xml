@@ -7,5 +7,17 @@
     xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
+    <!--====================================================================================================
+    = JAX-RS CLIENTS
+    =====================================================================================================-->
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="clientFormManagerFhirLocal" parent="clientFormManagerFhir"
+        c:addr="${sdcct.ws.form.manager.fhir.url}"/>
     
+    <!--====================================================================================================
+    = JAX-WS CLIENTS
+    =====================================================================================================-->
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="clientFormManagerRfdLocal" parent="clientFormManagerRfd"
+        c:addr="${sdcct.ws.form.manager.rfd.url}"/>
 </beans:beans>

@@ -1,0 +1,13 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          %{project.artifactId}
+# Required-Start:    $local_fs $remote_fs $network
+# Required-Stop:     $local_fs $remote_fs $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start %{project.artifactId}.
+# Description:       Start %{project.artifactId}.
+### END INIT INFO
+
+SHELL="/bin/sh" \
+"/%{project.build.debShareBinDataDirectoryPath}/%{project.artifactId}" "$@"

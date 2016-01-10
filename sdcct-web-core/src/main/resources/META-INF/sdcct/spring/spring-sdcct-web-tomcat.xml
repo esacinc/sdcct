@@ -8,37 +8,22 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
     <!--====================================================================================================
-    = LIFECYCLE LISTENERS
-    =====================================================================================================-->
-    <beans:bean id="lifecycleListener" class="org.apache.catalina.LifecycleListener" abstract="true"/>
-    
-    <beans:bean id="lifecycleListenerJreMemLeakPrevention" class="org.apache.catalina.core.JreMemoryLeakPreventionListener" parent="lifecycleListener"/>
-    
-    <beans:bean id="lifecycleListenerThreadLocalLeakPrevention" class="org.apache.catalina.core.ThreadLocalLeakPreventionListener" parent="lifecycleListener"/>
-    
-    <!--====================================================================================================
     = EMBEDDED SERVLET CONTAINER FACTORIES
     =====================================================================================================-->
-    <beans:bean id="embeddedServletContainerFactory" class="org.springframework.boot.context.embedded.EmbeddedServletContainerFactory" abstract="true"/>
-    
-    <beans:bean id="embeddedServletContainerFactoryTomcat" class="org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory"
-        parent="embeddedServletContainerFactory" abstract="true"/>
-    
     <!--suppress ELValidationInJSP SpringElInspection SpringPlaceholdersInspection -->
-    <beans:bean id="embeddedServletContainerFactoryTomcatMain" class="gov.hhs.onc.sdcct.web.tomcat.impl.SdcctTomcatEmbeddedServletContainerFactory"
-        parent="embeddedServletContainerFactoryTomcat"
+    <beans:bean id="embeddedServletContainerFactoryTomcat" class="gov.hhs.onc.sdcct.web.tomcat.impl.SdcctTomcatEmbeddedServletContainerFactory"
         p:baseDirectory="#{ app.homeDirectory }"
-        p:connectionTimeout="${sdcct.web.tomcat.server.conn.timeout}"
-        p:contextPath="${sdcct.web.tomcat.server.context.path}"
-        p:documentRoot="${sdcct.web.tomcat.server.doc.root.dir}"
-        p:maxConnections="${sdcct.web.tomcat.server.conn.max}"
-        p:maxConnectionThreads="${sdcct.web.tomcat.server.conn.thread.max}"
-        p:port="${sdcct.web.tomcat.server.port.http}"
+        p:connectionTimeout="${sdcct.tomcat.server.conn.timeout}"
+        p:contextPath="${sdcct.tomcat.server.context.path}"
+        p:documentRoot="${sdcct.tomcat.server.doc.root.dir}"
+        p:maxConnections="${sdcct.tomcat.server.conn.max}"
+        p:maxConnectionThreads="${sdcct.tomcat.server.conn.thread.max}"
+        p:port="${sdcct.tomcat.server.port.http}"
         p:uriEncoding="#{ T(java.nio.charset.StandardCharsets).UTF_8 }">
         <beans:property name="contextLifecycleListeners">
             <beans:list>
-                <beans:ref bean="lifecycleListenerJreMemLeakPrevention"/>
-                <beans:ref bean="lifecycleListenerThreadLocalLeakPrevention"/>
+                <beans:bean id="lifecycleListenerJreMemLeakPrevention" class="org.apache.catalina.core.JreMemoryLeakPreventionListener"/>
+                <beans:bean id="lifecycleListenerThreadLocalLeakPrevention" class="org.apache.catalina.core.ThreadLocalLeakPreventionListener"/>
             </beans:list>
         </beans:property>
     </beans:bean>

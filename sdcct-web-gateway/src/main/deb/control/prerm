@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -e
+
+pkgName="%{project.artifactId}"
+
+case "$1" in
+    deconfigure)
+        ! service "${pkgName}" "status" &>"/dev/null" || service "${pkgName}" "stop"
+        ;;
+    
+    failed-upgrade|upgrade)
+        ;;
+esac
+
+exit 0

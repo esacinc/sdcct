@@ -20,6 +20,9 @@
     <properties>
         <!-- Project properties -->
         <project.basedir.all>${project.basedir}/..</project.basedir.all>
+        <!-- Project build Debian properties -->
+        <project.build.debShareWebappDataDirectoryPath>${project.build.debShareDataDirectoryPath}/webapp</project.build.debShareWebappDataDirectoryPath>
+        <project.build.debShareWebappDataDirectory>${project.build.debDataDirectory}/${project.build.debShareWebappDataDirectoryPath}</project.build.debShareWebappDataDirectory>
     </properties>
     
     <dependencyManagement>
@@ -43,17 +46,12 @@
             <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-core</artifactId>
-                <version>8.0.29</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.tomcat.embed</groupId>
-                <artifactId>tomcat-embed-el</artifactId>
-                <version>8.0.29</version>
+                <version>8.0.30</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-logging-log4j</artifactId>
-                <version>8.0.29</version>
+                <version>8.0.30</version>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.web</groupId>
@@ -69,6 +67,13 @@
                         <artifactId>jsp-api</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-bom</artifactId>
+                <version>4.0.3.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -178,6 +183,31 @@
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>appassembler-maven-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>generate-daemons</id>
+                            <configuration>
+                                <daemons>
+                                    <daemon>
+                                        <id>${project.artifactId}</id>
+                                        <jvmSettings>
+                                            <extraArguments>
+                                                <extraArgument>-Xss4m</extraArgument>
+                                                <extraArgument>-XX:MetaspaceSize=512m</extraArgument>
+                                            </extraArguments>
+                                            <initialMemorySize>1024M</initialMemorySize>
+                                            <maxMemorySize>2048M</maxMemorySize>
+                                            <maxStackSize>768M</maxStackSize>
+                                        </jvmSettings>
+                                    </daemon>
+                                </daemons>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
                     <executions>
                         <execution>
@@ -193,6 +223,28 @@
                                         <type>jar</type>
                                     </artifact>
                                 </artifacts>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.vafer</groupId>
+                    <artifactId>jdeb</artifactId>
+                    <executions>
+                        <execution>
+                            <id>jdeb</id>
+                            <configuration>
+                                <dataSet>
+                                    <data>
+                                        <src>${project.build.directory}/${project.artifactId}</src>
+                                        <type>directory</type>
+                                        <excludes>WEB-INF/classes/**,WEB-INF/lib/**</excludes>
+                                        <mapper>
+                                            <type>perm</type>
+                                            <prefix>/${project.build.debShareWebappDataDirectoryPath}</prefix>
+                                        </mapper>
+                                    </data>
+                                </dataSet>
                             </configuration>
                         </execution>
                     </executions>

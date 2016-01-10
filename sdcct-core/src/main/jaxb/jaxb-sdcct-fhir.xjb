@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jaxb:bindings
+    jaxb:extensionBindingPrefixes="annox xjc"
+    jaxb:version="2.0"
+    node="/xsd:schema"
+    schemaLocation="../schema/FHIR/fhir-single.xsd"
+    xmlns:annox="http://annox.dev.java.net"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    
+    <!--====================================================================================================
+    = SCHEMA
+    =====================================================================================================-->
+    <jaxb:schemaBindings>
+        <jaxb:package name="gov.hhs.onc.sdcct.fhir"/>
+    </jaxb:schemaBindings>
+    
+    <!--====================================================================================================
+    = SIMPLE TYPES
+    =====================================================================================================-->
+    <jaxb:bindings node="xsd:simpleType[@name='DetectedIssueSeverity-list']">
+        <jaxb:typesafeEnumClass name="DetectedIssueSeverityType"/>
+    </jaxb:bindings>
+    
+    <jaxb:bindings node="xsd:simpleType[@name='IssueSeverity-list']">
+        <jaxb:typesafeEnumClass name="IssueSeverityType"/>
+    </jaxb:bindings>
+    
+    <jaxb:bindings node="xsd:simpleType[@name='IssueType-list']">
+        <jaxb:typesafeEnumClass name="IssueCodeType"/>
+    </jaxb:bindings>
+    
+    <!--====================================================================================================
+    = COMPLEX TYPES
+    =====================================================================================================-->
+    <jaxb:bindings node="xsd:complexType[@name='IssueType']">
+        <jaxb:class name="IssueCode"/>
+    </jaxb:bindings>
+    
+    <jaxb:bindings node="xsd:complexType[@name='string']">
+        <jaxb:class name="StringValue"/>
+    </jaxb:bindings>
+ </jaxb:bindings>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fhir:Questionnaire
+    xmlns:fhir="http://hl7.org/fhir">
+    
+    <fhir:id value="test1"/>
+    
+    <fhir:meta>
+        <fhir:versionId value="1"/>
+    </fhir:meta>
+    
+    <fhir:status value="draft"/>
+    
+    <fhir:group>
+        <fhir:linkId value="section1"/>
+        <fhir:title value="Section 1"/>
+        <fhir:text value="Section 1"/>
+        <fhir:question>
+            <fhir:linkId value="question1.1"/>
+            <fhir:text value="Question 1.1"/>
+            <fhir:type value="string"/>
+        </fhir:question>
+        <fhir:question>
+            <fhir:linkId value="question1.2"/>
+            <fhir:text value="Question 1.2"/>
+            <fhir:type value="choice"/>
+            <fhir:option id="question1.2-listItem1">
+                <fhir:display value="Question 1.2 ListItem 1"/>
+            </fhir:option>
+            <fhir:option id="question1.2-listItem2">
+                <fhir:display value="Question 1.2 ListItem 2"/>
+            </fhir:option>
+        </fhir:question>
+    </fhir:group>
+</fhir:Questionnaire>

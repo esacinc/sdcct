@@ -7,5 +7,39 @@
     xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
+    <!--====================================================================================================
+    = JAX-RS SERVERS
+    =====================================================================================================-->
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="serverFormManagerFhir" parent="serverFhir"
+        p:address="${sdcct.ws.form.manager.fhir.url.path}"
+        p:serviceBean-ref="wsFormManagerFhirImpl"/>
     
+    <!--====================================================================================================
+    = JAX-WS SERVERS
+    =====================================================================================================-->
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="serverFormManagerRfd" parent="serverRfd"
+        p:address="${sdcct.ws.form.manager.rfd.url.path}"
+        p:endpointName="#{ T(gov.hhs.onc.sdcct.rfd.RfdXmlQnames).FORM_MANAGER_PORT }"
+        p:serviceBean-ref="wsFormManagerRfdImpl"
+        p:serviceName="#{ T(gov.hhs.onc.sdcct.rfd.RfdXmlQnames).FORM_MANAGER_SERVICE }"
+        p:wsdlLocation="${sdcct.ws.form.manager.rfd.wsdl.loc}"/>
+    
+    <!--====================================================================================================
+    = JAX-RS CLIENTS
+    =====================================================================================================-->
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="clientFormManagerFhir" parent="clientFhir" lazy-init="true" scope="prototype"
+        p:serviceClass="gov.hhs.onc.sdcct.web.form.manager.FhirFormManagerWebService"/>
+    
+    <!--====================================================================================================
+    = JAX-WS CLIENTS
+    =====================================================================================================-->
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="clientFormManagerRfd" parent="clientRfd" lazy-init="true" scope="prototype"
+        p:endpointName="#{ T(gov.hhs.onc.sdcct.rfd.RfdXmlQnames).FORM_MANAGER_PORT }"
+        p:serviceClass="gov.hhs.onc.sdcct.rfd.RfdFormManagerPortType"
+        p:serviceName="#{ T(gov.hhs.onc.sdcct.rfd.RfdXmlQnames).FORM_MANAGER_SERVICE }"
+        p:wsdlLocation="${sdcct.ws.form.manager.rfd.wsdl.loc}"/>
 </beans:beans>

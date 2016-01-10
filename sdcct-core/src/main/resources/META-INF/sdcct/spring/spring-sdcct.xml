@@ -30,5 +30,50 @@
     <!--====================================================================================================
     = CONVERSION SERVICES
     =====================================================================================================-->
-    <beans:bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean" primary="true"/>
+    <beans:bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean" primary="true">
+        <beans:property name="converters">
+            <beans:set>
+                <beans:ref bean="convResourceSrc"/>
+            </beans:set>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = THREAD GROUPS
+    =====================================================================================================-->
+    <beans:bean id="threadGroup" class="java.lang.ThreadGroup">
+        <beans:constructor-arg index="0" type="java.lang.String" value="sdcct"/>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = TASK EXECUTORS
+    =====================================================================================================-->
+    <beans:bean id="taskExecThreadPool" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor" abstract="true"
+        p:daemon="true"
+        p:queueCapacity="0"
+        p:threadGroup-ref="threadGroup"/>
+    
+    <beans:bean id="taskExecThreadPoolDynamic" parent="taskExecThreadPool" abstract="true"
+        p:allowCoreThreadTimeOut="true"
+        p:corePoolSize="0"/>
+    
+    <!--====================================================================================================
+    = TASK SCHEDULERS
+    =====================================================================================================-->
+    <beans:bean id="taskSchedulerThreadPool" class="org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler" abstract="true"
+        p:daemon="true"
+        p:removeOnCancelPolicy="true"
+        p:threadGroup-ref="threadGroup"/>
+    
+    <!--====================================================================================================
+    = TIME ZONES
+    =====================================================================================================-->
+    <beans:bean id="timeZone" class="java.util.TimeZone" abstract="true"/>
+    
+    <beans:bean id="timeZoneDefault" parent="timeZone" factory-method="getDefault"/>
+    
+    <beans:bean id="timeZoneUtc" parent="timeZone" factory-method="getTimeZone">
+        <beans:constructor-arg index="0" type="java.lang.String" value="UTC"/>
+        <beans:constructor-arg index="1" type="boolean" value="false"/>
+    </beans:bean>
 </beans:beans>

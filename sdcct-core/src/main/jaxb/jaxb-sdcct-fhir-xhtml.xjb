@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jaxb:bindings
+    jaxb:extensionBindingPrefixes="annox xjc"
+    jaxb:version="2.0"
+    node="/xsd:schema"
+    schemaLocation="../schema/FHIR/fhir-xhtml.xsd"
+    xmlns:annox="http://annox.dev.java.net"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+    xmlns:xml="http://www.w3.org/XML/1998/namespace"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    
+    <!--====================================================================================================
+    = SCHEMA
+    =====================================================================================================-->
+    <jaxb:schemaBindings>
+        <jaxb:package name="gov.hhs.onc.sdcct.fhir.xhtml"/>
+    </jaxb:schemaBindings>
+    
+    <!--====================================================================================================
+    = ATTRIBUTE GROUPS
+    =====================================================================================================-->
+    <jaxb:bindings node="xsd:attributeGroup[@name='i18n']/xsd:attribute[@ref='xml:lang']">
+        <jaxb:property name="xmlLang"/>
+    </jaxb:bindings>
+    
+    <!--====================================================================================================
+    = ELEMENTS
+    =====================================================================================================-->
+    <jaxb:bindings node="xsd:element[@name='bdo']/xsd:complexType/xsd:complexContent/xsd:extension/xsd:attribute[@ref='xml:lang']">
+        <jaxb:property name="xmlLang"/>
+    </jaxb:bindings>
+ </jaxb:bindings>

@@ -1,0 +1,36 @@
+#!/bin/bash
+
+set -e
+
+pkgName="%{project.artifactId}"
+pkgUser="%{project.artifactId}"
+pkgGroup="%{project.artifactId}"
+
+rootDir="$(pwd)"
+rootDir="${rootDir#*/}"
+
+case "$1" in
+    abort-install|abort-upgrade|disappear|failed-upgrade)
+        ;;
+    
+    purge|remove|upgrade)
+        update-rc.d -f "${pkgName}" "remove"
+        ;;&
+    
+    purge)
+        users="$(cut -d ":" -f 1 <"${rootDir}/etc/passwd" | sort)"
+        
+        [[ -z "$(printf "--" '%s\n%s' "${users}" "${pkgUser}" | sort | uniq -d)" ]] || userdel "${pkgUser}"
+        
+        while read "groupLine"; do
+            [[ "$(cut -d ":" -f 1 <<<"${groupLine}")" != "${pkgGroup}" ]] || \
+                {
+                    [[ -n "$(cut -d ":" -f 4 <<<"${groupLine}")" ]] || \
+                        groupdel "${pkgGroup}"
+                    
+                    break
+                }
+        done <"${rootDir}/etc/group"
+esac
+
+exit 0

@@ -1,5 +1,6 @@
 package gov.hhs.onc.sdcct.context.impl;
 
+import javax.annotation.Nullable;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringApplicationRunListener;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -15,7 +16,7 @@ public abstract class AbstractSdcctApplicationRunListener implements SpringAppli
     }
 
     @Override
-    public void finished(ConfigurableApplicationContext appContext, Throwable exception) {
+    public void finished(ConfigurableApplicationContext appContext, @Nullable Throwable exception) {
     }
 
     @Override
