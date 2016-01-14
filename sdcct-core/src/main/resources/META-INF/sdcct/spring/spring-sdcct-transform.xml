@@ -8,12 +8,65 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
     <!--====================================================================================================
-    = RENDERERS
+    = CONFIGURATIONS
     =====================================================================================================-->
-    <beans:bean id="renderer" class="gov.hhs.onc.sdcct.transform.render.SdcctRenderer" abstract="true">
-        <beans:property name="defaultOptions">
+    <beans:bean id="config" class="gov.hhs.onc.sdcct.transform.impl.SdcctConfiguration"
+        p:lineNumbering="true"
+        p:recoveryPolicy="#{ T(net.sf.saxon.Configuration).DO_NOT_RECOVER }"
+        p:stripsAllWhiteSpace="false"
+        p:stripsWhiteSpace="#{ T(net.sf.saxon.value.Whitespace).NONE }"
+        p:xsltVersion="2.0">
+        <beans:property name="configurationProperties">
             <beans:map>
-                <beans:entry key="#{ T(gov.hhs.onc.sdcct.transform.render.RenderOptions).PRETTY_NAME }" value="false"/>
+                <beans:entry key="#{ T(net.sf.saxon.lib.FeatureKeys).GENERATE_BYTE_CODE }" value="true" value-type="java.lang.Boolean"/>
+            </beans:map>
+        </beans:property>
+        <beans:property name="defaultSerializationProperties">
+            <beans:map>
+                <beans:entry key="#{ T(javax.xml.transform.OutputKeys).ENCODING }" value="#{ T(java.nio.charset.StandardCharsets).UTF_8.name() }"/>
+                <beans:entry key="#{ T(javax.xml.transform.OutputKeys).STANDALONE }" value="#{ T(gov.hhs.onc.sdcct.utils.SdcctOptionUtils).YES_VALUE }"/>
+            </beans:map>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = PROCESSORS
+    =====================================================================================================-->
+    <beans:bean id="processor" class="gov.hhs.onc.sdcct.transform.impl.SdcctProcessor"
+        c:config-ref="config"/>
+    
+    <!--====================================================================================================
+    = SERIALIZERS
+    =====================================================================================================-->
+    <beans:bean id="serializer" class="gov.hhs.onc.sdcct.transform.impl.SdcctSerializer" abstract="true"/>
+    
+    <beans:bean id="serializerXml" parent="serializer" factory-bean="processor" factory-method="newSerializer" lazy-init="true" scope="prototype">
+        <beans:constructor-arg name="outProps">
+            <beans:map>
+                <beans:entry key="#{ T(javax.xml.transform.OutputKeys).METHOD }" value="xml"/>
+            </beans:map>
+        </beans:constructor-arg>
+    </beans:bean>
+    
+    <!--suppress SpringBeanConstructorArgInspection -->
+    <beans:bean id="serializerXmlPretty" parent="serializerXml" factory-bean="processor" factory-method="newSerializer" lazy-init="true"
+        scope="prototype">
+        <beans:constructor-arg name="outProps">
+            <beans:map merge="true">
+                <beans:entry key="#{ T(javax.xml.transform.OutputKeys).INDENT }" value="#{ T(gov.hhs.onc.sdcct.utils.SdcctOptionUtils).YES_VALUE }"/>
+                <!--suppress SpringPlaceholdersInspection -->
+                <beans:entry key="#{ T(net.sf.saxon.lib.SaxonOutputKeys).INDENT_SPACES }" value="${sdcct.transform.serialize.pretty.indent.spaces}"/>
+            </beans:map>
+        </beans:constructor-arg>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = CONTENT CODECS
+    =====================================================================================================-->
+    <beans:bean id="contentCodec" class="gov.hhs.onc.sdcct.transform.content.ContentCodec" abstract="true">
+        <beans:property name="defaultEncodeOptions">
+            <beans:map>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.transform.content.ContentEncodeOptions).PRETTY_NAME }" value="false" value-type="java.lang.Boolean"/>
             </beans:map>
         </beans:property>
     </beans:bean>

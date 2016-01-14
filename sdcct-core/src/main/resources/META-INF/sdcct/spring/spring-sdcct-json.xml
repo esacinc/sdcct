@@ -14,13 +14,12 @@
         <beans:constructor-arg name="version" value="#{ T(com.fasterxml.jackson.core.Version).unknownVersion() }"/>
     </beans:bean>
     
-    <beans:bean id="moduleJdk8" class="com.fasterxml.jackson.datatype.jdk8.Jdk8Module"/>
-    
     <!--====================================================================================================
     = OBJECT MAPPERS
     =====================================================================================================-->
     <beans:bean id="objMapper" class="gov.hhs.onc.sdcct.json.impl.SdcctObjectMapperFactoryBean"
-        p:autoDetectFields="false">
+        p:autoDetectFields="false"
+        p:serializationInclusion="NON_EMPTY">
         <beans:property name="features">
             <beans:map>
                 <beans:entry key="#{ T(com.fasterxml.jackson.databind.MapperFeature).AUTO_DETECT_CREATORS }" value="false"/>
@@ -29,20 +28,26 @@
         </beans:property>
         <beans:property name="modules">
             <beans:list>
-                <beans:ref bean="moduleJdk8"/>
+                <!--
+                TODO: handle xml:lang attributes
+                -->
+                <!--
+                <beans:bean id="moduleJaxbAnno" class="com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule"
+                    p:nonNillableInclusion="USE_DEFAULTS"
+                    p:priority="SECONDARY"/>
+                -->
+                <beans:bean id="moduleJdk8" class="com.fasterxml.jackson.datatype.jdk8.Jdk8Module"/>
             </beans:list>
         </beans:property>
     </beans:bean>
     
-    <!--p:autoDetectGettersSetters="false"-->
-    
     <!--suppress SpringPlaceholdersInspection -->
     <beans:bean id="objMapperPretty" parent="objMapper"
         p:indentOutput="true"
-        p:indentSpaces="${sdcct.json.render.format.indent.spaces}"/>
+        p:indentSpaces="${sdcct.transform.serialize.pretty.indent.spaces}"/>
     
     <!--====================================================================================================
-    = RENDERERS
+    = CONTENT CODECS
     =====================================================================================================-->
-    <beans:bean id="rendererJson" class="gov.hhs.onc.sdcct.json.impl.JsonRenderer" parent="renderer"/>
+    <beans:bean id="contentCodecJson" class="gov.hhs.onc.sdcct.json.impl.JsonCodec" parent="contentCodec"/>
 </beans:beans>

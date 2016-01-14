@@ -26,5 +26,10 @@
                 <beans:bean id="lifecycleListenerThreadLocalLeakPrevention" class="org.apache.catalina.core.ThreadLocalLeakPreventionListener"/>
             </beans:list>
         </beans:property>
+        <beans:property name="valves">
+            <beans:array>
+                <beans:ref bean="valveLogging"/>
+            </beans:array>
+        </beans:property>
     </beans:bean>
 </beans:beans>

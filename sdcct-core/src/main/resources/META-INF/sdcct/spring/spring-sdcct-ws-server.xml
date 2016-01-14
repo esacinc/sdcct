@@ -24,10 +24,11 @@
         <beans:property name="providers">
             <beans:list>
                 <beans:ref bean="exceptionMapperFhir"/>
-                <beans:bean class="gov.hhs.onc.sdcct.fhir.impl.FhirRendererProvider">
+                <beans:bean class="gov.hhs.onc.sdcct.fhir.impl.FhirWadlGenerator"/>
+                <beans:bean class="gov.hhs.onc.sdcct.fhir.impl.FhirContentProvider">
                     <beans:property name="defaultQueryParameters">
                         <beans:map>
-                            <beans:entry key="#{ T(gov.hhs.onc.sdcct.fhir.FhirWsQueryParamNames).PRETTY }" value="true"/>
+                            <beans:entry key="#{ T(gov.hhs.onc.sdcct.fhir.FhirWsQueryParamNames).PRETTY }" value="false" value-type="java.lang.Boolean"/>
                         </beans:map>
                     </beans:property>
                 </beans:bean>
@@ -45,6 +46,11 @@
             <beans:list>
                 <beans:ref bean="featureLogging"/>
                 <beans:ref bean="featureSchemaValidation"/>
+            </beans:list>
+        </beans:property>
+        <beans:property name="outFaultInterceptors">
+            <beans:list>
+                <beans:ref bean="interceptorFaultStackTrace"/>
             </beans:list>
         </beans:property>
     </beans:bean>

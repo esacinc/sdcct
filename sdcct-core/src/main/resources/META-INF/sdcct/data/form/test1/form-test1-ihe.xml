@@ -5,7 +5,7 @@
     
     <sdc:Body ID="body">
         <sdc:ChildItems>
-            <sdc:Section ID="section1">
+            <sdc:Section ID="section1" title="Section 1">
                 <sdc:ChildItems>
                     <sdc:Question ID="question1.1" title="Question 1.1">
                         <sdc:ResponseField>

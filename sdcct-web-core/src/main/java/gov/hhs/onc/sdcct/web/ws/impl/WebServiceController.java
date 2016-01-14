@@ -54,6 +54,7 @@ public class WebServiceController implements Controller, ServletConfigAware {
                 BusFactory.setThreadDefaultBus(null);
             }
         } else {
+            // TODO: improve error handling
             LOGGER.error(String.format("Unable to determine CXF destination (path=%s) for request.", destPath));
 
             servletResp.setStatus(HttpStatus.NOT_FOUND.value());

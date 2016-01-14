@@ -8,13 +8,19 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
     <!--====================================================================================================
-    = CONDUITS
+    = CONDUIT CONFIGURERS
     =====================================================================================================-->
-    <beans:bean name="*.http-conduit" class="org.apache.cxf.transport.http.URLConnectionHTTPConduit" lazy-init="true"
-        c:b-ref="bus">
-        <beans:constructor-arg name="ei">
-            <beans:bean class="org.apache.cxf.service.model.EndpointInfo"/>
-        </beans:constructor-arg>
+    <beans:bean id="conduitConfigurer" class="gov.hhs.onc.sdcct.ws.impl.SdcctConduitConfigurer"
+        p:bus-ref="bus">
+        <beans:property name="clientPolicy">
+            <!--suppress SpringPlaceholdersInspection -->
+            <beans:bean class="org.apache.cxf.transports.http.configuration.HTTPClientPolicy"
+                p:allowChunking="false"
+                p:cacheControl="no-cache, no-store, no-transform"
+                p:connection="CLOSE"
+                p:connectionTimeout="${sdcct.ws.client.conn.timeout}"
+                p:receiveTimeout="${sdcct.ws.client.receive.timeout}"/>
+        </beans:property>
     </beans:bean>
     
     <!--====================================================================================================

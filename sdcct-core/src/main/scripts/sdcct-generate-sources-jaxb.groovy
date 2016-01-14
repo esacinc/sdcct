@@ -301,6 +301,9 @@ def propSetterName
 def Field classModelAnnosField = JDefinedClass.class.getDeclaredField("annotations")
 classModelAnnosField.accessible = true
 
+def Field methodModelAnnosField = JMethod.class.getDeclaredField("annotations")
+methodModelAnnosField.accessible = true
+
 def Method annoModelAddValueMethod = JAnnotationUse.class.declaredMethods.find{ it.name == "addValue" }
 annoModelAddValueMethod.accessible = true
 
@@ -346,9 +349,11 @@ outline.allPackageContexts.each{
             propClass = (propGetter = classMethods[propGetterName]).type()
             
             (implPropGetter = implClassMethods[propGetterName]).annotations().find{ it.annotationClass.fullName() == JsonProperty.class.name }.each{
-                implPropGetter.removeAnnotation(it)
+                methodModelAnnosField.get(implPropGetter).remove(it)
                 
-                propGetter.annotate(JsonProperty.class)
+                propGetter.annotations()
+                
+                methodModelAnnosField.get(propGetter).add(it)
             }
             
             if (propIsGetter) {

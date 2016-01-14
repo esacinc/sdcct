@@ -6,6 +6,7 @@ import gov.hhs.onc.sdcct.io.impl.ResourceSource;
 import gov.hhs.onc.sdcct.sdc.PackageType;
 import javax.annotation.Nullable;
 import org.springframework.beans.factory.InitializingBean;
+import org.w3c.dom.Element;
 
 public interface Form extends InitializingBean, NamedBean {
     public boolean isSetFormDesignSource();
@@ -19,6 +20,11 @@ public interface Form extends InitializingBean, NamedBean {
 
     @Nullable
     public PackageType getPackage();
+
+    public boolean isSetPackageElement();
+
+    @Nullable
+    public Element getPackageElement();
 
     public boolean isSetQuestionnaire();
 

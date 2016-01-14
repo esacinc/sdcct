@@ -1,7 +1,7 @@
 package gov.hhs.onc.sdcct.web.form.manager.impl;
 
 import gov.hhs.onc.sdcct.form.Form;
-import gov.hhs.onc.sdcct.rfd.RfdXmlQnames;
+import gov.hhs.onc.sdcct.rfd.RfdWsXmlQnames;
 import gov.hhs.onc.sdcct.rfd.impl.RetrieveFormRequestTypeImpl;
 import gov.hhs.onc.sdcct.rfd.impl.WorkflowDataTypeImpl;
 import gov.hhs.onc.sdcct.web.test.impl.AbstractSdcctWebIntegrationTests;
@@ -21,7 +21,7 @@ public class RfdFormManagerServiceIntegrationTests extends AbstractSdcctWebInteg
 
     @Test
     public void testRetrieveForm() throws Exception {
-        this.testClient.invoke(RfdXmlQnames.RETRIEVE_FORM_OP,
-            new RetrieveFormRequestTypeImpl(null, new WorkflowDataTypeImpl(this.testForm1.getId(), true, null, null, null)));
+        this.testClient.invoke(RfdWsXmlQnames.RETRIEVE_FORM_OP,
+            new RetrieveFormRequestTypeImpl().setWorkflowData(new WorkflowDataTypeImpl().setFormID(this.testForm1.getId()).setEncodedResponse(true)));
     }
 }

@@ -7,12 +7,4 @@
     xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
-    <!--====================================================================================================
-    = FORMS
-    =====================================================================================================-->
-    <beans:bean id="formTest1" parent="formImpl"
-        p:formDesignSource="classpath*:META-INF/sdcct/data/form/test1/form-test1-ihe.xml"
-        p:id="test1"
-        p:name="Test 1"
-        p:questionnaireSource="classpath*:META-INF/sdcct/data/form/test1/form-test1-fhir.xml"/>
 </beans:beans>

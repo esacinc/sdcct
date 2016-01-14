@@ -8,11 +8,43 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
     <!--====================================================================================================
+    = XML INPUT FACTORIES
+    =====================================================================================================-->
+    <beans:bean id="xmlInFactory" class="gov.hhs.onc.sdcct.xml.impl.SdcctXmlInputFactory">
+        <beans:property name="properties">
+            <beans:map>
+                <beans:entry key="#{ T(javax.xml.stream.XMLInputFactory).IS_REPLACING_ENTITY_REFERENCES }" value="false" value-type="java.lang.Boolean"/>
+                <beans:entry key="#{ T(javax.xml.stream.XMLInputFactory).IS_SUPPORTING_EXTERNAL_ENTITIES }" value="false" value-type="java.lang.Boolean"/>
+                <beans:entry key="#{ T(com.ctc.wstx.api.WstxInputProperties).P_CACHE_DTDS }" value="false" value-type="java.lang.Boolean"/>
+                <beans:entry key="#{ T(javax.xml.stream.XMLInputFactory).SUPPORT_DTD }" value="false" value-type="java.lang.Boolean"/>
+                <beans:entry key="#{ T(org.codehaus.stax2.XMLStreamProperties).XSP_SUPPORT_XMLID }"
+                    value="#{ T(org.codehaus.stax2.XMLStreamProperties).XSP_V_XMLID_FULL }"/>
+            </beans:map>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = XML OUTPUT FACTORIES
+    =====================================================================================================-->
+    <beans:bean id="xmlOutFactory" class="gov.hhs.onc.sdcct.xml.impl.SdcctXmlOutputFactory">
+        <beans:property name="properties">
+            <beans:map>
+                <beans:entry key="#{ T(org.codehaus.stax2.XMLStreamProperties).XSP_SUPPORT_XMLID }"
+                    value="#{ T(org.codehaus.stax2.XMLStreamProperties).XSP_V_XMLID_FULL }"/>
+            </beans:map>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
     = OBJECT FACTORIES
     =====================================================================================================-->
     <beans:bean id="objFactoryFhir" class="gov.hhs.onc.sdcct.fhir.ObjectFactory"/>
     
     <beans:bean id="objFactoryFhirImpl" class="gov.hhs.onc.sdcct.fhir.impl.ObjectFactory"/>
+    
+    <beans:bean id="objFactoryFhirXhtml" class="gov.hhs.onc.sdcct.fhir.xhtml.ObjectFactory"/>
+    
+    <beans:bean id="objFactoryFhirXhtmlImpl" class="gov.hhs.onc.sdcct.fhir.xhtml.impl.ObjectFactory"/>
     
     <beans:bean id="objFactoryRfd" class="gov.hhs.onc.sdcct.rfd.ObjectFactory"/>
     
@@ -29,39 +61,26 @@
         c:charsetName="#{ T(java.nio.charset.StandardCharsets).UTF_8.name() }"/>
     
     <!--====================================================================================================
-    = JAXB MARSHALLERS
+    = CONTENT CODECS
     =====================================================================================================-->
-    <beans:bean id="jaxbMarshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller"
-        p:checkForXmlRootElement="false"
-        p:supportJaxbElementClass="true">
+    <beans:bean id="contentCodecXml" class="gov.hhs.onc.sdcct.xml.impl.XmlCodec" parent="contentCodec">
         <beans:property name="marshallerProperties">
             <beans:map>
                 <beans:entry key="#{ T(com.sun.xml.bind.marshaller.CharacterEscapeHandler).name }" value-ref="charEscapeHandlerNio"/>
                 <beans:entry key="#{ T(javax.xml.bind.Marshaller).JAXB_ENCODING }" value="#{ T(java.nio.charset.StandardCharsets).UTF_8.name() }"/>
             </beans:map>
         </beans:property>
-        <beans:property name="packagesToScan">
+        <beans:property name="objectFactories">
             <beans:array>
-                <beans:value>#{ objFactoryFhirImpl.class.package.name }</beans:value>
-                <beans:value>#{ objFactoryRfdImpl.class.package.name }</beans:value>
-                <beans:value>#{ objFactorySdcImpl.class.package.name }</beans:value>
+                <beans:array>
+                    <beans:ref bean="objFactoryFhirImpl"/>
+                    <beans:ref bean="objFactoryFhirXhtmlImpl"/>
+                </beans:array>
+                <beans:array>
+                    <beans:ref bean="objFactoryRfdImpl"/>
+                    <beans:ref bean="objFactorySdcImpl"/>
+                </beans:array>
             </beans:array>
         </beans:property>
     </beans:bean>
-    
-    <beans:bean id="jaxbMarshallerPretty" parent="jaxbMarshaller">
-        <beans:property name="marshallerProperties">
-            <beans:map merge="true">
-                <beans:entry key="com.sun.xml.bind.indentString"
-                    value="#{ T(org.apache.commons.lang3.StringUtils).repeat(T(org.apache.commons.lang3.StringUtils).SPACE,
-                        T(java.lang.Integer).parseInt('${sdcct.xml.render.format.indent.spaces}')) }"/>
-                <beans:entry key="#{ T(javax.xml.bind.Marshaller).JAXB_FORMATTED_OUTPUT }" value="true"/>
-            </beans:map>
-        </beans:property>
-    </beans:bean>
-    
-    <!--====================================================================================================
-    = RENDERERS
-    =====================================================================================================-->
-    <beans:bean id="rendererXml" class="gov.hhs.onc.sdcct.xml.impl.XmlRenderer" parent="renderer"/>
 </beans:beans>

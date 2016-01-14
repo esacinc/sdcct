@@ -8,21 +8,26 @@
         <fhir:versionId value="1"/>
     </fhir:meta>
     
-    <fhir:status value="draft"/>
+    <fhir:language value="en-US"/>
+    
+    <fhir:status value="published"/>
     
     <fhir:group>
         <fhir:linkId value="section1"/>
         <fhir:title value="Section 1"/>
         <fhir:text value="Section 1"/>
+        <fhir:required value="true"/>
         <fhir:question>
             <fhir:linkId value="question1.1"/>
             <fhir:text value="Question 1.1"/>
             <fhir:type value="string"/>
+            <fhir:required value="true"/>
         </fhir:question>
         <fhir:question>
             <fhir:linkId value="question1.2"/>
             <fhir:text value="Question 1.2"/>
             <fhir:type value="choice"/>
+            <fhir:required value="true"/>
             <fhir:option id="question1.2-listItem1">
                 <fhir:display value="Question 1.2 ListItem 1"/>
             </fhir:option>

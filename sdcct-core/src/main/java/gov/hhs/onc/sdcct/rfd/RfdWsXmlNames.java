@@ -1,6 +1,6 @@
 package gov.hhs.onc.sdcct.rfd;
 
-public final class RfdXmlNames {
+public final class RfdWsXmlNames {
     public final static String DELIM = "_";
 
     public final static String ARCHIVE_AFFIX = "Archive";
@@ -65,6 +65,6 @@ public final class RfdXmlNames {
     public final static String FORM_RECEIVER_PORT = FORM_RECEIVER + PORT_SOAP_12_SUFFIX;
     public final static String FORM_RECEIVER_SERVICE = FORM_RECEIVER + SERVICE_SUFFIX;
 
-    private RfdXmlNames() {
+    private RfdWsXmlNames() {
     }
 }

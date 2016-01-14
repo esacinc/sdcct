@@ -20,13 +20,20 @@
     <!--====================================================================================================
     = FEATURES
     =====================================================================================================-->
-    <beans:bean id="featureLogging" class="org.apache.cxf.feature.LoggingFeature"
-        p:prettyLogging="true"/>
+    <beans:bean id="featureLogging" class="org.apache.cxf.feature.LoggingFeature"/>
     
     <!--====================================================================================================
     = BUS
     =====================================================================================================-->
-    <beans:bean id="bus" class="org.apache.cxf.bus.spring.SpringBus" destroy-method="shutdown" primary="true"/>
+    <beans:bean id="bus" class="org.apache.cxf.bus.spring.SpringBus" destroy-method="shutdown" primary="true">
+        <beans:property name="properties">
+            <beans:map>
+                <!--suppress SpringPlaceholdersInspection -->
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.ws.SdcctWsContextPropertyNames).ERROR_STACK_TRACE }" value="${sdcct.ws.context.error.stack.trace}"
+                    value-type="java.lang.Boolean"/>
+            </beans:map>
+        </beans:property>
+    </beans:bean>
     <beans:alias name="bus" alias="cxf"/>
     
     <!--====================================================================================================

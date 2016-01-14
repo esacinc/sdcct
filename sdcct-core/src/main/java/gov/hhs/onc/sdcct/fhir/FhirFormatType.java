@@ -1,7 +1,7 @@
 package gov.hhs.onc.sdcct.fhir;
 
 import gov.hhs.onc.sdcct.io.SdcctMediaTypes;
-import gov.hhs.onc.sdcct.transform.render.RenderType;
+import gov.hhs.onc.sdcct.transform.content.SdcctContentType;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -9,27 +9,35 @@ import java.util.stream.Stream;
 import org.springframework.http.MediaType;
 
 public enum FhirFormatType {
-    JSON(RenderType.JSON, SdcctMediaTypes.APP_JSON_FHIR, "json"), XML(RenderType.XML, SdcctMediaTypes.APP_XML_FHIR, "xml", MediaType.TEXT_XML_VALUE);
+    JSON(SdcctContentType.JSON, SdcctMediaTypes.APP_JSON_FHIR, SdcctMediaTypes.APP_JSON_FHIR_UTF8, SdcctMediaTypes.JSON_SUBTYPE), XML(SdcctContentType.XML,
+        SdcctMediaTypes.APP_XML_FHIR, SdcctMediaTypes.APP_XML_FHIR_UTF8, SdcctMediaTypes.XML_SUBTYPE, MediaType.TEXT_XML_VALUE);
 
-    private final RenderType renderType;
+    private final SdcctContentType contentType;
     private final MediaType mediaType;
-    private final Set<String> values;
+    private final MediaType encMediaType;
+    private final Set<String> queryParamValues;
 
-    private FhirFormatType(RenderType renderType, MediaType mediaType, String ... values) {
-        (this.values = Stream.of(values).collect(Collectors.toCollection(() -> new LinkedHashSet<>(values.length)))).add((this.renderType = renderType)
-            .getMediaType().toString());
-        this.values.add((this.mediaType = mediaType).toString());
+    private FhirFormatType(SdcctContentType contentType, MediaType mediaType, MediaType encMediaType, String ... queryParamValues) {
+        (this.queryParamValues = Stream.of(queryParamValues).collect(Collectors.toCollection(() -> new LinkedHashSet<>((queryParamValues.length + 2)))))
+            .add((this.contentType = contentType).getMediaType().toString());
+        this.queryParamValues.add((this.mediaType = mediaType).toString());
+
+        this.encMediaType = encMediaType;
+    }
+
+    public SdcctContentType getContentType() {
+        return this.contentType;
+    }
+
+    public MediaType getEncodedMediaType() {
+        return this.encMediaType;
     }
 
     public MediaType getMediaType() {
         return this.mediaType;
     }
 
-    public RenderType getRenderType() {
-        return this.renderType;
-    }
-
-    public Set<String> getValues() {
-        return this.values;
+    public Set<String> getQueryParamValues() {
+        return this.queryParamValues;
     }
 }

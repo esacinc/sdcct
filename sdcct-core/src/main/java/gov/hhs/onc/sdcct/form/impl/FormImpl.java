@@ -1,43 +1,48 @@
 package gov.hhs.onc.sdcct.form.impl;
 
-import com.github.sebhoss.warnings.CompilerWarnings;
 import gov.hhs.onc.sdcct.beans.impl.AbstractNamedBean;
 import gov.hhs.onc.sdcct.fhir.Questionnaire;
+import gov.hhs.onc.sdcct.fhir.impl.QuestionnaireImpl;
 import gov.hhs.onc.sdcct.form.Form;
 import gov.hhs.onc.sdcct.io.impl.ResourceSource;
-import gov.hhs.onc.sdcct.sdc.FormDesignType;
 import gov.hhs.onc.sdcct.sdc.PackageType;
 import gov.hhs.onc.sdcct.sdc.impl.FormDesignPkgTypeImpl;
+import gov.hhs.onc.sdcct.sdc.impl.FormDesignTypeImpl;
 import gov.hhs.onc.sdcct.sdc.impl.FormPackageModulesImpl;
 import gov.hhs.onc.sdcct.sdc.impl.FormPackageTypeImpl;
 import gov.hhs.onc.sdcct.sdc.impl.PackageModulesTypeImpl;
 import gov.hhs.onc.sdcct.sdc.impl.PackageTypeImpl;
+import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
 import javax.annotation.Nullable;
-import javax.xml.bind.JAXBElement;
+import javax.xml.transform.dom.DOMResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.oxm.jaxb.Jaxb2Marshaller;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class FormImpl extends AbstractNamedBean implements Form {
     @Autowired
-    private Jaxb2Marshaller jaxbMarshaller;
+    private XmlCodec xmlCodec;
 
     private ResourceSource formDesignSrc;
     private ResourceSource questionnaireSrc;
     private PackageType pkg;
+    private Element pkgElem;
     private Questionnaire questionnaire;
 
     @Override
-    @SuppressWarnings({ CompilerWarnings.UNCHECKED })
     public void afterPropertiesSet() throws Exception {
         if (this.isSetFormDesignSource()) {
-            this.pkg =
-                new PackageTypeImpl().setPackageModules(new PackageModulesTypeImpl().setMainFormPackage(new FormPackageTypeImpl()
-                    .setFormPackageModules(new FormPackageModulesImpl().setFormDesignPkg(new FormDesignPkgTypeImpl()
-                        .setFormDesignTemplate(((JAXBElement<FormDesignType>) this.jaxbMarshaller.unmarshal(this.formDesignSrc)).getValue())))));
+            this.pkgElem =
+                ((Document) this.xmlCodec.encode(
+                    (this.pkg =
+                        new PackageTypeImpl().setPackageModules(new PackageModulesTypeImpl().setMainFormPackage(new FormPackageTypeImpl()
+                            .setFormPackageModules(new FormPackageModulesImpl().setFormDesignPkg(new FormDesignPkgTypeImpl()
+                                .setFormDesignTemplate(this.xmlCodec.decode(this.formDesignSrc, FormDesignTypeImpl.class))))))), new DOMResult()).getNode())
+                    .getDocumentElement();
         }
 
         if (this.isSetQuestionnaireSource()) {
-            this.questionnaire = ((JAXBElement<Questionnaire>) this.jaxbMarshaller.unmarshal(this.questionnaireSrc)).getValue();
+            this.questionnaire = this.xmlCodec.decode(this.questionnaireSrc, QuestionnaireImpl.class);
         }
     }
 
@@ -66,6 +71,17 @@ public class FormImpl extends AbstractNamedBean implements Form {
     @Override
     public PackageType getPackage() {
         return this.pkg;
+    }
+
+    @Override
+    public boolean isSetPackageElement() {
+        return (this.pkgElem != null);
+    }
+
+    @Nullable
+    @Override
+    public Element getPackageElement() {
+        return this.pkgElem;
     }
 
     @Override
