@@ -13,11 +13,15 @@
     <!--suppress ELValidationInJSP SpringElInspection SpringPlaceholdersInspection -->
     <beans:bean id="embeddedServletContainerFactoryTomcat" class="gov.hhs.onc.sdcct.web.tomcat.impl.SdcctTomcatEmbeddedServletContainerFactory"
         p:baseDirectory="#{ app.homeDirectory }"
+        p:connectionEndpointName="#{ threadGroup.name }-tomcat-server-http"
+        p:connectionKeepAliveTimeout="${sdcct.tomcat.server.conn.keep.alive.timeout}"
         p:connectionTimeout="${sdcct.tomcat.server.conn.timeout}"
         p:contextPath="${sdcct.tomcat.server.context.path}"
         p:documentRoot="${sdcct.tomcat.server.doc.root.dir}"
+        p:httpTxId-ref="txIdHttp"
         p:maxConnections="${sdcct.tomcat.server.conn.max}"
         p:maxConnectionThreads="${sdcct.tomcat.server.conn.thread.max}"
+        p:minConnectionThreads="${sdcct.tomcat.server.conn.thread.min}"
         p:port="${sdcct.tomcat.server.port.http}"
         p:uriEncoding="#{ T(java.nio.charset.StandardCharsets).UTF_8 }">
         <beans:property name="contextLifecycleListeners">
@@ -25,11 +29,6 @@
                 <beans:bean id="lifecycleListenerJreMemLeakPrevention" class="org.apache.catalina.core.JreMemoryLeakPreventionListener"/>
                 <beans:bean id="lifecycleListenerThreadLocalLeakPrevention" class="org.apache.catalina.core.ThreadLocalLeakPreventionListener"/>
             </beans:list>
-        </beans:property>
-        <beans:property name="valves">
-            <beans:array>
-                <beans:ref bean="valveLogging"/>
-            </beans:array>
         </beans:property>
     </beans:bean>
 </beans:beans>

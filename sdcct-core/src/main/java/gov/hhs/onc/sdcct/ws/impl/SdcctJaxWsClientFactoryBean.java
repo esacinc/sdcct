@@ -1,5 +1,6 @@
 package gov.hhs.onc.sdcct.ws.impl;
 
+import gov.hhs.onc.sdcct.logging.impl.TxTaskExecutor;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.SmartFactoryBean;
 
 public class SdcctJaxWsClientFactoryBean extends JaxWsProxyFactoryBean implements DisposableBean, SmartFactoryBean<Client> {
+    private TxTaskExecutor txTaskExec;
     private ClientProxy clientProxy;
 
     public SdcctJaxWsClientFactoryBean() {
@@ -37,6 +39,8 @@ public class SdcctJaxWsClientFactoryBean extends JaxWsProxyFactoryBean implement
     public Object create() {
         this.configured = true;
 
+        this.getServiceFactory().setExecutor(this.txTaskExec);
+
         return super.create();
     }
 
@@ -63,5 +67,13 @@ public class SdcctJaxWsClientFactoryBean extends JaxWsProxyFactoryBean implement
     @Override
     public boolean isSingleton() {
         return false;
+    }
+
+    public TxTaskExecutor getTxTaskExecutor() {
+        return this.txTaskExec;
+    }
+
+    public void setTxTaskExecutor(TxTaskExecutor txTaskExec) {
+        this.txTaskExec = txTaskExec;
     }
 }

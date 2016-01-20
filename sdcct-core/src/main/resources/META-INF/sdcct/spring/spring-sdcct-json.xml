@@ -19,7 +19,8 @@
     =====================================================================================================-->
     <beans:bean id="objMapper" class="gov.hhs.onc.sdcct.json.impl.SdcctObjectMapperFactoryBean"
         p:autoDetectFields="false"
-        p:serializationInclusion="NON_EMPTY">
+        p:autoDetectGettersSetters="false"
+        p:serializationInclusion="NON_DEFAULT">
         <beans:property name="features">
             <beans:map>
                 <beans:entry key="#{ T(com.fasterxml.jackson.databind.MapperFeature).AUTO_DETECT_CREATORS }" value="false"/>
@@ -28,14 +29,9 @@
         </beans:property>
         <beans:property name="modules">
             <beans:list>
-                <!--
-                TODO: handle xml:lang attributes
-                -->
-                <!--
                 <beans:bean id="moduleJaxbAnno" class="com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule"
-                    p:nonNillableInclusion="USE_DEFAULTS"
+                    p:nonNillableInclusion="NON_DEFAULT"
                     p:priority="SECONDARY"/>
-                -->
                 <beans:bean id="moduleJdk8" class="com.fasterxml.jackson.datatype.jdk8.Jdk8Module"/>
             </beans:list>
         </beans:property>
@@ -44,7 +40,7 @@
     <!--suppress SpringPlaceholdersInspection -->
     <beans:bean id="objMapperPretty" parent="objMapper"
         p:indentOutput="true"
-        p:indentSpaces="${sdcct.transform.serialize.pretty.indent.spaces}"/>
+        p:indentSize="${sdcct.transform.content.pretty.indent.size}"/>
     
     <!--====================================================================================================
     = CONTENT CODECS

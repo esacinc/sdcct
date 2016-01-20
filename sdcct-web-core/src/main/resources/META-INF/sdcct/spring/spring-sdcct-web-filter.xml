@@ -8,12 +8,7 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
     <!--====================================================================================================
-    = FILTERS
+    = FILTER REGISTRATION BEANS
     =====================================================================================================-->
-    <beans:bean id="filter" class="javax.servlet.Filter" abstract="true"/>
-    
-    <!--====================================================================================================
-    = REGISTRATION BEANS: FILTER
-    =====================================================================================================-->
-    <beans:bean id="regBeanFilter" class="org.springframework.boot.context.embedded.FilterRegistrationBean" parent="regBean" abstract="true"/>
+    <beans:bean id="regBeanFilter" class="org.springframework.boot.context.embedded.FilterRegistrationBean" abstract="true"/>
 </beans:beans>

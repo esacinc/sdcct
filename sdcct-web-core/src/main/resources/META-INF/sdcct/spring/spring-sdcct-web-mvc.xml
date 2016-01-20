@@ -22,18 +22,14 @@
     <!--====================================================================================================
     = INTERCEPTORS
     =====================================================================================================-->
-    <beans:bean id="interceptorHandler" class="org.springframework.web.servlet.HandlerInterceptor" abstract="true"/>
-    
-    <beans:bean id="interceptorWebContent" class="org.springframework.web.servlet.mvc.WebContentInterceptor" parent="interceptorHandler"
-        p:cacheSeconds="0"
-        p:useCacheControlHeader="true"
-        p:useCacheControlNoStore="true"
-        p:useExpiresHeader="true"/>
-    
     <mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/**"/>
-            <beans:ref bean="interceptorWebContent"/>
+            <beans:bean class="org.springframework.web.servlet.mvc.WebContentInterceptor"
+                p:cacheSeconds="0"
+                p:useCacheControlHeader="true"
+                p:useCacheControlNoStore="true"
+                p:useExpiresHeader="true"/>
         </mvc:interceptor>
     </mvc:interceptors>
     
@@ -45,17 +41,15 @@
     </mvc:view-resolvers>
     
     <!--====================================================================================================
-    = SERVLETS
-    =====================================================================================================-->
-    <beans:bean id="servletDispatcher" class="org.springframework.web.servlet.DispatcherServlet" parent="servletHttp"/>
-    
-    <!--====================================================================================================
-    = REGISTRATION BEANS: SERVLET
+    = SERVLET REGISTRATION BEANS
     =====================================================================================================-->
     <beans:bean id="regBeanServletDispatcher" parent="regBeanServlet"
         p:loadOnStartup="1"
         p:name="dispatcherServlet"
-        p:servlet-ref="servletDispatcher">
+        p:order="#{ T(org.springframework.core.Ordered).HIGHEST_PRECEDENCE }">
+        <beans:property name="servlet">
+            <beans:bean class="org.springframework.web.servlet.DispatcherServlet"/>
+        </beans:property>
         <beans:property name="urlMappings">
             <beans:list>
                 <beans:value>/</beans:value>

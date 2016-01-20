@@ -1,13 +1,16 @@
-package gov.hhs.onc.sdcct.web.logging;
+package gov.hhs.onc.sdcct.net.logging;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import gov.hhs.onc.sdcct.logging.MarkerFieldName;
 
 @MarkerFieldName("httpResponse")
 public interface HttpResponseEvent extends HttpEvent {
-    public Integer getStatus();
+    @JsonProperty
+    public Integer getStatusCode();
 
-    public void setStatus(Integer status);
+    public void setStatusCode(Integer statusCode);
 
+    @JsonProperty
     public String getStatusMessage();
 
     public void setStatusMessage(String statusMsg);

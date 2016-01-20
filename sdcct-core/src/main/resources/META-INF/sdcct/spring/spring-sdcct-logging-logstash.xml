@@ -15,7 +15,7 @@
         p:lineSeparator="#{ T(org.apache.commons.lang3.StringUtils).LF }">
         <beans:property name="objectMapper">
             <beans:bean parent="objMapper"
-                p:propertyNamingStrategy="CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES">
+                p:propertyNamingStrategy="SNAKE_CASE">
                 <beans:property name="features">
                     <beans:map merge="true">
                         <beans:entry key="#{ T(com.fasterxml.jackson.core.JsonGenerator.Feature).ESCAPE_NON_ASCII }" value="true"/>
@@ -51,6 +51,7 @@
                 <beans:bean class="net.logstash.logback.composite.loggingevent.LogLevelJsonProvider"/>
                 <beans:bean class="net.logstash.logback.composite.loggingevent.LogLevelValueJsonProvider"/>
                 <beans:bean class="net.logstash.logback.composite.loggingevent.LogstashMarkersJsonProvider"/>
+                <beans:ref bean="jsonProvMdc"/>
                 <beans:ref bean="jsonProvMsgMarker"/>
                 <beans:bean class="net.logstash.logback.composite.loggingevent.StackTraceJsonProvider"
                     p:throwableConverter-ref="patternConvThrowableProxyRootCause"/>

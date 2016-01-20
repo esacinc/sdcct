@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FormDesign xmlns="http://healthIT.gov/sdc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://healthIT.gov/sdc SDCFormDesign.xsd" formID="ID=129/v=2.004.001/"
+   formID="ID=129/v=2.004.001/"
    baseItemURI="https://cap.org/ecc/sdc">
 
    <!-- @styleClass: left, right, noBreak, header_text, title, body, linkIcon, 
@@ -17,7 +17,7 @@
          styleClass="header_text">
          <HTML>
             <div xmlns="http://www.w3.org/1999/xhtml"
-               xsi:schemaLocation="http://www.w3.org/1999/xhtml xhtml.xsd" class="header_text"
+               class="header_text"
                style="border-bottom:1px solid black;padding-bottom:0px;text-align:left;"
                >Surgical Pathology Cancer Case Summary (Checklist)</div>
          </HTML>
@@ -45,9 +45,8 @@
          styleClass="title">
          <!-- could add @val on DisplayText to shorten the construct-->
          <HTML>
-            <div xmlns="http://www.w3.org/1999/xhtml"
-               xsi:schemaLocation="http://www.w3.org/1999/xhtml xhtml.xsd">
-               <b>ADRENAL GLAND:<i style="s1"
+            <div xmlns="http://www.w3.org/1999/xhtml">
+               <b>ADRENAL GLAND:<i class="s1"
                      >Biopsy (Core Needle, Incisional, Excisional); Resection</i></b>
             </div>
          </HTML>

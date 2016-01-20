@@ -63,7 +63,8 @@ public class FhirContentProvider extends AbstractConfigurableProvider implements
             if (!this.formatQueryParamValues.containsKey(formatQueryParamValue)) {
                 throw new FhirException(
                     String.format("Invalid format query parameter (name=%s) value: %s", FhirWsQueryParamNames.FORMAT, formatQueryParamValue))
-                        .setIssueCodeType(IssueCodeType.PROCESSING).setRespStatus(Status.BAD_REQUEST);
+                        .setIssueCodeType(IssueCodeType.PROCESSING).setIssueDetailConceptParts("MSG_PARAM_INVALID", FhirWsQueryParamNames.FORMAT)
+                        .setRespStatus(Status.BAD_REQUEST);
             }
 
             format = this.formatQueryParamValues.get(formatQueryParamValue);
@@ -89,7 +90,8 @@ public class FhirContentProvider extends AbstractConfigurableProvider implements
             } catch (IllegalArgumentException e) {
                 throw new FhirException(
                     String.format("Invalid pretty query parameter (name=%s) value: %s", FhirWsQueryParamNames.PRETTY, prettyQueryParamValue), e)
-                        .setIssueCodeType(IssueCodeType.PROCESSING).setRespStatus(Status.BAD_REQUEST);
+                        .setIssueCodeType(IssueCodeType.PROCESSING).setIssueDetailConceptParts("MSG_PARAM_INVALID", FhirWsQueryParamNames.PRETTY)
+                        .setRespStatus(Status.BAD_REQUEST);
             }
         }
 
@@ -97,7 +99,7 @@ public class FhirContentProvider extends AbstractConfigurableProvider implements
             entityStream.write(codec.encode(obj, encodeOpts));
         } catch (Exception e) {
             throw new FhirException(
-                String.format("Unable to encode (mediaType=%s) content object (class=%s).", formatEncMediaTypeValue, obj.getClass().getName()))
+                String.format("Unable to encode (mediaType=%s) content object (class=%s).", formatEncMediaTypeValue, obj.getClass().getName()), e)
                     .setIssueCodeType(IssueCodeType.STRUCTURE);
         }
     }

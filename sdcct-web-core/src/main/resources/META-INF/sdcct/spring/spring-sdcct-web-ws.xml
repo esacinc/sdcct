@@ -8,14 +8,6 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
     <!--====================================================================================================
-    = CONTROLLERS
-    =====================================================================================================-->
-    <!--suppress SpringPlaceholdersInspection -->
-    <beans:bean id="controllerWs" class="gov.hhs.onc.sdcct.web.ws.impl.WebServiceController"
-        p:baseUrlPath="${sdcct.ws.base.url.path}"
-        p:bus-ref="bus"/>
-    
-    <!--====================================================================================================
     = HANDLER MAPPINGS
     =====================================================================================================-->
     <beans:bean id="handlerMappingService" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping"
@@ -23,7 +15,12 @@
         <beans:property name="urlMap">
             <beans:map>
                 <!--suppress SpringPlaceholdersInspection -->
-                <beans:entry key="${sdcct.ws.base.url.path}/**" value-ref="controllerWs"/>
+                <beans:entry key="${sdcct.ws.base.url.path}/**">
+                    <!--suppress SpringPlaceholdersInspection -->
+                    <beans:bean class="gov.hhs.onc.sdcct.web.ws.impl.WebServiceController"
+                        p:baseUrlPath="${sdcct.ws.base.url.path}"
+                        p:bus-ref="bus"/>
+                </beans:entry>
             </beans:map>
         </beans:property>
     </beans:bean>

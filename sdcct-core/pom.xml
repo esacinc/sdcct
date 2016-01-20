@@ -77,6 +77,18 @@
             <artifactId>jsr305</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-apt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-collections</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-core</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.ryantenney.metrics</groupId>
             <artifactId>metrics-spring</artifactId>
         </dependency>
@@ -197,10 +209,6 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http-netty-client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-addr</artifactId>
         </dependency>
         <dependency>
@@ -303,10 +311,6 @@
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring-oxm</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
         </dependency>
         <dependency>
@@ -336,6 +340,16 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies-deb</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
@@ -400,6 +414,14 @@
                     <execution>
                         <id>copy-test-resources-testng</id>
                     </execution>
+                    <execution>
+                        <id>copy-resources-deb-control</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>copy-resources-deb-data</id>
+                        <phase>none</phase>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -445,7 +467,7 @@
                     <dependency>
                         <groupId>com.sun.xml.bind</groupId>
                         <artifactId>jaxb-xjc</artifactId>
-                        <version>2.2.10</version>
+                        <version>2.2.11</version>
                     </dependency>
                     <dependency>
                         <groupId>com.sun.xml.ws</groupId>
@@ -469,7 +491,7 @@
                     <dependency>
                         <groupId>org.glassfish.jaxb</groupId>
                         <artifactId>jaxb-xjc</artifactId>
-                        <version>2.2.10</version>
+                        <version>2.2.11</version>
                         <exclusions>
                             <exclusion>
                                 <groupId>com.sun.istack</groupId>

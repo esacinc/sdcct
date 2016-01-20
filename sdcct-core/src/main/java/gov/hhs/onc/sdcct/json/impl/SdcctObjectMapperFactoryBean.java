@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.io.SerializedString;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.IOException;
 import java.util.Map;
@@ -31,20 +32,22 @@ public class SdcctObjectMapperFactoryBean extends Jackson2ObjectMapperFactoryBea
 
     private final static SerializedString FIELD_VALUE_DELIM = new SerializedString(": ");
 
-    private int indentSpaces;
+    private int indentSize;
 
     @Override
     public void afterPropertiesSet() {
         super.afterPropertiesSet();
 
-        if (this.getObject().isEnabled(SerializationFeature.INDENT_OUTPUT) && (this.indentSpaces > 0)) {
-            DefaultIndenter indenter = new DefaultIndenter(StringUtils.repeat(StringUtils.SPACE, this.indentSpaces), StringUtils.LF);
+        ObjectMapper objMapper = this.getObject();
+
+        if (objMapper.isEnabled(SerializationFeature.INDENT_OUTPUT) && (this.indentSize > 0)) {
+            DefaultIndenter indenter = new DefaultIndenter(StringUtils.repeat(StringUtils.SPACE, this.indentSize), StringUtils.LF);
 
             SdcctPrettyPrinter prettyPrinter = new SdcctPrettyPrinter(indenter.getIndent());
             prettyPrinter.indentArraysWith(indenter);
             prettyPrinter.indentObjectsWith(indenter);
 
-            this.getObject().setDefaultPrettyPrinter(prettyPrinter);
+            objMapper.setDefaultPrettyPrinter(prettyPrinter);
         }
     }
 
@@ -60,11 +63,11 @@ public class SdcctObjectMapperFactoryBean extends Jackson2ObjectMapperFactoryBea
         }
     }
 
-    public int getIndentSpaces() {
-        return this.indentSpaces;
+    public int getIndentSize() {
+        return this.indentSize;
     }
 
-    public void setIndentSpaces(int indentSpaces) {
-        this.indentSpaces = indentSpaces;
+    public void setIndentSize(int indentSize) {
+        this.indentSize = indentSize;
     }
 }

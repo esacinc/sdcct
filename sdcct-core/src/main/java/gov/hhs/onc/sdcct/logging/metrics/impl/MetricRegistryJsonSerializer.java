@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import gov.hhs.onc.sdcct.logging.utils.SdcctMarkerUtils;
+import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -17,8 +18,6 @@ import org.springframework.stereotype.Component;
 
 @Component("jsonSerializerMetricRegistry")
 public class MetricRegistryJsonSerializer extends StdSerializer<MetricRegistry> {
-    private final static String METRIC_KEY_DELIM = ".";
-
     private final static long serialVersionUID = 0L;
 
     public MetricRegistryJsonSerializer() {
@@ -43,7 +42,7 @@ public class MetricRegistryJsonSerializer extends StdSerializer<MetricRegistry> 
 
         if (!metricMap.isEmpty()) {
             Map<String, List<String>> metricKeyMap = metricMap.keySet().stream().sorted(String.CASE_INSENSITIVE_ORDER)
-                .collect(Collectors.groupingBy((metricKey) -> StringUtils.split(metricKey, METRIC_KEY_DELIM, 2)[0]));
+                .collect(Collectors.groupingBy((metricKey) -> StringUtils.split(metricKey, SdcctStringUtils.PERIOD, 2)[0]));
 
             List<String> metricKeys;
             String metricFieldKey;
@@ -51,14 +50,15 @@ public class MetricRegistryJsonSerializer extends StdSerializer<MetricRegistry> 
 
             for (String metricKeyPrefix : metricKeyMap.keySet()) {
                 if (((metricKeys = metricKeyMap.get(metricKeyPrefix)).size() == 1)
-                    && !StringUtils.contains((metricFieldKey = metricKeys.get(0)), METRIC_KEY_DELIM)) {
+                    && !StringUtils.contains((metricFieldKey = metricKeys.get(0)), SdcctStringUtils.PERIOD_CHAR)) {
                     jsonGen.writeObjectField(SdcctMarkerUtils.buildFieldName(metricKeyPrefix),
                         (((metricFieldValue = metricMap.get(metricFieldKey)) instanceof Gauge<?>)
                             ? ((Gauge<?>) metricFieldValue).getValue() : metricFieldValue));
                 } else {
                     serializeMetricField(jsonGen, metricKeyPrefix,
                         metricKeys.stream().sorted(String.CASE_INSENSITIVE_ORDER)
-                            .collect(Collectors.toMap((String metricKey) -> StringUtils.removeStartIgnoreCase(metricKey, (metricKeyPrefix + METRIC_KEY_DELIM)),
+                            .collect(Collectors.toMap(
+                                (String metricKey) -> StringUtils.removeStartIgnoreCase(metricKey, (metricKeyPrefix + SdcctStringUtils.PERIOD_CHAR)),
                                 ((Function<String, Object>) metricMap::get))));
                 }
             }

@@ -38,6 +38,12 @@
         <jaxb:class name="IssueCode"/>
     </jaxb:bindings>
     
+    <jaxb:bindings node="xsd:complexType[@name='ResourceContainer']">
+        <jaxb:bindings node="xsd:choice">
+            <jaxb:property name="content"/>
+        </jaxb:bindings>
+    </jaxb:bindings>
+    
     <jaxb:bindings node="xsd:complexType[@name='string']">
         <jaxb:class name="StringValue"/>
     </jaxb:bindings>

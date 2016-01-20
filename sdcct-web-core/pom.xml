@@ -189,10 +189,6 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http-netty-client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-addr</artifactId>
         </dependency>
         <dependency>
@@ -294,10 +290,6 @@
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring-oxm</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
         </dependency>
         <dependency>
@@ -349,6 +341,20 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies-deb</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>copy-test-dependencies-web</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <executions>
                     <execution>
@@ -374,6 +380,14 @@
                 <executions>
                     <execution>
                         <id>copy-test-resources-testng</id>
+                    </execution>
+                    <execution>
+                        <id>copy-resources-deb-control</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>copy-resources-deb-data</id>
+                        <phase>none</phase>
                     </execution>
                 </executions>
             </plugin>

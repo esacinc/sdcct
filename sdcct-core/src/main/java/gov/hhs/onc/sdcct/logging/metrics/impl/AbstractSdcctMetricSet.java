@@ -3,6 +3,7 @@ package gov.hhs.onc.sdcct.logging.metrics.impl;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Metric;
 import gov.hhs.onc.sdcct.logging.metrics.SdcctMetricSet;
+import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
 import java.lang.management.MemoryUsage;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,10 +43,6 @@ public abstract class AbstractSdcctMetricSet implements SdcctMetricSet {
             }
         }
     }
-
-    protected final static String METRIC_NAME_DELIM = ".";
-    protected final static String METRIC_NAME_PART_DELIM = "_";
-    protected final static String METRIC_DISPLAY_NAME_PART_DELIM = "-";
 
     protected final static String AFTER_METRIC_NAME_PART = "after";
     protected final static String BEFORE_METRIC_NAME_PART = "before";
@@ -136,10 +133,10 @@ public abstract class AbstractSdcctMetricSet implements SdcctMetricSet {
     }
 
     protected static String normalizeMetricDisplayName(String metricDisplayName) {
-        return METRIC_DISPLAY_NAME_NORMALIZE_REPLACE_PATTERN.matcher(metricDisplayName).replaceAll(METRIC_DISPLAY_NAME_PART_DELIM);
+        return METRIC_DISPLAY_NAME_NORMALIZE_REPLACE_PATTERN.matcher(metricDisplayName).replaceAll(SdcctStringUtils.HYPHEN);
     }
 
     protected static String buildMetricName(String ... metricNameParts) {
-        return StringUtils.join(metricNameParts, METRIC_NAME_DELIM);
+        return StringUtils.join(metricNameParts, SdcctStringUtils.PERIOD_CHAR);
     }
 }

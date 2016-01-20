@@ -2,6 +2,7 @@ package gov.hhs.onc.sdcct.logging.metrics.impl;
 
 import com.codahale.metrics.Metric;
 import com.sun.management.UnixOperatingSystemMXBean;
+import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
 import java.lang.management.ManagementFactory;
 import java.util.Map;
 import org.springframework.stereotype.Component;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component("metricSetSys")
 public class SystemMetricSet extends AbstractSdcctMetricSet {
     private final static String CPU_METRIC_NAME_PART = "cpu";
-    private final static String FILE_DESCRIPTOR_METRIC_NAME_PART = "file" + METRIC_NAME_PART_DELIM + "descriptor";
+    private final static String FILE_DESCRIPTOR_METRIC_NAME_PART = "file" + SdcctStringUtils.UNDERSCORE_CHAR + "descriptor";
     private final static String OS_METRIC_NAME_PART = "os";
     private final static String SYSTEM_METRIC_NAME_PART = "system";
 

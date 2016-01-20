@@ -1,6 +1,5 @@
 package gov.hhs.onc.sdcct.form.impl;
 
-import gov.hhs.onc.sdcct.beans.impl.AbstractNamedBean;
 import gov.hhs.onc.sdcct.fhir.Questionnaire;
 import gov.hhs.onc.sdcct.fhir.impl.QuestionnaireImpl;
 import gov.hhs.onc.sdcct.form.Form;
@@ -19,26 +18,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class FormImpl extends AbstractNamedBean implements Form {
+public class FormImpl implements Form {
     @Autowired
     private XmlCodec xmlCodec;
 
+    private String id;
+    private String name;
     private ResourceSource formDesignSrc;
     private ResourceSource questionnaireSrc;
     private PackageType pkg;
     private Element pkgElem;
     private Questionnaire questionnaire;
 
+    public FormImpl(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     @Override
     public void afterPropertiesSet() throws Exception {
         if (this.isSetFormDesignSource()) {
-            this.pkgElem =
-                ((Document) this.xmlCodec.encode(
-                    (this.pkg =
-                        new PackageTypeImpl().setPackageModules(new PackageModulesTypeImpl().setMainFormPackage(new FormPackageTypeImpl()
-                            .setFormPackageModules(new FormPackageModulesImpl().setFormDesignPkg(new FormDesignPkgTypeImpl()
-                                .setFormDesignTemplate(this.xmlCodec.decode(this.formDesignSrc, FormDesignTypeImpl.class))))))), new DOMResult()).getNode())
-                    .getDocumentElement();
+            this.pkgElem = ((Document) this.xmlCodec.encode(
+                (this.pkg = new PackageTypeImpl().setPackageModules(new PackageModulesTypeImpl()
+                    .setMainFormPackage(new FormPackageTypeImpl().setFormPackageModules(new FormPackageModulesImpl().setFormDesignPkg(
+                        new FormDesignPkgTypeImpl().setFormDesignTemplate(this.xmlCodec.decode(this.formDesignSrc, FormDesignTypeImpl.class))))))),
+                new DOMResult()).getNode()).getDocumentElement();
         }
 
         if (this.isSetQuestionnaireSource()) {
@@ -60,6 +64,16 @@ public class FormImpl extends AbstractNamedBean implements Form {
     @Override
     public void setFormDesignSource(@Nullable ResourceSource formDesignSrc) {
         this.formDesignSrc = formDesignSrc;
+    }
+
+    @Override
+    public String getId() {
+        return this.id;
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
     }
 
     @Override

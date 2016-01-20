@@ -8,10 +8,17 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
     <!--====================================================================================================
+    = TASK EXECUTORS
+    =====================================================================================================-->
+    <beans:bean id="taskExecTxWsServer" parent="taskExecTxWs"
+        p:threadNamePrefix="#{ threadGroup.name }-ws-server"/>
+    
+    <!--====================================================================================================
     = JAX-RS SERVERS
     =====================================================================================================-->
     <beans:bean id="serverJaxRs" class="gov.hhs.onc.sdcct.ws.impl.SdcctJaxRsServerFactoryBean" abstract="true"
-        p:bus-ref="bus">
+        p:bus-ref="bus"
+        p:txTaskExecutor-ref="taskExecTxWsServer">
         <beans:property name="features">
             <beans:list>
                 <beans:ref bean="featureLogging"/>
@@ -41,7 +48,8 @@
     =====================================================================================================-->
     <beans:bean id="serverJaxWs" class="gov.hhs.onc.sdcct.ws.impl.SdcctJaxWsServerFactoryBean" abstract="true"
         p:bindingConfig-ref="soapBindingConfig12"
-        p:bus-ref="bus">
+        p:bus-ref="bus"
+        p:txTaskExecutor-ref="taskExecTxWsServer">
         <beans:property name="features">
             <beans:list>
                 <beans:ref bean="featureLogging"/>
@@ -50,7 +58,7 @@
         </beans:property>
         <beans:property name="outFaultInterceptors">
             <beans:list>
-                <beans:ref bean="interceptorFaultStackTrace"/>
+                <beans:ref bean="interceptorSoapFaultStackTrace"/>
             </beans:list>
         </beans:property>
     </beans:bean>

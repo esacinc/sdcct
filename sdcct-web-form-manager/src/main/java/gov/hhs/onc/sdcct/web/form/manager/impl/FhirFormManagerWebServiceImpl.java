@@ -19,12 +19,12 @@ public class FhirFormManagerWebServiceImpl extends AbstractFhirFormWebService<Fo
 
             if (form == null) {
                 throw new FhirException(String.format("Form (id=%s) is unavailable.", questionnaireId)).setIssueCodeType(IssueCodeType.NOT_FOUND)
-                    .setRespStatus(Status.NOT_FOUND);
+                    .setIssueDetailConceptParts("MSG_NO_EXIST", questionnaireId).setRespStatus(Status.NOT_FOUND);
             }
 
             if (!form.isSetQuestionnaire()) {
                 throw new FhirException(String.format("FHIR SDC variant of the specified form (id=%s) is unavailable.", questionnaireId))
-                    .setIssueCodeType(IssueCodeType.NOT_FOUND).setRespStatus(Status.NOT_FOUND);
+                    .setIssueCodeType(IssueCodeType.NOT_FOUND).setIssueDetailConceptParts("MSG_NO_EXIST", questionnaireId).setRespStatus(Status.NOT_FOUND);
             }
 
             return form.getQuestionnaire();

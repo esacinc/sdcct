@@ -40,6 +40,6 @@ public final class SdcctMarkerUtils {
     }
 
     public static String buildFieldName(String fieldName) {
-        return StringUtils.join(SdcctStringUtils.splitCamelCase(fieldName, SdcctStringUtils.UNDERSCORE), SdcctStringUtils.UNDERSCORE).toLowerCase();
+        return StringUtils.join(SdcctStringUtils.splitCamelCase(fieldName, SdcctStringUtils.UNDERSCORE), SdcctStringUtils.UNDERSCORE_CHAR).toLowerCase();
     }
 }

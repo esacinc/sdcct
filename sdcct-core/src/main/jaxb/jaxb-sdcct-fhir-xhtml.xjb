@@ -22,6 +22,9 @@
     =====================================================================================================-->
     <jaxb:bindings node="xsd:attributeGroup[@name='i18n']/xsd:attribute[@ref='xml:lang']">
         <jaxb:property name="xmlLang"/>
+        <annox:annotate target="field">
+            @com.fasterxml.jackson.annotation.JsonIgnore
+        </annox:annotate>
     </jaxb:bindings>
     
     <!--====================================================================================================
@@ -29,5 +32,8 @@
     =====================================================================================================-->
     <jaxb:bindings node="xsd:element[@name='bdo']/xsd:complexType/xsd:complexContent/xsd:extension/xsd:attribute[@ref='xml:lang']">
         <jaxb:property name="xmlLang"/>
+        <annox:annotate target="field">
+            @com.fasterxml.jackson.annotation.JsonIgnore
+        </annox:annotate>
     </jaxb:bindings>
  </jaxb:bindings>

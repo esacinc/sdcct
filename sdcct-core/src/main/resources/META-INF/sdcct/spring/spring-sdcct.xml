@@ -46,12 +46,17 @@
     </beans:bean>
     
     <!--====================================================================================================
+    = THREAD FACTORIES
+    =====================================================================================================-->
+    <beans:bean id="threadFactory" class="org.springframework.scheduling.concurrent.CustomizableThreadFactory" abstract="true"
+        p:daemon="true"
+        p:threadGroup-ref="threadGroup"/>
+    
+    <!--====================================================================================================
     = TASK EXECUTORS
     =====================================================================================================-->
-    <beans:bean id="taskExecThreadPool" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor" abstract="true"
-        p:daemon="true"
-        p:queueCapacity="0"
-        p:threadGroup-ref="threadGroup"/>
+    <beans:bean id="taskExecThreadPool" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor" parent="threadFactory" abstract="true"
+        p:queueCapacity="0"/>
     
     <beans:bean id="taskExecThreadPoolDynamic" parent="taskExecThreadPool" abstract="true"
         p:allowCoreThreadTimeOut="true"
@@ -60,10 +65,8 @@
     <!--====================================================================================================
     = TASK SCHEDULERS
     =====================================================================================================-->
-    <beans:bean id="taskSchedulerThreadPool" class="org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler" abstract="true"
-        p:daemon="true"
-        p:removeOnCancelPolicy="true"
-        p:threadGroup-ref="threadGroup"/>
+    <beans:bean id="taskSchedulerThreadPool" class="org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler" parent="threadFactory" abstract="true"
+        p:removeOnCancelPolicy="true"/>
     
     <!--====================================================================================================
     = TIME ZONES

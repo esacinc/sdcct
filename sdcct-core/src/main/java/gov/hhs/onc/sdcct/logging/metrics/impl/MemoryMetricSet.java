@@ -1,6 +1,7 @@
 package gov.hhs.onc.sdcct.logging.metrics.impl;
 
 import com.codahale.metrics.Metric;
+import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
 import java.lang.management.BufferPoolMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
@@ -12,14 +13,14 @@ import org.springframework.stereotype.Component;
 @Component("metricSetMem")
 public class MemoryMetricSet extends AbstractSdcctMetricSet {
     private final static String MEMORY_BUFFER_POOL_METRIC_NAME_PREFIX =
-        buildMetricName(MEMORY_METRIC_NAME_PART, ("buffer" + METRIC_NAME_PART_DELIM + POOL_METRIC_NAME_PART));
+        buildMetricName(MEMORY_METRIC_NAME_PART, ("buffer" + SdcctStringUtils.UNDERSCORE_CHAR + POOL_METRIC_NAME_PART));
     private final static String MEMORY_HEAP_METRIC_NAME_PREFIX = buildMetricName(MEMORY_METRIC_NAME_PART, HEAP_METRIC_NAME_PART);
     private final static String MEMORY_NON_HEAP_METRIC_NAME_PREFIX = buildMetricName(MEMORY_METRIC_NAME_PART, ("non" + HEAP_METRIC_NAME_PART));
     private final static String MEMORY_POOL_METRIC_NAME_PREFIX = buildMetricName(MEMORY_METRIC_NAME_PART, POOL_METRIC_NAME_PART);
     private final static String MEMORY_TOTAL_METRIC_NAME_PREFIX = buildMetricName(MEMORY_METRIC_NAME_PART, TOTAL_METRIC_NAME_PART);
 
     private final static String MEMORY_OBJ_PENDING_FINALIZATION_COUNT_METRIC_NAME = buildMetricName(MEMORY_METRIC_NAME_PART,
-        ("obj" + METRIC_NAME_PART_DELIM + "pending" + METRIC_NAME_PART_DELIM + "finalization"), COUNT_METRIC_NAME_PART);
+        ("obj" + SdcctStringUtils.UNDERSCORE_CHAR + "pending" + SdcctStringUtils.UNDERSCORE_CHAR + "finalization"), COUNT_METRIC_NAME_PART);
 
     @Override
     public Map<String, Metric> getMetrics() {

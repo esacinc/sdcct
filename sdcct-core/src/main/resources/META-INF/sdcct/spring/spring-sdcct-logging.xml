@@ -7,5 +7,15 @@
     xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
+    <!--====================================================================================================
+    = TRANSACTION IDS
+    =====================================================================================================-->
+    <beans:bean id="txId" class="gov.hhs.onc.sdcct.data.impl.TxId" abstract="true"/>
     
+    <beans:bean id="txIdHttp" parent="txId"/>
+    
+    <!--====================================================================================================
+    = TASK EXECUTORS
+    =====================================================================================================-->
+    <beans:bean id="taskExecTx" class="gov.hhs.onc.sdcct.logging.impl.TxTaskExecutor" parent="threadFactory" abstract="true"/>
 </beans:beans>

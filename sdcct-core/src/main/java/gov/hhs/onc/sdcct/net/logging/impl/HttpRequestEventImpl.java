@@ -1,15 +1,20 @@
-package gov.hhs.onc.sdcct.web.logging.impl;
+package gov.hhs.onc.sdcct.net.logging.impl;
 
-import gov.hhs.onc.sdcct.web.logging.HttpRequestEvent;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import gov.hhs.onc.sdcct.logging.impl.SdcctMarkerBuilder;
+import gov.hhs.onc.sdcct.net.logging.HttpRequestEvent;
+import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
+import java.util.List;
+import java.util.Map;
 import javax.annotation.Nullable;
-import org.springframework.http.HttpMethod;
 
 public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpRequestEvent {
     private String authType;
     private String contextPath;
     private String localName;
     private Integer localPort;
-    private HttpMethod method;
+    private String method;
+    private Map<String, List<String>> params;
     private String pathInfo;
     private String protocol;
     private String queryString;
@@ -17,6 +22,7 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
     private String remoteHost;
     private Integer remotePort;
     private String scheme;
+    private boolean secure;
     private String serverName;
     private Integer serverPort;
     private String servletPath;
@@ -24,6 +30,22 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
     private String url;
     private String userPrincipal;
 
+    @Override
+    protected SdcctMarkerBuilder buildMarkerInternal() {
+        String msgPrefix = String.format("HTTP %s request", this.endpointType.name().toLowerCase());
+
+        return super.buildMarkerInternal().appendMessage(
+            (msgPrefix + String.format(" (txId=%s, method=%s, uri=%s, headers=%s, localName=%s, localPort=%d, remoteAddr=%s, remoteHost=%s, remotePort=%d).",
+                this.txId, this.method, this.uri, this.headers, this.localName, this.localPort, this.remoteAddr, this.remoteHost, this.remotePort)),
+            (msgPrefix + SdcctStringUtils.PERIOD_CHAR));
+    }
+
+    @Override
+    public boolean hasAuthType() {
+        return (this.authType != null);
+    }
+
+    @JsonProperty
     @Nullable
     @Override
     public String getAuthType() {
@@ -35,6 +57,12 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
         this.authType = authType;
     }
 
+    @Override
+    public boolean hasContextPath() {
+        return (this.contextPath != null);
+    }
+
+    @JsonProperty
     @Nullable
     @Override
     public String getContextPath() {
@@ -46,6 +74,12 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
         this.contextPath = contextPath;
     }
 
+    @Override
+    public boolean hasLocalName() {
+        return (this.localName != null);
+    }
+
+    @JsonProperty
     @Nullable
     @Override
     public String getLocalName() {
@@ -57,6 +91,12 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
         this.localName = localName;
     }
 
+    @Override
+    public boolean hasLocalPort() {
+        return (this.localPort != null);
+    }
+
+    @JsonProperty
     @Nullable
     @Override
     public Integer getLocalPort() {
@@ -68,16 +108,29 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
         this.localPort = localPort;
     }
 
+    @JsonProperty
     @Override
-    public HttpMethod getMethod() {
+    public String getMethod() {
         return this.method;
     }
 
     @Override
-    public void setMethod(HttpMethod method) {
+    public void setMethod(String method) {
         this.method = method;
     }
 
+    @JsonProperty
+    @Override
+    public Map<String, List<String>> getParameters() {
+        return this.params;
+    }
+
+    @Override
+    public void setParameters(Map<String, List<String>> params) {
+        this.params = params;
+    }
+
+    @JsonProperty
     @Override
     public String getPathInfo() {
         return this.pathInfo;
@@ -88,6 +141,7 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
         this.pathInfo = pathInfo;
     }
 
+    @JsonProperty
     @Override
     public String getProtocol() {
         return this.protocol;
@@ -98,6 +152,7 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
         this.protocol = protocol;
     }
 
+    @JsonProperty
     @Override
     public String getQueryString() {
         return this.queryString;
@@ -108,6 +163,12 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
         this.queryString = queryString;
     }
 
+    @Override
+    public boolean hasRemoteAddr() {
+        return (this.remoteAddr != null);
+    }
+
+    @JsonProperty
     @Nullable
     @Override
     public String getRemoteAddr() {
@@ -119,6 +180,7 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
         this.remoteAddr = remoteAddr;
     }
 
+    @JsonProperty
     @Override
     public String getRemoteHost() {
         return this.remoteHost;
@@ -129,6 +191,7 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
         this.remoteHost = remoteHost;
     }
 
+    @JsonProperty
     @Override
     public Integer getRemotePort() {
         return this.remotePort;
@@ -139,6 +202,7 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
         this.remotePort = remotePort;
     }
 
+    @JsonProperty
     @Override
     public String getScheme() {
         return this.scheme;
@@ -149,6 +213,23 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
         this.scheme = scheme;
     }
 
+    @JsonProperty
+    @Override
+    public boolean isSecure() {
+        return this.secure;
+    }
+
+    @Override
+    public void setSecure(boolean secure) {
+        this.secure = secure;
+    }
+
+    @Override
+    public boolean hasServerName() {
+        return (this.serverName != null);
+    }
+
+    @JsonProperty
     @Nullable
     @Override
     public String getServerName() {
@@ -160,6 +241,12 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
         this.serverName = serverName;
     }
 
+    @Override
+    public boolean hasServerPort() {
+        return (this.serverPort != null);
+    }
+
+    @JsonProperty
     @Nullable
     @Override
     public Integer getServerPort() {
@@ -171,6 +258,12 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
         this.serverPort = serverPort;
     }
 
+    @Override
+    public boolean hasServletPath() {
+        return (this.servletPath != null);
+    }
+
+    @JsonProperty
     @Nullable
     @Override
     public String getServletPath() {
@@ -182,6 +275,7 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
         this.servletPath = servletPath;
     }
 
+    @JsonProperty
     @Override
     public String getUri() {
         return this.uri;
@@ -192,6 +286,7 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
         this.uri = uri;
     }
 
+    @JsonProperty
     @Override
     public String getUrl() {
         return this.url;
@@ -202,6 +297,12 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
         this.url = url;
     }
 
+    @Override
+    public boolean hasUserPrincipal() {
+        return (this.userPrincipal != null);
+    }
+
+    @JsonProperty
     @Nullable
     @Override
     public String getUserPrincipal() {

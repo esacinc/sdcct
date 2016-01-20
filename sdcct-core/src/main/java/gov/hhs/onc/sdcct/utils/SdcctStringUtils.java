@@ -12,6 +12,9 @@ public final class SdcctStringUtils {
     public final static String HYPHEN = "-";
     public final static char HYPHEN_CHAR = '-';
 
+    public final static String PERIOD = ".";
+    public final static char PERIOD_CHAR = '.';
+
     public final static String UNDERSCORE = "_";
     public final static char UNDERSCORE_CHAR = '_';
 

@@ -7,9 +7,4 @@
     xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
-    <!--====================================================================================================
-    = REGISTRATION BEANS
-    =====================================================================================================-->
-    <beans:bean id="regBean" class="org.springframework.boot.context.embedded.RegistrationBean" abstract="true"
-        p:order="#{ T(org.springframework.core.Ordered).LOWEST_PRECEDENCE }"/>
 </beans:beans>

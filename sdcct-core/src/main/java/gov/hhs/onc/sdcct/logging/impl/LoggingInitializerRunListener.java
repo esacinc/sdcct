@@ -96,11 +96,11 @@ public class LoggingInitializerRunListener extends AbstractApplicationInitialize
         }
     }
 
-    private final static String CONSOLE_APPENDER_PATTERN = "%" + PriorityColorCompositeConverter.WORD + " - %" + MessageMarkerConverter.WORD + "{"
-        + AppenderType.CONSOLE.getId() + "}%n%" + RootCauseThrowableProxyConverter.WORD;
+    private final static String CONSOLE_APPENDER_PATTERN = "%" + PriorityColorCompositeConverter.WORD + "%" + TxMdcConverter.WORD + " - %"
+        + MessageMarkerConverter.WORD + "{" + AppenderType.CONSOLE.getId() + "}%n%" + RootCauseThrowableProxyConverter.WORD;
 
-    private final static String FILE_APPENDER_PATTERN = "%d{yyyy-MM-dd HH:mm:ss z} [%C:%L %t] %p - %" + MessageMarkerConverter.WORD + "{"
-        + AppenderType.FILE.getId() + "}%n%" + RootCauseThrowableProxyConverter.WORD;
+    private final static String FILE_APPENDER_PATTERN = "%d{yyyy-MM-dd HH:mm:ss z} [%C:%L %t] %p%" + TxMdcConverter.WORD + " - %" + MessageMarkerConverter.WORD
+        + "{" + AppenderType.FILE.getId() + "}%n%" + RootCauseThrowableProxyConverter.WORD;
 
     private LoggerContext loggerContext;
     private Map<AppenderType, Appender<ILoggingEvent>> appenders = new EnumMap<>(AppenderType.class);
@@ -140,6 +140,7 @@ public class LoggingInitializerRunListener extends AbstractApplicationInitialize
         this.buildConversionRule(MessageMarkerConverter.WORD, MessageMarkerConverter.class);
         this.buildConversionRule(PriorityColorCompositeConverter.WORD, PriorityColorCompositeConverter.class);
         this.buildConversionRule(RootCauseThrowableProxyConverter.WORD, RootCauseThrowableProxyConverter.class);
+        this.buildConversionRule(TxMdcConverter.WORD, TxMdcConverter.class);
 
         this.buildAppender(new ConsoleAppender<>(), AppenderType.CONSOLE, this.buildPatternLayoutEncoder(CONSOLE_APPENDER_PATTERN), true);
 
@@ -161,8 +162,7 @@ public class LoggingInitializerRunListener extends AbstractApplicationInitialize
 
             this.buildLogger(loggerName, loggerLvl, false, ((loggerPropValueParts.length == 2)
                 ? Stream.of(org.springframework.util.StringUtils.commaDelimitedListToStringArray(loggerPropValueParts[1])).map(loggerAppenderName -> {
-                AppenderType loggerAppenderType =
-                    SdcctEnumUtils.findByPredicate(AppenderType.class, appenderType -> appenderType.getId().equals(loggerAppenderName));
+                AppenderType loggerAppenderType = SdcctEnumUtils.findById(AppenderType.class, loggerAppenderName);
 
                 if (!this.appenders.containsKey(loggerAppenderType)) {
                     throw new ApplicationContextException(String.format("Unknown application (name=%s) logger (name=%s) appender type (name=%s).",

@@ -55,7 +55,7 @@
             <beans:map merge="true">
                 <beans:entry key="#{ T(javax.xml.transform.OutputKeys).INDENT }" value="#{ T(gov.hhs.onc.sdcct.utils.SdcctOptionUtils).YES_VALUE }"/>
                 <!--suppress SpringPlaceholdersInspection -->
-                <beans:entry key="#{ T(net.sf.saxon.lib.SaxonOutputKeys).INDENT_SPACES }" value="${sdcct.transform.serialize.pretty.indent.spaces}"/>
+                <beans:entry key="#{ T(net.sf.saxon.lib.SaxonOutputKeys).INDENT_SPACES }" value="${sdcct.transform.content.pretty.indent.size}"/>
             </beans:map>
         </beans:constructor-arg>
     </beans:bean>

@@ -336,9 +336,10 @@ outline.allPackageContexts.each{
         }
         
         fields = implClass.fields()
-        classMethods = classRef.methods().stream().collect(Collectors.toMap({ it.name() }, { it }))
-        implClassMethods = implClass.methods().stream().collect(Collectors.toMap({ it.name() }, { it }))
-        props = classModel.properties.stream().collect(Collectors.toMap({ it.getName(true) }, { it }))
+        classMethods = classRef.methods().stream().collect(Collectors.toMap({ it.name() }, { it }, { classMethod1, classMethod2 -> classMethod2 }))
+        implClassMethods = implClass.methods().stream().collect(Collectors.toMap({ it.name() }, { it },
+            { implClassMethod1, implClassMethod2 -> implClassMethod2 }))
+        props = classModel.properties.stream().collect(Collectors.toMap({ it.getName(true) }, { it }, { prop1, prop2 -> prop2 }))
         
         props.values().each{
             if (!implClassMethods.containsKey((propGetterName = (GETTER_METHOD_NAME_PREFIX + (publicPropName = it.getName(true))))) &&

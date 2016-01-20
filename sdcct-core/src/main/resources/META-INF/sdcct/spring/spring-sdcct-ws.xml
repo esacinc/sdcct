@@ -8,6 +8,22 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
     <!--====================================================================================================
+    = TRANSACTION IDS
+    =====================================================================================================-->
+    <beans:bean id="txIdWs" parent="txId"/>
+    
+    <!--====================================================================================================
+    = TASK EXECUTORS
+    =====================================================================================================-->
+    <beans:bean id="taskExecTxWs" parent="taskExecTx" abstract="true">
+        <beans:constructor-arg name="txIds">
+            <beans:map>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.logging.MdcPropertyNames).WS_TX_ID }" value-ref="txIdWs"/>
+            </beans:map>
+        </beans:constructor-arg>
+    </beans:bean>
+    
+    <!--====================================================================================================
     = SOAP BINDINGS
     =====================================================================================================-->
     <beans:bean id="soapBindingConfig" class="org.apache.cxf.binding.soap.SoapBindingConfiguration" abstract="true"
@@ -20,7 +36,7 @@
     <!--====================================================================================================
     = FEATURES
     =====================================================================================================-->
-    <beans:bean id="featureLogging" class="org.apache.cxf.feature.LoggingFeature"/>
+    <beans:bean id="featureLogging" class="gov.hhs.onc.sdcct.ws.logging.impl.SdcctLoggingFeature"/>
     
     <!--====================================================================================================
     = BUS
@@ -29,7 +45,7 @@
         <beans:property name="properties">
             <beans:map>
                 <!--suppress SpringPlaceholdersInspection -->
-                <beans:entry key="#{ T(gov.hhs.onc.sdcct.ws.SdcctWsContextPropertyNames).ERROR_STACK_TRACE }" value="${sdcct.ws.context.error.stack.trace}"
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.ws.WsPropertyNames).ERROR_STACK_TRACE }" value="${sdcct.ws.context.error.stack.trace}"
                     value-type="java.lang.Boolean"/>
             </beans:map>
         </beans:property>

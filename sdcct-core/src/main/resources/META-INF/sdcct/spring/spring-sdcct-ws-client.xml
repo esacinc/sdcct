@@ -8,6 +8,18 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
     <!--====================================================================================================
+    = TASK EXECUTORS
+    =====================================================================================================-->
+    <beans:bean id="taskExecTxWsClient" parent="taskExecTxWs"
+        p:threadNamePrefix="#{ threadGroup.name }-ws-client">
+        <beans:constructor-arg name="txIds">
+            <beans:map merge="true">
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.logging.MdcPropertyNames).HTTP_TX_ID }" value-ref="txIdHttp"/>
+            </beans:map>
+        </beans:constructor-arg>
+    </beans:bean>
+    
+    <!--====================================================================================================
     = CONDUIT CONFIGURERS
     =====================================================================================================-->
     <beans:bean id="conduitConfigurer" class="gov.hhs.onc.sdcct.ws.impl.SdcctConduitConfigurer"
@@ -27,7 +39,8 @@
     = JAX-RS CLIENTS
     =====================================================================================================-->
     <beans:bean id="clientJaxRs" class="gov.hhs.onc.sdcct.ws.impl.SdcctJaxRsClientFactoryBean" abstract="true"
-        p:bus-ref="bus">
+        p:bus-ref="bus"
+        p:txTaskExecutor-ref="taskExecTxWsClient">
         <beans:property name="conduitSelector">
             <beans:bean class="org.apache.cxf.endpoint.DeferredConduitSelector"/>
         </beans:property>
@@ -46,7 +59,8 @@
     =====================================================================================================-->
     <beans:bean id="clientJaxWs" class="gov.hhs.onc.sdcct.ws.impl.SdcctJaxWsClientFactoryBean" abstract="true"
         p:bindingConfig-ref="soapBindingConfig12"
-        p:bus-ref="bus">
+        p:bus-ref="bus"
+        p:txTaskExecutor-ref="taskExecTxWsClient">
         <beans:property name="conduitSelector">
             <beans:bean class="org.apache.cxf.endpoint.DeferredConduitSelector"/>
         </beans:property>
