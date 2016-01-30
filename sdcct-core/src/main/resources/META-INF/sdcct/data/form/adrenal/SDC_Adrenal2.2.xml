@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FormDesign xmlns="http://healthIT.gov/sdc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   formID="ID=129/v=2.004.001/"
+   xsi:schemaLocation="http://healthIT.gov/sdc SDCFormDesign.xsd" formID="ID=129/v=2.004.001/"
    baseItemURI="https://cap.org/ecc/sdc">
 
    <!-- @styleClass: left, right, noBreak, header_text, title, body, linkIcon, 
@@ -9,15 +9,15 @@
    <!-- many custom @type values are used as object names, .e.g., "approval-status" -->
 
 
-   <Header ID="S1" title="Adrenal Gland" styleClass="left">
+   <Header ID="S1" title="Adrenal Gland" styleClass="left noBreak">
 
-      <OtherText val="CAP Approved" styleClass="right noBreak"/>
+      <OtherText val="CAP Approved" styleClass="floatRight"/>
 
       <OtherText val="Surgical Pathology Cancer Case Summary (Checklist)" name="header_text"
          styleClass="header_text">
          <HTML>
             <div xmlns="http://www.w3.org/1999/xhtml"
-               class="header_text"
+               xsi:schemaLocation="http://www.w3.org/1999/xhtml xhtml.xsd" class="header_text"
                style="border-bottom:1px solid black;padding-bottom:0px;text-align:left;"
                >Surgical Pathology Cancer Case Summary (Checklist)</div>
          </HTML>
@@ -45,8 +45,9 @@
          styleClass="title">
          <!-- could add @val on DisplayText to shorten the construct-->
          <HTML>
-            <div xmlns="http://www.w3.org/1999/xhtml">
-               <b>ADRENAL GLAND:<i class="s1"
+            <div xmlns="http://www.w3.org/1999/xhtml"
+               xsi:schemaLocation="http://www.w3.org/1999/xhtml xhtml.xsd">
+               <b>ADRENAL GLAND:<i style="s1"
                      >Biopsy (Core Needle, Incisional, Excisional); Resection</i></b>
             </div>
          </HTML>
@@ -96,9 +97,6 @@
       <!-- Section without title -->
       <OtherText val="aaa" type="tooltip"/>
       <ChildItems>
-         <Section ID="S002" title="Section111" minCard="0">
-            <!-- Section without title -->
-            <ChildItems>
                <Section ID="4257" title="[METADATA]" visible="false" showInReport="false">
                   <!-- does DisplayText need @visible ? -->
                   <ChildItems>
@@ -460,7 +458,7 @@
 
                <Section ID="17878" title="MARGINS">
                   <ChildItems>
-                     <Question ID="20899" title="">
+                     <Question ID="2153" title="">
                         <!-- Invisible question -->
                         <OtherText type="tooltip" val="Margins Status"/>
                         <ListField>
@@ -634,7 +632,6 @@
                            <LinkText val="Note F"/>
                            <LinkURI val="https://cap.org/eccID=129/v=2.004.001.1000043#NoteF"/>
                         </Link>
-                        <!-- need @val on LinkText instead of UTF8Text -->
                         <ListField multiSelect="true">
                            <List>
                               <ListItem ID="2159" title="Not identified">
@@ -974,8 +971,6 @@
                      </Question>
                   </ChildItems>
                </Section>
-            </ChildItems>
-         </Section>
 
          <Section ID="17884" title="ADDITIONAL NON_TUMOR" mustImplement="false">
             <!-- @mustImplement is unclear on CAP optional items -->
