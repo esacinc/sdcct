@@ -5,23 +5,23 @@ import gov.hhs.onc.sdcct.rfd.RfdWsXmlQnames;
 import gov.hhs.onc.sdcct.rfd.impl.RetrieveFormRequestTypeImpl;
 import gov.hhs.onc.sdcct.rfd.impl.WorkflowDataTypeImpl;
 import gov.hhs.onc.sdcct.web.test.impl.AbstractSdcctWebIntegrationTests;
+import gov.hhs.onc.sdcct.ws.impl.JaxWsClient;
 import javax.annotation.Resource;
-import org.apache.cxf.endpoint.Client;
 import org.testng.annotations.Test;
 
 @Test(groups = { "sdcct.test.it.web.form.manager.all", "sdcct.test.it.web.form.manager.ws.rfd" })
-public class RfdFormManagerServiceIntegrationTests extends AbstractSdcctWebIntegrationTests {
+public class RfdFormManagerWebServiceIntegrationTests extends AbstractSdcctWebIntegrationTests {
     @Resource(name = "formTest1")
     @SuppressWarnings({ "SpringJavaAutowiringInspection" })
     private Form testForm1;
 
     @Resource(name = "clientFormManagerRfdLocal")
     @SuppressWarnings({ "SpringJavaAutowiringInspection" })
-    private Client testClient;
+    private JaxWsClient testClient;
 
     @Test
     public void testRetrieveForm() throws Exception {
-        this.testClient.invoke(RfdWsXmlQnames.RETRIEVE_FORM_OP,
+        this.testClient.invoke(this.testClient.buildInvocationDelegate(), RfdWsXmlQnames.RETRIEVE_FORM_OP,
             new RetrieveFormRequestTypeImpl().setWorkflowData(new WorkflowDataTypeImpl().setFormID(this.testForm1.getId()).setEncodedResponse(true)));
     }
 }

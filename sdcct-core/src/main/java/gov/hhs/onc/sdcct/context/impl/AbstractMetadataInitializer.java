@@ -1,7 +1,7 @@
 package gov.hhs.onc.sdcct.context.impl;
 
 import gov.hhs.onc.sdcct.context.MetadataInitializer;
-import gov.hhs.onc.sdcct.context.SdcctProperties;
+import gov.hhs.onc.sdcct.context.SdcctPropertyNames;
 import java.io.File;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -46,6 +46,6 @@ public abstract class AbstractMetadataInitializer extends AbstractApplicationIni
 
     @Nullable
     protected String buildHomeDirectoryPath(ConfigurableEnvironment env) {
-        return Optional.ofNullable(env.getProperty(SdcctProperties.APP_HOME_DIR_NAME)).orElse(env.getProperty(SdcctProperties.USER_DIR_NAME));
+        return Optional.ofNullable(env.getProperty(SdcctPropertyNames.APP_HOME_DIR)).orElse(env.getProperty(SdcctPropertyNames.USER_DIR));
     }
 }

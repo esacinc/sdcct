@@ -1,10 +1,11 @@
 package gov.hhs.onc.sdcct.web.tomcat.impl;
 
-import gov.hhs.onc.sdcct.data.impl.TxId;
-import gov.hhs.onc.sdcct.logging.MdcPropertyNames;
+import gov.hhs.onc.sdcct.context.SdcctPropertyNames;
+import gov.hhs.onc.sdcct.logging.impl.TxIdGenerator;
 import gov.hhs.onc.sdcct.logging.impl.TxTaskWrapper;
 import java.io.File;
 import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -73,19 +74,21 @@ public class SdcctTomcatEmbeddedServletContainerFactory extends TomcatEmbeddedSe
     }
 
     public class SdcctThreadPoolExecutor extends ThreadPoolExecutor {
-        public SdcctThreadPoolExecutor() {
+        private Map<String, TxIdGenerator> txIdGens;
+
+        public SdcctThreadPoolExecutor(Map<String, TxIdGenerator> txIdGens) {
             super(SdcctTomcatEmbeddedServletContainerFactory.this.minConnThreads, SdcctTomcatEmbeddedServletContainerFactory.this.maxConnThreads,
                 SdcctTomcatEmbeddedServletContainerFactory.this.connKeepAliveTimeout, TimeUnit.SECONDS, new TaskQueue(), new TaskThreadFactory(
                     (SdcctTomcatEmbeddedServletContainerFactory.this.connEndpointName + CONN_EXEC_THREAD_NAME_PREFIX), true, Thread.NORM_PRIORITY));
+
+            this.txIdGens = txIdGens;
 
             ((TaskQueue) this.getQueue()).setParent(this);
         }
 
         @Override
         public void execute(Runnable task) {
-            super.execute((task.getClass().getName().equals(SOCKET_PROCESSOR_CLASS_NAME)
-                ? new TxTaskWrapper(Collections.singletonMap(MdcPropertyNames.HTTP_TX_ID, SdcctTomcatEmbeddedServletContainerFactory.this.httpTxId), task)
-                : task));
+            super.execute((task.getClass().getName().equals(SOCKET_PROCESSOR_CLASS_NAME) ? new TxTaskWrapper(this.txIdGens, task) : task));
         }
     }
 
@@ -97,10 +100,10 @@ public class SdcctTomcatEmbeddedServletContainerFactory extends TomcatEmbeddedSe
     private String connEndpointName;
     private int connKeepAliveTimeout;
     private int connTimeout;
-    private TxId httpTxId;
     private int maxConns;
     private int maxConnThreads;
     private int minConnThreads;
+    private TxIdGenerator txIdGen;
     private Tomcat tomcat;
 
     @Override
@@ -130,7 +133,7 @@ public class SdcctTomcatEmbeddedServletContainerFactory extends TomcatEmbeddedSe
         super.customizeConnector(conn);
 
         Http11NioProtocol connProtocol = ((Http11NioProtocol) conn.getProtocolHandler());
-        connProtocol.setExecutor(new SdcctThreadPoolExecutor());
+        connProtocol.setExecutor(new SdcctThreadPoolExecutor(Collections.singletonMap(SdcctPropertyNames.HTTP_SERVER_TX_ID, this.txIdGen)));
         connProtocol.setConnectionTimeout(this.connTimeout);
         connProtocol.getEndpoint().setName(this.connEndpointName);
         connProtocol.setKeepAliveTimeout(this.connKeepAliveTimeout);
@@ -185,14 +188,6 @@ public class SdcctTomcatEmbeddedServletContainerFactory extends TomcatEmbeddedSe
         this.connTimeout = connTimeout;
     }
 
-    public TxId getHttpTxId() {
-        return this.httpTxId;
-    }
-
-    public void setHttpTxId(TxId httpTxId) {
-        this.httpTxId = httpTxId;
-    }
-
     @Nonnegative
     public int getMaxConnections() {
         return this.maxConns;
@@ -222,6 +217,14 @@ public class SdcctTomcatEmbeddedServletContainerFactory extends TomcatEmbeddedSe
 
     public Tomcat getTomcat() {
         return this.tomcat;
+    }
+
+    public TxIdGenerator getTxIdGenerator() {
+        return this.txIdGen;
+    }
+
+    public void setTxIdGenerator(TxIdGenerator txIdGen) {
+        this.txIdGen = txIdGen;
     }
 
     public void setValves(Valve ... valves) {

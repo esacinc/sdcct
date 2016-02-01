@@ -8,11 +8,11 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
     <!--====================================================================================================
-    = TRANSACTION IDS
+    = TRANSACTION ID GENERATORS
     =====================================================================================================-->
-    <beans:bean id="txId" class="gov.hhs.onc.sdcct.data.impl.TxId" abstract="true"/>
-    
-    <beans:bean id="txIdHttp" parent="txId"/>
+    <beans:bean id="txIdGen" class="gov.hhs.onc.sdcct.logging.impl.TxIdGenerator" abstract="true">
+        <beans:constructor-arg name="msgDigest" ref="msgDigestSha1"/>
+    </beans:bean>
     
     <!--====================================================================================================
     = TASK EXECUTORS

@@ -3,6 +3,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName
 import com.github.sebhoss.warnings.CompilerWarnings
 import com.sun.codemodel.CodeWriter
 import com.sun.codemodel.JAnnotationUse
+import com.sun.codemodel.JClass
 import com.sun.codemodel.JCodeModel
 import com.sun.codemodel.JDefinedClass
 import com.sun.codemodel.JExpr
@@ -28,6 +29,7 @@ import com.sun.tools.xjc.model.Model
 import com.sun.tools.xjc.outline.Outline
 import com.sun.xml.ws.util.ServiceFinder
 import gov.hhs.onc.sdcct.tools.codegen.impl.CodegenErrorReceiver
+import gov.hhs.onc.sdcct.tools.codegen.impl.CodegenNameConverter
 import gov.hhs.onc.sdcct.tools.utils.SdcctToolUtils
 import java.lang.reflect.Field
 import java.lang.reflect.Method
@@ -62,6 +64,8 @@ def final IMPL_CLASS_NAME_SUFFIX = "Impl"
 def final JAXB_CONTEXT_FACTORY_SIMPLE_CLASS_NAME = "JAXBContextFactory"
 
 def final VALUE_FIELD_NAME = "value"
+
+def final ADD_METHOD_NAME = "add"
 
 def final GETTER_METHOD_NAME_PREFIX = "get"
 def final IS_METHOD_NAME_PREFIX = "is"
@@ -178,6 +182,8 @@ opts.schemaLanguage = Language.XMLSCHEMA
 opts.targetDir = outDir
 opts.verbose = verbose
 
+opts.setNameConverter(new CodegenNameConverter(), null)
+
 try {
     if (wsimport) {
         wsimportOpts.parseArguments(args.toArray(new String[args.size()]))
@@ -200,40 +206,45 @@ plugins.each{
 
 try {
     if (wsimport) {
-        plugins.each{
+        plugins.each {
             wsimportOpts.activePlugins.add(it.forWsimport())
         }
-        
+
         def metadataFinder = new MetadataFinder(new WSDLInternalizationLogic(), wsimportOpts, wsimportErrorReceiver)
         metadataFinder.parseWSDL()
-        
+
         def wsdlModel = new WSDLModeler(wsimportOpts, wsimportErrorReceiver, metadataFinder).buildModel()
         def wsdlJaxbModel = wsdlModel.JAXBModel.s2JJAXBModel
         def wsdlJaxbModelClass = wsdlJaxbModel.class
-        
-        def wsdlJaxbModelModelField = wsdlJaxbModelClass.declaredFields.find{ (it.name == "model") }
+
+        def wsdlJaxbModelModelField = wsdlJaxbModelClass.declaredFields.find { (it.name == "model") }
         wsdlJaxbModelModelField.accessible = true
-        model = ((Model) wsdlJaxbModelModelField.get(wsdlJaxbModel))
-        
-        def wsdlJaxbModelOutlineField = wsdlJaxbModelClass.declaredFields.find{ (it.name == "outline") }
+        model = ((Model)wsdlJaxbModelModelField.get(wsdlJaxbModel))
+
+        def wsdlJaxbModelOutlineField = wsdlJaxbModelClass.declaredFields.find { (it.name == "outline") }
         wsdlJaxbModelOutlineField.accessible = true
-        outline = ((Outline) wsdlJaxbModelOutlineField.get(wsdlJaxbModel))
-        
+        outline = ((Outline)wsdlJaxbModelOutlineField.get(wsdlJaxbModel))
+
         CustomExceptionGenerator.generate(wsdlModel, wsimportOpts, wsimportErrorReceiver)
         SeiGenerator.generate(wsdlModel, wsimportOpts, wsimportErrorReceiver)
-        
+
         for (GeneratorBase genBase : ServiceFinder.find(GeneratorBase)) {
             genBase.init(wsdlModel, wsimportOpts, wsimportErrorReceiver)
             genBase.doGeneration()
         }
-        
+
         for (Plugin plugin : wsimportOpts.activePlugins) {
             plugin.run(wsdlModel, wsimportOpts, wsimportErrorReceiver)
         }
     } else {
-        model = ModelLoader.load(opts, (codeModel = new JCodeModel()), xjcErrorReceiver)
-        outline = model.generateCode(opts, xjcErrorReceiver)
+        if ((model = ModelLoader.load(opts, (codeModel = new JCodeModel()), xjcErrorReceiver)) != null) {
+            outline = model.generateCode(opts, xjcErrorReceiver)
+        } else {
+            throw new MojoExecutionException("Unable to generate code model for class(es).")
+        }
     }
+} catch (MojoExecutionException e) {
+    throw e
 } catch (e) {
     throw new MojoExecutionException("Unable to generate code outline for class(es).", e)
 }
@@ -294,9 +305,14 @@ def propGetterName
 def propIsGetter
 def propGetter
 def propClass
+def privatePropName
 def implPropGetter
 def implPropSetter
 def propSetterName
+def propAdderName
+def propItemClass
+def implPropAdder
+def implPropAdderBody
 
 def Field classModelAnnosField = JDefinedClass.class.getDeclaredField("annotations")
 classModelAnnosField.accessible = true
@@ -348,6 +364,7 @@ outline.allPackageContexts.each{
             }
             
             propClass = (propGetter = classMethods[propGetterName]).type()
+            privatePropName = it.getName(false)
             
             (implPropGetter = implClassMethods[propGetterName]).annotations().find{ it.annotationClass.fullName() == JsonProperty.class.name }.each{
                 methodModelAnnosField.get(implPropGetter).remove(it)
@@ -365,7 +382,7 @@ outline.allPackageContexts.each{
                 if (classMethods.containsKey(propSetterName)) {
                     classMethods[propSetterName].type(classRef)
                 } else {
-                    classRef.method(JMod.NONE, classRef, propSetterName).param(propClass, "value")
+                    classRef.method(JMod.NONE, classRef, propSetterName).param(propClass, privatePropName)
                 }
                 
                 (implPropSetter = implClassMethods[propSetterName]).type(classRef)
@@ -374,6 +391,15 @@ outline.allPackageContexts.each{
                 if (StringUtils.startsWith(implPropSetter?.params()[0].type().fullName(), JAXBElement.class.name)) {
                     implPropSetter.annotate(SuppressWarnings.class).paramArray(VALUE_FIELD_NAME).param(uncheckedStaticRef)
                 }
+            }
+            
+            if (it.collection) {
+                classRef.method(JMod.NONE, classRef, (propAdderName = (ADD_METHOD_NAME + publicPropName))).param(
+                    (propItemClass = ((JClass) propClass).getTypeParameters()[0]), privatePropName);
+                
+                (implPropAdder = implClass.method(JMod.PUBLIC, classRef, propAdderName)).param(propItemClass, privatePropName)
+                (implPropAdderBody = implPropAdder.body()).invoke(JExpr._this().invoke(implPropGetter), ADD_METHOD_NAME).arg(JExpr.direct(privatePropName))
+                implPropAdderBody._return(JExpr._this())
             }
         }
     }

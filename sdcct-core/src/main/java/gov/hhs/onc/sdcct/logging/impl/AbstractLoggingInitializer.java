@@ -1,6 +1,6 @@
 package gov.hhs.onc.sdcct.logging.impl;
 
-import gov.hhs.onc.sdcct.context.SdcctProperties;
+import gov.hhs.onc.sdcct.context.SdcctPropertyNames;
 import gov.hhs.onc.sdcct.context.impl.AbstractApplicationInitializer;
 import gov.hhs.onc.sdcct.context.impl.SdcctApplication;
 import gov.hhs.onc.sdcct.logging.LoggingInitializer;
@@ -29,7 +29,7 @@ public abstract class AbstractLoggingInitializer extends AbstractApplicationInit
 
     protected String buildLogstashLogFileName(ConfigurableEnvironment env) {
         String logstashLogFileName =
-            env.getProperty(SdcctProperties.LOGGING_LOGSTASH_FILE_NAME_NAME, (this.app.getName() + DEFAULT_LOGSTASH_LOG_FILE_NAME_SUFFIX));
+            env.getProperty(SdcctPropertyNames.LOGGING_LOGSTASH_FILE_NAME, (this.app.getName() + DEFAULT_LOGSTASH_LOG_FILE_NAME_SUFFIX));
 
         if (StringUtils.isBlank(logstashLogFileName)) {
             throw new ApplicationContextException("Unable to determine Logstash log file name.");
@@ -39,13 +39,13 @@ public abstract class AbstractLoggingInitializer extends AbstractApplicationInit
     }
 
     protected boolean buildLogConsoleTty(ConfigurableEnvironment env) {
-        String consoleTty = env.getProperty(SdcctProperties.LOGGING_CONSOLE_TTY_NAME);
+        String consoleTty = env.getProperty(SdcctPropertyNames.LOGGING_CONSOLE_TTY);
 
         return ((consoleTty != null) ? BooleanUtils.toBoolean(consoleTty) : (System.console() != null));
     }
 
     protected String buildLogFileName(ConfigurableEnvironment env) {
-        String logFileName = env.getProperty(SdcctProperties.LOGGING_FILE_NAME_NAME, this.app.getName());
+        String logFileName = env.getProperty(SdcctPropertyNames.LOGGING_FILE_NAME, this.app.getName());
 
         if (StringUtils.isBlank(logFileName)) {
             throw new ApplicationContextException("Unable to determine log file name.");
@@ -77,6 +77,6 @@ public abstract class AbstractLoggingInitializer extends AbstractApplicationInit
     }
 
     protected String buildLogFileDirectoryPath(ConfigurableEnvironment env) {
-        return env.getProperty(SdcctProperties.LOGGING_FILE_DIR_NAME, new File(this.app.getHomeDirectory(), DEFAULT_LOG_FILE_DIR_RELATIVE_PATH).getPath());
+        return env.getProperty(SdcctPropertyNames.LOGGING_FILE_DIR, new File(this.app.getHomeDirectory(), DEFAULT_LOG_FILE_DIR_RELATIVE_PATH).getPath());
     }
 }

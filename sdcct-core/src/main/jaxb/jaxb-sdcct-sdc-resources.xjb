@@ -12,27 +12,12 @@
     <!--====================================================================================================
     = ATTRIBUTE GROUPS
     =====================================================================================================-->
-    <jaxb:bindings node="xsd:attributeGroup[@name='ChangeAttributes']">
-        <jaxb:bindings node="xsd:attribute[@name='changeID']">
-            <jaxb:property name="changeId"/>
-        </jaxb:bindings>
-    </jaxb:bindings>
-    
     <jaxb:bindings node="xsd:attributeGroup[@name='IDAttributes']">
         <jaxb:bindings node="xsd:attribute[@name='ID']">
             <jaxb:property name="id"/>
         </jaxb:bindings>
         <jaxb:bindings node="xsd:attribute[@name='baseURI']">
             <jaxb:property name="baseUri"/>
-        </jaxb:bindings>
-    </jaxb:bindings>
-    
-    <jaxb:bindings node="xsd:attributeGroup[@name='ResponseReportingAttributes']">
-        <jaxb:bindings node="xsd:attribute[@name='instanceGUID']">
-            <jaxb:property name="instanceGuid"/>
-        </jaxb:bindings>
-        <jaxb:bindings node="xsd:attribute[@name='parentGUID']">
-            <jaxb:property name="parentGuid"/>
         </jaxb:bindings>
     </jaxb:bindings>
  </jaxb:bindings>

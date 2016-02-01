@@ -8,16 +8,32 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
     <!--====================================================================================================
+    = TRANSACTION ID GENERATORS
+    =====================================================================================================-->
+    <beans:bean id="txIdGenHttpClient" parent="txIdGen"
+        c:name="http-client"/>
+    
+    <beans:bean id="txIdGenWsClient" parent="txIdGen"
+        c:name="ws-client"/>
+    
+    <!--====================================================================================================
     = TASK EXECUTORS
     =====================================================================================================-->
-    <beans:bean id="taskExecTxWsClient" parent="taskExecTxWs"
+    <beans:bean id="taskExecTxWsClient" parent="taskExecTx"
         p:threadNamePrefix="#{ threadGroup.name }-ws-client">
-        <beans:constructor-arg name="txIds">
-            <beans:map merge="true">
-                <beans:entry key="#{ T(gov.hhs.onc.sdcct.logging.MdcPropertyNames).HTTP_TX_ID }" value-ref="txIdHttp"/>
+        <beans:constructor-arg name="txIdGens">
+            <beans:map>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.context.SdcctPropertyNames).HTTP_CLIENT_TX_ID }" value-ref="txIdGenHttpClient"/>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.context.SdcctPropertyNames).WS_CLIENT_TX_ID }" value-ref="txIdGenWsClient"/>
             </beans:map>
         </beans:constructor-arg>
     </beans:bean>
+    
+    <!--====================================================================================================
+    = CONDUIT SELECTORS
+    =====================================================================================================-->
+    <beans:bean id="conduitSelector" class="gov.hhs.onc.sdcct.ws.impl.SdcctConduitSelector" lazy-init="true" scope="prototype"
+        c:taskExec-ref="taskExecTxWsClient"/>
     
     <!--====================================================================================================
     = CONDUIT CONFIGURERS
@@ -38,12 +54,9 @@
     <!--====================================================================================================
     = JAX-RS CLIENTS
     =====================================================================================================-->
-    <beans:bean id="clientJaxRs" class="gov.hhs.onc.sdcct.ws.impl.SdcctJaxRsClientFactoryBean" abstract="true"
+    <beans:bean id="clientJaxRs" class="gov.hhs.onc.sdcct.ws.impl.JaxRsClientFactoryBean" abstract="true"
         p:bus-ref="bus"
-        p:txTaskExecutor-ref="taskExecTxWsClient">
-        <beans:property name="conduitSelector">
-            <beans:bean class="org.apache.cxf.endpoint.DeferredConduitSelector"/>
-        </beans:property>
+        p:conduitSelector-ref="conduitSelector">
         <beans:property name="features">
             <beans:list>
                 <beans:ref bean="featureLogging"/>
@@ -57,13 +70,10 @@
     <!--====================================================================================================
     = JAX-WS CLIENTS
     =====================================================================================================-->
-    <beans:bean id="clientJaxWs" class="gov.hhs.onc.sdcct.ws.impl.SdcctJaxWsClientFactoryBean" abstract="true"
+    <beans:bean id="clientJaxWs" class="gov.hhs.onc.sdcct.ws.impl.JaxWsClientFactoryBean" abstract="true"
         p:bindingConfig-ref="soapBindingConfig12"
         p:bus-ref="bus"
-        p:txTaskExecutor-ref="taskExecTxWsClient">
-        <beans:property name="conduitSelector">
-            <beans:bean class="org.apache.cxf.endpoint.DeferredConduitSelector"/>
-        </beans:property>
+        p:conduitSelector-ref="conduitSelector">
         <beans:property name="features">
             <beans:list>
                 <beans:ref bean="featureLogging"/>

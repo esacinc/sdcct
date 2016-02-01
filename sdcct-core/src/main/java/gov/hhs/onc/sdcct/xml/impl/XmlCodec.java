@@ -82,14 +82,22 @@ public class XmlCodec extends AbstractContentCodec implements InitializingBean {
             try {
                 unmarshaller.setProperty(unmarshallerPropName, unmarshallerPropValue);
             } catch (PropertyException e) {
-                throw new JAXBException(String.format("Unable to set JAXB unmarshaller property (name=%s) value: %s", unmarshallerPropName,
-                    unmarshallerPropValue), e);
+                throw new JAXBException(
+                    String.format("Unable to set JAXB unmarshaller property (name=%s) value: %s", unmarshallerPropName, unmarshallerPropValue), e);
             }
         }
 
         Object result = unmarshaller.unmarshal(src);
 
         return resultClass.cast(((result instanceof JAXBElement<?>) ? ((JAXBElement<?>) result).getValue() : result));
+    }
+
+    public <T extends Result> T decode(Source src, T result) throws Exception {
+        return this.decode(src, result, Collections.emptyMap());
+    }
+
+    public <T extends Result> T decode(Source src, T result, Map<String, Object> opts) throws Exception {
+        return this.serializer.serializeToResult(src, result);
     }
 
     @Override
@@ -115,9 +123,10 @@ public class XmlCodec extends AbstractContentCodec implements InitializingBean {
             try {
                 src = srcClassCreateElemMethod.invoke(srcClassObjFactory, src);
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                throw new JAXBException(String.format(
-                    "Unable to invoke JAXB object factory (class=%s) element creation method (name=%s) for source class (name=%s).", srcClassObjFactory
-                        .getClass().getName(), srcClassCreateElemMethod.getName(), srcClass.getName()), e);
+                throw new JAXBException(
+                    String.format("Unable to invoke JAXB object factory (class=%s) element creation method (name=%s) for source class (name=%s).",
+                        srcClassObjFactory.getClass().getName(), srcClassCreateElemMethod.getName(), srcClass.getName()),
+                    e);
             }
         }
 
@@ -130,14 +139,30 @@ public class XmlCodec extends AbstractContentCodec implements InitializingBean {
             try {
                 marshaller.setProperty(marshallerPropName, marshallerPropValue);
             } catch (PropertyException e) {
-                throw new JAXBException(String.format("Unable to set JAXB marshaller property (name=%s) value: %s", marshallerPropName, marshallerPropValue), e);
+                throw new JAXBException(String.format("Unable to set JAXB marshaller property (name=%s) value: %s", marshallerPropName, marshallerPropValue),
+                    e);
             }
         }
 
-        marshaller.marshal(src, (SdcctOptionUtils.getBooleanValue(opts, ContentEncodeOptions.PRETTY_NAME, this.defaultEncodeOpts)
-            ? this.prettySerializer : this.serializer).getContentHandler(result, null, null));
+        marshaller.marshal(src, this.buildSerializer(opts, this.defaultEncodeOpts).getContentHandler(result, null, null));
 
         return result;
+    }
+
+    public byte[] encode(Source src) throws Exception {
+        return this.encode(src, Collections.emptyMap());
+    }
+
+    public byte[] encode(Source src, Map<String, Object> opts) throws Exception {
+        return this.encode(src, new ByteArrayResult(), opts).getBytes();
+    }
+
+    public <T extends Result> T encode(Source src, T result) throws Exception {
+        return this.encode(src, result, Collections.emptyMap());
+    }
+
+    public <T extends Result> T encode(Source src, T result, Map<String, Object> opts) throws Exception {
+        return this.buildSerializer(opts, this.defaultEncodeOpts).serializeToResult(src, result);
     }
 
     @Override
@@ -148,12 +173,10 @@ public class XmlCodec extends AbstractContentCodec implements InitializingBean {
         Class<?> contextClass;
 
         for (Object[] contextObjFactories : this.objFactories) {
-            context =
-                JAXBContextCache.getCachedContextAndSchemas(
-                    new LinkedHashSet<>((contextObjFactoryClasses =
-                        Stream.of(contextObjFactories).collect(
-                            SdcctStreamUtils.toMap(Function.identity(), Object::getClass, () -> new LinkedHashMap<>(contextObjFactories.length)))).values()),
-                    null, this.contextProps, null, true).getContext();
+            context = JAXBContextCache.getCachedContextAndSchemas(
+                new LinkedHashSet<>((contextObjFactoryClasses = Stream.of(contextObjFactories)
+                    .collect(SdcctStreamUtils.toMap(Function.identity(), Object::getClass, () -> new LinkedHashMap<>(contextObjFactories.length)))).values()),
+                null, this.contextProps, null, true).getContext();
 
             for (Object contextObjFactory : contextObjFactoryClasses.keySet()) {
                 for (Method contextObjFactoryMethod : contextObjFactoryClasses.get(contextObjFactory).getMethods()) {
@@ -175,6 +198,10 @@ public class XmlCodec extends AbstractContentCodec implements InitializingBean {
                 this.contextClasses.size(), this.contextClassCreateElemMethods.size(),
                 contextObjFactoryClasses.values().stream().map(Class::getName).collect(Collectors.joining(", "))));
         }
+    }
+
+    private SdcctSerializer buildSerializer(Map<String, Object> opts, Map<String, Object> defaultOpts) {
+        return (SdcctOptionUtils.getBooleanValue(opts, ContentEncodeOptions.PRETTY_NAME, defaultOpts) ? this.prettySerializer : this.serializer);
     }
 
     public Map<String, Object> getContextProperties() {

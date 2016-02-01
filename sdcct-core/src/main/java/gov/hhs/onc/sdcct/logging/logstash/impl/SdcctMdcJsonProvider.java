@@ -2,7 +2,7 @@ package gov.hhs.onc.sdcct.logging.logstash.impl;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import com.fasterxml.jackson.core.JsonGenerator;
-import gov.hhs.onc.sdcct.logging.MdcPropertyNames;
+import gov.hhs.onc.sdcct.context.SdcctPropertyNames;
 import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
 import java.io.IOException;
 import java.util.Map;
@@ -30,7 +30,8 @@ public class SdcctMdcJsonProvider extends AbstractFieldJsonProvider<ILoggingEven
         }
 
         JsonWritingUtils.writeMapStringFields(jsonGen, this.getFieldName(),
-            mdcProps.entrySet().stream().filter(mdcPropEntry -> StringUtils.startsWith(mdcPropEntry.getKey(), MdcPropertyNames.PREFIX)).collect(SdcctStreamUtils
-                .toMap(mdcPropEntry -> StringUtils.removeStart(mdcPropEntry.getKey(), MdcPropertyNames.PREFIX), Entry::getValue, TreeMap::new)));
+            mdcProps.entrySet().stream().filter(mdcPropEntry -> StringUtils.startsWith(mdcPropEntry.getKey(), SdcctPropertyNames.PREFIX))
+                .collect(SdcctStreamUtils.toMap(mdcPropEntry -> StringUtils.removeStart(mdcPropEntry.getKey(), SdcctPropertyNames.PREFIX), Entry::getValue,
+                    TreeMap::new)));
     }
 }

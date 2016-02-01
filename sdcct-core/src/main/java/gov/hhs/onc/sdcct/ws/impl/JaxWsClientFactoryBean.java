@@ -1,24 +1,34 @@
 package gov.hhs.onc.sdcct.ws.impl;
 
-import gov.hhs.onc.sdcct.logging.impl.TxTaskExecutor;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.SmartFactoryBean;
 
-public class SdcctJaxWsClientFactoryBean extends JaxWsProxyFactoryBean implements DisposableBean, SmartFactoryBean<Client> {
-    private TxTaskExecutor txTaskExec;
+public class JaxWsClientFactoryBean extends JaxWsProxyFactoryBean implements DisposableBean, SmartFactoryBean<JaxWsClient> {
     private ClientProxy clientProxy;
 
-    public SdcctJaxWsClientFactoryBean() {
+    public JaxWsClientFactoryBean() {
         super();
     }
 
-    public SdcctJaxWsClientFactoryBean(String addr) {
+    public JaxWsClientFactoryBean(String addr) {
         super();
 
         this.setAddress(addr);
+    }
+
+    @Override
+    public JaxWsClient getObject() throws Exception {
+        return new JaxWsClient(((Client) this.create()));
+    }
+
+    @Override
+    public Object create() {
+        this.configured = true;
+
+        return super.create();
     }
 
     @Override
@@ -28,20 +38,6 @@ public class SdcctJaxWsClientFactoryBean extends JaxWsProxyFactoryBean implement
 
             this.clientProxy = null;
         }
-    }
-
-    @Override
-    public Client getObject() throws Exception {
-        return ((Client) this.create());
-    }
-
-    @Override
-    public Object create() {
-        this.configured = true;
-
-        this.getServiceFactory().setExecutor(this.txTaskExec);
-
-        return super.create();
     }
 
     @Override
@@ -56,7 +52,7 @@ public class SdcctJaxWsClientFactoryBean extends JaxWsProxyFactoryBean implement
 
     @Override
     public Class<?> getObjectType() {
-        return Client.class;
+        return JaxWsClient.class;
     }
 
     @Override
@@ -67,13 +63,5 @@ public class SdcctJaxWsClientFactoryBean extends JaxWsProxyFactoryBean implement
     @Override
     public boolean isSingleton() {
         return false;
-    }
-
-    public TxTaskExecutor getTxTaskExecutor() {
-        return this.txTaskExec;
-    }
-
-    public void setTxTaskExecutor(TxTaskExecutor txTaskExec) {
-        this.txTaskExec = txTaskExec;
     }
 }

@@ -4,10 +4,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import gov.hhs.onc.sdcct.logging.impl.AbstractLoggingEvent;
 import gov.hhs.onc.sdcct.net.logging.RestEndpointType;
 import gov.hhs.onc.sdcct.net.logging.RestEvent;
+import gov.hhs.onc.sdcct.net.logging.RestEventType;
 
 public abstract class AbstractRestEvent extends AbstractLoggingEvent implements RestEvent {
+    protected RestEventType eventType;
     protected RestEndpointType endpointType;
     protected String txId;
+
+    protected AbstractRestEvent(RestEventType eventType) {
+        this.eventType = eventType;
+    }
 
     @JsonProperty
     @Override
@@ -18,6 +24,11 @@ public abstract class AbstractRestEvent extends AbstractLoggingEvent implements 
     @Override
     public void setEndpointType(RestEndpointType endpointType) {
         this.endpointType = endpointType;
+    }
+
+    @Override
+    public RestEventType getEventType() {
+        return this.eventType;
     }
 
     @JsonProperty

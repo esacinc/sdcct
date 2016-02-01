@@ -1,6 +1,6 @@
 package gov.hhs.onc.sdcct.web.context.impl;
 
-import gov.hhs.onc.sdcct.context.SdcctProperties;
+import gov.hhs.onc.sdcct.context.SdcctPropertyNames;
 import gov.hhs.onc.sdcct.context.impl.SdcctApplication;
 import gov.hhs.onc.sdcct.context.impl.SdcctApplicationConfiguration;
 import java.io.File;
@@ -21,7 +21,7 @@ public class WebServletInitializer extends SpringBootServletInitializer {
         app.setApplicationContextClass(SdcctWebApplicationContext.class);
         app.setWebEnvironment(true);
 
-        app.setHomeDirectory(new File(Optional.ofNullable(System.getProperty(SdcctProperties.APP_HOME_DIR_NAME))
+        app.setHomeDirectory(new File(Optional.ofNullable(System.getProperty(SdcctPropertyNames.APP_HOME_DIR))
             .orElseGet(() -> (servletContext.getRealPath(WEBAPP_HOME_RESOLVE_PATH) + WEBAPP_HOME_CONTEXT_PATH))));
 
         app.addInitializers(new ServletContextApplicationContextInitializer(servletContext));

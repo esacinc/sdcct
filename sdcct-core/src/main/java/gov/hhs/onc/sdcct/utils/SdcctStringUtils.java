@@ -3,11 +3,47 @@ package gov.hhs.onc.sdcct.utils;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.commons.lang3.text.StrBuilder;
 
 public final class SdcctStringUtils {
+    public static class SdcctToStringStyle extends ToStringStyle {
+        public final static SdcctToStringStyle INSTANCE = new SdcctToStringStyle();
+
+        private final static long serialVersionUID = 0L;
+
+        public SdcctToStringStyle() {
+            super();
+
+            this.setArrayEnd("]");
+            this.setArraySeparator(", ");
+            this.setArrayStart("[");
+            this.setContentEnd("}");
+            this.setContentStart("{");
+            this.setFieldSeparator(", ");
+            this.setNullText("null");
+            this.setUseClassName(false);
+            this.setUseIdentityHashCode(false);
+        }
+
+        @Override
+        public void removeLastFieldSeparator(StringBuffer buffer) {
+            super.removeLastFieldSeparator(buffer);
+        }
+
+        private Object readResolve() {
+            return INSTANCE;
+        }
+    }
+
     public final static String COLON = ":";
     public final static char COLON_CHAR = ':';
+
+    public final static String COMMA = ",";
+    public final static char COMMA_CHAR = ',';
+
+    public final static String EQUALS = "=";
+    public final static char EQUALS_CHAR = '=';
 
     public final static String HYPHEN = "-";
     public final static char HYPHEN_CHAR = '-';

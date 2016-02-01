@@ -9,8 +9,8 @@ import java.util.stream.Stream;
 import org.springframework.http.MediaType;
 
 public enum FhirFormatType {
-    JSON(SdcctContentType.JSON, SdcctMediaTypes.APP_JSON_FHIR, SdcctMediaTypes.APP_JSON_FHIR_UTF8, SdcctMediaTypes.JSON_SUBTYPE), XML(SdcctContentType.XML,
-        SdcctMediaTypes.APP_XML_FHIR, SdcctMediaTypes.APP_XML_FHIR_UTF8, SdcctMediaTypes.XML_SUBTYPE, MediaType.TEXT_XML_VALUE);
+    JSON(SdcctContentType.JSON, SdcctMediaTypes.APP_JSON_FHIR, SdcctMediaTypes.APP_JSON_FHIR_UTF8, SdcctMediaTypes.JSON_SUBTYPE),
+    XML(SdcctContentType.XML, SdcctMediaTypes.APP_XML_FHIR, SdcctMediaTypes.APP_XML_FHIR_UTF8, SdcctMediaTypes.XML_SUBTYPE, MediaType.TEXT_XML_VALUE);
 
     private final SdcctContentType contentType;
     private final MediaType mediaType;

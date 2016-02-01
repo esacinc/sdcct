@@ -8,6 +8,12 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
     <!--====================================================================================================
+    = TRANSACTION ID GENERATORS
+    =====================================================================================================-->
+    <beans:bean id="txIdGenHttpServer" parent="txIdGen"
+        c:name="http-server"/>
+    
+    <!--====================================================================================================
     = EMBEDDED SERVLET CONTAINER FACTORIES
     =====================================================================================================-->
     <!--suppress ELValidationInJSP SpringElInspection SpringPlaceholdersInspection -->
@@ -18,10 +24,10 @@
         p:connectionTimeout="${sdcct.tomcat.server.conn.timeout}"
         p:contextPath="${sdcct.tomcat.server.context.path}"
         p:documentRoot="${sdcct.tomcat.server.doc.root.dir}"
-        p:httpTxId-ref="txIdHttp"
         p:maxConnections="${sdcct.tomcat.server.conn.max}"
         p:maxConnectionThreads="${sdcct.tomcat.server.conn.thread.max}"
         p:minConnectionThreads="${sdcct.tomcat.server.conn.thread.min}"
+        p:txIdGenerator-ref="txIdGenHttpServer"
         p:port="${sdcct.tomcat.server.port.http}"
         p:uriEncoding="#{ T(java.nio.charset.StandardCharsets).UTF_8 }">
         <beans:property name="contextLifecycleListeners">

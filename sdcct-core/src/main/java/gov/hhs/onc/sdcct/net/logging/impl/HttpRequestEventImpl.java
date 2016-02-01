@@ -1,12 +1,13 @@
 package gov.hhs.onc.sdcct.net.logging.impl;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import gov.hhs.onc.sdcct.logging.impl.SdcctMarkerBuilder;
 import gov.hhs.onc.sdcct.net.logging.HttpRequestEvent;
-import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
+import gov.hhs.onc.sdcct.net.logging.RestEventType;
+import gov.hhs.onc.sdcct.utils.SdcctStringUtils.SdcctToStringStyle;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpRequestEvent {
     private String authType;
@@ -14,9 +15,9 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
     private String localName;
     private Integer localPort;
     private String method;
-    private Map<String, List<String>> params;
     private String pathInfo;
     private String protocol;
+    private Map<String, List<String>> queryParams;
     private String queryString;
     private String remoteAddr;
     private String remoteHost;
@@ -30,14 +31,27 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
     private String url;
     private String userPrincipal;
 
-    @Override
-    protected SdcctMarkerBuilder buildMarkerInternal() {
-        String msgPrefix = String.format("HTTP %s request", this.endpointType.name().toLowerCase());
+    public HttpRequestEventImpl() {
+        super(RestEventType.REQUEST);
+    }
 
-        return super.buildMarkerInternal().appendMessage(
-            (msgPrefix + String.format(" (txId=%s, method=%s, uri=%s, headers=%s, localName=%s, localPort=%d, remoteAddr=%s, remoteHost=%s, remotePort=%d).",
-                this.txId, this.method, this.uri, this.headers, this.localName, this.localPort, this.remoteAddr, this.remoteHost, this.remotePort)),
-            (msgPrefix + SdcctStringUtils.PERIOD_CHAR));
+    @Override
+    protected void buildMarkerMessages(StringBuffer msgBuffer, ToStringBuilder msgToStrBuilder, StringBuffer logstashFileMsgBuffer,
+        ToStringBuilder logstashFileMsgToStrBuilder) {
+        super.buildMarkerMessages(msgBuffer, msgToStrBuilder, logstashFileMsgBuffer, logstashFileMsgToStrBuilder);
+
+        msgToStrBuilder.append("method", this.method);
+        msgToStrBuilder.append("uri", this.uri);
+        msgToStrBuilder.append("headers", this.headers);
+        msgToStrBuilder.append("localName", this.localName);
+        msgToStrBuilder.append("localPort", this.localPort);
+        msgToStrBuilder.append("remoteAddr", this.remoteAddr);
+        msgToStrBuilder.append("remoteHost", this.remoteHost);
+        msgToStrBuilder.append("remotePort", this.remotePort);
+
+        ((SdcctToStringStyle) msgToStrBuilder.getStyle()).removeLastFieldSeparator(msgBuffer);
+
+        msgBuffer.append(").");
     }
 
     @Override
@@ -121,17 +135,6 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
 
     @JsonProperty
     @Override
-    public Map<String, List<String>> getParameters() {
-        return this.params;
-    }
-
-    @Override
-    public void setParameters(Map<String, List<String>> params) {
-        this.params = params;
-    }
-
-    @JsonProperty
-    @Override
     public String getPathInfo() {
         return this.pathInfo;
     }
@@ -150,6 +153,17 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
     @Override
     public void setProtocol(String protocol) {
         this.protocol = protocol;
+    }
+
+    @JsonProperty
+    @Override
+    public Map<String, List<String>> getQueryParameters() {
+        return this.queryParams;
+    }
+
+    @Override
+    public void setQueryParameters(Map<String, List<String>> queryParams) {
+        this.queryParams = queryParams;
     }
 
     @JsonProperty

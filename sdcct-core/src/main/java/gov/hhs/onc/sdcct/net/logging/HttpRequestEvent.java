@@ -1,12 +1,10 @@
 package gov.hhs.onc.sdcct.net.logging;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import gov.hhs.onc.sdcct.logging.MarkerFieldName;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 
-@MarkerFieldName("httpRequest")
 public interface HttpRequestEvent extends HttpEvent {
     public boolean hasAuthType();
 
@@ -46,11 +44,6 @@ public interface HttpRequestEvent extends HttpEvent {
     public void setMethod(String method);
 
     @JsonProperty
-    public Map<String, List<String>> getParameters();
-
-    public void setParameters(Map<String, List<String>> params);
-
-    @JsonProperty
     public String getPathInfo();
 
     public void setPathInfo(String pathInfo);
@@ -59,6 +52,11 @@ public interface HttpRequestEvent extends HttpEvent {
     public String getProtocol();
 
     public void setProtocol(String protocol);
+
+    @JsonProperty
+    public Map<String, List<String>> getQueryParameters();
+
+    public void setQueryParameters(Map<String, List<String>> queryParams);
 
     @JsonProperty
     public String getQueryString();

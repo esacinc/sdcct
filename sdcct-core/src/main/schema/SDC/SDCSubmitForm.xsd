@@ -40,9 +40,7 @@
     </xs:complexType>
     <xs:complexType name="FormResponsesType">
         <xs:complexContent>
-            <xs:extension base="FormDesignType">
-                <xs:attributeGroup ref="ResponseAttributes"/>
-            </xs:extension>
+            <xs:extension base="FormDesignType"/>
         </xs:complexContent>
     </xs:complexType>
 </xs:schema>

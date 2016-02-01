@@ -33,7 +33,7 @@ public class SoapFaultStackTraceInterceptor extends AbstractPhaseInterceptor<Soa
         if (((faultCause = fault.getCause()) == null) || !MessageUtils.getContextualBoolean(msg, WsPropertyNames.ERROR_STACK_TRACE, false)) {
             return;
         }
-        
+
         Element faultDetailElem = fault.getOrCreateDetail();
         Document faultDetailDoc = faultDetailElem.getOwnerDocument();
 

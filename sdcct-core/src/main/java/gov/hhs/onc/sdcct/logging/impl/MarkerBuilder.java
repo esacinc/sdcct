@@ -8,40 +8,40 @@ import org.apache.commons.lang3.builder.Builder;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
-public class SdcctMarkerBuilder implements Builder<Marker> {
+public class MarkerBuilder implements Builder<Marker> {
     private Marker marker;
 
-    public SdcctMarkerBuilder(String ... tags) {
+    public MarkerBuilder(String ... tags) {
         this.appendTags(tags);
     }
 
-    public SdcctMarkerBuilder appendField(Object fieldValue) {
+    public MarkerBuilder appendField(Object fieldValue) {
         return this.appendField(SdcctMarkerUtils.buildFieldName(fieldValue), fieldValue);
     }
 
-    public SdcctMarkerBuilder appendField(String fieldName, Object fieldValue) {
+    public MarkerBuilder appendField(String fieldName, Object fieldValue) {
         return this.appendMarker(new ObjectAppendingMarker(fieldName, fieldValue));
     }
 
-    public SdcctMarkerBuilder appendMessage(String msg) {
+    public MarkerBuilder appendMessage(String msg) {
         return this.appendMessage(msg, null);
     }
 
-    public SdcctMarkerBuilder appendMessage(String msg, @Nullable String logstashFileMsg) {
+    public MarkerBuilder appendMessage(String msg, @Nullable String logstashFileMsg) {
         return this.appendMessage(msg, null, logstashFileMsg);
     }
 
-    public SdcctMarkerBuilder appendMessage(String consoleMsg, @Nullable String fileMsg, @Nullable String logstashFileMsg) {
+    public MarkerBuilder appendMessage(String consoleMsg, @Nullable String fileMsg, @Nullable String logstashFileMsg) {
         return this.appendMarker(new MessageMarker(consoleMsg, fileMsg, logstashFileMsg));
     }
 
-    public SdcctMarkerBuilder appendTags(String ... tags) {
+    public MarkerBuilder appendTags(String ... tags) {
         Stream.of(tags).forEach(tag -> this.appendMarker(MarkerFactory.getDetachedMarker(tag)));
 
         return this;
     }
 
-    public SdcctMarkerBuilder appendMarker(Marker markerAppend) {
+    public MarkerBuilder appendMarker(Marker markerAppend) {
         if (this.marker == null) {
             this.marker = markerAppend;
         } else {

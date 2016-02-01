@@ -15,6 +15,11 @@
         p:address="${sdcct.ws.form.manager.fhir.url.path}"
         p:serviceBean-ref="wsFormManagerFhirImpl"/>
     
+    <!--
+    TODO: Activate once WADL generation is implemented.
+    -->
+    <!--p:docLocation="${sdcct.ws.form.manager.fhir.wadl.loc}"-->
+    
     <!--====================================================================================================
     = JAX-WS SERVERS
     =====================================================================================================-->

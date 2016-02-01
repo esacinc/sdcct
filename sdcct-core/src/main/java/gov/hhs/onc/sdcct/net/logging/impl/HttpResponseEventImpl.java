@@ -1,21 +1,31 @@
 package gov.hhs.onc.sdcct.net.logging.impl;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import gov.hhs.onc.sdcct.logging.impl.SdcctMarkerBuilder;
 import gov.hhs.onc.sdcct.net.logging.HttpResponseEvent;
-import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
+import gov.hhs.onc.sdcct.net.logging.RestEventType;
+import gov.hhs.onc.sdcct.utils.SdcctStringUtils.SdcctToStringStyle;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class HttpResponseEventImpl extends AbstractHttpEvent implements HttpResponseEvent {
     private Integer statusCode;
     private String statusMsg;
 
-    @Override
-    protected SdcctMarkerBuilder buildMarkerInternal() {
-        String msgPrefix = String.format("HTTP %s response", this.endpointType.name().toLowerCase());
+    public HttpResponseEventImpl() {
+        super(RestEventType.RESPONSE);
+    }
 
-        return super.buildMarkerInternal().appendMessage(
-            (msgPrefix + String.format(" (txId=%s, headers=%s, statusCode=%d, statusMsg=%s).", this.txId, this.headers, this.statusCode, this.statusMsg)),
-            (msgPrefix + SdcctStringUtils.PERIOD_CHAR));
+    @Override
+    protected void buildMarkerMessages(StringBuffer msgBuffer, ToStringBuilder msgToStrBuilder, StringBuffer logstashFileMsgBuffer,
+        ToStringBuilder logstashFileMsgToStrBuilder) {
+        super.buildMarkerMessages(msgBuffer, msgToStrBuilder, logstashFileMsgBuffer, logstashFileMsgToStrBuilder);
+
+        msgToStrBuilder.append("headers", this.headers);
+        msgToStrBuilder.append("statusCode", this.statusCode);
+        msgToStrBuilder.append("statusMsg", this.statusMsg);
+
+        ((SdcctToStringStyle) msgToStrBuilder.getStyle()).removeLastFieldSeparator(msgBuffer);
+
+        msgBuffer.append(").");
     }
 
     @JsonProperty

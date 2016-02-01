@@ -8,17 +8,16 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
     <!--====================================================================================================
-    = TASK EXECUTORS
+    = TRANSACTION ID GENERATORS
     =====================================================================================================-->
-    <beans:bean id="taskExecTxWsServer" parent="taskExecTxWs"
-        p:threadNamePrefix="#{ threadGroup.name }-ws-server"/>
+    <beans:bean id="txIdGenWsServer" parent="txIdGen"
+        c:name="ws-server"/>
     
     <!--====================================================================================================
     = JAX-RS SERVERS
     =====================================================================================================-->
-    <beans:bean id="serverJaxRs" class="gov.hhs.onc.sdcct.ws.impl.SdcctJaxRsServerFactoryBean" abstract="true"
-        p:bus-ref="bus"
-        p:txTaskExecutor-ref="taskExecTxWsServer">
+    <beans:bean id="serverJaxRs" class="gov.hhs.onc.sdcct.ws.impl.JaxRsServerFactoryBean" abstract="true"
+        p:bus-ref="bus">
         <beans:property name="features">
             <beans:list>
                 <beans:ref bean="featureLogging"/>
@@ -31,12 +30,16 @@
         <beans:property name="providers">
             <beans:list>
                 <beans:ref bean="exceptionMapperFhir"/>
-                <beans:bean class="gov.hhs.onc.sdcct.fhir.impl.FhirWadlGenerator"/>
-                <beans:bean class="gov.hhs.onc.sdcct.fhir.impl.FhirContentProvider">
-                    <beans:property name="defaultQueryParameters">
-                        <beans:map>
-                            <beans:entry key="#{ T(gov.hhs.onc.sdcct.fhir.FhirWsQueryParamNames).PRETTY }" value="false" value-type="java.lang.Boolean"/>
-                        </beans:map>
+                <beans:ref bean="provContentFhir"/>
+                <beans:bean class="gov.hhs.onc.sdcct.fhir.impl.FhirWadlGenerator"
+                    c:bus-ref="bus"
+                    p:linkAnyMediaTypeToXmlSchema="true">
+                    <beans:property name="externalLinks">
+                        <beans:list>
+                            <beans:value>../schema/FHIR/fhir-single.xsd</beans:value>
+                            <beans:value>../schema/FHIR/fhir-xhtml.xsd</beans:value>
+                            <beans:value>../schema/FHIR/xml.xsd</beans:value>
+                        </beans:list>
                     </beans:property>
                 </beans:bean>
             </beans:list>
@@ -46,10 +49,9 @@
     <!--====================================================================================================
     = JAX-WS SERVERS
     =====================================================================================================-->
-    <beans:bean id="serverJaxWs" class="gov.hhs.onc.sdcct.ws.impl.SdcctJaxWsServerFactoryBean" abstract="true"
+    <beans:bean id="serverJaxWs" class="gov.hhs.onc.sdcct.ws.impl.JaxWsServerFactoryBean" abstract="true"
         p:bindingConfig-ref="soapBindingConfig12"
-        p:bus-ref="bus"
-        p:txTaskExecutor-ref="taskExecTxWsServer">
+        p:bus-ref="bus">
         <beans:property name="features">
             <beans:list>
                 <beans:ref bean="featureLogging"/>

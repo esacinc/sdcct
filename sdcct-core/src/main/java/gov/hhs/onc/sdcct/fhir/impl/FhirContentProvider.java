@@ -10,6 +10,7 @@ import gov.hhs.onc.sdcct.utils.SdcctEnumUtils;
 import gov.hhs.onc.sdcct.utils.SdcctOptionUtils;
 import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -21,12 +22,15 @@ import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import javax.annotation.Priority;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
+import org.apache.commons.io.IOUtils;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider;
@@ -35,8 +39,8 @@ import org.apache.cxf.message.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 
-@Priority(1)
-public class FhirContentProvider extends AbstractConfigurableProvider implements MessageBodyWriter<Object> {
+@Priority(2)
+public class FhirContentProvider<T> extends AbstractConfigurableProvider implements MessageBodyReader<T>, MessageBodyWriter<T> {
     @Autowired
     private List<ContentCodec> codecs;
 
@@ -46,7 +50,7 @@ public class FhirContentProvider extends AbstractConfigurableProvider implements
     private Map<String, FhirFormatType> formatQueryParamValues;
 
     @Override
-    public void writeTo(Object obj, Class<?> type, Type genericType, Annotation[] annos, MediaType mediaType, MultivaluedMap<String, Object> headers,
+    public void writeTo(T obj, Class<?> type, Type genericType, Annotation[] annos, MediaType mediaType, MultivaluedMap<String, Object> headers,
         OutputStream entityStream) throws IOException, WebApplicationException {
         Message msg = JAXRSUtils.getCurrentMessage();
         MultivaluedMap<String, String> queryParams = new UriInfoImpl(msg.getExchange().getInMessage()).getQueryParameters();
@@ -82,6 +86,8 @@ public class FhirContentProvider extends AbstractConfigurableProvider implements
 
         ContentCodec codec = this.formatCodecs.get(format);
 
+        msg.put(ContentCodec.class, codec);
+
         if (mergedQueryParams.containsKey(FhirWsQueryParamNames.PRETTY)) {
             String prettyQueryParamValue = mergedQueryParams.get(FhirWsQueryParamNames.PRETTY);
 
@@ -97,6 +103,8 @@ public class FhirContentProvider extends AbstractConfigurableProvider implements
 
         try {
             entityStream.write(codec.encode(obj, encodeOpts));
+
+            entityStream.close();
         } catch (Exception e) {
             throw new FhirException(
                 String.format("Unable to encode (mediaType=%s) content object (class=%s).", formatEncMediaTypeValue, obj.getClass().getName()), e)
@@ -105,12 +113,46 @@ public class FhirContentProvider extends AbstractConfigurableProvider implements
     }
 
     @Override
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annos, MediaType mediaType) {
-        return this.formatMediaTypes.keySet().stream().anyMatch(mediaType::isCompatible);
+    public T readFrom(Class<T> type, Type genericType, Annotation[] annos, MediaType mediaType, MultivaluedMap<String, String> headers,
+        InputStream entityStream) throws IOException, WebApplicationException {
+        ContentCodec codec = this.findCodec(mediaType);
+
+        // JAXRSUtils.getCurrentMessage().put(ContentCodec.class, codec);
+
+        try {
+            byte[] entityBytes = IOUtils.toByteArray(entityStream);
+
+            entityStream.close();
+
+            return (type.equals(byte[].class) ? type.cast(entityBytes) : codec.decode(entityBytes, type));
+        } catch (Exception e) {
+            throw new FhirException(String.format("Unable to decode (mediaType=%s) content object (class=%s).", mediaType, type.getName()), e)
+                .setIssueCodeType(IssueCodeType.STRUCTURE);
+        }
     }
 
     @Override
-    public long getSize(Object obj, Class<?> type, Type genericType, Annotation[] annos, MediaType mediaType) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annos, MediaType mediaType) {
+        return this.isCompatible(mediaType);
+    }
+
+    @Override
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annos, MediaType mediaType) {
+        return this.isCompatible(mediaType);
+    }
+
+    public boolean isCompatible(MediaType mediaType) {
+        return this.formatMediaTypes.keySet().stream().anyMatch(mediaType::isCompatible);
+    }
+
+    @Nullable
+    public ContentCodec findCodec(MediaType mediaType) {
+        return this.formatMediaTypes.keySet().stream().filter(mediaType::isCompatible).map(this.formatMediaTypes::get).findFirst().map(this.formatCodecs::get)
+            .orElse(null);
+    }
+
+    @Override
+    public long getSize(T obj, Class<?> type, Type genericType, Annotation[] annos, MediaType mediaType) {
         return -1;
     }
 
@@ -144,5 +186,9 @@ public class FhirContentProvider extends AbstractConfigurableProvider implements
     public void setDefaultQueryParameters(Map<String, String> defaultQueryParams) {
         this.defaultQueryParams.clear();
         this.defaultQueryParams.putAll(defaultQueryParams);
+    }
+
+    public Map<FhirFormatType, ContentCodec> getFormatCodecs() {
+        return this.formatCodecs;
     }
 }

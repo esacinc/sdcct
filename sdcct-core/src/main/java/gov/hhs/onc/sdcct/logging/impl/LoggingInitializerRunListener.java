@@ -24,7 +24,7 @@ import ch.qos.logback.core.status.StatusUtil;
 import ch.qos.logback.core.util.StatusPrinter;
 import com.github.sebhoss.warnings.CompilerWarnings;
 import gov.hhs.onc.sdcct.beans.factory.impl.AbstractSdcctBeanPostProcessor;
-import gov.hhs.onc.sdcct.context.SdcctProperties;
+import gov.hhs.onc.sdcct.context.SdcctPropertyNames;
 import gov.hhs.onc.sdcct.context.impl.AbstractApplicationInitializerRunListener;
 import gov.hhs.onc.sdcct.context.impl.SdcctApplication;
 import gov.hhs.onc.sdcct.io.SdcctFileNameExtensions;
@@ -96,7 +96,7 @@ public class LoggingInitializerRunListener extends AbstractApplicationInitialize
         }
     }
 
-    private final static String CONSOLE_APPENDER_PATTERN = "%" + PriorityColorCompositeConverter.WORD + "%" + TxMdcConverter.WORD + " - %"
+    private final static String CONSOLE_APPENDER_PATTERN = "[%t] %" + PriorityColorCompositeConverter.WORD + "%" + TxMdcConverter.WORD + " - %"
         + MessageMarkerConverter.WORD + "{" + AppenderType.CONSOLE.getId() + "}%n%" + RootCauseThrowableProxyConverter.WORD;
 
     private final static String FILE_APPENDER_PATTERN = "%d{yyyy-MM-dd HH:mm:ss z} [%C:%L %t] %p%" + TxMdcConverter.WORD + " - %" + MessageMarkerConverter.WORD
@@ -151,7 +151,7 @@ public class LoggingInitializerRunListener extends AbstractApplicationInitialize
 
         this.buildLogger(org.slf4j.Logger.ROOT_LOGGER_NAME, Level.WARN, true, this.appenders.values());
 
-        PropertySourceUtils.getSubProperties(env.getPropertySources(), SdcctProperties.LOGGING_LOGGER_PREFIX).forEach((loggerName, loggerPropValue) -> {
+        PropertySourceUtils.getSubProperties(env.getPropertySources(), SdcctPropertyNames.LOGGING_LOGGER_PREFIX).forEach((loggerName, loggerPropValue) -> {
             String[] loggerPropValueParts = StringUtils.split(((String) loggerPropValue), SdcctStringUtils.COLON, 2);
             Level loggerLvl = Level.toLevel(loggerPropValueParts[0].toUpperCase(), null);
 

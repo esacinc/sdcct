@@ -1,5 +1,7 @@
 package gov.hhs.onc.sdcct.web.ws.impl;
 
+import gov.hhs.onc.sdcct.context.SdcctPropertyNames;
+import gov.hhs.onc.sdcct.logging.impl.TxIdGenerator;
 import javax.annotation.Nullable;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -14,6 +16,7 @@ import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.context.ServletConfigAware;
 import org.springframework.web.servlet.ModelAndView;
@@ -30,6 +33,7 @@ public class WebServiceController implements Controller, ServletConfigAware {
     private String baseUrlPath;
     private ServletConfig servletConfig;
     private ServletContext servletContext;
+    private TxIdGenerator txIdGen;
 
     @Nullable
     @Override
@@ -47,11 +51,15 @@ public class WebServiceController implements Controller, ServletConfigAware {
             servletReq.setAttribute(ENDPOINT_ADDR_SERVLET_REQ_ATTR_NAME, (this.baseUrlPath + dest.getEndpointInfo().getAddress()));
 
             try {
+                MDC.put(SdcctPropertyNames.WS_SERVER_TX_ID, this.txIdGen.generateId().toString());
+
                 BusFactory.setThreadDefaultBus(bus);
 
                 dest.invoke(this.servletConfig, this.servletContext, servletReq, servletResp);
             } finally {
                 BusFactory.setThreadDefaultBus(null);
+
+                MDC.remove(SdcctPropertyNames.WS_SERVER_TX_ID);
             }
         } else {
             // TODO: improve error handling
@@ -82,5 +90,13 @@ public class WebServiceController implements Controller, ServletConfigAware {
     @Override
     public void setServletConfig(ServletConfig servletConfig) {
         this.servletContext = (this.servletConfig = servletConfig).getServletContext();
+    }
+
+    public TxIdGenerator getTxIdGenerator() {
+        return this.txIdGen;
+    }
+
+    public void setTxIdGenerator(TxIdGenerator txIdGen) {
+        this.txIdGen = txIdGen;
     }
 }

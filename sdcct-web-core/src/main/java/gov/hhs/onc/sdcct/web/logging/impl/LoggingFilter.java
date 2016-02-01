@@ -1,6 +1,6 @@
 package gov.hhs.onc.sdcct.web.logging.impl;
 
-import gov.hhs.onc.sdcct.logging.MdcPropertyNames;
+import gov.hhs.onc.sdcct.context.SdcctPropertyNames;
 import gov.hhs.onc.sdcct.net.logging.HttpRequestEvent;
 import gov.hhs.onc.sdcct.net.logging.HttpResponseEvent;
 import gov.hhs.onc.sdcct.net.logging.RestEndpointType;
@@ -16,7 +16,6 @@ import javax.servlet.ServletException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 @Component("filterLogging")
@@ -25,7 +24,7 @@ public class LoggingFilter extends AbstractSdcctFilter {
 
     @Override
     protected void doFilterInternal(TomcatRequest servletReq, TomcatResponse servletResp, FilterChain chain) throws IOException, ServletException {
-        String txId = MDC.get(MdcPropertyNames.HTTP_TX_ID);
+        String txId = ((String) servletReq.getAttribute(SdcctPropertyNames.HTTP_SERVER_TX_ID));
 
         HttpRequestEvent reqEvent = new HttpRequestEventImpl();
         reqEvent.setAuthType(servletReq.getAuthType());
@@ -39,9 +38,9 @@ public class LoggingFilter extends AbstractSdcctFilter {
         reqEvent.setLocalName(servletReq.getLocalName());
         reqEvent.setLocalPort(servletReq.getLocalPort());
         reqEvent.setMethod(servletReq.getMethod());
-        reqEvent.setParameters(servletReq.getParameters());
         reqEvent.setPathInfo(servletReq.getPathInfo());
         reqEvent.setProtocol(servletReq.getProtocol());
+        reqEvent.setQueryParameters(servletReq.getParameters());
         reqEvent.setQueryString(servletReq.getQueryString());
         reqEvent.setRemoteAddr(servletReq.getRemoteAddr());
         reqEvent.setRemoteHost(servletReq.getRemoteHost());

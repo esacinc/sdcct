@@ -9,6 +9,8 @@ public interface RestEvent extends LoggingEvent {
 
     public void setEndpointType(RestEndpointType endpointType);
 
+    public RestEventType getEventType();
+
     @JsonProperty
     public String getTxId();
 

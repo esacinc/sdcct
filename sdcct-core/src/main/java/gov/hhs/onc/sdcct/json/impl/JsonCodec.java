@@ -1,10 +1,12 @@
 package gov.hhs.onc.sdcct.json.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.hhs.onc.sdcct.transform.content.ContentEncodeOptions;
 import gov.hhs.onc.sdcct.transform.content.SdcctContentType;
 import gov.hhs.onc.sdcct.transform.content.impl.AbstractContentCodec;
 import gov.hhs.onc.sdcct.utils.SdcctOptionUtils;
+import java.util.Collections;
 import java.util.Map;
 import javax.annotation.Resource;
 
@@ -24,6 +26,14 @@ public class JsonCodec extends AbstractContentCodec {
     @Override
     public <T> T decode(byte[] src, Class<T> resultClass, Map<String, Object> opts) throws Exception {
         return this.objMapper.readValue(src, resultClass);
+    }
+
+    public JsonNode decode(byte[] src) throws Exception {
+        return this.decode(src, Collections.emptyMap());
+    }
+
+    public JsonNode decode(byte[] src, Map<String, Object> opts) throws Exception {
+        return this.objMapper.readTree(src);
     }
 
     @Override

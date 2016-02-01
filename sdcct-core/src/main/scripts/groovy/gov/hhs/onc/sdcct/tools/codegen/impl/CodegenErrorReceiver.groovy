@@ -1,4 +1,5 @@
 package gov.hhs.onc.sdcct.tools.codegen.impl
+
 import com.sun.tools.xjc.ErrorReceiver
 import com.sun.tools.xjc.api.ErrorListener
 import java.util.regex.Pattern

@@ -5,7 +5,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Reporter;
 import gov.hhs.onc.sdcct.logging.logstash.LogstashTags;
 import gov.hhs.onc.sdcct.logging.metrics.SdcctMetricSet;
-import gov.hhs.onc.sdcct.logging.impl.SdcctMarkerBuilder;
+import gov.hhs.onc.sdcct.logging.impl.MarkerBuilder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +34,7 @@ public class LogstashReporter implements Reporter, SmartLifecycle {
                         }));
 
                     LOGGER.info(
-                        new SdcctMarkerBuilder(LogstashTags.METRICS).appendField(METRICS_MARKER_FIELD_NAME, LogstashReporter.this.metricRegistry).build(),
+                        new MarkerBuilder(LogstashTags.METRICS).appendField(METRICS_MARKER_FIELD_NAME, LogstashReporter.this.metricRegistry).build(),
                         String.format("Reporting %d metric(s).", LogstashReporter.this.metricRegistry.getMetrics().size()));
                 } catch (Exception e) {
                     LOGGER.error(String.format("Unable to report %d metric(s).", LogstashReporter.this.metricRegistry.getMetrics().size()), e);

@@ -19,7 +19,8 @@
                     <!--suppress SpringPlaceholdersInspection -->
                     <beans:bean class="gov.hhs.onc.sdcct.web.ws.impl.WebServiceController"
                         p:baseUrlPath="${sdcct.ws.base.url.path}"
-                        p:bus-ref="bus"/>
+                        p:bus-ref="bus"
+                        p:txIdGenerator-ref="txIdGenWsServer"/>
                 </beans:entry>
             </beans:map>
         </beans:property>
