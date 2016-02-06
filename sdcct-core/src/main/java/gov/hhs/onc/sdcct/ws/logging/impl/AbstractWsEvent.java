@@ -85,7 +85,7 @@ public abstract class AbstractWsEvent extends AbstractRestEvent implements WsEve
 
     @Override
     protected String buildMarkerFieldName() {
-        return ("ws" + StringUtils.capitalize(this.endpointType.getId()) + StringUtils.capitalize(this.eventType.getId()));
+        return String.join(SdcctStringUtils.PERIOD, "ws", this.endpointType.getId(), this.eventType.getId());
     }
 
     @Override

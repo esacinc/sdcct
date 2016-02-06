@@ -11,7 +11,9 @@ public class SdcctApplication extends SpringApplication {
     public final static String BEAN_NAME = "app";
 
     private File homeDir;
+    private boolean logConsoleThreadName;
     private boolean logConsoleTty;
+    private boolean logConsoleTx;
     private File logFileDir;
     private String logFileName;
     private String logstashLogFileName;
@@ -44,12 +46,28 @@ public class SdcctApplication extends SpringApplication {
         this.homeDir = homeDir;
     }
 
+    public boolean isLogConsoleThreadName() {
+        return this.logConsoleThreadName;
+    }
+
+    public void setLogConsoleThreadName(boolean logConsoleThreadName) {
+        this.logConsoleThreadName = logConsoleThreadName;
+    }
+
     public boolean isLogConsoleTty() {
         return this.logConsoleTty;
     }
 
     public void setLogConsoleTty(boolean logConsoleTty) {
         this.logConsoleTty = logConsoleTty;
+    }
+
+    public boolean isLogConsoleTx() {
+        return this.logConsoleTx;
+    }
+
+    public void setLogConsoleTx(boolean logConsoleTx) {
+        this.logConsoleTx = logConsoleTx;
     }
 
     public File getLogFileDirectory() {

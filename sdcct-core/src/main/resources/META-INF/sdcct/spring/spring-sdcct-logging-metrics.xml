@@ -31,6 +31,7 @@
     =====================================================================================================-->
     <!--suppress SpringPlaceholdersInspection -->
     <beans:bean id="reporterLogstash" class="gov.hhs.onc.sdcct.logging.metrics.impl.LogstashReporter"
+        p:objectMapper-ref="objMapperLogstash"
         p:period="${sdcct.logging.metrics.reporter.logstash.period}"
         p:taskScheduler-ref="taskSchedulerMetricsReporter"/>
 </beans:beans>

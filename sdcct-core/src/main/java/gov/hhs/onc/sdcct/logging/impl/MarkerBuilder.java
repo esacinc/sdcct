@@ -3,7 +3,6 @@ package gov.hhs.onc.sdcct.logging.impl;
 import gov.hhs.onc.sdcct.logging.utils.SdcctMarkerUtils;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import net.logstash.logback.marker.ObjectAppendingMarker;
 import org.apache.commons.lang3.builder.Builder;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
@@ -20,7 +19,7 @@ public class MarkerBuilder implements Builder<Marker> {
     }
 
     public MarkerBuilder appendField(String fieldName, Object fieldValue) {
-        return this.appendMarker(new ObjectAppendingMarker(fieldName, fieldValue));
+        return this.appendMarker(new FieldMarker(fieldName, fieldValue));
     }
 
     public MarkerBuilder appendMessage(String msg) {

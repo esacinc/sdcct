@@ -8,11 +8,12 @@ import gov.hhs.onc.sdcct.context.impl.SdcctApplication;
 import gov.hhs.onc.sdcct.logging.AppenderType;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class CachingAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
-    private final Object lock = new Object();
-
     private SdcctApplication app;
+    private final Lock lock = new ReentrantLock();
     private Deque<ILoggingEvent> cache = new LinkedList<>();
     private Appender<ILoggingEvent> appender;
 
@@ -21,23 +22,29 @@ public class CachingAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
     }
 
     public void flush(AppenderType appenderType, Appender<ILoggingEvent> appender) {
-        synchronized (this.lock) {
+        this.lock.lock();
+
+        try {
             this.appender = appender;
 
             int numCachedEvents = this.cache.size();
 
             while (!this.cache.isEmpty()) {
-                this.append(this.cache.removeFirst());
+                this.doAppend(this.cache.removeFirst());
             }
 
             this.context.getStatusManager().add(new InfoStatus(String.format("Flushed %d cached application (name=%s) logging event(s) to appender (type=%s).",
                 numCachedEvents, this.app.getName(), appenderType.getId()), appender));
+        } finally {
+            this.lock.unlock();
         }
     }
 
     @Override
     public void stop() {
-        synchronized (this.lock) {
+        this.lock.lock();
+
+        try {
             this.cache.clear();
 
             if (this.appender != null) {
@@ -45,19 +52,27 @@ public class CachingAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
             }
 
             super.stop();
+        } finally {
+            this.lock.unlock();
         }
     }
 
     @Override
     public void start() {
-        synchronized (this.lock) {
+        this.lock.lock();
+
+        try {
             super.start();
+        } finally {
+            this.lock.unlock();
         }
     }
 
     @Override
     protected void append(ILoggingEvent event) {
-        synchronized (this.lock) {
+        this.lock.lock();
+
+        try {
             if (!this.isStarted()) {
                 return;
             }
@@ -67,6 +82,8 @@ public class CachingAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
             } else {
                 this.cache.add(event);
             }
+        } finally {
+            this.lock.unlock();
         }
     }
 }

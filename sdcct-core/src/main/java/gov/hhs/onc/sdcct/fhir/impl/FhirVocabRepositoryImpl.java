@@ -28,9 +28,11 @@ public class FhirVocabRepositoryImpl implements FhirVocabRepository {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        this.valueSets = SdcctStreamUtils.asInstances(
-            this.xmlCodec.decode(this.valueSetsSrc, BundleImpl.class).getEntry().stream().map(bundleEntry -> bundleEntry.getResource().getContent()),
-            ValueSet.class).collect(SdcctStreamUtils.toMap(valueSet -> valueSet.getId().getValue(), Function.identity(), TreeMap::new));
+        this.valueSets =
+            SdcctStreamUtils
+                .asInstances(this.xmlCodec.decode(this.valueSetsSrc, BundleImpl.class, null).getEntry().stream()
+                    .map(bundleEntry -> bundleEntry.getResource().getContent()), ValueSet.class)
+            .collect(SdcctStreamUtils.toMap(valueSet -> valueSet.getId().getValue(), Function.identity(), TreeMap::new));
 
         this.valueSetConcepts = new MultiKeyMap<>();
 

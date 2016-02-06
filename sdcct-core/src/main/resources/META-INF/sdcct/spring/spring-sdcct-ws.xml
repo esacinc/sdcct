@@ -87,6 +87,18 @@
     <!--====================================================================================================
     = JAX-RS PROVIDERS
     =====================================================================================================-->
+    <beans:bean id="provWadlGenFhir" class="gov.hhs.onc.sdcct.fhir.impl.FhirWadlGenerator"
+        c:bus-ref="bus"
+        p:linkAnyMediaTypeToXmlSchema="true">
+        <beans:property name="externalLinks">
+            <beans:list>
+                <beans:value>../schema/FHIR/fhir-single.xsd</beans:value>
+                <beans:value>../schema/FHIR/fhir-xhtml.xsd</beans:value>
+                <beans:value>../schema/FHIR/xml.xsd</beans:value>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+    
     <beans:bean id="provContentFhir" class="gov.hhs.onc.sdcct.fhir.impl.FhirContentProvider">
         <beans:property name="defaultQueryParameters">
             <beans:map>

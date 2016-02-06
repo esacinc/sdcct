@@ -3,8 +3,6 @@ package gov.hhs.onc.sdcct.transform.impl;
 import java.io.File;
 import java.io.OutputStream;
 import java.io.Writer;
-import java.util.Properties;
-import javax.annotation.Nullable;
 import net.sf.saxon.s9api.Processor;
 
 public class SdcctProcessor extends Processor {
@@ -13,12 +11,13 @@ public class SdcctProcessor extends Processor {
     }
 
     @Override
-    public SdcctSerializer newSerializer(File outFile) {
-        return this.newSerializer(outFile, null);
+    public SdcctDocumentBuilder newDocumentBuilder() {
+        return new SdcctDocumentBuilder(this.getUnderlyingConfiguration());
     }
 
-    public SdcctSerializer newSerializer(File outFile, @Nullable Properties outProps) {
-        SdcctSerializer serializer = this.newSerializer(outProps);
+    @Override
+    public SdcctSerializer newSerializer(File outFile) {
+        SdcctSerializer serializer = this.newSerializer();
         serializer.setOutputFile(outFile);
 
         return serializer;
@@ -26,11 +25,7 @@ public class SdcctProcessor extends Processor {
 
     @Override
     public SdcctSerializer newSerializer(Writer outWriter) {
-        return this.newSerializer(outWriter, null);
-    }
-
-    public SdcctSerializer newSerializer(Writer outWriter, @Nullable Properties outProps) {
-        SdcctSerializer serializer = this.newSerializer(outProps);
+        SdcctSerializer serializer = this.newSerializer();
         serializer.setOutputWriter(outWriter);
 
         return serializer;
@@ -38,11 +33,7 @@ public class SdcctProcessor extends Processor {
 
     @Override
     public SdcctSerializer newSerializer(OutputStream outStream) {
-        return this.newSerializer(outStream, null);
-    }
-
-    public SdcctSerializer newSerializer(OutputStream outStream, @Nullable Properties outProps) {
-        SdcctSerializer serializer = this.newSerializer(outProps);
+        SdcctSerializer serializer = this.newSerializer();
         serializer.setOutputStream(outStream);
 
         return serializer;
@@ -50,14 +41,7 @@ public class SdcctProcessor extends Processor {
 
     @Override
     public SdcctSerializer newSerializer() {
-        return this.newSerializer(((Properties) null));
-    }
-
-    public SdcctSerializer newSerializer(@Nullable Properties outProps) {
-        SdcctSerializer serializer = new SdcctSerializer(this, outProps);
-        serializer.setDefaultOutputProperties(this.getUnderlyingConfiguration().getDefaultSerializationProperties());
-
-        return serializer;
+        return new SdcctSerializer(this);
     }
 
     @Override

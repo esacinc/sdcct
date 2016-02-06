@@ -1,23 +1,21 @@
 package gov.hhs.onc.sdcct.transform.content;
 
-import java.util.Map;
+import gov.hhs.onc.sdcct.transform.content.impl.ContentDecodeOptions;
+import gov.hhs.onc.sdcct.transform.content.impl.ContentEncodeOptions;
+import javax.annotation.Nullable;
 
 public interface ContentCodec {
-    public <T> T decode(byte[] src, Class<T> resultClass) throws Exception;
+    public byte[] encode(Object src, @Nullable ContentEncodeOptions opts) throws Exception;
 
-    public <T> T decode(byte[] src, Class<T> resultClass, Map<String, Object> opts) throws Exception;
+    public <T> T decode(byte[] src, Class<T> resultClass, @Nullable ContentDecodeOptions opts) throws Exception;
 
-    public byte[] encode(Object src) throws Exception;
+    public ContentDecodeOptions getDefaultDecodeOptions();
 
-    public byte[] encode(Object src, Map<String, Object> opts) throws Exception;
+    public void setDefaultDecodeOptions(ContentDecodeOptions defaultDecodeOpts);
 
-    public Map<String, Object> getDefaultDecodeOptions();
+    public ContentEncodeOptions getDefaultEncodeOptions();
 
-    public void setDefaultDecodeOptions(Map<String, Object> defaultDecodeOpts);
-
-    public Map<String, Object> getDefaultEncodeOptions();
-
-    public void setDefaultEncodeOptions(Map<String, Object> defaultEncodeOpts);
+    public void setDefaultEncodeOptions(ContentEncodeOptions defaultEncodeOpts);
 
     public SdcctContentType getType();
 }

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project id="badff769-0e12-4fe0-ad45-18c68173ed21" activeEnvironment="Default" name="soapui-sdcct-form-manager-fhir-project" resourceRoot="" soapui-version="5.2.1" xmlns:con="http://eviware.com/soapui/config">
+  <con:settings/>
+  <con:interface xsi:type="con:RestService" id="45a2cb49-fecb-4c20-b3e2-2b25e575f05d" wadlVersion="http://wadl.dev.java.net/2009/02" name="FHIR Form Manager" type="rest" basePath="${#Spring#sdcct.ws.base.url.path}${#Spring#sdcct.ws.form.manager.fhir.url.path}" definitionUrl="${#Spring#sdcct.ws.form.manager.fhir.wadl.url}" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <con:settings/>
+    <con:endpoints>
+      <con:endpoint>${#Spring#sdcct.tomcat.server.context.url}</con:endpoint>
+    </con:endpoints>
+    <con:resource name="/" path="/" id="ca9cb35a-82eb-4785-b1f4-b387ab979d25">
+      <con:settings/>
+      <con:parameters/>
+      <con:resource name="Questionnaire/{id}" path="Questionnaire/{id}" id="20d77951-3c82-41ff-823c-4086012bba0a">
+        <con:settings/>
+        <con:parameters>
+          <con:parameter>
+            <con:name>id</con:name>
+            <con:value>test1</con:value>
+            <con:style>TEMPLATE</con:style>
+            <con:default/>
+          </con:parameter>
+        </con:parameters>
+        <con:method name="GET" id="44126487-0729-4d13-954e-e87c9f6f5419" method="GET">
+          <con:settings/>
+          <con:parameters/>
+          <con:representation type="RESPONSE" id="">
+            <con:mediaType>application/json+fhir</con:mediaType>
+            <con:params/>
+            <con:element xsi:nil="true"/>
+            <con:description xsi:nil="true"/>
+          </con:representation>
+          <con:representation type="RESPONSE" id="">
+            <con:mediaType>application/xml+fhir</con:mediaType>
+            <con:params/>
+            <con:element xsi:nil="true"/>
+            <con:description xsi:nil="true"/>
+          </con:representation>
+        </con:method>
+      </con:resource>
+    </con:resource>
+  </con:interface>
+  <con:testSuite id="95d3ff45-15ca-4378-94c6-73fbcaceabe4" name="FHIR Form Manager Test Suite">
+    <con:settings/>
+    <con:runType>SEQUENTIAL</con:runType>
+    <con:testCase id="106aa27b-991a-4703-8df3-9fee6a046e95" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="FHIR Form Manager Read Questionnaire Testcase" searchProperties="true">
+      <con:settings/>
+      <con:testStep type="restrequest" name="FHIR Form Manager Read Questionnaire Request" id="6497e488-d256-4993-982b-45be1a2483ed">
+        <con:settings/>
+        <con:config service="FHIR Form Manager" resourcePath="${#Spring#sdcct.ws.base.url.path}${#Spring#sdcct.ws.form.manager.fhir.url.path}/Questionnaire/{id}" methodName="GET" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:restRequest name="FHIR Form Manager Read Questionnaire Request" id="187c5413-7849-4d33-8654-ddd2ab3fd837" mediaType="application/json">
+            <con:settings/>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>${#Spring#sdcct.tomcat.server.context.url}</con:endpoint>
+            <con:request/>
+            <con:credentials>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:jmsPropertyConfig/>
+            <con:parameters>
+              <entry key="id" value="test1" xmlns="http://eviware.com/soapui/config"/>
+            </con:parameters>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+    </con:testCase>
+    <con:properties/>
+  </con:testSuite>
+  <con:properties/>
+  <con:wssContainer/>
+  <con:oAuth2ProfileContainer/>
+</con:soapui-project>

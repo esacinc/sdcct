@@ -133,7 +133,7 @@ public abstract class AbstractSdcctMetricSet implements SdcctMetricSet {
     }
 
     protected static String normalizeMetricDisplayName(String metricDisplayName) {
-        return METRIC_DISPLAY_NAME_NORMALIZE_REPLACE_PATTERN.matcher(metricDisplayName).replaceAll(SdcctStringUtils.HYPHEN);
+        return METRIC_DISPLAY_NAME_NORMALIZE_REPLACE_PATTERN.matcher(metricDisplayName).replaceAll(SdcctStringUtils.UNDERSCORE).toLowerCase();
     }
 
     protected static String buildMetricName(String ... metricNameParts) {

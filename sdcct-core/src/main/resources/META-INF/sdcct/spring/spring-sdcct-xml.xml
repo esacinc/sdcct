@@ -24,11 +24,18 @@
     </beans:bean>
     
     <!--====================================================================================================
+    = SAX PARSER FACTORIES
+    =====================================================================================================-->
+    <beans:bean id="saxParserFactory" class="gov.hhs.onc.sdcct.xml.impl.SdcctSaxParserFactory"
+        c:xmlInFactory-ref="xmlInFactory"/>
+    
+    <!--====================================================================================================
     = XML OUTPUT FACTORIES
     =====================================================================================================-->
     <beans:bean id="xmlOutFactory" class="gov.hhs.onc.sdcct.xml.impl.SdcctXmlOutputFactory">
         <beans:property name="properties">
             <beans:map>
+                <beans:entry key="#{ T(com.ctc.wstx.api.WstxOutputProperties).P_USE_DOUBLE_QUOTES_IN_XML_DECL }" value="true" value-type="java.lang.Boolean"/>
                 <beans:entry key="#{ T(org.codehaus.stax2.XMLStreamProperties).XSP_SUPPORT_XMLID }"
                     value="#{ T(org.codehaus.stax2.XMLStreamProperties).XSP_V_XMLID_FULL }"/>
             </beans:map>
@@ -61,26 +68,46 @@
         c:charsetName="#{ T(java.nio.charset.StandardCharsets).UTF_8.name() }"/>
     
     <!--====================================================================================================
-    = CONTENT CODECS
+    = JAXB CONTEXT INFOS
     =====================================================================================================-->
-    <beans:bean id="contentCodecXml" class="gov.hhs.onc.sdcct.xml.impl.XmlCodec" parent="contentCodec">
-        <beans:property name="marshallerProperties">
+    <beans:bean id="jaxbContextInfo" class="gov.hhs.onc.sdcct.xml.jaxb.impl.JaxbContextInfoImpl" abstract="true"/>
+    
+    <!--====================================================================================================
+    = JAXB CONTEXT REPOSITORIES
+    =====================================================================================================-->
+    <beans:bean id="jaxbContextRepo" class="gov.hhs.onc.sdcct.xml.jaxb.impl.JaxbContextRepositoryImpl">
+        <beans:property name="contextInfos">
+            <beans:array>
+                <beans:bean parent="jaxbContextInfo"
+                    c:id="FHIR">
+                    <beans:property name="objectFactories">
+                        <beans:array>
+                            <beans:ref bean="objFactoryFhirImpl"/>
+                            <beans:ref bean="objFactoryFhirXhtmlImpl"/>
+                        </beans:array>
+                    </beans:property>
+                </beans:bean>
+                <beans:bean parent="jaxbContextInfo"
+                    c:id="RFD">
+                    <beans:property name="objectFactories">
+                        <beans:array>
+                            <beans:ref bean="objFactoryRfdImpl"/>
+                            <beans:ref bean="objFactorySdcImpl"/>
+                        </beans:array>
+                    </beans:property>
+                </beans:bean>
+            </beans:array>
+        </beans:property>
+        <beans:property name="defaultMarshallerProperties">
             <beans:map>
                 <beans:entry key="#{ T(com.sun.xml.bind.marshaller.CharacterEscapeHandler).name }" value-ref="charEscapeHandlerNio"/>
                 <beans:entry key="#{ T(javax.xml.bind.Marshaller).JAXB_ENCODING }" value="#{ T(java.nio.charset.StandardCharsets).UTF_8.name() }"/>
             </beans:map>
         </beans:property>
-        <beans:property name="objectFactories">
-            <beans:array>
-                <beans:array>
-                    <beans:ref bean="objFactoryFhirImpl"/>
-                    <beans:ref bean="objFactoryFhirXhtmlImpl"/>
-                </beans:array>
-                <beans:array>
-                    <beans:ref bean="objFactoryRfdImpl"/>
-                    <beans:ref bean="objFactorySdcImpl"/>
-                </beans:array>
-            </beans:array>
-        </beans:property>
     </beans:bean>
+    
+    <!--====================================================================================================
+    = CONTENT CODECS
+    =====================================================================================================-->
+    <beans:bean id="contentCodecXml" class="gov.hhs.onc.sdcct.xml.impl.XmlCodec" parent="contentCodec"/>
 </beans:beans>

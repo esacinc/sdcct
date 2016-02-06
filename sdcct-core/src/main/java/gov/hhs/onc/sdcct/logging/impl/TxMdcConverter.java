@@ -8,13 +8,14 @@ import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class TxMdcConverter extends ClassicConverter {
     public final static String WORD = "xTx";
 
-    private final static String SECTION_PREFIX = " {";
-    private final static String SECTION_SUFFIX = "}";
+    private final static String SECTION_PREFIX = "{";
+    private final static String SECTION_SUFFIX = "} ";
 
     private final static String MDC_PROP_DELIM = ", ";
 
@@ -49,7 +50,8 @@ public class TxMdcConverter extends ClassicConverter {
 
     @Override
     public void start() {
-        this.enabled = ((SdcctApplication) this.getContext().getObject(SdcctApplication.BEAN_NAME)).isLogConsoleTty();
+        this.enabled =
+            (!BooleanUtils.toBoolean(this.getFirstOption()) || ((SdcctApplication) this.getContext().getObject(SdcctApplication.BEAN_NAME)).isLogConsoleTx());
 
         super.start();
     }

@@ -149,27 +149,27 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>2.7.0</version>
+                <version>2.7.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
-                <version>2.7.0</version>
+                <version>2.7.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.7.0</version>
+                <version>2.7.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.datatype</groupId>
                 <artifactId>jackson-datatype-jdk8</artifactId>
-                <version>2.7.0</version>
+                <version>2.7.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.module</groupId>
                 <artifactId>jackson-module-jaxb-annotations</artifactId>
-                <version>2.7.0</version>
+                <version>2.7.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.woodstox</groupId>
@@ -189,17 +189,17 @@
             <dependency>
                 <groupId>com.querydsl</groupId>
                 <artifactId>querydsl-apt</artifactId>
-                <version>4.0.7</version>
+                <version>4.0.8</version>
             </dependency>
             <dependency>
                 <groupId>com.querydsl</groupId>
                 <artifactId>querydsl-collections</artifactId>
-                <version>4.0.7</version>
+                <version>4.0.8</version>
             </dependency>
             <dependency>
                 <groupId>com.querydsl</groupId>
                 <artifactId>querydsl-core</artifactId>
-                <version>4.0.7</version>
+                <version>4.0.8</version>
             </dependency>
             <dependency>
                 <groupId>com.ryantenney.metrics</groupId>
@@ -384,9 +384,14 @@
                 <version>2.2.12</version>
             </dependency>
             <dependency>
+                <groupId>net.java.dev.msv</groupId>
+                <artifactId>msv-core</artifactId>
+                <version>2013.6.1</version>
+            </dependency>
+            <dependency>
                 <groupId>net.logstash.logback</groupId>
                 <artifactId>logstash-logback-encoder</artifactId>
-                <version>4.5.1</version>
+                <version>4.6</version>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.servlet</groupId>
@@ -401,7 +406,7 @@
             <dependency>
                 <groupId>net.sf.saxon</groupId>
                 <artifactId>Saxon-HE</artifactId>
-                <version>9.7.0-1</version>
+                <version>9.7.0-2</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.ant</groupId>
@@ -604,22 +609,22 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>jcl-over-slf4j</artifactId>
-                <version>1.7.13</version>
+                <version>1.7.14</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>jul-to-slf4j</artifactId>
-                <version>1.7.13</version>
+                <version>1.7.14</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>log4j-over-slf4j</artifactId>
-                <version>1.7.13</version>
+                <version>1.7.14</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.7.13</version>
+                <version>1.7.14</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -646,7 +651,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>1.3.1.RELEASE</version>
+                <version>1.3.2.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -678,7 +683,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.3</version>
+                    <version>3.5</version>
                     <inherited>true</inherited>
                     <configuration>
                         <compilerArgs>
@@ -906,7 +911,9 @@
                         <argLine>-Xms512m -Xmx1024m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=256m -XX:+UseG1GC -XX:MaxGCPauseMillis=50</argLine>
                         <reportFormat>plain</reportFormat>
                         <systemPropertyVariables combine.children="append">
+                            <sdcct.logging.console.thread.name>true</sdcct.logging.console.thread.name>
                             <sdcct.logging.console.tty>true</sdcct.logging.console.tty>
+                            <sdcct.logging.console.tx>true</sdcct.logging.console.tx>
                             <sdcct.logging.file.dir>${project.build.directory}/surefire-logs</sdcct.logging.file.dir>
                         </systemPropertyVariables>
                         <trimStackTrace>false</trimStackTrace>
@@ -1135,7 +1142,7 @@
                 <plugin>
                     <groupId>org.vafer</groupId>
                     <artifactId>jdeb</artifactId>
-                    <version>1.4</version>
+                    <version>1.5</version>
                     <inherited>true</inherited>
                     <executions>
                         <execution>

@@ -96,10 +96,10 @@ public class LoggingInitializerRunListener extends AbstractApplicationInitialize
         }
     }
 
-    private final static String CONSOLE_APPENDER_PATTERN = "[%t] %" + PriorityColorCompositeConverter.WORD + "%" + TxMdcConverter.WORD + " - %"
+    private final static String CONSOLE_APPENDER_PATTERN = "%xT%" + TxMdcConverter.WORD + "{true}%" + PriorityColorCompositeConverter.WORD + " - %"
         + MessageMarkerConverter.WORD + "{" + AppenderType.CONSOLE.getId() + "}%n%" + RootCauseThrowableProxyConverter.WORD;
 
-    private final static String FILE_APPENDER_PATTERN = "%d{yyyy-MM-dd HH:mm:ss z} [%C:%L %t] %p%" + TxMdcConverter.WORD + " - %" + MessageMarkerConverter.WORD
+    private final static String FILE_APPENDER_PATTERN = "%d{yyyy-MM-dd HH:mm:ss z} [%C:%L %t] %" + TxMdcConverter.WORD + "%p - %" + MessageMarkerConverter.WORD
         + "{" + AppenderType.FILE.getId() + "}%n%" + RootCauseThrowableProxyConverter.WORD;
 
     private LoggerContext loggerContext;
@@ -140,6 +140,7 @@ public class LoggingInitializerRunListener extends AbstractApplicationInitialize
         this.buildConversionRule(MessageMarkerConverter.WORD, MessageMarkerConverter.class);
         this.buildConversionRule(PriorityColorCompositeConverter.WORD, PriorityColorCompositeConverter.class);
         this.buildConversionRule(RootCauseThrowableProxyConverter.WORD, RootCauseThrowableProxyConverter.class);
+        this.buildConversionRule(ThreadSectionConverter.WORD, ThreadSectionConverter.class);
         this.buildConversionRule(TxMdcConverter.WORD, TxMdcConverter.class);
 
         this.buildAppender(new ConsoleAppender<>(), AppenderType.CONSOLE, this.buildPatternLayoutEncoder(CONSOLE_APPENDER_PATTERN), true);

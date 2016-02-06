@@ -9,7 +9,7 @@ import gov.hhs.onc.sdcct.ws.impl.JaxWsClient;
 import javax.annotation.Resource;
 import org.testng.annotations.Test;
 
-@Test(groups = { "sdcct.test.it.web.form.manager.all", "sdcct.test.it.web.form.manager.ws.rfd" })
+@Test(enabled = false, groups = { "sdcct.test.it.web.form.manager.all", "sdcct.test.it.web.form.manager.ws.rfd.all", "sdcct.test.it.web.form.manager.ws.rfd.client" })
 public class RfdFormManagerWebServiceIntegrationTests extends AbstractSdcctWebIntegrationTests {
     @Resource(name = "formTest1")
     @SuppressWarnings({ "SpringJavaAutowiringInspection" })
@@ -19,7 +19,7 @@ public class RfdFormManagerWebServiceIntegrationTests extends AbstractSdcctWebIn
     @SuppressWarnings({ "SpringJavaAutowiringInspection" })
     private JaxWsClient testClient;
 
-    @Test
+    @Test(enabled = false)
     public void testRetrieveForm() throws Exception {
         this.testClient.invoke(this.testClient.buildInvocationDelegate(), RfdWsXmlQnames.RETRIEVE_FORM_OP,
             new RetrieveFormRequestTypeImpl().setWorkflowData(new WorkflowDataTypeImpl().setFormID(this.testForm1.getId()).setEncodedResponse(true)));

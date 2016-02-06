@@ -12,14 +12,16 @@
     =====================================================================================================-->
     <beans:bean id="formImpl" class="gov.hhs.onc.sdcct.form.impl.FormImpl" abstract="true"/>
     
+    <!--suppress SpringPlaceholdersInspection -->
     <beans:bean id="formTest1" parent="formImpl"
         c:id="test1"
         c:name="Test 1"
-        p:formDesignSource="classpath*:META-INF/sdcct/data/form/test1/form-test1-ihe.xml"
-        p:questionnaireSource="classpath*:META-INF/sdcct/data/form/test1/form-test1-fhir.xml"/>
+        p:formDesignSource="classpath*:${sdcct.data.form.dir.path}/test1/form-test1-ihe.xml"
+        p:questionnaireSource="classpath*:${sdcct.data.form.dir.path}/test1/form-test1-fhir.xml"/>
     
+    <!--suppress SpringPlaceholdersInspection -->
     <beans:bean id="formAdrenal" parent="formImpl"
         c:id="sdc-adrenal"
         c:name="Adrenal Gland"
-        p:formDesignSource="classpath*:META-INF/sdcct/data/form/adrenal/SDC_Adrenal*.xml"/>
+        p:formDesignSource="classpath*:${sdcct.data.form.dir.path}/adrenal/SDC_Adrenal*.xml"/>
 </beans:beans>

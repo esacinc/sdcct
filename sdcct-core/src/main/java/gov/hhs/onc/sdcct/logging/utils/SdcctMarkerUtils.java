@@ -1,8 +1,17 @@
 package gov.hhs.onc.sdcct.logging.utils;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import gov.hhs.onc.sdcct.logging.MarkerFieldName;
+import gov.hhs.onc.sdcct.utils.SdcctIteratorUtils;
+import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
-import java.util.Iterator;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Marker;
@@ -12,23 +21,43 @@ public final class SdcctMarkerUtils {
     private SdcctMarkerUtils() {
     }
 
-    @Nullable
-    public static <T extends Marker> T findByType(@Nullable Marker marker, Class<T> markerClass) {
-        if (marker != null) {
-            if (markerClass.isAssignableFrom(marker.getClass())) {
-                return markerClass.cast(marker);
-            } else if (marker.hasReferences()) {
-                Iterator<Marker> refMarkerIterator = marker.iterator();
+    public static <T> void serializeFields(JsonGenerator jsonGen, Map<String, T> fields) throws IOException {
+        serializeFields(jsonGen, fields, Function.identity());
+    }
 
-                while (refMarkerIterator.hasNext()) {
-                    if ((marker = findByType(refMarkerIterator.next(), markerClass)) != null) {
-                        return markerClass.cast(marker);
+    public static <T> void serializeFields(JsonGenerator jsonGen, Map<String, T> fields, Function<T, ?> fieldValueProcessor) throws IOException {
+        if (!fields.isEmpty()) {
+            Map<String, List<String>> fieldNamePrefixes = fields.keySet().stream().sorted(String.CASE_INSENSITIVE_ORDER)
+                .collect(Collectors.groupingBy(fieldName -> StringUtils.split(fieldName, SdcctStringUtils.PERIOD, 2)[0]));
+            List<String> subFieldNames;
+            int numSubFields, subFieldNameStartIndex;
+            String subFieldName;
+            Map<String, T> subFields;
+
+            for (String fieldNamePrefix : fieldNamePrefixes.keySet()) {
+                if (((numSubFields = (subFieldNames = fieldNamePrefixes.get(fieldNamePrefix)).size()) == 1)
+                    && !StringUtils.contains((subFieldName = subFieldNames.get(0)), SdcctStringUtils.PERIOD_CHAR)) {
+                    jsonGen.writeObjectField(buildFieldName(fieldNamePrefix), fieldValueProcessor.apply(fields.get(subFieldName)));
+                } else {
+                    subFieldNames.sort(String.CASE_INSENSITIVE_ORDER);
+
+                    subFieldNameStartIndex = (fieldNamePrefix.length() + 1);
+                    subFields = new HashMap<>(numSubFields);
+
+                    for (String subFieldNameItem : subFieldNames) {
+                        subFields.put(
+                            ((subFieldNameStartIndex < subFieldNameItem.length()) ? subFieldNameItem.substring(subFieldNameStartIndex) : subFieldNameItem),
+                            fields.get(subFieldNameItem));
                     }
+
+                    jsonGen.writeObjectFieldStart(fieldNamePrefix);
+
+                    serializeFields(jsonGen, subFields, fieldValueProcessor);
+
+                    jsonGen.writeEndObject();
                 }
             }
         }
-
-        return null;
     }
 
     public static String buildFieldName(Object fieldValue) {
@@ -41,5 +70,9 @@ public final class SdcctMarkerUtils {
 
     public static String buildFieldName(String fieldName) {
         return StringUtils.join(SdcctStringUtils.splitCamelCase(fieldName, SdcctStringUtils.UNDERSCORE), SdcctStringUtils.UNDERSCORE_CHAR).toLowerCase();
+    }
+
+    public static Stream<Marker> stream(@Nullable Marker marker) {
+        return SdcctStreamUtils.ofTree(marker, markerItem -> (markerItem.hasReferences() ? SdcctIteratorUtils.stream(markerItem.iterator()) : Stream.empty()));
     }
 }

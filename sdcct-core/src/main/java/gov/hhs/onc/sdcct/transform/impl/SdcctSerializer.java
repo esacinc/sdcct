@@ -1,45 +1,72 @@
 package gov.hhs.onc.sdcct.transform.impl;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
+import gov.hhs.onc.sdcct.io.impl.ByteArrayResult;
+import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
 import java.util.List;
 import java.util.Properties;
 import javax.annotation.Nullable;
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamResult;
 import net.sf.saxon.Configuration;
 import net.sf.saxon.event.FilterFactory;
 import net.sf.saxon.event.PipelineConfiguration;
-import net.sf.saxon.event.Receiver;
 import net.sf.saxon.event.ReceivingContentHandler;
 import net.sf.saxon.event.Sender;
-import net.sf.saxon.lib.AugmentedSource;
+import net.sf.saxon.event.SequenceReceiver;
 import net.sf.saxon.lib.ParseOptions;
+import net.sf.saxon.om.Item;
+import net.sf.saxon.om.NodeInfo;
+import net.sf.saxon.om.SequenceIterator;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.Serializer;
-import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.trans.XPathException;
+import net.sf.saxon.tree.iter.SingletonIterator;
 import org.apache.commons.collections4.CollectionUtils;
 
 public class SdcctSerializer extends Serializer {
     private Properties defaultOutProps;
 
     public SdcctSerializer(SdcctProcessor processor) {
-        this(processor, null);
-    }
-
-    public SdcctSerializer(SdcctProcessor processor, @Nullable Properties outProps) {
         super(processor);
 
-        if (outProps != null) {
-            this.setOutputProperties(outProps);
+        this.setDefaultOutputProperties(
+            processor.getUnderlyingConfiguration().getDefaultSerializationProperties().entrySet().stream().collect(SdcctStreamUtils.toMap(Properties::new)));
+    }
+
+    public byte[] serialize(Source src, @Nullable ParseOptions parseOpts, @Nullable Properties outProps) throws SaxonApiException {
+        return this.serialize(src, new ByteArrayResult(), parseOpts, outProps).getBytes();
+    }
+
+    public <T extends Result> T serialize(Source src, T result, @Nullable ParseOptions parseOpts, @Nullable Properties outProps) throws SaxonApiException {
+        SdcctConfiguration config = this.getProcessor().getUnderlyingConfiguration();
+        SequenceReceiver receiver = this.getReceiver(config, config.makePipelineConfiguration(), result, parseOpts, outProps);
+
+        try {
+            if (src instanceof NodeInfo) {
+                SequenceIterator srcIterator = SingletonIterator.makeIterator(((NodeInfo) src));
+                Item srcItem;
+
+                receiver.open();
+
+                while ((srcItem = srcIterator.next()) != null) {
+                    receiver.append(srcItem);
+                }
+            } else {
+                Sender.send(src, receiver, null);
+            }
+
+            return result;
+        } catch (XPathException e) {
+            throw new SaxonApiException(String.format("Unable to serialize source (class=%s, sysId=%s) to result (class=%s, sysId=%s).",
+                src.getClass().getName(), src.getSystemId(), result.getClass().getName(), result.getSystemId()), e);
+        } finally {
+            try {
+                receiver.close();
+            } catch (XPathException e) {
+                // noinspection ThrowFromFinallyBlock
+                throw new SaxonApiException(String.format("Unable to close Saxon serializer receiver (class=%s) for result (class=%s, sysId=%s).",
+                    receiver.getClass().getName(), result.getClass().getName(), result.getSystemId()), e);
+            }
         }
     }
 
@@ -53,145 +80,66 @@ public class SdcctSerializer extends Serializer {
         SdcctPipelineConfiguration pipelineConfig = config.makePipelineConfiguration();
 
         ReceivingContentHandler contentHandler = new ReceivingContentHandler();
-        contentHandler.setReceiver(this.getReceiver(config, pipelineConfig, result, parseOpts, ((outProps != null) ? outProps : this.getOutputProperties())));
+        contentHandler.setReceiver(this.getReceiver(config, pipelineConfig, result, parseOpts, outProps));
         contentHandler.setPipelineConfiguration(pipelineConfig);
 
         return contentHandler;
     }
 
     @Override
-    public String serializeNodeToString(XdmNode node) throws SaxonApiException {
-        return this.serializeToString(node.getUnderlyingNode());
-    }
-
-    public void serializeToFile(Source src, File file) throws SaxonApiException {
-        this.serializeToFile(src, file, this.getOutputProperties());
-    }
-
-    public void serializeToFile(Source src, File file, Properties outProps) throws SaxonApiException {
-        try (FileOutputStream outStream = new FileOutputStream(file)) {
-            this.serializeToStream(src, outStream, outProps);
-        } catch (IOException e) {
-            throw new SaxonApiException(String.format("Unable to serialize source (class=%s, sysId=%s) to file (path=%s).", src.getClass().getName(),
-                src.getSystemId(), file.getPath()), e);
-        }
-    }
-
-    public String serializeToString(Source src) throws SaxonApiException {
-        return this.serializeToString(src, this.getOutputProperties());
-    }
-
-    public String serializeToString(Source src, Properties outProps) throws SaxonApiException {
-        byte[] resultBytes = this.serializeToBytes(src, outProps);
-        String encName = outProps.getProperty(OutputKeys.ENCODING);
-
-        try {
-            return ((encName != null) ? new String(resultBytes, encName) : new String(resultBytes, StandardCharsets.UTF_8));
-        } catch (UnsupportedEncodingException e) {
-            throw new SaxonApiException(String.format("Unable to serialize source (class=%s, sysId=%s) to string (encName=%s).", src.getClass().getName(),
-                src.getSystemId(), encName), e);
-        }
-    }
-
-    public byte[] serializeToBytes(Source src) throws SaxonApiException {
-        return this.serializeToBytes(src, this.getOutputProperties());
-    }
-
-    public byte[] serializeToBytes(Source src, Properties outProps) throws SaxonApiException {
-        try (ByteArrayOutputStream outStream = new ByteArrayOutputStream()) {
-            return this.serializeToStream(src, outStream, outProps).toByteArray();
-        } catch (IOException e) {
-            throw new SaxonApiException(
-                String.format("Unable to serialize source (class=%s, sysId=%s) to bytes.", src.getClass().getName(), src.getSystemId()), e);
-        }
-    }
-
-    public <T extends OutputStream> T serializeToStream(Source src, T outStream) throws SaxonApiException {
-        return this.serializeToStream(src, outStream, this.getOutputProperties());
-    }
-
-    public <T extends OutputStream> T serializeToStream(Source src, T outStream, Properties outProps) throws SaxonApiException {
-        this.serializeToResult(src, new StreamResult(outStream), outProps);
-
-        return outStream;
-    }
-
-    public <T extends Result> T serializeToResult(Source src, T result) throws SaxonApiException {
-        return this.serializeToResult(src, result, this.getOutputProperties());
-    }
-
-    public <T extends Result> T serializeToResult(Source src, T result, Properties outProps) throws SaxonApiException {
-        ParseOptions parseOpts = null;
-
-        if (src instanceof AugmentedSource) {
-            AugmentedSource augmentedSrc = ((AugmentedSource) src);
-
-            parseOpts = augmentedSrc.getParseOptions();
-        }
-
-        SdcctConfiguration config = this.getProcessor().getUnderlyingConfiguration();
-        Receiver receiver = this.getReceiver(config, config.makePipelineConfiguration(), result, parseOpts, outProps);
-
-        try {
-            Sender.send(src, receiver, null);
-
-            return result;
-        } catch (XPathException e) {
-            throw new SaxonApiException(String.format("Unable to serialize source (class=%s, sysId=%s) to result (class=%s, sysId=%s).", src.getClass()
-                .getName(), src.getSystemId(), result.getClass().getName(), result.getSystemId()), e);
-        } finally {
-            try {
-                receiver.close();
-            } catch (XPathException e) {
-                // noinspection ThrowFromFinallyBlock
-                throw new SaxonApiException(String.format("Unable to close Saxon serializer receiver (class=%s) for result (class=%s, sysId=%s).", receiver
-                    .getClass().getName(), result.getClass().getName(), result.getSystemId()), e);
-            }
-        }
-    }
-
-    @Override
-    public Receiver getReceiver(Configuration config) throws SaxonApiException {
+    public SequenceReceiver getReceiver(Configuration config) throws SaxonApiException {
         return this.getReceiver(config.makePipelineConfiguration());
     }
 
     @Override
-    public Receiver getReceiver(PipelineConfiguration pipelineConfig) throws SaxonApiException {
-        return this.getReceiver(((SdcctConfiguration) pipelineConfig.getConfiguration()), ((SdcctPipelineConfiguration) pipelineConfig), this.getResult(),
-            null, this.getOutputProperties());
+    public SequenceReceiver getReceiver(PipelineConfiguration pipelineConfig) throws SaxonApiException {
+        return this.getReceiver(((SdcctConfiguration) pipelineConfig.getConfiguration()), ((SdcctPipelineConfiguration) pipelineConfig), this.getResult(), null,
+            null);
     }
 
-    public Receiver getReceiver(SdcctConfiguration config, SdcctPipelineConfiguration pipelineConfig, Result result, @Nullable ParseOptions parseOpts,
-        Properties outProps) throws SaxonApiException {
-        Receiver receiver;
+    public SequenceReceiver getReceiver(SdcctConfiguration config, SdcctPipelineConfiguration pipelineConfig, Result result, @Nullable ParseOptions parseOpts,
+        @Nullable Properties outProps) throws SaxonApiException {
+        SequenceReceiver receiver;
 
         try {
-            receiver = config.getSerializerFactory().getReceiver(result, pipelineConfig, outProps);
+            receiver = config.getSerializerFactory().getReceiver(result, pipelineConfig, this.mergeOutputProperties(outProps));
         } catch (XPathException e) {
-            throw new SaxonApiException(String.format("Unable to build Saxon serializer receiver for result (class=%s, sysId=%s).",
-                result.getClass().getName(), result.getSystemId()), e);
+            throw new SaxonApiException(
+                String.format("Unable to build Saxon serializer receiver for result (class=%s, sysId=%s).", result.getClass().getName(), result.getSystemId()),
+                e);
         }
 
         if (receiver.getSystemId() == null) {
             receiver.setSystemId(result.getSystemId());
         }
 
+        ParseOptions pipelineParseOpts = pipelineConfig.getParseOptions();
+
         if (parseOpts != null) {
-            ParseOptions pipelineParseOpts = pipelineConfig.getParseOptions();
             pipelineParseOpts.merge(parseOpts);
+        }
 
-            List<FilterFactory> parseFilters = pipelineParseOpts.getFilters();
+        List<FilterFactory> parseFilters = pipelineParseOpts.getFilters();
 
-            if (!CollectionUtils.isEmpty(parseFilters)) {
-                for (int a = (parseFilters.size() - 1); a >= 0; a--) {
-                    receiver = parseFilters.get(a).makeFilter(receiver);
-                }
-
-                parseFilters.clear();
+        if (!CollectionUtils.isEmpty(parseFilters)) {
+            for (int a = (parseFilters.size() - 1); a >= 0; a--) {
+                receiver = parseFilters.get(a).makeFilter(receiver);
             }
+
+            parseFilters.clear();
         }
 
         return receiver;
+    }
+
+    private Properties mergeOutputProperties(@Nullable Properties outProps) {
+        Properties mergedOutProps = super.getCombinedOutputProperties();
+
+        if (outProps != null) {
+            mergedOutProps.putAll(outProps);
+        }
+
+        return mergedOutProps;
     }
 
     @Nullable
@@ -200,17 +148,8 @@ public class SdcctSerializer extends Serializer {
     }
 
     @Override
-    protected void setDefaultOutputProperties(@Nullable Properties defaultOutProps) {
+    public void setDefaultOutputProperties(@Nullable Properties defaultOutProps) {
         super.setDefaultOutputProperties((this.defaultOutProps = defaultOutProps));
-    }
-
-    @Override
-    public Properties getOutputProperties() {
-        return super.getOutputProperties();
-    }
-
-    public void setOutputProperties(Properties outProps) {
-        outProps.stringPropertyNames().forEach(outPropName -> this.setOutputProperty(Property.get(outPropName), outProps.getProperty(outPropName)));
     }
 
     @Override

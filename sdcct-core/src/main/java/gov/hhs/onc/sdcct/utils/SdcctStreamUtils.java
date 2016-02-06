@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 
 public final class SdcctStreamUtils {
     private SdcctStreamUtils() {
@@ -30,11 +31,24 @@ public final class SdcctStreamUtils {
         return Collectors.toMap(keyMapper, valueMapper, (value1, value2) -> value2, mapSupplier);
     }
 
+    @Nullable
+    public static <T, U> U findInstance(Stream<T> stream, Class<U> clazz) {
+        return stream.filter(instances(clazz)).findFirst().map(clazz::cast).orElse(null);
+    }
+
     public static <T, U> Stream<U> asInstances(Stream<T> stream, Class<U> clazz) {
         return stream.filter(instances(clazz)).map(clazz::cast);
     }
 
     public static <T, U> Predicate<? super T> instances(Class<U> clazz) {
         return clazz::isInstance;
+    }
+
+    public static <T> Stream<T> ofTree(@Nullable T obj, Function<T, Stream<T>> streamBuilder) {
+        return ((obj != null) ? traverse(streamBuilder).apply(obj) : Stream.empty());
+    }
+
+    public static <T> Function<T, Stream<T>> traverse(Function<T, Stream<T>> streamBuilder) {
+        return obj -> Stream.concat(Stream.of(obj), streamBuilder.apply(obj).flatMap(traverse(streamBuilder)));
     }
 }

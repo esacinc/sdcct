@@ -4,8 +4,8 @@ import gov.hhs.onc.sdcct.context.SdcctPropertyNames;
 import gov.hhs.onc.sdcct.context.impl.AbstractApplicationInitializer;
 import gov.hhs.onc.sdcct.context.impl.SdcctApplication;
 import gov.hhs.onc.sdcct.logging.LoggingInitializer;
+import gov.hhs.onc.sdcct.utils.SdcctOptionUtils;
 import java.io.File;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -21,7 +21,9 @@ public abstract class AbstractLoggingInitializer extends AbstractApplicationInit
 
     @Override
     public void initialize(ConfigurableEnvironment env) {
+        this.app.setLogConsoleThreadName(this.buildLogConsoleThreadName(env));
         this.app.setLogConsoleTty(this.buildLogConsoleTty(env));
+        this.app.setLogConsoleTx(this.buildLogConsoleTx(env));
         this.app.setLogFileDirectory(this.buildLogFileDirectory(env));
         this.app.setLogFileName(this.buildLogFileName(env));
         this.app.setLogstashLogFileName(this.buildLogstashLogFileName(env));
@@ -38,10 +40,18 @@ public abstract class AbstractLoggingInitializer extends AbstractApplicationInit
         return logstashLogFileName;
     }
 
-    protected boolean buildLogConsoleTty(ConfigurableEnvironment env) {
-        String consoleTty = env.getProperty(SdcctPropertyNames.LOGGING_CONSOLE_TTY);
+    protected boolean buildLogConsoleThreadName(ConfigurableEnvironment env) {
+        return SdcctOptionUtils.getBooleanValue(SdcctPropertyNames.LOGGING_CONSOLE_THREAD_NAME,
+            env.getProperty(SdcctPropertyNames.LOGGING_CONSOLE_THREAD_NAME));
+    }
 
-        return ((consoleTty != null) ? BooleanUtils.toBoolean(consoleTty) : (System.console() != null));
+    protected boolean buildLogConsoleTty(ConfigurableEnvironment env) {
+        return SdcctOptionUtils.getBooleanValue(SdcctPropertyNames.LOGGING_CONSOLE_TTY, env.getProperty(SdcctPropertyNames.LOGGING_CONSOLE_TTY),
+            (System.console() != null));
+    }
+
+    protected boolean buildLogConsoleTx(ConfigurableEnvironment env) {
+        return SdcctOptionUtils.getBooleanValue(SdcctPropertyNames.LOGGING_CONSOLE_TX, env.getProperty(SdcctPropertyNames.LOGGING_CONSOLE_TX));
     }
 
     protected String buildLogFileName(ConfigurableEnvironment env) {

@@ -11,14 +11,17 @@ import gov.hhs.onc.sdcct.sdc.impl.FormPackageModulesImpl;
 import gov.hhs.onc.sdcct.sdc.impl.FormPackageTypeImpl;
 import gov.hhs.onc.sdcct.sdc.impl.PackageModulesTypeImpl;
 import gov.hhs.onc.sdcct.sdc.impl.PackageTypeImpl;
+import gov.hhs.onc.sdcct.transform.impl.SdcctConfiguration;
+import gov.hhs.onc.sdcct.xml.impl.XdmDocumentDestination;
 import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
 import javax.annotation.Nullable;
-import javax.xml.transform.dom.DOMResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class FormImpl implements Form {
+    @Autowired
+    private SdcctConfiguration config;
+
     @Autowired
     private XmlCodec xmlCodec;
 
@@ -38,15 +41,17 @@ public class FormImpl implements Form {
     @Override
     public void afterPropertiesSet() throws Exception {
         if (this.isSetFormDesignSource()) {
-            this.pkgElem = ((Document) this.xmlCodec.encode(
-                (this.pkg = new PackageTypeImpl().setPackageModules(new PackageModulesTypeImpl()
-                    .setMainFormPackage(new FormPackageTypeImpl().setFormPackageModules(new FormPackageModulesImpl().setFormDesignPkg(
-                        new FormDesignPkgTypeImpl().setFormDesignTemplate(this.xmlCodec.decode(this.formDesignSrc, FormDesignTypeImpl.class))))))),
-                new DOMResult()).getNode()).getDocumentElement();
+            this.pkgElem =
+                this.xmlCodec
+                    .encode(
+                        (this.pkg = new PackageTypeImpl().setPackageModules(new PackageModulesTypeImpl().setMainFormPackage(
+                            new FormPackageTypeImpl().setFormPackageModules(new FormPackageModulesImpl().setFormDesignPkg(new FormDesignPkgTypeImpl()
+                                .setFormDesignTemplate(this.xmlCodec.decode(this.formDesignSrc, FormDesignTypeImpl.class, null))))))),
+                new XdmDocumentDestination(this.config).getReceiver(), null).getXdmNode().getDocument().getDocumentElement();
         }
 
         if (this.isSetQuestionnaireSource()) {
-            this.questionnaire = this.xmlCodec.decode(this.questionnaireSrc, QuestionnaireImpl.class);
+            this.questionnaire = this.xmlCodec.decode(this.questionnaireSrc, QuestionnaireImpl.class, null);
         }
     }
 

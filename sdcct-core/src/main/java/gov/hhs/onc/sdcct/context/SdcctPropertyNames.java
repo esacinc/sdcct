@@ -22,7 +22,8 @@ public final class SdcctPropertyNames {
     public final static String DIR_SUFFIX = "dir";
     public final static String ID_SUFFIX = "id";
     public final static String NAME_SUFFIX = "name";
-    public final static String TX_ID_SUFFIX = "tx." + ID_SUFFIX;
+    public final static String TX_SUFFIX = "tx";
+    public final static String TX_ID_SUFFIX = TX_SUFFIX + "." + ID_SUFFIX;
 
     public final static String USER_DIR = "user." + DIR_SUFFIX;
 
@@ -32,7 +33,9 @@ public final class SdcctPropertyNames {
 
     public final static String HTTP_SERVER_TX_ID = HTTP_SERVER_PREFIX + TX_ID_SUFFIX;
 
+    public final static String LOGGING_CONSOLE_THREAD_NAME = LOGGING_CONSOLE_PREFIX + "thread." + NAME_SUFFIX;
     public final static String LOGGING_CONSOLE_TTY = LOGGING_CONSOLE_PREFIX + "tty";
+    public final static String LOGGING_CONSOLE_TX = LOGGING_CONSOLE_PREFIX + TX_SUFFIX;
 
     public final static String LOGGING_FILE_DIR = LOGGING_FILE_PREFIX + DIR_SUFFIX;
     public final static String LOGGING_FILE_NAME = LOGGING_FILE_PREFIX + NAME_SUFFIX;

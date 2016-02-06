@@ -23,7 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-@Test(groups = { "sdcct.test.it.web.form.manager.all", "sdcct.test.it.web.form.manager.ws.fhir" })
+@Test(enabled = false, groups = { "sdcct.test.it.web.form.manager.all", "sdcct.test.it.web.form.manager.ws.fhir.all", "sdcct.test.it.web.form.manager.ws.fhir.client" })
 public class FhirFormManagerWebServiceIntegrationTests extends AbstractSdcctWebIntegrationTests {
     @Resource(name = "formTest1")
     @SuppressWarnings({ "SpringJavaAutowiringInspection" })
@@ -33,7 +33,7 @@ public class FhirFormManagerWebServiceIntegrationTests extends AbstractSdcctWebI
     @SuppressWarnings({ "SpringJavaAutowiringInspection" })
     private JaxRsClient testClient;
 
-    @Test(dependsOnMethods = { "testGenerateWadl" })
+    @Test(enabled = false, dependsOnMethods = { "testGenerateWadl" })
     public void testReadQuestionnaire() throws Exception {
         String testFormId1 = this.testForm1.getId(), testUri1 =
             new UriBuilderImpl(this.testClient.getDelegate().getCurrentURI()).path(FhirFormManagerWebService.class.getMethod("readQuestionnaire", String.class))
@@ -66,7 +66,7 @@ public class FhirFormManagerWebServiceIntegrationTests extends AbstractSdcctWebI
         }
     }
 
-    @Test
+    @Test(enabled = false)
     public void testGenerateWadl() throws Exception {
         URI testWadlUri = new UriBuilderImpl(this.testClient.getDelegate().getCurrentURI()).queryParam(WadlGenerator.WADL_QUERY).build();
 

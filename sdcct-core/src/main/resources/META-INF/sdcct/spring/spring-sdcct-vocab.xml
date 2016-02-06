@@ -10,6 +10,7 @@
     <!--====================================================================================================
     = VOCAB REPOSITORIES
     =====================================================================================================-->
+    <!--suppress SpringPlaceholdersInspection -->
     <beans:bean id="repoVocabFhir" class="gov.hhs.onc.sdcct.fhir.impl.FhirVocabRepositoryImpl"
-        p:valueSetsSource="classpath*:META-INF/sdcct/data/vocab/fhir/valuesets.xml"/>
+        p:valueSetsSource="classpath*:${sdcct.data.vocab.dir.path}/fhir/valuesets.xml"/>
 </beans:beans>

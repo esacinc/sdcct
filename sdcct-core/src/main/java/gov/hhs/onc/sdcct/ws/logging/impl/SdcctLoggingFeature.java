@@ -1,9 +1,9 @@
 package gov.hhs.onc.sdcct.ws.logging.impl;
 
+import com.sun.xml.ws.encoding.soap.SOAP12Constants;
 import gov.hhs.onc.sdcct.context.SdcctPropertyNames;
-import gov.hhs.onc.sdcct.fhir.FhirFormatType;
-import gov.hhs.onc.sdcct.fhir.impl.FhirContentProvider;
 import gov.hhs.onc.sdcct.io.impl.ByteArraySource;
+import gov.hhs.onc.sdcct.io.utils.SdcctMediaTypeUtils;
 import gov.hhs.onc.sdcct.json.impl.JsonCodec;
 import gov.hhs.onc.sdcct.logging.LoggingEvent;
 import gov.hhs.onc.sdcct.net.logging.HttpRequestEvent;
@@ -14,7 +14,9 @@ import gov.hhs.onc.sdcct.net.logging.RestEventType;
 import gov.hhs.onc.sdcct.net.logging.impl.HttpRequestEventImpl;
 import gov.hhs.onc.sdcct.net.logging.impl.HttpResponseEventImpl;
 import gov.hhs.onc.sdcct.transform.content.ContentCodec;
-import gov.hhs.onc.sdcct.transform.content.ContentEncodeOptions;
+import gov.hhs.onc.sdcct.transform.content.SdcctContentType;
+import gov.hhs.onc.sdcct.transform.content.impl.ContentEncodeOptions;
+import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
 import gov.hhs.onc.sdcct.ws.WsDirection;
 import gov.hhs.onc.sdcct.ws.WsPropertyNames;
 import gov.hhs.onc.sdcct.ws.logging.WsEvent;
@@ -22,20 +24,23 @@ import gov.hhs.onc.sdcct.ws.logging.WsMessageType;
 import gov.hhs.onc.sdcct.ws.logging.WsRequestEvent;
 import gov.hhs.onc.sdcct.ws.logging.WsResponseEvent;
 import gov.hhs.onc.sdcct.ws.utils.SdcctWsPropertyUtils;
+import gov.hhs.onc.sdcct.xml.impl.XdmDocument;
 import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
+import gov.hhs.onc.sdcct.xml.utils.SdcctXmlUtils;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.SequenceInputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import javax.ws.rs.core.MediaType;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.dom.DOMSource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.Binding;
@@ -43,6 +48,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
@@ -72,11 +78,13 @@ import org.apache.cxf.ws.policy.PolicyConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.w3c.dom.Document;
+import org.springframework.http.MediaType;
+import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
-public class SdcctLoggingFeature extends AbstractFeature {
+public class SdcctLoggingFeature extends AbstractFeature implements InitializingBean {
     private abstract class AbstractLoggingInterceptor<T extends WsEvent> extends AbstractPhaseInterceptor<Message> {
         protected Class<T> eventClass;
         protected Supplier<T> eventCreator;
@@ -345,13 +353,14 @@ public class SdcctLoggingFeature extends AbstractFeature {
         }
     }
 
-    private final static Map<String, Object> PRETTY_PAYLOAD_ENC_OPTS = Collections.singletonMap(ContentEncodeOptions.PRETTY_NAME, Boolean.TRUE);
+    private final static ContentEncodeOptions PRETTY_PAYLOAD_ENC_OPTS = new ContentEncodeOptions().setOption(ContentEncodeOptions.PRETTY, true);
 
     private final static Logger LOGGER = LoggerFactory.getLogger(SdcctLoggingFeature.class);
 
     @Autowired
-    private FhirContentProvider<?> fhirContentProv;
+    private List<ContentCodec> codecs;
 
+    private Map<SdcctContentType, ContentCodec> contentTypeCodecs;
     private ServerLoggingHookInInterceptor restServerHookInInterceptor = new ServerLoggingHookInInterceptor(WsMessageType.REST),
         soapServerHookInInterceptor = new ServerLoggingHookInInterceptor(WsMessageType.SOAP);
     private ServerLoggingProcessInInterceptor restServerProcessInInterceptor = new ServerLoggingProcessInInterceptor(WsMessageType.REST),
@@ -386,6 +395,11 @@ public class SdcctLoggingFeature extends AbstractFeature {
         if (interceptorProv instanceof ClientConfiguration) {
             initialize(interceptorProv, this.restClientHookInInterceptor, this.restClientProcessInInterceptor, this.restClientOutInterceptor);
         }
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        this.contentTypeCodecs = this.codecs.stream().collect(SdcctStreamUtils.toMap(ContentCodec::getType, Function.identity(), HashMap::new));
     }
 
     private <T extends WsEvent> void processEvent(Exchange exchange, Message msg, T event, WsMessageType msgType, byte ... payloadBytes) throws Exception {
@@ -460,11 +474,12 @@ public class SdcctLoggingFeature extends AbstractFeature {
                     }
                 }
 
-                if ((codec = msg.get(ContentCodec.class)) == null) {
-                    codec = SdcctLoggingFeature.this.fhirContentProv.findCodec(MediaType.valueOf(SdcctWsPropertyUtils.getProperty(msg, Message.CONTENT_TYPE)));
-                }
-            } else if (soapMsgType) {
-                codec = SdcctLoggingFeature.this.fhirContentProv.getFormatCodecs().get(FhirFormatType.XML);
+                codec = msg.get(ContentCodec.class);
+            }
+
+            if (codec == null) {
+                codec = this.contentTypeCodecs.get(
+                    SdcctMediaTypeUtils.findCompatible(SdcctContentType.class, MediaType.valueOf(SdcctWsPropertyUtils.getProperty(msg, Message.CONTENT_TYPE))));
             }
 
             if (codec != null) {
@@ -487,20 +502,68 @@ public class SdcctLoggingFeature extends AbstractFeature {
 
     private <T extends WsEvent> void processXmlPayload(Exchange exchange, Message msg, T event, WsMessageType msgType, Charset enc, XmlCodec codec,
         byte ... payloadBytes) throws Exception {
-        Document doc = ((Document) codec.decode(new ByteArraySource(payloadBytes), new DOMResult()).getNode());
-
-        event.setPrettyPayload(new String(codec.encode(new DOMSource(doc), PRETTY_PAYLOAD_ENC_OPTS), enc));
+        event.setPrettyPayload(new String(codec.encode(new ByteArraySource(payloadBytes), PRETTY_PAYLOAD_ENC_OPTS), enc));
 
         if (msgType == WsMessageType.SOAP) {
-            Element docElem = doc.getDocumentElement();
+            XdmDocument doc = codec.decode(payloadBytes, null);
+            Element docElem = doc.getDocument().getDocumentElement();
 
-            // TODO: process SOAP headers + faults
+            processSoapHeaders(event, docElem);
+            processSoapFault(event, docElem);
         }
     }
 
-    protected <T extends WsEvent> void processJsonPayload(Exchange exchange, Message msg, T event, WsMessageType msgType, Charset enc, JsonCodec codec,
+    private static <T extends WsEvent> void processSoapFault(T event, Element docElem) {
+        Element soapFaultElem =
+            DOMUtils.getFirstChildWithName(DOMUtils.getFirstChildWithName(docElem, SOAP12Constants.QNAME_SOAP_BODY), SOAP12Constants.QNAME_SOAP_FAULT);
+
+        if (soapFaultElem == null) {
+            return;
+        }
+
+        Map<String, Object> soapFaultContentMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+
+        Optional.ofNullable(DOMUtils.getFirstChildWithName(soapFaultElem, SOAP12Constants.QNAME_FAULT_CODE))
+            .ifPresent(soapFaultCodeElem -> soapFaultContentMap.put(SOAP12Constants.QNAME_FAULT_CODE.getLocalPart(),
+                DOMUtils.getContent(DOMUtils.getFirstChildWithName(soapFaultCodeElem, SOAP12Constants.QNAME_FAULT_VALUE))));
+
+        List<Element> soapFaultSubcodeElems = SdcctXmlUtils.findElements(soapFaultElem, SOAP12Constants.QNAME_FAULT_SUBCODE);
+
+        if (!soapFaultSubcodeElems.isEmpty()) {
+            soapFaultContentMap.put(SOAP12Constants.QNAME_FAULT_SUBCODE.getLocalPart(),
+                soapFaultSubcodeElems.stream()
+                    .map(soapFaultSubcodeElem -> DOMUtils.getContent(DOMUtils.getFirstChildWithName(soapFaultSubcodeElem, SOAP12Constants.QNAME_FAULT_VALUE)))
+                    .collect(Collectors.toList()));
+        }
+
+        Optional.ofNullable(DOMUtils.getFirstChildWithName(soapFaultElem, SOAP12Constants.QNAME_FAULT_REASON))
+            .ifPresent(soapFaultReasonElem -> soapFaultContentMap.put(SOAP12Constants.QNAME_FAULT_REASON.getLocalPart(),
+                DOMUtils.getContent(DOMUtils.getFirstChildWithName(soapFaultReasonElem, SOAP12Constants.QNAME_FAULT_REASON_TEXT))));
+
+        Optional.ofNullable(DOMUtils.getFirstChildWithName(soapFaultElem, SOAP12Constants.QNAME_FAULT_DETAIL)).ifPresent(soapFaultDetailElem -> {
+            List<Element> soapFaultDetailChildElems = DomUtils.getChildElements(soapFaultDetailElem);
+
+            if (!soapFaultDetailChildElems.isEmpty()) {
+                soapFaultContentMap.put(SOAP12Constants.QNAME_FAULT_DETAIL.getLocalPart(),
+                    SdcctXmlUtils.mapTreeContent(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER), soapFaultDetailChildElems.stream()));
+            }
+        });
+
+        event.setSoapFault(soapFaultContentMap);
+    }
+
+    private static <T extends WsEvent> void processSoapHeaders(T event, Element docElem) {
+        List<Element> soapHeaderElems = SdcctXmlUtils.findElements(docElem, SOAP12Constants.QNAME_SOAP_HEADER).stream()
+            .flatMap(soapHeaderContainerElem -> DomUtils.getChildElements(soapHeaderContainerElem).stream()).collect(Collectors.toList());
+
+        if (!soapHeaderElems.isEmpty()) {
+            event.setSoapHeaders(SdcctXmlUtils.mapTreeContent(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER), soapHeaderElems.stream()));
+        }
+    }
+
+    private <T extends WsEvent> void processJsonPayload(Exchange exchange, Message msg, T event, WsMessageType msgType, Charset enc, JsonCodec codec,
         byte ... payloadBytes) throws Exception {
-        event.setPrettyPayload(new String(codec.encode(codec.decode(payloadBytes), PRETTY_PAYLOAD_ENC_OPTS), enc));
+        event.setPrettyPayload(new String(codec.encode(codec.decode(payloadBytes, null), PRETTY_PAYLOAD_ENC_OPTS), enc));
     }
 
     private void logEvent(LoggingEvent event) {

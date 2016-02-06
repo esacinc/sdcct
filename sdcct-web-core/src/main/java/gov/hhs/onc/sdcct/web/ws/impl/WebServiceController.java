@@ -38,7 +38,7 @@ public class WebServiceController implements Controller, ServletConfigAware {
     @Nullable
     @Override
     public ModelAndView handleRequest(HttpServletRequest servletReq, HttpServletResponse servletResp) throws Exception {
-        String destPath = StringUtils.removeStart(servletReq.getRequestURI(), this.baseUrlPath);
+        String destPath = StringUtils.removeStart(servletReq.getRequestURI(), this.baseUrlPath), txId;
         DestinationRegistry destReg =
             ((HTTPTransportFactory) this.bus.getExtension(DestinationFactoryManager.class).getDestinationFactoryForUri(HTTP_TRANSPORT_NS_URI)).getRegistry();
         AbstractHTTPDestination dest = destReg.getDestinationForPath(destPath, true);
@@ -51,7 +51,9 @@ public class WebServiceController implements Controller, ServletConfigAware {
             servletReq.setAttribute(ENDPOINT_ADDR_SERVLET_REQ_ATTR_NAME, (this.baseUrlPath + dest.getEndpointInfo().getAddress()));
 
             try {
-                MDC.put(SdcctPropertyNames.WS_SERVER_TX_ID, this.txIdGen.generateId().toString());
+                MDC.put(SdcctPropertyNames.WS_SERVER_TX_ID, (txId = this.txIdGen.generateId().toString()));
+
+                servletReq.setAttribute(SdcctPropertyNames.HTTP_SERVER_TX_ID, txId);
 
                 BusFactory.setThreadDefaultBus(bus);
 

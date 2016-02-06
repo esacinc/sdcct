@@ -40,7 +40,7 @@ public abstract class AbstractHttpEvent extends AbstractRestEvent implements Htt
 
     @Override
     protected String buildMarkerFieldName() {
-        return ("http" + StringUtils.capitalize(this.endpointType.getId()) + StringUtils.capitalize(this.eventType.getId()));
+        return String.join(SdcctStringUtils.PERIOD, "http", this.endpointType.getId(), this.eventType.getId());
     }
 
     @JsonProperty

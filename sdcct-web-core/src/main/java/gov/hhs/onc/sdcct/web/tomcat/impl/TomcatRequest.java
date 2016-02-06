@@ -1,6 +1,7 @@
 package gov.hhs.onc.sdcct.web.tomcat.impl;
 
 import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -17,8 +18,8 @@ public class TomcatRequest extends Request {
     }
 
     public Map<String, List<String>> getParameters() {
-        return EnumerationUtils.toList(this.getParameterNames()).stream().collect(SdcctStreamUtils.toMap(Function.identity(),
-            paramName -> Stream.of(this.getParameterValues(paramName)).collect(Collectors.toList()), () -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER)));
+        return EnumerationUtils.toList(this.getParameterNames()).stream().sorted(String.CASE_INSENSITIVE_ORDER).collect(SdcctStreamUtils
+            .toMap(Function.identity(), paramName -> Stream.of(this.getParameterValues(paramName)).collect(Collectors.toList()), LinkedHashMap::new));
     }
 
     @Override

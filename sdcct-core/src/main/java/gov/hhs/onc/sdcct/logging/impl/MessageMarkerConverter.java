@@ -4,6 +4,7 @@ import ch.qos.logback.classic.pattern.MessageConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import gov.hhs.onc.sdcct.logging.AppenderType;
 import gov.hhs.onc.sdcct.logging.utils.SdcctMarkerUtils;
+import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
 
 public class MessageMarkerConverter extends MessageConverter {
     public final static String WORD = "mMarker";
@@ -12,7 +13,7 @@ public class MessageMarkerConverter extends MessageConverter {
 
     @Override
     public String convert(ILoggingEvent event) {
-        MessageMarker msgMarker = SdcctMarkerUtils.findByType(event.getMarker(), MessageMarker.class);
+        MessageMarker msgMarker = SdcctStreamUtils.findInstance(SdcctMarkerUtils.stream(event.getMarker()), MessageMarker.class);
 
         return ((msgMarker != null) ? msgMarker.getMessages().get(this.appenderType) : super.convert(event));
     }
