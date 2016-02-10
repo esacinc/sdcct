@@ -6,6 +6,13 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--====================================================================================================
+    = JAX-WS CLIENTS
+    =====================================================================================================-->
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="clientFormReceiverRfdLocal" parent="clientFormReceiverRfd"
+                c:addr="${sdcct.ws.form.receiver.rfd.url}"/>
     
     
 </beans:beans>
