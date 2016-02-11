@@ -12,7 +12,7 @@
     =====================================================================================================-->
     <!--suppress SpringPlaceholdersInspection -->
     <beans:bean id="clientFormReceiverRfdLocal" parent="clientFormReceiverRfd"
-                c:addr="${sdcct.ws.form.receiver.rfd.url}"/>
-    
-    
+        c:addr="${sdcct.ws.form.receiver.rfd.url}"/>
+
+
 </beans:beans>
