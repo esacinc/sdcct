@@ -7,5 +7,5 @@ import javax.annotation.Nullable;
 
 public interface FormArchiver extends FormService {
     @Nullable
-    public String submitForm(AnyXMLContentType body) throws Exception;
+    public String archiveForm(AnyXMLContentType body) throws Exception;
 }

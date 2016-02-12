@@ -1,8 +1,8 @@
 package gov.hhs.onc.sdcct.form.archiver.impl;
 
 import gov.hhs.onc.sdcct.form.Form;
+import gov.hhs.onc.sdcct.form.archiver.FormArchiver;
 import gov.hhs.onc.sdcct.form.impl.AbstractFormService;
-import gov.hhs.onc.sdcct.form.receiver.FormReceiver;
 import gov.hhs.onc.sdcct.rfd.AnyXMLContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@Component("formReceiverImpl")
-public class FormArchiverImpl extends AbstractFormService implements FormReceiver {
+@Component("formArchiverImpl")
+public class FormArchiverImpl extends AbstractFormService implements FormArchiver {
     @Autowired(required = false)
     private List<Form> forms;
 
@@ -22,8 +22,8 @@ public class FormArchiverImpl extends AbstractFormService implements FormReceive
 
     @Nullable
     @Override
-    public String submitForm(AnyXMLContentType body) throws Exception {
-        return "Received form....";
+    public String archiveForm(AnyXMLContentType body) throws Exception {
+        return "Archived form....";
     }
 
     @Override

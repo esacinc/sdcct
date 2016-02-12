@@ -6,6 +6,27 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--====================================================================================================
+    = JAX-WS SERVERS
+    =====================================================================================================-->
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="serverFormArchiverRfd" parent="serverRfd"
+        p:address="${sdcct.ws.form.archiver.rfd.url.path}"
+        p:endpointName="#{ T(gov.hhs.onc.sdcct.rfd.RfdWsXmlQnames).FORM_ARCHIVER_PORT }"
+        p:serviceBean-ref="wsFormArchiverRfdImpl"
+        p:serviceName="#{ T(gov.hhs.onc.sdcct.rfd.RfdWsXmlQnames).FORM_ARCHIVER_SERVICE }"
+        p:wsdlLocation="${sdcct.ws.form.archiver.rfd.wsdl.loc}"/>
+
+    <!--====================================================================================================
+    = JAX-WS CLIENTS
+    =====================================================================================================-->
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="clientFormArchiverRfd" parent="clientRfd" lazy-init="true" scope="prototype"
+        p:endpointName="#{ T(gov.hhs.onc.sdcct.rfd.RfdWsXmlQnames).FORM_ARCHIVER_PORT }"
+        p:serviceClass="gov.hhs.onc.sdcct.rfd.RfdFormArchiverPortType"
+        p:serviceName="#{ T(gov.hhs.onc.sdcct.rfd.RfdWsXmlQnames).FORM_ARCHIVER_SERVICE }"
+        p:wsdlLocation="${sdcct.ws.form.archiver.rfd.wsdl.loc}"/>
     
     
 </beans:beans>
