@@ -43,7 +43,7 @@ public class FhirVocabRepositoryImpl implements FhirVocabRepository {
         Code valueSetConceptCode;
 
         for (String valueSetId : this.valueSets.keySet()) {
-            if (!(valueSet = this.valueSets.get(valueSetId)).isSetCodeSystem()) {
+            if (!(valueSet = this.valueSets.get(valueSetId)).hasCodeSystem()) {
                 continue;
             }
 

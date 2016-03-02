@@ -13,9 +13,9 @@
     <!--suppress SpringPlaceholdersInspection -->
     <beans:bean id="serverFormArchiverRfd" parent="serverRfd"
         p:address="${sdcct.ws.form.archiver.rfd.url.path}"
-        p:endpointName="#{ T(gov.hhs.onc.sdcct.rfd.RfdWsXmlQnames).FORM_ARCHIVER_PORT }"
+        p:endpointName="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).FORM_ARCHIVER_PORT }"
         p:serviceBean-ref="wsFormArchiverRfdImpl"
-        p:serviceName="#{ T(gov.hhs.onc.sdcct.rfd.RfdWsXmlQnames).FORM_ARCHIVER_SERVICE }"
+        p:serviceName="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).FORM_ARCHIVER_SERVICE }"
         p:wsdlLocation="${sdcct.ws.form.archiver.rfd.wsdl.loc}"/>
 
     <!--====================================================================================================
@@ -23,10 +23,8 @@
     =====================================================================================================-->
     <!--suppress SpringPlaceholdersInspection -->
     <beans:bean id="clientFormArchiverRfd" parent="clientRfd" lazy-init="true" scope="prototype"
-        p:endpointName="#{ T(gov.hhs.onc.sdcct.rfd.RfdWsXmlQnames).FORM_ARCHIVER_PORT }"
+        p:endpointName="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).FORM_ARCHIVER_PORT }"
         p:serviceClass="gov.hhs.onc.sdcct.rfd.RfdFormArchiverPortType"
-        p:serviceName="#{ T(gov.hhs.onc.sdcct.rfd.RfdWsXmlQnames).FORM_ARCHIVER_SERVICE }"
+        p:serviceName="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).FORM_ARCHIVER_SERVICE }"
         p:wsdlLocation="${sdcct.ws.form.archiver.rfd.wsdl.loc}"/>
-    
-    
 </beans:beans>

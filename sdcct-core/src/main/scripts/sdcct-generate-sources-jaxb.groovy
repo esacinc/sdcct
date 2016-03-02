@@ -1,5 +1,6 @@
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeName
+import com.fasterxml.jackson.databind.util.ISO8601Utils
 import com.github.sebhoss.warnings.CompilerWarnings
 import com.sun.codemodel.CodeWriter
 import com.sun.codemodel.JAnnotationUse
@@ -35,6 +36,8 @@ import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.util.regex.Pattern
 import java.util.stream.Collectors
+import javax.annotation.Generated
+import javax.xml.bind.JAXBContext
 import javax.xml.bind.JAXBElement
 import javax.xml.bind.annotation.XmlNs
 import javax.xml.bind.annotation.XmlRootElement
@@ -44,14 +47,7 @@ import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.ClassUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.maven.plugin.MojoExecutionException
-
-def final XJC_ARGS = [
-    "-mark-generated",
-    "-Xdefault-value",
-    "-Xsetters",
-    "-Xannotate",
-    "-Xvalue-constructor"
-]
+import org.eclipse.persistence.jaxb.JAXBContextFactory
 
 def final JAVA_SRC_FILE_EXT = ".java"
 
@@ -63,13 +59,25 @@ def final IMPL_CLASS_NAME_SUFFIX = "Impl"
 
 def final JAXB_CONTEXT_FACTORY_SIMPLE_CLASS_NAME = "JAXBContextFactory"
 
-def final VALUE_FIELD_NAME = "value"
+def final COMMENTS_FIELD_NAME = "comments"
+def final DATE_MEMBER_NAME = "date"
+def final VALUE_MEMBER_NAME = "value"
 
 def final ADD_METHOD_NAME = "add"
 
 def final GETTER_METHOD_NAME_PREFIX = "get"
+def final HAS_METHOD_NAME_PREFIX = "has"
 def final IS_METHOD_NAME_PREFIX = "is"
 def final SETTER_METHOD_NAME_PREFIX = "set"
+
+def final MOXY_JAXB_CONTEXT_FACTORY_JAXB_PROPS_CONTENT = (JAXBContext.JAXB_CONTEXT_FACTORY + "=" + JAXBContextFactory.name)
+
+def final DEFAULT_XJC_ARGS = [
+    "-Xdefault-value",
+    "-Xsetters",
+    "-Xannotate",
+    "-Xvalue-constructor"
+]
 
 def errorReceiver = new CodegenErrorReceiver(log)
 def xjcErrorReceiver = errorReceiver.forXjc()
@@ -86,6 +94,9 @@ def debug = BooleanUtils.toBoolean(((String)bindingVars["debug"]))
 def enc = project.properties["project.build.sourceEncoding"]
 def verbose = BooleanUtils.toBoolean(((String)bindingVars["verbose"]))
 def wsimport = BooleanUtils.toBoolean(((String) bindingVars["wsimport"]))
+def generatorName = "sdcct-generate-sources-jaxb"
+def generationTime = ISO8601Utils.format(new Date())
+def generationComments = ("JAXB RI v" + Options.getBuildID())
 def wsimportOpts = null
 def opts
 def args
@@ -141,7 +152,7 @@ if (wsimport) {
         wsimportOpts.addWSDL(it.file)
     }
 
-    CollectionUtils.addAll((args = XJC_ARGS.collect(new ArrayList<String>(), { ("-B" + it) })), SdcctToolUtils.tokenize(((String)bindingVars["args"])))
+    CollectionUtils.addAll((args = DEFAULT_XJC_ARGS.collect(new ArrayList<String>(), { ("-B" + it) })), SdcctToolUtils.tokenize(((String)bindingVars["args"])))
 } else {
     opts = new Options()
     
@@ -169,7 +180,7 @@ if (wsimport) {
         opts.addGrammar(it.file)
     }
 
-    CollectionUtils.addAll((args = new ArrayList<String>(XJC_ARGS)), SdcctToolUtils.tokenize(((String) bindingVars["args"])))
+    CollectionUtils.addAll((args = new ArrayList<String>(DEFAULT_XJC_ARGS)), SdcctToolUtils.tokenize(((String) bindingVars["args"])))
 }
     
 opts.automaticNameConflictResolution = true
@@ -313,6 +324,8 @@ def propAdderName
 def propItemClass
 def implPropAdder
 def implPropAdderBody
+def hasPropMethodName
+def implHasPropMethodBody
 
 def Field classModelAnnosField = JDefinedClass.class.getDeclaredField("annotations")
 classModelAnnosField.accessible = true
@@ -327,10 +340,13 @@ outline.allPackageContexts.each{
     [
         (objFactoryGen = ((DualObjectFactoryGenerator) it.objectFactoryGenerator())).publicOFG,
         objFactoryGen.privateOFG
-    ].each{ it.objectFactory.annotate(SuppressWarnings.class).paramArray(VALUE_FIELD_NAME).param(rawTypesStaticRef).param(uncheckedStaticRef) }
+    ].each{ it.objectFactory.annotate(SuppressWarnings.class).paramArray(VALUE_MEMBER_NAME).param(rawTypesStaticRef).param(uncheckedStaticRef) }
     
     it.classes?.each{
-        if (((classRef = it.ref) == null) || ((implClass = it.implClass) == null) || ((classModel = it.target) == null)) {
+        (implClass = it.implClass).annotate(Generated).param(VALUE_MEMBER_NAME, generatorName).param(DATE_MEMBER_NAME, generationTime)
+            .param(COMMENTS_FIELD_NAME, generationComments)
+        
+        if (((classRef = it.ref) == null) || ((classModel = it.target) == null)) {
             return;
         }
         
@@ -346,6 +362,9 @@ outline.allPackageContexts.each{
             
             classAnnos.remove(it)
         }
+        
+        classRef.annotate(Generated).param(VALUE_MEMBER_NAME, generatorName).param(DATE_MEMBER_NAME, generationTime)
+            .param(COMMENTS_FIELD_NAME, generationComments)
         
         if (implClass.abstract) {
             abstractImplClassNames.add(implClass.name())
@@ -389,7 +408,7 @@ outline.allPackageContexts.each{
                 implPropSetter.body()._return(JExpr._this())
 
                 if (StringUtils.startsWith(implPropSetter?.params()[0].type().fullName(), JAXBElement.class.name)) {
-                    implPropSetter.annotate(SuppressWarnings.class).paramArray(VALUE_FIELD_NAME).param(uncheckedStaticRef)
+                    implPropSetter.annotate(SuppressWarnings.class).paramArray(VALUE_MEMBER_NAME).param(uncheckedStaticRef)
                 }
             }
             
@@ -401,8 +420,17 @@ outline.allPackageContexts.each{
                 (implPropAdderBody = implPropAdder.body()).invoke(JExpr._this().invoke(implPropGetter), ADD_METHOD_NAME).arg(JExpr.direct(privatePropName))
                 implPropAdderBody._return(JExpr._this())
             }
+            
+            classRef.method(JMod.NONE, codeModel.BOOLEAN, (hasPropMethodName = (HAS_METHOD_NAME_PREFIX + publicPropName)));
+            
+            implClass.method(JMod.PUBLIC, codeModel.BOOLEAN, hasPropMethodName).body()._return(JExpr._this().ref(privatePropName)
+                .ne((propClass.primitive ? ((propClass == codeModel.BOOLEAN) ? JExpr.lit(false) : JExpr.lit(0)) : JExpr._null())))
         }
     }
+}
+
+outline.enums.each{
+    it.clazz.annotate(Generated).param(VALUE_MEMBER_NAME, generatorName).param(DATE_MEMBER_NAME, generationTime).param(COMMENTS_FIELD_NAME, generationComments)
 }
 
 try {
@@ -413,22 +441,23 @@ try {
 
 log.info("Built code model for ${numBeans} class(es).")
 
-def srcFile
+def File srcFile
 def srcFileBaseName
 def srcFileContent
 
 ant.fileset(dir: outDir, includes: "**/*${JAVA_SRC_FILE_EXT}").each{
-    srcFileContent = (srcFile = it.file).text
+    if ((srcFileBaseName = StringUtils.removeEnd((srcFile = it.file).name, JAVA_SRC_FILE_EXT)) == JAXB_CONTEXT_FACTORY_SIMPLE_CLASS_NAME) {
+        srcFile.delete()
+        
+        return
+    }
+    
+    srcFileContent = srcFile.text
     
     abstractImplClassNames.each {
         srcFileContent = srcFileContent.replaceAll(Pattern.compile("(\\s+)(${it})(\\s+|[\\.\\(])"), {
             it[1] + ABSTRACT_CLASS_NAME_PREFIX + StringUtils.removeEnd(it[2], IMPL_CLASS_NAME_SUFFIX) + it[3]
         })
-    }
-    
-    if ((srcFileBaseName = StringUtils.removeEnd(srcFile.name, JAVA_SRC_FILE_EXT)) == JAXB_CONTEXT_FACTORY_SIMPLE_CLASS_NAME) {
-        srcFileContent = srcFileContent.replaceFirst(Pattern.compile("(\\npublic\\s+class\\s+${JAXB_CONTEXT_FACTORY_SIMPLE_CLASS_NAME}\\s+)"),
-        "\n@${SuppressWarnings.class.simpleName}({ ${compilerWarningsClassName}.${rawTypesFieldName}, ${compilerWarningsClassName}.${uncheckedFieldName} })\$1")
     }
     
     srcFile.write(srcFileContent)
@@ -437,4 +466,8 @@ ant.fileset(dir: outDir, includes: "**/*${JAVA_SRC_FILE_EXT}").each{
         srcFile.renameTo(new File(srcFile.parentFile,
             (ABSTRACT_CLASS_NAME_PREFIX + StringUtils.removeEnd(srcFileBaseName, IMPL_CLASS_NAME_SUFFIX) + JAVA_SRC_FILE_EXT)))
     }
+}
+
+ant.fileset(dir: outDir, includes: "**/jaxb.properties").each{
+    it.file.text = MOXY_JAXB_CONTEXT_FACTORY_JAXB_PROPS_CONTENT
 }

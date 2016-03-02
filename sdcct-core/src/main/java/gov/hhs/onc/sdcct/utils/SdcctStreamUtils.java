@@ -17,12 +17,12 @@ public final class SdcctStreamUtils {
     }
 
     @SuppressWarnings({ CompilerWarnings.RAWTYPES })
-    public static <T, U, V extends Entry<T, U>> Collector<V, ?, Map<T, U>> toMap() {
+    public static <T, U, V extends Entry<? extends T, ? extends U>> Collector<V, ?, Map<T, U>> toMap() {
         return toMap(Entry::getKey, Entry::getValue, HashMap::new);
     }
 
     @SuppressWarnings({ CompilerWarnings.RAWTYPES })
-    public static <T, U, V extends Entry<T, U>, W extends Map<T, U>> Collector<V, ?, W> toMap(Supplier<W> mapSupplier) {
+    public static <T, U, V extends Entry<? extends T, ? extends U>, W extends Map<T, U>> Collector<V, ?, W> toMap(Supplier<W> mapSupplier) {
         return toMap(Entry::getKey, Entry::getValue, mapSupplier);
     }
 

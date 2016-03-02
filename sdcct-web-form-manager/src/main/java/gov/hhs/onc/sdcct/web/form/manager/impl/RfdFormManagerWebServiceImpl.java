@@ -1,19 +1,24 @@
 package gov.hhs.onc.sdcct.web.form.manager.impl;
 
-import gov.hhs.onc.sdcct.form.Form;
 import gov.hhs.onc.sdcct.form.manager.FormManager;
 import gov.hhs.onc.sdcct.rfd.RetrieveClarificationRequestType;
 import gov.hhs.onc.sdcct.rfd.RetrieveFormRequestType;
 import gov.hhs.onc.sdcct.rfd.RetrieveFormResponseType;
 import gov.hhs.onc.sdcct.rfd.RfdFormManagerPortType;
-import gov.hhs.onc.sdcct.rfd.RfdWsXmlNames;
-import gov.hhs.onc.sdcct.rfd.impl.AbstractRfdFormWebService;
+import gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlNames;
+import gov.hhs.onc.sdcct.rfd.ws.impl.AbstractRfdFormWebService;
 import gov.hhs.onc.sdcct.rfd.impl.AnyXMLContentTypeImpl;
 import gov.hhs.onc.sdcct.rfd.impl.FormDataTypeImpl;
 import gov.hhs.onc.sdcct.rfd.impl.RetrieveFormResponseTypeImpl;
+import gov.hhs.onc.sdcct.sdc.FormDesignType;
+import gov.hhs.onc.sdcct.sdc.impl.FormDesignPkgTypeImpl;
+import gov.hhs.onc.sdcct.sdc.impl.FormPackageModulesImpl;
+import gov.hhs.onc.sdcct.sdc.impl.FormPackageTypeImpl;
+import gov.hhs.onc.sdcct.sdc.impl.PackageModulesTypeImpl;
+import gov.hhs.onc.sdcct.sdc.impl.PackageTypeImpl;
 import gov.hhs.onc.sdcct.web.form.manager.RfdFormManagerWebService;
 import gov.hhs.onc.sdcct.xml.SdcctXmlNs;
-import java.util.Collections;
+import gov.hhs.onc.sdcct.xml.impl.XdmDocumentDestination;
 import javax.jws.WebService;
 import org.apache.cxf.interceptor.Fault;
 import org.springframework.http.HttpStatus;
@@ -29,17 +34,17 @@ public class RfdFormManagerWebServiceImpl extends AbstractRfdFormWebService<Form
         String reqFormId = reqParams.getWorkflowData().getFormID();
 
         try {
-            Form form = this.service.retrieveForm(reqFormId);
+            FormDesignType formDesign = this.service.findFormDesignById(reqFormId);
 
-            if (form == null) {
+            if (formDesign == null) {
                 throw new Fault(new Exception(String.format("Form (id=%s) is unavailable.", reqFormId)));
             }
 
-            if (!form.isSetPackageElement()) {
-                throw new Fault(new Exception(String.format("IHE SDC variant of the specified form (id=%s) is unavailable.", reqFormId)));
-            }
-
-            return new RetrieveFormResponseTypeImpl(new FormDataTypeImpl(new AnyXMLContentTypeImpl(Collections.singletonList(form.getPackageElement()))),
+            return new RetrieveFormResponseTypeImpl(new FormDataTypeImpl(new AnyXMLContentTypeImpl().addAny(this.xmlCodec
+                .encode(
+                    new PackageTypeImpl().setPackageModules(new PackageModulesTypeImpl().setMainFormPackage(new FormPackageTypeImpl()
+                        .setFormPackageModules(new FormPackageModulesImpl().setFormDesignPkg(new FormDesignPkgTypeImpl().setFormDesignTemplate(formDesign))))),
+                    new XdmDocumentDestination(this.config).getReceiver(), null).getXdmNode().getDocument().getDocumentElement())),
                 MimeTypeUtils.APPLICATION_XML_VALUE, Integer.toString(HttpStatus.OK.value()));
         } catch (Fault e) {
             throw e;

@@ -1,7 +1,7 @@
 package gov.hhs.onc.sdcct.transform.impl;
 
 import com.ctc.wstx.sax.WstxSAXParser;
-import gov.hhs.onc.sdcct.utils.SdcctOptionUtils;
+import gov.hhs.onc.sdcct.config.utils.SdcctOptionUtils;
 import gov.hhs.onc.sdcct.xml.impl.SdcctSaxParserFactory;
 import java.util.Map;
 import java.util.Properties;

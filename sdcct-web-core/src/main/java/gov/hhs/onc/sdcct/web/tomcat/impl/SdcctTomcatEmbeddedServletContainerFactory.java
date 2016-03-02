@@ -18,6 +18,7 @@ import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.coyote.http11.Http11NioProtocol;
@@ -104,6 +105,7 @@ public class SdcctTomcatEmbeddedServletContainerFactory extends TomcatEmbeddedSe
     private int maxConnThreads;
     private int minConnThreads;
     private TxIdGenerator txIdGen;
+    private File workDir;
     private Tomcat tomcat;
 
     @Override
@@ -149,6 +151,8 @@ public class SdcctTomcatEmbeddedServletContainerFactory extends TomcatEmbeddedSe
         context.setTldValidation(true);
         context.setXmlNamespaceAware(true);
         context.setXmlValidation(true);
+
+        ((StandardContext) context).setWorkDir(this.workDir.getAbsolutePath());
 
         super.configureContext(context, servletContextInits);
     }
@@ -229,5 +233,13 @@ public class SdcctTomcatEmbeddedServletContainerFactory extends TomcatEmbeddedSe
 
     public void setValves(Valve ... valves) {
         this.setContextValves(Stream.of(valves).sorted(AnnotationAwareOrderComparator.INSTANCE).collect(Collectors.toList()));
+    }
+
+    public File getWorkDirectory() {
+        return this.workDir;
+    }
+
+    public void setWorkDirectory(File workDir) {
+        this.workDir = workDir;
     }
 }

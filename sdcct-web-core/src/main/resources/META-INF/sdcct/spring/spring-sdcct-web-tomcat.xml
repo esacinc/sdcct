@@ -23,13 +23,14 @@
         p:connectionKeepAliveTimeout="${sdcct.tomcat.server.conn.keep.alive.timeout}"
         p:connectionTimeout="${sdcct.tomcat.server.conn.timeout}"
         p:contextPath="${sdcct.tomcat.server.context.path}"
-        p:documentRoot="${sdcct.tomcat.server.doc.root.dir}"
+        p:documentRoot="${sdcct.webapp.dir}"
         p:maxConnections="${sdcct.tomcat.server.conn.max}"
         p:maxConnectionThreads="${sdcct.tomcat.server.conn.thread.max}"
         p:minConnectionThreads="${sdcct.tomcat.server.conn.thread.min}"
         p:txIdGenerator-ref="txIdGenHttpServer"
         p:port="${sdcct.tomcat.server.port.http}"
-        p:uriEncoding="#{ T(java.nio.charset.StandardCharsets).UTF_8 }">
+        p:uriEncoding="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"
+        p:workDirectory="${sdcct.work.dir}">
         <beans:property name="contextLifecycleListeners">
             <beans:list>
                 <beans:bean id="lifecycleListenerJreMemLeakPrevention" class="org.apache.catalina.core.JreMemoryLeakPreventionListener"/>

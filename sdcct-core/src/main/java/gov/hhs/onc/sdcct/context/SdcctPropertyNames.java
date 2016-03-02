@@ -6,6 +6,7 @@ public final class SdcctPropertyNames {
     public final static String SERVER_PREFIX = "server.";
     public final static String PREFIX = "sdcct.";
     public final static String APP_PREFIX = PREFIX + "app.";
+    public final static String DATA_PREFIX = PREFIX + "data.";
     public final static String HTTP_PREFIX = PREFIX + "http.";
     public final static String HTTP_CLIENT_PREFIX = HTTP_PREFIX + CLIENT_PREFIX;
     public final static String HTTP_SERVER_PREFIX = HTTP_PREFIX + SERVER_PREFIX;
@@ -28,6 +29,8 @@ public final class SdcctPropertyNames {
     public final static String USER_DIR = "user." + DIR_SUFFIX;
 
     public final static String APP_HOME_DIR = APP_PREFIX + "home." + DIR_SUFFIX;
+
+    public final static String DATA_DIR = DATA_PREFIX + DIR_SUFFIX;
 
     public final static String HTTP_CLIENT_TX_ID = HTTP_CLIENT_PREFIX + TX_ID_SUFFIX;
 

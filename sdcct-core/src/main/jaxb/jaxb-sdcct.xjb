@@ -10,8 +10,8 @@
     <!--====================================================================================================
     = GLOBAL
     =====================================================================================================-->
-    <jaxb:globalBindings choiceContentProperty="true" fixedAttributeAsConstantProperty="true" generateIsSetMethod="true" generateMixedExtensions="true"
-        generateValueClass="false" localScoping="toplevel">
+    <jaxb:globalBindings choiceContentProperty="true" fixedAttributeAsConstantProperty="true" generateMixedExtensions="true" generateValueClass="false"
+        localScoping="toplevel">
         <xjc:smartWildcardDefaultBinding/>
     </jaxb:globalBindings>
  </jaxb:bindings>

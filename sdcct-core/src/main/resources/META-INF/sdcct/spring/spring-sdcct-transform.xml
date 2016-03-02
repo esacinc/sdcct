@@ -24,7 +24,7 @@
         <beans:property name="defaultSerializationProperties">
             <beans:map>
                 <beans:entry key="#{ T(javax.xml.transform.OutputKeys).ENCODING }" value="#{ T(java.nio.charset.StandardCharsets).UTF_8.name() }"/>
-                <beans:entry key="#{ T(javax.xml.transform.OutputKeys).STANDALONE }" value="#{ T(gov.hhs.onc.sdcct.utils.SdcctOptionUtils).YES_VALUE }"/>
+                <beans:entry key="#{ T(javax.xml.transform.OutputKeys).STANDALONE }" value="#{ T(gov.hhs.onc.sdcct.config.utils.SdcctOptionUtils).YES_VALUE }"/>
             </beans:map>
         </beans:property>
     </beans:bean>
@@ -57,7 +57,7 @@
     <beans:bean id="serializerXmlPretty" parent="serializerXml" factory-bean="processor" factory-method="newSerializer">
         <beans:property name="defaultOutputProperties">
             <beans:map merge="true">
-                <beans:entry key="#{ T(javax.xml.transform.OutputKeys).INDENT }" value="#{ T(gov.hhs.onc.sdcct.utils.SdcctOptionUtils).YES_VALUE }"/>
+                <beans:entry key="#{ T(javax.xml.transform.OutputKeys).INDENT }" value="#{ T(gov.hhs.onc.sdcct.config.utils.SdcctOptionUtils).YES_VALUE }"/>
                 <!--suppress SpringPlaceholdersInspection -->
                 <beans:entry key="#{ T(net.sf.saxon.lib.SaxonOutputKeys).INDENT_SPACES }" value="${sdcct.transform.content.pretty.indent.size}"/>
                 <!--suppress SpringPlaceholdersInspection -->

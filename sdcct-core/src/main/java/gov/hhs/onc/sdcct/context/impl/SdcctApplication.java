@@ -10,6 +10,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 public class SdcctApplication extends SpringApplication {
     public final static String BEAN_NAME = "app";
 
+    private File dataDir;
     private File homeDir;
     private boolean logConsoleThreadName;
     private boolean logConsoleTty;
@@ -36,6 +37,14 @@ public class SdcctApplication extends SpringApplication {
         super.configurePropertySources(env, args);
 
         env.getPropertySources().addLast(this.propSrc);
+    }
+
+    public File getDataDirectory() {
+        return this.dataDir;
+    }
+
+    public void setDataDirectory(File dataDir) {
+        this.dataDir = dataDir;
     }
 
     public File getHomeDirectory() {

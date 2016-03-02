@@ -26,9 +26,9 @@
     <!--suppress SpringPlaceholdersInspection -->
     <beans:bean id="serverFormManagerRfd" parent="serverRfd"
         p:address="${sdcct.ws.form.manager.rfd.url.path}"
-        p:endpointName="#{ T(gov.hhs.onc.sdcct.rfd.RfdWsXmlQnames).FORM_MANAGER_PORT }"
+        p:endpointName="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).FORM_MANAGER_PORT }"
         p:serviceBean-ref="wsFormManagerRfdImpl"
-        p:serviceName="#{ T(gov.hhs.onc.sdcct.rfd.RfdWsXmlQnames).FORM_MANAGER_SERVICE }"
+        p:serviceName="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).FORM_MANAGER_SERVICE }"
         p:wsdlLocation="${sdcct.ws.form.manager.rfd.wsdl.loc}"/>
     
     <!--====================================================================================================
@@ -43,8 +43,8 @@
     =====================================================================================================-->
     <!--suppress SpringPlaceholdersInspection -->
     <beans:bean id="clientFormManagerRfd" parent="clientRfd" lazy-init="true" scope="prototype"
-        p:endpointName="#{ T(gov.hhs.onc.sdcct.rfd.RfdWsXmlQnames).FORM_MANAGER_PORT }"
+        p:endpointName="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).FORM_MANAGER_PORT }"
         p:serviceClass="gov.hhs.onc.sdcct.rfd.RfdFormManagerPortType"
-        p:serviceName="#{ T(gov.hhs.onc.sdcct.rfd.RfdWsXmlQnames).FORM_MANAGER_SERVICE }"
+        p:serviceName="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).FORM_MANAGER_SERVICE }"
         p:wsdlLocation="${sdcct.ws.form.manager.rfd.wsdl.loc}"/>
 </beans:beans>

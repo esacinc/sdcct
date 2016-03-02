@@ -13,9 +13,9 @@
     <!--suppress SpringPlaceholdersInspection -->
     <beans:bean id="serverFormReceiverRfd" parent="serverRfd"
         p:address="${sdcct.ws.form.receiver.rfd.url.path}"
-        p:endpointName="#{ T(gov.hhs.onc.sdcct.rfd.RfdWsXmlQnames).FORM_RECEIVER_PORT }"
+        p:endpointName="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).FORM_RECEIVER_PORT }"
         p:serviceBean-ref="wsFormReceiverRfdImpl"
-        p:serviceName="#{ T(gov.hhs.onc.sdcct.rfd.RfdWsXmlQnames).FORM_RECEIVER_SERVICE }"
+        p:serviceName="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).FORM_RECEIVER_SERVICE }"
         p:wsdlLocation="${sdcct.ws.form.receiver.rfd.wsdl.loc}"/>
 
     <!--====================================================================================================
@@ -23,8 +23,8 @@
     =====================================================================================================-->
     <!--suppress SpringPlaceholdersInspection -->
     <beans:bean id="clientFormReceiverRfd" parent="clientRfd" lazy-init="true" scope="prototype"
-        p:endpointName="#{ T(gov.hhs.onc.sdcct.rfd.RfdWsXmlQnames).FORM_RECEIVER_PORT }"
+        p:endpointName="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).FORM_RECEIVER_PORT }"
         p:serviceClass="gov.hhs.onc.sdcct.rfd.RfdFormReceiverPortType"
-        p:serviceName="#{ T(gov.hhs.onc.sdcct.rfd.RfdWsXmlQnames).FORM_RECEIVER_SERVICE }"
+        p:serviceName="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).FORM_RECEIVER_SERVICE }"
         p:wsdlLocation="${sdcct.ws.form.receiver.rfd.wsdl.loc}"/>
 </beans:beans>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    
+    <!--====================================================================================================
+    = CACHE MANAGER CONFIGURATIONS
+    =====================================================================================================-->
+    <beans:bean id="cacheManagerConfig" class="net.sf.ehcache.config.Configuration" abstract="true"/>
+    
+    <!--====================================================================================================
+    = CACHE MANAGERS
+    =====================================================================================================-->
+    <beans:bean id="cacheManager" class="gov.hhs.onc.sdcct.data.cache.impl.CacheManagerFactoryBean" abstract="true"/>
+    
+    <!--====================================================================================================
+    = CACHE CONFIGURATIONS
+    =====================================================================================================-->
+    <beans:bean id="cacheConfig" class="net.sf.ehcache.config.CacheConfiguration" abstract="true"
+        p:eternal="true"
+        p:memoryStoreEvictionPolicyFromObject="FIFO"/>
+    
+    <!--====================================================================================================
+    = CACHES
+    =====================================================================================================-->
+    <beans:bean id="cache" class="gov.hhs.onc.sdcct.data.cache.impl.CacheFactoryBean" abstract="true"
+        p:persistenceStrategy="NONE">
+        <beans:property name="listeners">
+            <beans:array>
+                <beans:ref bean="cacheListenerLogging"/>
+            </beans:array>
+        </beans:property>
+    </beans:bean>
+</beans:beans>

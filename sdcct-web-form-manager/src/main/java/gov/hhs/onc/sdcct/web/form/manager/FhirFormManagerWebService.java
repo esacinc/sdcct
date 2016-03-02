@@ -1,8 +1,8 @@
 package gov.hhs.onc.sdcct.web.form.manager;
 
-import gov.hhs.onc.sdcct.fhir.FhirFormWebService;
-import gov.hhs.onc.sdcct.fhir.FhirWsPathParamNames;
-import gov.hhs.onc.sdcct.fhir.FhirWsResourceNames;
+import gov.hhs.onc.sdcct.fhir.ws.FhirFormWebService;
+import gov.hhs.onc.sdcct.fhir.ws.FhirWsPathParamNames;
+import gov.hhs.onc.sdcct.fhir.ws.FhirWsResourceNames;
 import gov.hhs.onc.sdcct.fhir.Questionnaire;
 import gov.hhs.onc.sdcct.form.manager.FormManager;
 import gov.hhs.onc.sdcct.io.SdcctMediaTypes;

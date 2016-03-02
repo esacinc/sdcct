@@ -1,7 +1,7 @@
 package gov.hhs.onc.sdcct.transform.impl;
 
+import gov.hhs.onc.sdcct.config.utils.SdcctPropertiesUtils;
 import gov.hhs.onc.sdcct.io.impl.ByteArrayResult;
-import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
 import java.util.List;
 import java.util.Properties;
 import javax.annotation.Nullable;
@@ -29,8 +29,7 @@ public class SdcctSerializer extends Serializer {
     public SdcctSerializer(SdcctProcessor processor) {
         super(processor);
 
-        this.setDefaultOutputProperties(
-            processor.getUnderlyingConfiguration().getDefaultSerializationProperties().entrySet().stream().collect(SdcctStreamUtils.toMap(Properties::new)));
+        this.setDefaultOutputProperties(SdcctPropertiesUtils.clone(processor.getUnderlyingConfiguration().getDefaultSerializationProperties()));
     }
 
     public byte[] serialize(Source src, @Nullable ParseOptions parseOpts, @Nullable Properties outProps) throws SaxonApiException {
@@ -57,15 +56,15 @@ public class SdcctSerializer extends Serializer {
 
             return result;
         } catch (XPathException e) {
-            throw new SaxonApiException(String.format("Unable to serialize source (class=%s, sysId=%s) to result (class=%s, sysId=%s).",
-                src.getClass().getName(), src.getSystemId(), result.getClass().getName(), result.getSystemId()), e);
+            throw new SaxonApiException(String.format("Unable to serialize source (class=%s, sysId=%s) to result (class=%s, sysId=%s).", src.getClass()
+                .getName(), src.getSystemId(), result.getClass().getName(), result.getSystemId()), e);
         } finally {
             try {
                 receiver.close();
             } catch (XPathException e) {
                 // noinspection ThrowFromFinallyBlock
-                throw new SaxonApiException(String.format("Unable to close Saxon serializer receiver (class=%s) for result (class=%s, sysId=%s).",
-                    receiver.getClass().getName(), result.getClass().getName(), result.getSystemId()), e);
+                throw new SaxonApiException(String.format("Unable to close Saxon serializer receiver (class=%s) for result (class=%s, sysId=%s).", receiver
+                    .getClass().getName(), result.getClass().getName(), result.getSystemId()), e);
             }
         }
     }
@@ -93,8 +92,8 @@ public class SdcctSerializer extends Serializer {
 
     @Override
     public SequenceReceiver getReceiver(PipelineConfiguration pipelineConfig) throws SaxonApiException {
-        return this.getReceiver(((SdcctConfiguration) pipelineConfig.getConfiguration()), ((SdcctPipelineConfiguration) pipelineConfig), this.getResult(), null,
-            null);
+        return this.getReceiver(((SdcctConfiguration) pipelineConfig.getConfiguration()), ((SdcctPipelineConfiguration) pipelineConfig), this.getResult(),
+            null, null);
     }
 
     public SequenceReceiver getReceiver(SdcctConfiguration config, SdcctPipelineConfiguration pipelineConfig, Result result, @Nullable ParseOptions parseOpts,
@@ -104,9 +103,8 @@ public class SdcctSerializer extends Serializer {
         try {
             receiver = config.getSerializerFactory().getReceiver(result, pipelineConfig, this.mergeOutputProperties(outProps));
         } catch (XPathException e) {
-            throw new SaxonApiException(
-                String.format("Unable to build Saxon serializer receiver for result (class=%s, sysId=%s).", result.getClass().getName(), result.getSystemId()),
-                e);
+            throw new SaxonApiException(String.format("Unable to build Saxon serializer receiver for result (class=%s, sysId=%s).",
+                result.getClass().getName(), result.getSystemId()), e);
         }
 
         if (receiver.getSystemId() == null) {

@@ -28,8 +28,8 @@
         <module>sdcct-web-parent</module>
         <module>sdcct-web-core</module>
         <module>sdcct-web-form-manager</module>
-        <module>sdcct-web-form-archiver</module>
         <module>sdcct-web-form-receiver</module>
+        <module>sdcct-web-form-archiver</module>
         <module>sdcct-web-form-filler</module>
         <module>sdcct-web-gateway</module>
     </modules>

@@ -17,7 +17,7 @@ public class RfdFormManagerSoapUiWebServiceIntegrationTests extends AbstractSoap
     @Autowired
     @Override
     @SuppressWarnings({ "SpringJavaAutowiredMembersInspection" })
-    protected void setProjectSource(@Value("classpath*:${sdcct.data.soapui.dir.path}/soapui-sdcct-form-manager-rfd-project.xml") ResourceSource projectSrc) {
+    protected void setProjectSource(@Value("classpath*:${sdcct.data.soapui.src.dir.path}/soapui-sdcct-form-manager-rfd-project.xml") ResourceSource projectSrc) {
         super.setProjectSource(projectSrc);
     }
 }

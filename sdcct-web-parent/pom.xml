@@ -35,9 +35,9 @@
             </snapshots>
         </repository>
         <repository>
-            <id>soapui</id>
-            <name>SoapUI Repository</name>
-            <url>http://www.soapui.org/repository/maven2</url>
+            <id>smartbearsoftware</id>
+            <name>SmartBear Software Repository</name>
+            <url>http://smartbearsoftware.com/repository/maven2</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
@@ -69,12 +69,12 @@
             <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-core</artifactId>
-                <version>8.0.30</version>
+                <version>8.0.32</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-logging-log4j</artifactId>
-                <version>8.0.30</version>
+                <version>8.0.32</version>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.web</groupId>
@@ -94,7 +94,7 @@
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-bom</artifactId>
-                <version>4.0.3.RELEASE</version>
+                <version>4.0.4.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -108,6 +108,18 @@
                     <exclusion>
                         <groupId>bouncycastle</groupId>
                         <artifactId>bcprov-jdk15</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.jgoodies</groupId>
+                        <artifactId>binding</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.jgoodies</groupId>
+                        <artifactId>forms</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.jgoodies</groupId>
+                        <artifactId>looks</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>com.smartbear.utils.analytics</groupId>
@@ -152,6 +164,10 @@
                     <exclusion>
                         <groupId>net.sourceforge.htmlunit</groupId>
                         <artifactId>htmlunit-core-js</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.oltu.oauth2</groupId>
+                        <artifactId>org.apache.oltu.oauth2.client</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>org.apache.ws.security</groupId>
@@ -228,7 +244,9 @@
                         <execution>
                             <id>test-integration</id>
                             <configuration>
-                                <workingDirectory>${project.build.directory}/${project.artifactId}-test</workingDirectory>
+                                <systemPropertyVariables>
+                                    <sdcct.webapp.dir>${project.build.directory}/${project.artifactId}-test</sdcct.webapp.dir>
+                                </systemPropertyVariables>
                             </configuration>
                         </execution>
                     </executions>
