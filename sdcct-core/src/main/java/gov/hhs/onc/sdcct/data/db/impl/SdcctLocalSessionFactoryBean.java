@@ -32,6 +32,8 @@ public class SdcctLocalSessionFactoryBean extends LocalSessionFactoryBean implem
         public SessionFactoryBuilderImplementor getSessionFactoryBuilder(MetadataImplementor metadata, SessionFactoryBuilderImplementor delegate) {
             SdcctLocalSessionFactoryBean.this.metadata = metadata;
 
+            delegate.applyStatementInspector(SdcctLocalSessionFactoryBean.this.statementInspector);
+
             return delegate;
         }
     }
@@ -53,6 +55,10 @@ public class SdcctLocalSessionFactoryBean extends LocalSessionFactoryBean implem
                 ? Collections.singleton(serviceClass.cast(this.sessionFactoryBuilderFactory)) : super.loadJavaServices(serviceClass));
         }
     }
+
+    @Autowired
+    @SuppressWarnings({ "SpringJavaAutowiredMembersInspection" })
+    private LoggingStatementInspector statementInspector;
 
     @Autowired
     @SuppressWarnings({ "SpringJavaAutowiredMembersInspection" })
@@ -82,6 +88,9 @@ public class SdcctLocalSessionFactoryBean extends LocalSessionFactoryBean implem
 
         serviceRegistryBuilder.addService(RegionFactory.class, this.cacheRegionFactory);
 
+        MetadataService metadataService = new MetadataService();
+        serviceRegistryBuilder.addService(MetadataService.class, metadataService);
+
         SessionFactoryImplementor sessionFactory = ((SessionFactoryImplementor) super.buildSessionFactory(sessionFactoryBuilder));
         ExtendedSearchIntegrator searchIntegrator = ContextHelper.getSearchintegratorBySFI(sessionFactory);
 
@@ -94,6 +103,8 @@ public class SdcctLocalSessionFactoryBean extends LocalSessionFactoryBean implem
 
                 return newEntityIndexBinding;
             });
+
+        metadataService.initialize(this.metadata, searchIntegrator);
 
         return sessionFactory;
     }

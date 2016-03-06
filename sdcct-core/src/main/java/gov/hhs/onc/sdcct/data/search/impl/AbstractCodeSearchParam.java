@@ -6,9 +6,6 @@ import gov.hhs.onc.sdcct.data.search.SearchParamType;
 import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.SortableField;
-import org.hibernate.search.annotations.Store;
 
 @MappedSuperclass
 public abstract class AbstractCodeSearchParam extends AbstractSearchParam implements CodeSearchParam {
@@ -29,10 +26,8 @@ public abstract class AbstractCodeSearchParam extends AbstractSearchParam implem
     }
 
     @Column(name = DbColumnNames.CODE_SYSTEM)
-    @Field(name = DbColumnNames.CODE_SYSTEM, store = Store.YES)
     @Nullable
     @Override
-    @SortableField(forField = DbColumnNames.CODE_SYSTEM)
     public String getCodeSystem() {
         return this.codeSystem;
     }

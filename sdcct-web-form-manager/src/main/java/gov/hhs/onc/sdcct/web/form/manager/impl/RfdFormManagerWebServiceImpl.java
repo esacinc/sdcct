@@ -34,7 +34,7 @@ public class RfdFormManagerWebServiceImpl extends AbstractRfdFormWebService<Form
         String reqFormId = reqParams.getWorkflowData().getFormID();
 
         try {
-            FormDesignType formDesign = this.service.findFormDesignById(reqFormId);
+            FormDesignType formDesign = this.service.findFormDesign(reqFormId);
 
             if (formDesign == null) {
                 throw new Fault(new Exception(String.format("Form (id=%s) is unavailable.", reqFormId)));

@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.List;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
+import org.hibernate.criterion.Criterion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +43,7 @@ public abstract class AbstractSdcctDataService<T extends SdcctEntity, U extends 
     @Nonnegative
     @Override
     @Transactional
-    public long remove(SdcctCriteria criteria) throws Exception {
+    public long remove(SdcctCriteria<T> criteria) throws Exception {
         return this.dao.remove(criteria);
     }
 
@@ -54,7 +55,7 @@ public abstract class AbstractSdcctDataService<T extends SdcctEntity, U extends 
     }
 
     @Override
-    public List<T> findAll(SdcctCriteria criteria) throws Exception {
+    public List<T> findAll(SdcctCriteria<T> criteria) throws Exception {
         return this.dao.findAll(criteria);
     }
 
@@ -72,7 +73,7 @@ public abstract class AbstractSdcctDataService<T extends SdcctEntity, U extends 
 
     @Nullable
     @Override
-    public T find(SdcctCriteria criteria) throws Exception {
+    public T find(SdcctCriteria<T> criteria) throws Exception {
         return this.dao.find(criteria);
     }
 
@@ -92,13 +93,13 @@ public abstract class AbstractSdcctDataService<T extends SdcctEntity, U extends 
     }
 
     @Override
-    public boolean exists(SdcctCriteria criteria) throws Exception {
+    public boolean exists(SdcctCriteria<T> criteria) throws Exception {
         return this.dao.exists(criteria);
     }
 
     @Nonnegative
     @Override
-    public long count(SdcctCriteria criteria) throws Exception {
+    public long count(SdcctCriteria<T> criteria) throws Exception {
         return this.dao.count(criteria);
     }
 
@@ -106,5 +107,15 @@ public abstract class AbstractSdcctDataService<T extends SdcctEntity, U extends 
     @Transactional
     public void reindex() throws Exception {
         this.dao.reindex();
+    }
+
+    @Override
+    public SdcctCriteria<T> buildCriteria(Criterion ... criterions) {
+        return this.dao.buildCriteria(criterions);
+    }
+
+    @Override
+    public EntityMetadata getEntityMetadata() {
+        return this.dao.getEntityMetadata();
     }
 }

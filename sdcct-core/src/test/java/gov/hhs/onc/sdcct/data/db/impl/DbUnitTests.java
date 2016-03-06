@@ -1,6 +1,6 @@
 package gov.hhs.onc.sdcct.data.db.impl;
 
-import gov.hhs.onc.sdcct.data.db.DbColumnNames;
+import gov.hhs.onc.sdcct.data.db.DbPropertyNames;
 import gov.hhs.onc.sdcct.fhir.FhirForm;
 import gov.hhs.onc.sdcct.fhir.FhirFormDataService;
 import gov.hhs.onc.sdcct.fhir.FhirFormRegistry;
@@ -79,7 +79,7 @@ public class DbUnitTests extends AbstractSdcctUnitTests {
 
         Assert.assertEquals(actualTestFormId1, this.testFormId1, String.format("Test form IDs do not match: %s != %s", actualTestFormId1, this.testFormId1));
 
-        Assert.assertTrue(this.dataService.exists(new SdcctCriteria().addCriterions(SdcctCriterion.eq(DbColumnNames.ID, this.testFormId1))),
+        Assert.assertTrue(this.dataService.exists(this.dataService.buildCriteria().addKeyword(DbPropertyNames.CONTENT, this.testFormId1)),
             String.format("Test form (id=%s) does not exist by criteria.", this.testFormId1));
     }
 }

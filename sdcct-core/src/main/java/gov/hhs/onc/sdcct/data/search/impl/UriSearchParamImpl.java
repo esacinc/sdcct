@@ -7,20 +7,10 @@ import gov.hhs.onc.sdcct.data.search.UriSearchParam;
 import java.net.URI;
 import javax.annotation.Nullable;
 import javax.persistence.Column;
-import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.SortableField;
-import org.hibernate.search.annotations.Store;
 
-@Analyzer(impl = StandardAnalyzer.class)
-@Embeddable
 @Entity(name = "searchParamUri")
-@Indexed(index = DbTableNames.SEARCH_PARAM_URI)
 @Table(name = DbTableNames.SEARCH_PARAM_URI)
 public class UriSearchParamImpl extends AbstractSearchParam implements UriSearchParam {
     private URI value;
@@ -36,9 +26,7 @@ public class UriSearchParamImpl extends AbstractSearchParam implements UriSearch
     }
 
     @Column(name = DbColumnNames.VALUE, nullable = false)
-    @Field(name = DbColumnNames.VALUE, store = Store.YES)
     @Override
-    @SortableField(forField = DbColumnNames.VALUE)
     public URI getValue() {
         return this.value;
     }

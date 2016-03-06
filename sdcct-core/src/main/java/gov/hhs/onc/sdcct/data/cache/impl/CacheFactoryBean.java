@@ -9,17 +9,19 @@ import net.sf.ehcache.config.PersistenceConfiguration.Strategy;
 import net.sf.ehcache.event.CacheEventListener;
 import net.sf.ehcache.event.RegisteredEventListeners;
 import org.apache.commons.lang3.ArrayUtils;
+import org.springframework.cache.ehcache.EhCacheCache;
+import org.springframework.cache.ehcache.EhCacheCacheManager;
 
-public class CacheFactoryBean extends AbstractCacheComponentFactoryBean<Cache, CacheConfiguration> {
+public class CacheFactoryBean extends AbstractCacheComponentFactoryBean<EhCacheCache, CacheConfiguration> {
     private CacheEventListener[] listeners;
     private Strategy persistenceStrategy;
 
     public CacheFactoryBean() {
-        super(Cache.class);
+        super(EhCacheCache.class);
     }
 
     @Override
-    public Cache getObject() throws Exception {
+    public EhCacheCache getObject() throws Exception {
         String name = this.config.getName();
 
         if (name == null) {
@@ -34,6 +36,7 @@ public class CacheFactoryBean extends AbstractCacheComponentFactoryBean<Cache, C
 
         Cache cache = new Cache(this.config);
         cache.setName(name);
+        cache.setCacheManager(this.cacheManager.getCacheManager());
 
         if (!ArrayUtils.isEmpty(this.listeners)) {
             RegisteredEventListeners registeredListeners = cache.getCacheEventNotificationService();
@@ -41,7 +44,17 @@ public class CacheFactoryBean extends AbstractCacheComponentFactoryBean<Cache, C
             Stream.of(this.listeners).forEach(registeredListeners::registerListener);
         }
 
-        return cache;
+        cache.initialise();
+
+        return new EhCacheCache(cache);
+    }
+
+    public EhCacheCacheManager getCacheManager() {
+        return this.cacheManager;
+    }
+
+    public void setCacheManager(EhCacheCacheManager cacheManager) {
+        this.cacheManager = cacheManager;
     }
 
     public CacheEventListener[] getListeners() {

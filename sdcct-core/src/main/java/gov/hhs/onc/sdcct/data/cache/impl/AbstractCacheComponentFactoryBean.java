@@ -2,6 +2,7 @@ package gov.hhs.onc.sdcct.data.cache.impl;
 
 import gov.hhs.onc.sdcct.beans.factory.impl.AbstractSdcctFactoryBean;
 import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.cache.ehcache.EhCacheCacheManager;
 
 public abstract class AbstractCacheComponentFactoryBean<T, U> extends AbstractSdcctFactoryBean<T> implements BeanNameAware {
     protected String beanName;
@@ -9,6 +10,7 @@ public abstract class AbstractCacheComponentFactoryBean<T, U> extends AbstractSd
     protected String maxBytesLocalDisk;
     protected String maxBytesLocalHeap;
     protected String maxBytesLocalOffHeap;
+    protected EhCacheCacheManager cacheManager;
 
     protected AbstractCacheComponentFactoryBean(Class<T> beanClass) {
         super(beanClass);

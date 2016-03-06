@@ -1,13 +1,13 @@
-package gov.hhs.onc.sdcct.data.db;
+package gov.hhs.onc.sdcct.data.search;
 
 import gov.hhs.onc.sdcct.beans.IdentifiedBean;
 
-public enum CriterionOp implements IdentifiedBean {
-    EQ, NE, LIKE, GT, LT, GE, LE, BETWEEN;
+public enum SearchOpType implements IdentifiedBean {
+    EQ, NE, GT, LT, GE, LE, SA, EB, AP;
 
     private final String id;
 
-    private CriterionOp() {
+    private SearchOpType() {
         this.id = this.name().toLowerCase();
     }
 

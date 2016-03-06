@@ -6,20 +6,10 @@ import gov.hhs.onc.sdcct.data.search.SearchParamType;
 import gov.hhs.onc.sdcct.data.search.StringSearchParam;
 import javax.annotation.Nullable;
 import javax.persistence.Column;
-import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.SortableField;
-import org.hibernate.search.annotations.Store;
 
-@Analyzer(impl = StandardAnalyzer.class)
-@Embeddable
 @Entity(name = "searchParamStr")
-@Indexed(index = DbTableNames.SEARCH_PARAM_STR)
 @Table(name = DbTableNames.SEARCH_PARAM_STR)
 public class StringSearchParamImpl extends AbstractSearchParam implements StringSearchParam {
     private String value;
@@ -35,9 +25,7 @@ public class StringSearchParamImpl extends AbstractSearchParam implements String
     }
 
     @Column(name = DbColumnNames.VALUE, nullable = false)
-    @Field(name = DbColumnNames.VALUE, store = Store.YES)
     @Override
-    @SortableField(forField = DbColumnNames.VALUE)
     public String getValue() {
         return this.value;
     }

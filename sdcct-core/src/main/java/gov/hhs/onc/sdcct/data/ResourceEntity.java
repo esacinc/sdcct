@@ -15,9 +15,13 @@ public interface ResourceEntity extends IdentifiedBean, SdcctEntity {
 
     public void setContent(String content);
 
+    public void addCoordSearchParams(CoordSearchParam ... coordSearchParams);
+
     public Map<String, CoordSearchParam> getCoordSearchParams();
 
     public void setCoordSearchParams(Map<String, CoordSearchParam> coordSearchParams);
+
+    public void addDateSearchParams(DateSearchParam ... dateSearchParams);
 
     public Map<String, DateSearchParam> getDateSearchParams();
 
@@ -25,21 +29,31 @@ public interface ResourceEntity extends IdentifiedBean, SdcctEntity {
 
     public void setId(String id);
 
+    public void addNumberSearchParams(NumberSearchParam ... numSearchParams);
+
     public Map<String, NumberSearchParam> getNumberSearchParams();
 
     public void setNumberSearchParams(Map<String, NumberSearchParam> numSearchParams);
+
+    public void addQuantitySearchParams(QuantitySearchParam ... quantitySearchParams);
 
     public Map<String, QuantitySearchParam> getQuantitySearchParams();
 
     public void setQuantitySearchParams(Map<String, QuantitySearchParam> quantitySearchParams);
 
+    public void addStringSearchParams(StringSearchParam ... strSearchParams);
+
     public Map<String, StringSearchParam> getStringSearchParams();
 
     public void setStringSearchParams(Map<String, StringSearchParam> strSearchParams);
 
+    public void addTokenSearchParams(TokenSearchParam ... tokenSearchParams);
+
     public Map<String, TokenSearchParam> getTokenSearchParams();
 
     public void setTokenSearchParams(Map<String, TokenSearchParam> tokenSearchParams);
+
+    public void addUriSearchParams(UriSearchParam ... uriSearchParams);
 
     public Map<String, UriSearchParam> getUriSearchParams();
 

@@ -1,31 +1,24 @@
 package gov.hhs.onc.sdcct.data.cache.impl;
 
 import java.util.Optional;
-import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.SizeOfPolicyConfiguration;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.cache.ehcache.EhCacheCache;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
 
-public class CacheManagerFactoryBean extends AbstractCacheComponentFactoryBean<CacheManager, Configuration> implements DisposableBean {
-    private Cache[] caches;
-    private EhCacheCache[] wrappedCaches;
-    private CacheManager cacheManager;
-    private EhCacheCacheManager wrappedCacheManager;
-
+public class CacheManagerFactoryBean extends AbstractCacheComponentFactoryBean<EhCacheCacheManager, Configuration> implements DisposableBean {
     public CacheManagerFactoryBean() {
-        super(CacheManager.class);
+        super(EhCacheCacheManager.class);
     }
 
     @Override
     public void destroy() throws Exception {
-        this.cacheManager.shutdown();
+        this.cacheManager.getCacheManager().shutdown();
     }
 
     @Override
-    public CacheManager getObject() throws Exception {
+    public EhCacheCacheManager getObject() throws Exception {
         if (this.config.getName() == null) {
             this.config.setName(this.beanName);
         }
@@ -36,37 +29,6 @@ public class CacheManagerFactoryBean extends AbstractCacheComponentFactoryBean<C
         Optional.ofNullable(this.maxBytesLocalHeap).ifPresent(this.config::setMaxBytesLocalHeap);
         Optional.ofNullable(this.maxBytesLocalOffHeap).ifPresent(this.config::setMaxBytesLocalOffHeap);
 
-        this.cacheManager = new CacheManager(this.config);
-        this.wrappedCaches = new EhCacheCache[this.caches.length];
-
-        Cache cache;
-
-        for (int a = 0; a < this.caches.length; a++) {
-            (cache = this.caches[a]).setCacheManager(this.cacheManager);
-
-            cache.initialise();
-
-            this.wrappedCaches[a] = new EhCacheCache(cache);
-        }
-
-        (this.wrappedCacheManager = new EhCacheCacheManager(this.cacheManager)).initializeCaches();
-
-        return this.cacheManager;
-    }
-
-    public Cache[] getCaches() {
-        return this.caches;
-    }
-
-    public void setCaches(Cache ... caches) {
-        this.caches = caches;
-    }
-
-    public EhCacheCacheManager getWrappedCacheManager() {
-        return this.wrappedCacheManager;
-    }
-
-    public EhCacheCache[] getWrappedCaches() {
-        return this.wrappedCaches;
+        return (this.cacheManager = new EhCacheCacheManager(new CacheManager(this.config)));
     }
 }

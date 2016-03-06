@@ -6,9 +6,9 @@ import java.io.Serializable;
 import java.util.List;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
-import org.springframework.beans.factory.InitializingBean;
+import org.hibernate.criterion.Criterion;
 
-public interface SdcctDataAccessor<T, U extends SdcctEntity> extends InitializingBean {
+public interface SdcctDataAccessor<T, U extends SdcctEntity> extends SdcctEntityAccessor<T, U> {
     public boolean remove(T bean) throws Exception;
 
     public boolean removeByNaturalId(Serializable naturalId) throws Exception;
@@ -16,12 +16,12 @@ public interface SdcctDataAccessor<T, U extends SdcctEntity> extends Initializin
     public boolean removeById(Serializable id) throws Exception;
 
     @Nonnegative
-    public long remove(SdcctCriteria criteria) throws Exception;
+    public long remove(SdcctCriteria<U> criteria) throws Exception;
 
     @Nonnegative
     public long save(T bean) throws Exception;
 
-    public List<T> findAll(SdcctCriteria criteria) throws Exception;
+    public List<T> findAll(SdcctCriteria<U> criteria) throws Exception;
 
     @Nullable
     public T findByNaturalId(Serializable naturalId) throws Exception;
@@ -30,7 +30,7 @@ public interface SdcctDataAccessor<T, U extends SdcctEntity> extends Initializin
     public T findById(Serializable id) throws Exception;
 
     @Nullable
-    public T find(SdcctCriteria criteria) throws Exception;
+    public T find(SdcctCriteria<U> criteria) throws Exception;
 
     public boolean existsByNaturalId(Serializable naturalId) throws Exception;
 
@@ -38,18 +38,12 @@ public interface SdcctDataAccessor<T, U extends SdcctEntity> extends Initializin
 
     public boolean exists(T bean) throws Exception;
 
-    public boolean exists(SdcctCriteria criteria) throws Exception;
+    public boolean exists(SdcctCriteria<U> criteria) throws Exception;
 
     @Nonnegative
-    public long count(SdcctCriteria criteria) throws Exception;
+    public long count(SdcctCriteria<U> criteria) throws Exception;
 
     public void reindex() throws Exception;
 
-    public Class<T> getBeanClass();
-
-    public Class<? extends T> getBeanImplClass();
-
-    public Class<U> getEntityClass();
-
-    public Class<? extends U> getEntityImplClass();
+    public SdcctCriteria<U> buildCriteria(Criterion ... criterions);
 }

@@ -10,6 +10,36 @@
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
     
     <!--====================================================================================================
+    = CACHE MANAGERS
+    =====================================================================================================-->
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="cacheManagerDb" parent="cacheManager"
+        p:maxBytesLocalHeap="${sdcct.data.db.cache.heap.max}">
+        <beans:property name="configuration">
+            <beans:bean parent="cacheManagerConfig"/>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = CACHES
+    =====================================================================================================-->
+    <beans:bean id="cacheFormFhir" parent="cache"
+        p:cacheManager-ref="cacheManagerDb">
+        <beans:property name="configuration">
+            <beans:bean parent="cacheConfig"
+                p:name="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).FORM_FHIR }"/>
+        </beans:property>
+    </beans:bean>
+    
+    <beans:bean id="cacheFormRfd" parent="cache"
+        p:cacheManager-ref="cacheManagerDb">
+        <beans:property name="configuration">
+            <beans:bean parent="cacheConfig"
+                p:name="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).FORM_RFD }"/>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
     = DATA SOURCES
     =====================================================================================================-->
     <!--suppress SpringPlaceholdersInspection -->
@@ -43,37 +73,13 @@
             </beans:array>
         </beans:property>
         <beans:property name="cacheRegionFactory">
-            <beans:bean class="gov.hhs.onc.sdcct.data.cache.impl.CacheRegionFactory">
-                <beans:property name="cacheManager">
-                    <!--suppress SpringPlaceholdersInspection -->
-                    <beans:bean parent="cacheManager"
-                        p:maxBytesLocalHeap="${sdcct.data.db.cache.heap.max}">
-                        <beans:property name="caches">
-                            <beans:array>
-                                <beans:bean parent="cache">
-                                    <beans:property name="configuration">
-                                        <beans:bean parent="cacheConfig"
-                                            p:name="formFhir"/>
-                                    </beans:property>
-                                </beans:bean>
-                                <beans:bean parent="cache">
-                                    <beans:property name="configuration">
-                                        <beans:bean parent="cacheConfig"
-                                            p:name="formRfd"/>
-                                    </beans:property>
-                                </beans:bean>
-                            </beans:array>
-                        </beans:property>
-                        <beans:property name="configuration">
-                            <beans:bean parent="cacheManagerConfig"/>
-                        </beans:property>
-                    </beans:bean>
-                </beans:property>
-            </beans:bean>
+            <beans:bean class="gov.hhs.onc.sdcct.data.cache.impl.CacheRegionFactory"
+                p:cacheManager-ref="cacheManagerDb"/>
         </beans:property>
         <beans:property name="hibernateProperties">
             <beans:map>
-                <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).DIALECT }" value="org.hibernate.dialect.DerbyTenSevenDialect"/>
+                <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).AUTO_EVICT_COLLECTION_CACHE }" value="true"/>
+                <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).DIALECT }" value="#{ T(org.hibernate.dialect.DerbyTenSevenDialect).name }"/>
                 <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).GENERATE_STATISTICS }" value="true"/>
                 <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).LOG_SESSION_METRICS }" value="false"/>
                 <beans:entry key="hibernate.search.default.directory_provider" value="filesystem"/>
@@ -83,6 +89,7 @@
                 <beans:entry key="#{ T(org.hibernate.search.cfg.Environment).GENERATE_STATS }" value="true"/>
                 <beans:entry key="#{ T(org.hibernate.search.cfg.Environment).LUCENE_MATCH_VERSION }"
                     value="#{ T(org.hibernate.search.cfg.Environment).DEFAULT_LUCENE_MATCH_VERSION }"/>
+                <beans:entry key="#{ T(org.hibernate.search.cfg.Environment).WORKER_ENLIST_IN_TRANSACTION }" value="true"/>
             </beans:map>
         </beans:property>
     </beans:bean>

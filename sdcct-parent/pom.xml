@@ -139,37 +139,37 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.1.5</version>
+                <version>1.1.6</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
-                <version>1.1.5</version>
+                <version>1.1.6</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>2.7.1</version>
+                <version>2.7.2</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
-                <version>2.7.1</version>
+                <version>2.7.2</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.7.1-1</version>
+                <version>2.7.2</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.datatype</groupId>
                 <artifactId>jackson-datatype-jdk8</artifactId>
-                <version>2.7.1</version>
+                <version>2.7.2</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.module</groupId>
                 <artifactId>jackson-module-jaxb-annotations</artifactId>
-                <version>2.7.1</version>
+                <version>2.7.2</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.woodstox</groupId>
@@ -307,6 +307,11 @@
                         <artifactId>jaxb-jxc</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.10</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
@@ -513,6 +518,11 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-analyzers-phonetic</artifactId>
+                <version>5.5.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-core</artifactId>
                 <version>5.5.0</version>
             </dependency>
@@ -555,7 +565,7 @@
             <dependency>
                 <groupId>org.codehaus.woodstox</groupId>
                 <artifactId>stax2-api</artifactId>
-                <version>3.1.4</version>
+                <version>4.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jdt</groupId>
@@ -669,22 +679,22 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>jcl-over-slf4j</artifactId>
-                <version>1.7.16</version>
+                <version>1.7.18</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>jul-to-slf4j</artifactId>
-                <version>1.7.16</version>
+                <version>1.7.18</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>log4j-over-slf4j</artifactId>
-                <version>1.7.16</version>
+                <version>1.7.18</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.7.16</version>
+                <version>1.7.18</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -1215,6 +1225,10 @@
                     <artifactId>versions-maven-plugin</artifactId>
                     <version>2.2</version>
                     <inherited>true</inherited>
+                    <configuration>
+                        <processDependencyManagement>false</processDependencyManagement>
+                        <rulesUri>file://${project.basedir.all}/versions-rules.xml</rulesUri>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.vafer</groupId>

@@ -1,42 +1,38 @@
 package gov.hhs.onc.sdcct.data.impl;
 
 import gov.hhs.onc.sdcct.data.ResourceEntity;
+import gov.hhs.onc.sdcct.data.db.DbAnalyzerNames;
 import gov.hhs.onc.sdcct.data.db.DbColumnNames;
-import gov.hhs.onc.sdcct.data.db.DbPropertyNames;
+import gov.hhs.onc.sdcct.data.db.DbFieldNames;
 import gov.hhs.onc.sdcct.data.db.DbSequenceNames;
 import gov.hhs.onc.sdcct.data.search.CoordSearchParam;
 import gov.hhs.onc.sdcct.data.search.DateSearchParam;
 import gov.hhs.onc.sdcct.data.search.NumberSearchParam;
 import gov.hhs.onc.sdcct.data.search.QuantitySearchParam;
+import gov.hhs.onc.sdcct.data.search.SearchParamDef;
+import gov.hhs.onc.sdcct.data.search.SearchParamNames;
 import gov.hhs.onc.sdcct.data.search.StringSearchParam;
 import gov.hhs.onc.sdcct.data.search.TokenSearchParam;
 import gov.hhs.onc.sdcct.data.search.UriSearchParam;
-import gov.hhs.onc.sdcct.data.search.impl.CoordSearchParamImpl;
-import gov.hhs.onc.sdcct.data.search.impl.DateSearchParamImpl;
-import gov.hhs.onc.sdcct.data.search.impl.NumberSearchParamImpl;
-import gov.hhs.onc.sdcct.data.search.impl.QuantitySearchParamImpl;
-import gov.hhs.onc.sdcct.data.search.impl.StringSearchParamImpl;
-import gov.hhs.onc.sdcct.data.search.impl.TokenSearchParamImpl;
-import gov.hhs.onc.sdcct.data.search.impl.UriSearchParamImpl;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
-import javax.persistence.MapKey;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Transient;
 import org.hibernate.annotations.NaturalId;
+import org.hibernate.search.annotations.Analyzer;
+import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.SortableField;
-import org.hibernate.search.annotations.Store;
 
 @MappedSuperclass
 public abstract class AbstractResourceEntity extends AbstractSdcctEntity implements ResourceEntity {
@@ -51,10 +47,13 @@ public abstract class AbstractResourceEntity extends AbstractSdcctEntity impleme
     protected Map<String, UriSearchParam> uriSearchParams = new HashMap<>();
 
     @Column(name = DbColumnNames.CONTENT, nullable = false)
-    @Field(name = DbColumnNames.CONTENT, store = Store.YES)
+    @Fields({ @Field(analyzer = @Analyzer(definition = DbAnalyzerNames.EDGE_NGRAM), boost = @Boost(0.75F), name = DbFieldNames.CONTENT_EDGE_NGRAM),
+        @Field(analyzer = @Analyzer(definition = DbAnalyzerNames.LOWERCASE), name = DbFieldNames.CONTENT_LOWERCASE),
+        @Field(analyzer = @Analyzer(definition = DbAnalyzerNames.NGRAM), boost = @Boost(0.5F), name = DbFieldNames.CONTENT_NGRAM),
+        @Field(analyzer = @Analyzer(definition = DbAnalyzerNames.PHONETIC), boost = @Boost(0.25F), name = DbFieldNames.CONTENT_PHONETIC) })
     @Lob
     @Override
-    @SortableField(forField = DbColumnNames.CONTENT)
+    @SearchParamDef(name = SearchParamNames.CONTENT)
     public String getContent() {
         return this.content;
     }
@@ -64,10 +63,13 @@ public abstract class AbstractResourceEntity extends AbstractSdcctEntity impleme
         this.content = content;
     }
 
-    @IndexedEmbedded
-    @MapKey(name = DbColumnNames.NAME)
-    @OneToMany(cascade = { CascadeType.ALL }, mappedBy = DbPropertyNames.RESOURCE_ENTITY_ID, orphanRemoval = true, targetEntity = CoordSearchParamImpl.class)
     @Override
+    public void addCoordSearchParams(CoordSearchParam ... coordSearchParams) {
+        Stream.of(coordSearchParams).forEach(coordSearchParam -> this.coordSearchParams.put(coordSearchParam.getName(), coordSearchParam));
+    }
+
+    @Override
+    @Transient
     public Map<String, CoordSearchParam> getCoordSearchParams() {
         return this.coordSearchParams;
     }
@@ -78,10 +80,13 @@ public abstract class AbstractResourceEntity extends AbstractSdcctEntity impleme
         this.coordSearchParams.putAll(coordSearchParams);
     }
 
-    @IndexedEmbedded
-    @MapKey(name = DbColumnNames.NAME)
-    @OneToMany(cascade = { CascadeType.ALL }, mappedBy = DbPropertyNames.RESOURCE_ENTITY_ID, orphanRemoval = true, targetEntity = DateSearchParamImpl.class)
     @Override
+    public void addDateSearchParams(DateSearchParam ... dateSearchParams) {
+        Stream.of(dateSearchParams).forEach(dateSearchParam -> this.dateSearchParams.put(dateSearchParam.getName(), dateSearchParam));
+    }
+
+    @Override
+    @Transient
     public Map<String, DateSearchParam> getDateSearchParams() {
         return this.dateSearchParams;
     }
@@ -105,10 +110,9 @@ public abstract class AbstractResourceEntity extends AbstractSdcctEntity impleme
     }
 
     @Column(name = DbColumnNames.ID, nullable = false)
-    @Field(name = DbColumnNames.ID, store = Store.YES)
     @NaturalId
     @Override
-    @SortableField(forField = DbColumnNames.ID)
+    @SearchParamDef(name = SearchParamNames.ID)
     public String getId() {
         return this.id;
     }
@@ -118,10 +122,13 @@ public abstract class AbstractResourceEntity extends AbstractSdcctEntity impleme
         this.id = id;
     }
 
-    @IndexedEmbedded
-    @MapKey(name = DbColumnNames.NAME)
-    @OneToMany(cascade = { CascadeType.ALL }, mappedBy = DbPropertyNames.RESOURCE_ENTITY_ID, orphanRemoval = true, targetEntity = NumberSearchParamImpl.class)
     @Override
+    public void addNumberSearchParams(NumberSearchParam ... numSearchParams) {
+        Stream.of(numSearchParams).forEach(numSearchParam -> this.numSearchParams.put(numSearchParam.getName(), numSearchParam));
+    }
+
+    @Override
+    @Transient
     public Map<String, NumberSearchParam> getNumberSearchParams() {
         return this.numSearchParams;
     }
@@ -132,10 +139,13 @@ public abstract class AbstractResourceEntity extends AbstractSdcctEntity impleme
         this.numSearchParams.putAll(numSearchParams);
     }
 
-    @IndexedEmbedded
-    @MapKey(name = DbColumnNames.NAME)
-    @OneToMany(cascade = { CascadeType.ALL }, mappedBy = DbPropertyNames.RESOURCE_ENTITY_ID, orphanRemoval = true, targetEntity = QuantitySearchParamImpl.class)
     @Override
+    public void addQuantitySearchParams(QuantitySearchParam ... quantitySearchParams) {
+        Stream.of(quantitySearchParams).forEach(quantitySearchParam -> this.quantitySearchParams.put(quantitySearchParam.getName(), quantitySearchParam));
+    }
+
+    @Override
+    @Transient
     public Map<String, QuantitySearchParam> getQuantitySearchParams() {
         return this.quantitySearchParams;
     }
@@ -146,10 +156,13 @@ public abstract class AbstractResourceEntity extends AbstractSdcctEntity impleme
         this.quantitySearchParams.putAll(quantitySearchParams);
     }
 
-    @IndexedEmbedded
-    @MapKey(name = DbColumnNames.NAME)
-    @OneToMany(cascade = { CascadeType.ALL }, mappedBy = DbPropertyNames.RESOURCE_ENTITY_ID, orphanRemoval = true, targetEntity = StringSearchParamImpl.class)
     @Override
+    public void addStringSearchParams(StringSearchParam ... strSearchParams) {
+        Stream.of(strSearchParams).forEach(strSearchParam -> this.strSearchParams.put(strSearchParam.getName(), strSearchParam));
+    }
+
+    @Override
+    @Transient
     public Map<String, StringSearchParam> getStringSearchParams() {
         return this.strSearchParams;
     }
@@ -160,10 +173,13 @@ public abstract class AbstractResourceEntity extends AbstractSdcctEntity impleme
         this.strSearchParams.putAll(strSearchParams);
     }
 
-    @IndexedEmbedded
-    @MapKey(name = DbColumnNames.NAME)
-    @OneToMany(cascade = { CascadeType.ALL }, mappedBy = DbPropertyNames.RESOURCE_ENTITY_ID, orphanRemoval = true, targetEntity = TokenSearchParamImpl.class)
     @Override
+    public void addTokenSearchParams(TokenSearchParam ... tokenSearchParams) {
+        Stream.of(tokenSearchParams).forEach(tokenSearchParam -> this.tokenSearchParams.put(tokenSearchParam.getName(), tokenSearchParam));
+    }
+
+    @Override
+    @Transient
     public Map<String, TokenSearchParam> getTokenSearchParams() {
         return this.tokenSearchParams;
     }
@@ -174,10 +190,13 @@ public abstract class AbstractResourceEntity extends AbstractSdcctEntity impleme
         this.tokenSearchParams.putAll(tokenSearchParams);
     }
 
-    @IndexedEmbedded
-    @MapKey(name = DbColumnNames.NAME)
-    @OneToMany(cascade = { CascadeType.ALL }, mappedBy = DbPropertyNames.RESOURCE_ENTITY_ID, orphanRemoval = true, targetEntity = UriSearchParamImpl.class)
     @Override
+    public void addUriSearchParams(UriSearchParam ... uriSearchParams) {
+        Stream.of(uriSearchParams).forEach(uriSearchParam -> this.uriSearchParams.put(uriSearchParam.getName(), uriSearchParam));
+    }
+
+    @Override
+    @Transient
     public Map<String, UriSearchParam> getUriSearchParams() {
         return this.uriSearchParams;
     }

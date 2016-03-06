@@ -1,30 +1,27 @@
 package gov.hhs.onc.sdcct.data.db.impl;
 
-import com.github.sebhoss.warnings.CompilerWarnings;
 import gov.hhs.onc.sdcct.data.SdcctEntity;
-import gov.hhs.onc.sdcct.data.db.DbPropertyNames;
 import gov.hhs.onc.sdcct.data.db.SdcctDao;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import org.apache.commons.collections4.CollectionUtils;
-import org.hibernate.Criteria;
 import org.hibernate.IdentifierLoadAccess;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.SimpleNaturalIdLoadAccess;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.search.FullTextSession;
+import org.hibernate.internal.SessionImpl;
 import org.hibernate.search.Search;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractSdcctDao<T extends SdcctEntity> extends AbstractSdcctDataAccessor<T, T> implements SdcctDao<T> {
     @Autowired
     protected SessionFactory sessionFactory;
+
+    protected EntityMetadata entityMetadata;
 
     protected AbstractSdcctDao(Class<T> entityClass, Class<? extends T> entityImplClass) {
         super(entityClass, entityImplClass, entityClass, entityImplClass);
@@ -39,6 +36,7 @@ public abstract class AbstractSdcctDao<T extends SdcctEntity> extends AbstractSd
     @Override
     public boolean removeByNaturalId(Serializable naturalId) throws Exception {
         if (this.existsByNaturalId(naturalId)) {
+            // noinspection ConstantConditions
             this.buildSession().delete(this.buildRefByNaturalId(naturalId));
 
             return true;
@@ -50,6 +48,7 @@ public abstract class AbstractSdcctDao<T extends SdcctEntity> extends AbstractSd
     @Override
     public boolean removeById(Serializable id) throws Exception {
         if (this.existsById(id)) {
+            // noinspection ConstantConditions
             this.buildSession().delete(this.buildRefById(id));
 
             return true;
@@ -60,7 +59,7 @@ public abstract class AbstractSdcctDao<T extends SdcctEntity> extends AbstractSd
 
     @Nonnegative
     @Override
-    public long remove(SdcctCriteria criteria) throws Exception {
+    public long remove(SdcctCriteria<T> criteria) throws Exception {
         List<T> beans = this.findAll(criteria);
 
         if (CollectionUtils.isEmpty(beans)) {
@@ -78,26 +77,21 @@ public abstract class AbstractSdcctDao<T extends SdcctEntity> extends AbstractSd
     @Override
     public long save(T bean) throws Exception {
         long entityId;
+        Session session = this.buildSession();
 
         // noinspection ConstantConditions
         if (bean.hasEntityId() && this.existsById((entityId = bean.getEntityId()))) {
-            this.buildSession().update(bean);
+            session.update(bean);
         } else {
-            bean.setEntityId((entityId = ((Long) this.buildSession().save(bean))));
+            bean.setEntityId((entityId = ((Long) session.save(bean))));
         }
 
         return entityId;
     }
 
     @Override
-    @SuppressWarnings({ CompilerWarnings.UNCHECKED })
-    public List<T> findAll(SdcctCriteria criteria) throws Exception {
-        FullTextSession session = this.buildFullTextSession();
-        Criteria execCriteria = session.createCriteria(this.entityImplClass);
-
-        List<Long> entityIds = this.findIndexedEntityIds(criteria, session, execCriteria);
-
-        return (!entityIds.isEmpty() ? ((List<T>) execCriteria.add(Restrictions.in(DbPropertyNames.ENTITY_ID, entityIds)).list()) : new ArrayList<>());
+    public List<T> findAll(SdcctCriteria<T> criteria) throws Exception {
+        return criteria.setSession(this.buildSession()).listEntities();
     }
 
     @Nullable
@@ -114,13 +108,8 @@ public abstract class AbstractSdcctDao<T extends SdcctEntity> extends AbstractSd
 
     @Nullable
     @Override
-    public T find(SdcctCriteria criteria) throws Exception {
-        FullTextSession session = this.buildFullTextSession();
-        Criteria execCriteria = session.createCriteria(this.entityImplClass);
-
-        Long entityId = ((Long) ((Object[]) criteria.setLimit(1).buildQuery(this.entityImplClass, session, execCriteria).uniqueResult())[0]);
-
-        return ((entityId != null) ? this.entityImplClass.cast(execCriteria.add(Restrictions.idEq(entityId)).uniqueResult()) : null);
+    public T find(SdcctCriteria<T> criteria) throws Exception {
+        return criteria.setSession(this.buildSession()).firstEntity();
     }
 
     @Override
@@ -139,31 +128,32 @@ public abstract class AbstractSdcctDao<T extends SdcctEntity> extends AbstractSd
     }
 
     @Override
-    public boolean exists(SdcctCriteria criteria) throws Exception {
+    public boolean exists(SdcctCriteria<T> criteria) throws Exception {
         return (this.count(criteria) > 0);
     }
 
     @Nonnegative
     @Override
-    public long count(SdcctCriteria criteria) throws Exception {
-        FullTextSession session = this.buildFullTextSession();
-        Criteria execCriteria = session.createCriteria(this.entityImplClass);
-
-        List<Long> entityIds = this.findIndexedEntityIds(criteria, session, execCriteria);
-
-        return (!entityIds.isEmpty() ? ((Long) execCriteria.add(Restrictions.in(DbPropertyNames.ENTITY_ID, entityIds)).setProjection(Projections.rowCount())
-            .setMaxResults(1).uniqueResult()) : 0);
+    public long count(SdcctCriteria<T> criteria) throws Exception {
+        return ((long) criteria.setProjection(Projections.rowCount()).setSession(this.buildSession()).uniqueResult());
     }
 
     @Override
     public void reindex() throws Exception {
-        this.buildFullTextSession().createIndexer(this.entityImplClass).startAndWait();
+        if (this.entityMetadata.isIndexed()) {
+            Search.getFullTextSession(this.buildSession()).createIndexer(this.entityImplClass).startAndWait();
+        }
     }
 
-    @SuppressWarnings({ CompilerWarnings.UNCHECKED })
-    protected List<Long> findIndexedEntityIds(SdcctCriteria criteria, FullTextSession session, Criteria execCriteria) throws Exception {
-        return ((List<Object[]>) criteria.buildQuery(this.entityImplClass, session, execCriteria).list()).stream().map(results -> ((Long) results[0]))
-            .collect(Collectors.toList());
+    @Override
+    public SdcctCriteria<T> buildCriteria(Criterion ... criterions) {
+        return new SdcctCriteria<>(this.entityClass, this.entityImplClass, this.entityMetadata).addAll(criterions);
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        this.entityMetadata =
+            this.sessionFactory.getSessionFactoryOptions().getServiceRegistry().getService(MetadataService.class).getEntities().get(this.entityImplClass);
     }
 
     @Nullable
@@ -172,7 +162,7 @@ public abstract class AbstractSdcctDao<T extends SdcctEntity> extends AbstractSd
     }
 
     protected SimpleNaturalIdLoadAccess<? extends T> buildNaturalIdLoadAccess() {
-        return this.buildSession().bySimpleNaturalId(this.entityImplClass);
+        return this.sessionFactory.getCurrentSession().bySimpleNaturalId(this.entityImplClass);
     }
 
     @Nullable
@@ -181,14 +171,15 @@ public abstract class AbstractSdcctDao<T extends SdcctEntity> extends AbstractSd
     }
 
     protected IdentifierLoadAccess<? extends T> buildIdLoadAccess() {
-        return this.buildSession().byId(this.entityImplClass);
+        return this.sessionFactory.getCurrentSession().byId(this.entityImplClass);
     }
 
-    protected FullTextSession buildFullTextSession() {
-        return Search.getFullTextSession(this.buildSession());
+    protected SessionImpl buildSession() {
+        return ((SessionImpl) this.sessionFactory.getCurrentSession());
     }
 
-    protected Session buildSession() {
-        return Search.getFullTextSession(this.sessionFactory.getCurrentSession());
+    @Override
+    public EntityMetadata getEntityMetadata() {
+        return this.entityMetadata;
     }
 }

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
+import org.hibernate.criterion.Criterion;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractSdcctRegistry<T, U extends ResourceEntity, V extends SdcctDao<U>, W extends SdcctDataService<U, V>> extends
@@ -34,23 +35,23 @@ public abstract class AbstractSdcctRegistry<T, U extends ResourceEntity, V exten
 
     @Override
     public boolean remove(T bean) throws Exception {
-        return dataService.remove(this.encode(bean));
+        return this.dataService.remove(this.encode(bean));
     }
 
     @Override
     public boolean removeByNaturalId(Serializable naturalId) throws Exception {
-        return dataService.removeByNaturalId(naturalId);
+        return this.dataService.removeByNaturalId(naturalId);
     }
 
     @Override
     public boolean removeById(Serializable id) throws Exception {
-        return dataService.removeById(id);
+        return this.dataService.removeById(id);
     }
 
     @Nonnegative
     @Override
-    public long remove(SdcctCriteria criteria) throws Exception {
-        return dataService.remove(criteria);
+    public long remove(SdcctCriteria<U> criteria) throws Exception {
+        return this.dataService.remove(criteria);
     }
 
     @Nonnegative
@@ -64,7 +65,7 @@ public abstract class AbstractSdcctRegistry<T, U extends ResourceEntity, V exten
     }
 
     @Override
-    public List<T> findAll(SdcctCriteria criteria) throws Exception {
+    public List<T> findAll(SdcctCriteria<U> criteria) throws Exception {
         List<U> entities = this.dataService.findAll(criteria);
         List<T> beans = new ArrayList<>(entities.size());
 
@@ -80,19 +81,19 @@ public abstract class AbstractSdcctRegistry<T, U extends ResourceEntity, V exten
     @Nullable
     @Override
     public T findByNaturalId(Serializable naturalId) throws Exception {
-        return this.decode(dataService.findByNaturalId(naturalId));
+        return this.decode(this.dataService.findByNaturalId(naturalId));
     }
 
     @Nullable
     @Override
     public T findById(Serializable id) throws Exception {
-        return this.decode(dataService.findById(id));
+        return this.decode(this.dataService.findById(id));
     }
 
     @Nullable
     @Override
-    public T find(SdcctCriteria criteria) throws Exception {
-        return this.decode(dataService.find(criteria));
+    public T find(SdcctCriteria<U> criteria) throws Exception {
+        return this.decode(this.dataService.find(criteria));
     }
 
     @Override
@@ -111,19 +112,24 @@ public abstract class AbstractSdcctRegistry<T, U extends ResourceEntity, V exten
     }
 
     @Override
-    public boolean exists(SdcctCriteria criteria) throws Exception {
+    public boolean exists(SdcctCriteria<U> criteria) throws Exception {
         return this.dataService.exists(criteria);
     }
 
     @Nonnegative
     @Override
-    public long count(SdcctCriteria criteria) throws Exception {
+    public long count(SdcctCriteria<U> criteria) throws Exception {
         return this.dataService.count(criteria);
     }
 
     @Override
     public void reindex() throws Exception {
         this.dataService.reindex();
+    }
+
+    @Override
+    public SdcctCriteria<U> buildCriteria(Criterion ... criterions) {
+        return this.dataService.buildCriteria(criterions);
     }
 
     @Override
@@ -153,5 +159,10 @@ public abstract class AbstractSdcctRegistry<T, U extends ResourceEntity, V exten
     @Nullable
     protected T decode(@Nullable U entity) throws Exception {
         return ((entity != null) ? this.xmlCodec.decode(entity.getContent().getBytes(StandardCharsets.UTF_8), this.beanImplClass, null) : null);
+    }
+
+    @Override
+    public EntityMetadata getEntityMetadata() {
+        return this.dataService.getEntityMetadata();
     }
 }

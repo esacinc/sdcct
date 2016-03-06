@@ -1,9 +1,9 @@
 /*====================================================================================================
 = SEQUENCES
 =====================================================================================================*/
-create sequence search_param_entity_id as bigint minvalue 1;
+create sequence search_param_entity_id as bigint start with 1;
 
-create sequence resource_entity_id as bigint minvalue 1;
+create sequence resource_entity_id as bigint start with 1;
 
 /*====================================================================================================
 = TABLES

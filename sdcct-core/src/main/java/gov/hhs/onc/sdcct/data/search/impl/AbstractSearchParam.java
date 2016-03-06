@@ -14,9 +14,6 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Transient;
 import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.SortableField;
-import org.hibernate.search.annotations.Store;
 
 @MappedSuperclass
 public abstract class AbstractSearchParam extends AbstractSdcctEntity implements SearchParam {
@@ -42,15 +39,12 @@ public abstract class AbstractSearchParam extends AbstractSdcctEntity implements
     @Nullable
     @Override
     @SequenceGenerator(allocationSize = 1, name = DbSequenceNames.SEARCH_PARAM_ENTITY_ID, sequenceName = DbSequenceNames.SEARCH_PARAM_ENTITY_ID)
-    @SortableField(forField = DbColumnNames.ENTITY_ID)
     public Long getEntityId() {
         return super.getEntityId();
     }
     
     @Column(name = DbColumnNames.NAME, nullable = false)
-    @Field(name = DbColumnNames.NAME, store = Store.YES)
     @Override
-    @SortableField(forField = DbColumnNames.NAME)
     public String getName() {
         return this.name;
     }

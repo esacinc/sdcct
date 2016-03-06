@@ -9,7 +9,6 @@ public final class SearchParamNames {
     public final static String LAST_UPDATED = "_lastUpdated";
     public final static String PROFILE = "_profile";
     public final static String PUBLISHER = "publisher";
-    public final static String QUERY = "_query";
     public final static String SECURITY = "_security";
     public final static String STATUS = "status";
     public final static String TAG = "_tag";

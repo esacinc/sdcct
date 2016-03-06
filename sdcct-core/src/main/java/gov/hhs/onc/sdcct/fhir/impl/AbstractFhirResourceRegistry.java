@@ -5,10 +5,13 @@ import gov.hhs.onc.sdcct.data.db.SdcctDataService;
 import gov.hhs.onc.sdcct.data.db.impl.AbstractSdcctRegistry;
 import gov.hhs.onc.sdcct.data.search.SearchParamNames;
 import gov.hhs.onc.sdcct.data.search.impl.DateSearchParamImpl;
+import gov.hhs.onc.sdcct.data.search.impl.TokenSearchParamImpl;
+import gov.hhs.onc.sdcct.data.search.impl.UriSearchParamImpl;
 import gov.hhs.onc.sdcct.fhir.DomainResource;
 import gov.hhs.onc.sdcct.fhir.FhirResource;
 import gov.hhs.onc.sdcct.fhir.FhirResourceRegistry;
 import gov.hhs.onc.sdcct.fhir.Meta;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.function.Supplier;
@@ -28,10 +31,29 @@ public abstract class AbstractFhirResourceRegistry<T extends DomainResource, U e
             Meta meta = bean.getMeta();
 
             if (meta.hasLastUpdated()) {
-                entity.getDateSearchParams().put(
-                    SearchParamNames.LAST_UPDATED,
-                    new DateSearchParamImpl(entityId, SearchParamNames.LAST_UPDATED, new Date(meta.getLastUpdated().getValue().toGregorianCalendar()
-                        .toInstant().toEpochMilli())));
+                entity.addDateSearchParams(new DateSearchParamImpl(entityId, SearchParamNames.LAST_UPDATED, new Date(meta.getLastUpdated().getValue()
+                    .toGregorianCalendar().toInstant().toEpochMilli())));
+            }
+
+            if (meta.hasProfile()) {
+                meta.getProfile().stream()
+                    .forEach(profile -> entity.addUriSearchParams(new UriSearchParamImpl(SearchParamNames.PROFILE, entityId, URI.create(profile.getValue()))));
+            }
+
+            if (meta.hasSecurity()) {
+                meta.getSecurity()
+                    .stream()
+                    .forEach(
+                        security -> entity.addTokenSearchParams(new TokenSearchParamImpl(entityId, SearchParamNames.SECURITY, security.getSystem().getValue(),
+                            security.getCode().getValue())));
+            }
+
+            if (meta.hasTag()) {
+                meta.getTag()
+                    .stream()
+                    .forEach(
+                        tag -> entity.addTokenSearchParams(new TokenSearchParamImpl(entityId, SearchParamNames.TAG, tag.getSystem().getValue(), tag.getCode()
+                            .getValue())));
             }
         }
 

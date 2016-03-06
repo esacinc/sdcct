@@ -7,21 +7,10 @@ import gov.hhs.onc.sdcct.data.search.SearchParamType;
 import java.math.BigDecimal;
 import javax.annotation.Nullable;
 import javax.persistence.Column;
-import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.NumericField;
-import org.hibernate.search.annotations.SortableField;
-import org.hibernate.search.annotations.Store;
 
-@Analyzer(impl = StandardAnalyzer.class)
-@Embeddable
 @Entity(name = "searchParamNum")
-@Indexed(index = DbTableNames.SEARCH_PARAM_NUM)
 @Table(name = DbTableNames.SEARCH_PARAM_NUM)
 public class NumberSearchParamImpl extends AbstractSearchParam implements NumberSearchParam {
     private BigDecimal value;
@@ -37,10 +26,7 @@ public class NumberSearchParamImpl extends AbstractSearchParam implements Number
     }
 
     @Column(name = DbColumnNames.VALUE, nullable = false)
-    @Field(name = DbColumnNames.VALUE, store = Store.YES)
-    @NumericField
     @Override
-    @SortableField(forField = DbColumnNames.VALUE)
     public BigDecimal getValue() {
         return this.value;
     }
