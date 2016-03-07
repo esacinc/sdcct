@@ -36,13 +36,14 @@ public class CacheFactoryBean extends AbstractCacheComponentFactoryBean<EhCacheC
 
         Cache cache = new Cache(this.config);
         cache.setName(name);
-        cache.setCacheManager(this.cacheManager.getCacheManager());
 
         if (!ArrayUtils.isEmpty(this.listeners)) {
             RegisteredEventListeners registeredListeners = cache.getCacheEventNotificationService();
 
             Stream.of(this.listeners).forEach(registeredListeners::registerListener);
         }
+
+        cache.setCacheManager(this.cacheManager.getCacheManager());
 
         cache.initialise();
 

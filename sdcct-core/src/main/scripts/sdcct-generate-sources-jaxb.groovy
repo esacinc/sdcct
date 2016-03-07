@@ -11,6 +11,7 @@ import com.sun.codemodel.JExpr
 import com.sun.codemodel.JFieldVar
 import com.sun.codemodel.JMethod
 import com.sun.codemodel.JMod
+import com.sun.codemodel.JType
 import com.sun.tools.ws.processor.generator.CustomExceptionGenerator
 import com.sun.tools.ws.processor.generator.GeneratorBase
 import com.sun.tools.ws.processor.generator.SeiGenerator
@@ -27,6 +28,7 @@ import com.sun.tools.xjc.generator.bean.DualObjectFactoryGenerator
 import com.sun.tools.xjc.model.CClassInfo
 import com.sun.tools.xjc.model.CPropertyInfo
 import com.sun.tools.xjc.model.Model
+import com.sun.tools.xjc.outline.ClassOutline
 import com.sun.tools.xjc.outline.Outline
 import com.sun.xml.ws.util.ServiceFinder
 import gov.hhs.onc.sdcct.tools.codegen.impl.CodegenErrorReceiver
@@ -34,7 +36,6 @@ import gov.hhs.onc.sdcct.tools.codegen.impl.CodegenNameConverter
 import gov.hhs.onc.sdcct.tools.utils.SdcctToolUtils
 import java.lang.reflect.Field
 import java.lang.reflect.Method
-import java.util.regex.Pattern
 import java.util.stream.Collectors
 import javax.annotation.Generated
 import javax.xml.bind.JAXBContext
@@ -43,6 +44,7 @@ import javax.xml.bind.annotation.XmlNs
 import javax.xml.bind.annotation.XmlRootElement
 import javax.xml.bind.annotation.XmlSchema
 import org.apache.commons.collections4.CollectionUtils
+import org.apache.commons.collections4.map.MultiKeyMap
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.ClassUtils
 import org.apache.commons.lang3.StringUtils
@@ -75,8 +77,7 @@ def final MOXY_JAXB_CONTEXT_FACTORY_JAXB_PROPS_CONTENT = (JAXBContext.JAXB_CONTE
 def final DEFAULT_XJC_ARGS = [
     "-Xdefault-value",
     "-Xsetters",
-    "-Xannotate",
-    "-Xvalue-constructor"
+    "-Xannotate"
 ]
 
 def errorReceiver = new CodegenErrorReceiver(log)
@@ -90,9 +91,9 @@ def outDir = new File(outDir)
 outDir.mkdirs()
 project.addCompileSourceRoot(outDir.path)
 
-def debug = BooleanUtils.toBoolean(((String)bindingVars["debug"]))
+def debug = BooleanUtils.toBoolean(((String) bindingVars["debug"]))
 def enc = project.properties["project.build.sourceEncoding"]
-def verbose = BooleanUtils.toBoolean(((String)bindingVars["verbose"]))
+def verbose = BooleanUtils.toBoolean(((String) bindingVars["verbose"]))
 def wsimport = BooleanUtils.toBoolean(((String) bindingVars["wsimport"]))
 def generatorName = "sdcct-generate-sources-jaxb"
 def generationTime = ISO8601Utils.format(new Date())
@@ -117,11 +118,11 @@ if (wsimport) {
     wsimportOpts.verbose = verbose
 
     (ant.fileset(dir: jaxbSrcDir) {
-        SdcctToolUtils.tokenize(((String)bindingVars["bindingIncludes"])).each {
+        SdcctToolUtils.tokenize(((String) bindingVars["bindingIncludes"])).each {
             ant.include(name: it)
         }
 
-        SdcctToolUtils.tokenize(((String)bindingVars["bindingExcludes"])).each {
+        SdcctToolUtils.tokenize(((String) bindingVars["bindingExcludes"])).each {
             ant.exclude(name: it)
         }
     }).each {
@@ -129,11 +130,11 @@ if (wsimport) {
     }
 
     (ant.fileset(dir: schemaSrcDir) {
-        SdcctToolUtils.tokenize(((String)bindingVars["schemaIncludes"])).each {
+        SdcctToolUtils.tokenize(((String) bindingVars["schemaIncludes"])).each {
             ant.include(name: it)
         }
 
-        SdcctToolUtils.tokenize(((String)bindingVars["schemaExcludes"])).each {
+        SdcctToolUtils.tokenize(((String) bindingVars["schemaExcludes"])).each {
             ant.exclude(name: it)
         }
     }).each {
@@ -141,18 +142,18 @@ if (wsimport) {
     }
 
     (ant.fileset(dir: new File(project.properties.getProperty("project.build.wsdlSourceDirectory"))) {
-        SdcctToolUtils.tokenize(((String)bindingVars["wsdlIncludes"])).each {
+        SdcctToolUtils.tokenize(((String) bindingVars["wsdlIncludes"])).each {
             ant.include(name: it)
         }
 
-        SdcctToolUtils.tokenize(((String)bindingVars["wsdlExcludes"])).each {
+        SdcctToolUtils.tokenize(((String) bindingVars["wsdlExcludes"])).each {
             ant.exclude(name: it)
         }
     }).each {
         wsimportOpts.addWSDL(it.file)
     }
 
-    CollectionUtils.addAll((args = DEFAULT_XJC_ARGS.collect(new ArrayList<String>(), { ("-B" + it) })), SdcctToolUtils.tokenize(((String)bindingVars["args"])))
+    CollectionUtils.addAll((args = DEFAULT_XJC_ARGS.collect(new ArrayList<String>(), { ("-B" + it) })), SdcctToolUtils.tokenize(((String) bindingVars["args"])))
 } else {
     opts = new Options()
     
@@ -230,7 +231,7 @@ try {
 
         def wsdlJaxbModelModelField = wsdlJaxbModelClass.declaredFields.find { (it.name == "model") }
         wsdlJaxbModelModelField.accessible = true
-        model = ((Model)wsdlJaxbModelModelField.get(wsdlJaxbModel))
+        model = ((Model) wsdlJaxbModelModelField.get(wsdlJaxbModel))
 
         def wsdlJaxbModelOutlineField = wsdlJaxbModelClass.declaredFields.find { (it.name == "outline") }
         wsdlJaxbModelOutlineField.accessible = true
@@ -305,27 +306,40 @@ def objFactoryGen
 def CClassInfo classModel
 def JDefinedClass classRef
 def JDefinedClass implClass
+def String className
+def String implClassName
 def List<JAnnotationUse> classAnnos
 def JAnnotationUse implAnnoModel
 def Map<String, JFieldVar> fields
 def Map<String, JMethod> classMethods
 def Map<String, JMethod> implClassMethods
 def Map<String, CPropertyInfo> props
-def publicPropName
-def propGetterName
-def propIsGetter
-def propGetter
+def MultiKeyMap<String, JMethod> propSetters = new MultiKeyMap<>()
+def MultiKeyMap<String, JMethod> propAdders = new MultiKeyMap<>()
+def String publicPropName
+def String propGetterName
+def boolean propIsGetter
+def JMethod propGetter
+def JMethod propSetter
 def propClass
-def privatePropName
-def implPropGetter
-def implPropSetter
-def propSetterName
-def propAdderName
+def String privatePropName
+def JMethod implPropGetter
+def JMethod implPropSetter
+def String propSetterName
+def implPropSetterBody
+def String propAdderName
 def propItemClass
-def implPropAdder
+def JMethod propAdder
+def JMethod implPropAdder
 def implPropAdderBody
-def hasPropMethodName
-def implHasPropMethodBody
+def String hasPropMethodName
+def JClass superImplClass
+def String superClassName
+def String superImplClassName
+def ClassOutline superClassOutline
+def CClassInfo superClassModel
+def JMethod superPropAccessor
+def JType superPropAccessorParamType
 
 def Field classModelAnnosField = JDefinedClass.class.getDeclaredField("annotations")
 classModelAnnosField.accessible = true
@@ -347,9 +361,11 @@ outline.allPackageContexts.each{
             .param(COMMENTS_FIELD_NAME, generationComments)
         
         if (((classRef = it.ref) == null) || ((classModel = it.target) == null)) {
-            return;
+            return
         }
         
+        className = classRef.fullName()
+        implClassName = implClass.fullName()
         classAnnos = classModelAnnosField.get(classRef)
         
         classRef.annotations().findAll{ (it.annotationClass.fullName() == JsonTypeName.class.name) ||
@@ -399,32 +415,107 @@ outline.allPackageContexts.each{
             
             if (implClassMethods.containsKey((propSetterName = (SETTER_METHOD_NAME_PREFIX + publicPropName)))) {
                 if (classMethods.containsKey(propSetterName)) {
-                    classMethods[propSetterName].type(classRef)
+                    (propSetter = classMethods[propSetterName]).type(classRef)
                 } else {
-                    classRef.method(JMod.NONE, classRef, propSetterName).param(propClass, privatePropName)
+                    (propSetter = classRef.method(JMod.NONE, classRef, propSetterName)).param(propClass, privatePropName)
                 }
                 
                 (implPropSetter = implClassMethods[propSetterName]).type(classRef)
                 implPropSetter.body()._return(JExpr._this())
-
+                
                 if (StringUtils.startsWith(implPropSetter?.params()[0].type().fullName(), JAXBElement.class.name)) {
                     implPropSetter.annotate(SuppressWarnings.class).paramArray(VALUE_MEMBER_NAME).param(uncheckedStaticRef)
+                } else {
+                    propSetters.put(className, publicPropName, propSetter)
+                    propSetters.put(implClassName, publicPropName, implPropSetter)
                 }
             }
             
             if (it.collection) {
-                classRef.method(JMod.NONE, classRef, (propAdderName = (ADD_METHOD_NAME + publicPropName))).param(
+                (propAdder = classRef.method(JMod.NONE, classRef, (propAdderName = (ADD_METHOD_NAME + publicPropName)))).param(
                     (propItemClass = ((JClass) propClass).getTypeParameters()[0]), privatePropName);
                 
                 (implPropAdder = implClass.method(JMod.PUBLIC, classRef, propAdderName)).param(propItemClass, privatePropName)
                 (implPropAdderBody = implPropAdder.body()).invoke(JExpr._this().invoke(implPropGetter), ADD_METHOD_NAME).arg(JExpr.direct(privatePropName))
                 implPropAdderBody._return(JExpr._this())
+                
+                propAdders.put(className, publicPropName, propAdder)
+                propAdders.put(implClassName, publicPropName, implPropAdder)
             }
             
             classRef.method(JMod.NONE, codeModel.BOOLEAN, (hasPropMethodName = (HAS_METHOD_NAME_PREFIX + publicPropName)));
             
             implClass.method(JMod.PUBLIC, codeModel.BOOLEAN, hasPropMethodName).body()._return(JExpr._this().ref(privatePropName)
                 .ne((propClass.primitive ? ((propClass == codeModel.BOOLEAN) ? JExpr.lit(false) : JExpr.lit(0)) : JExpr._null())))
+        }
+    }
+    
+    it.classes?.each{
+        if (((classModel = it.target) == null) || ((classRef = it.ref) == null) || ((implClass = it.implClass) == null)) {
+            return
+        }
+        
+        className = classRef.fullName()
+        implClassName = implClass.fullName()
+        superImplClass = implClass
+        
+        while ((superImplClassName = (superImplClass = superImplClass._extends()).fullName()) != Object.name) {
+            if ((superClassName = (superClassOutline = outline.classes.find{ (it.implClass.fullName() == superImplClassName) })?.ref?.fullName()) == null) {
+                continue
+            }
+            
+            (superClassModel = superClassOutline.target).properties.each {
+                publicPropName = it.getName(true)
+                privatePropName = it.getName(false)
+
+                if (propSetters.containsKey(superClassName, publicPropName)) {
+                    superPropAccessor = propSetters.get(superClassName, publicPropName)
+                    propSetterName = (SETTER_METHOD_NAME_PREFIX + publicPropName)
+
+                    if (propSetters.containsKey(className, publicPropName)) {
+                        if ((propSetter = propSetters.get(className, publicPropName)).type().fullName() != className) {
+                            propSetter.type(classRef)
+
+                            propSetters.get(implClassName, publicPropName).type(classRef)
+                        }
+                    } else {
+                        (propSetter = classRef.method(JMod.NONE, classRef, propSetterName))
+                            .param(JMod.NONE, (superPropAccessorParamType = superPropAccessor.params()[0].type()), privatePropName)
+                        propSetter.annotate(Override)
+
+                        (implPropSetter = implClass.method(JMod.PUBLIC, classRef, propSetterName))
+                            .param(JMod.NONE, superPropAccessorParamType, privatePropName)
+                        implPropSetter.annotate(Override)
+
+                        (implPropSetterBody = implPropSetter.body())._return(JExpr.cast(classRef, JExpr._super().invoke(superPropAccessor)
+                            .arg(JExpr.direct(privatePropName))))
+                    }
+                }
+
+                if (it.collection && propAdders.get(superClassName, publicPropName)) {
+                    superPropAccessor = propAdders.get(superClassName, publicPropName)
+                    propAdderName = (ADD_METHOD_NAME + publicPropName)
+
+                    if (propAdders.containsKey(className, publicPropName)) {
+                        if ((propAdder = propAdders.get(className, publicPropName)).type().fullName() != className) {
+                            propAdder.type(classRef)
+
+                            propAdders.get(implClassName, publicPropName).type(classRef)
+                        }
+                    } else {
+                        (propAdder = classRef.method(JMod.NONE, classRef, propAdderName))
+                            .param(JMod.NONE, (superPropAccessorParamType = superPropAccessor.params()[0].type()), privatePropName)
+                        propAdder.annotate(Override)
+
+                        (implPropAdder = implClass.method(JMod.PUBLIC, classRef, propAdderName))
+                            .param(JMod.NONE, superPropAccessorParamType, privatePropName)
+                        implPropAdder.annotate(Override)
+
+                        (implPropAdderBody = implPropAdder.body())._return(JExpr.cast(classRef, JExpr._super().invoke(superPropAccessor)
+                            .arg(JExpr.direct(privatePropName))))
+                    }
+                }
+            }
         }
     }
 }
@@ -454,8 +545,8 @@ ant.fileset(dir: outDir, includes: "**/*${JAVA_SRC_FILE_EXT}").each{
     
     srcFileContent = srcFile.text
     
-    abstractImplClassNames.each {
-        srcFileContent = srcFileContent.replaceAll(Pattern.compile("(\\s+)(${it})(\\s+|[\\.\\(])"), {
+    abstractImplClassNames.each{
+        srcFileContent = srcFileContent.replaceAll(~/(\s+|\()(${it})(\s+|[\.\(\)])/, {
             it[1] + ABSTRACT_CLASS_NAME_PREFIX + StringUtils.removeEnd(it[2], IMPL_CLASS_NAME_SUFFIX) + it[3]
         })
     }

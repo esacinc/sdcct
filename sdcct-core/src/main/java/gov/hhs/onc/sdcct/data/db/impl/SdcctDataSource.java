@@ -1,25 +1,18 @@
 package gov.hhs.onc.sdcct.data.db.impl;
 
 import com.mchange.v2.c3p0.AbstractComboPooledDataSource;
-import com.mchange.v2.c3p0.DataSources;
 import gov.hhs.onc.sdcct.beans.factory.impl.EmbeddedPlaceholderResolver;
-import gov.hhs.onc.sdcct.config.utils.SdcctPropertiesUtils;
 import gov.hhs.onc.sdcct.io.impl.ResourceSource;
+import gov.hhs.onc.sdcct.net.utils.SdcctUriUtils;
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Properties;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.derby.iapi.reference.Attribute;
-import org.apache.derby.iapi.reference.Property;
-import org.apache.derby.jdbc.EmbeddedDriver;
-import org.apache.derby.shared.common.reference.SQLState;
+import javax.annotation.Nonnegative;
+import org.hsqldb.DatabaseURL;
+import org.hsqldb.jdbc.JDBCDriver;
+import org.hsqldb.server.Server;
+import org.hsqldb.server.ServerConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -28,19 +21,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.jdbc.datasource.embedded.OutputStreamFactory;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
+import org.springframework.util.ResourceUtils;
 
 public class SdcctDataSource extends AbstractComboPooledDataSource implements DisposableBean, InitializingBean {
-    private final static String NO_OP_ERROR_LOG_METHOD_PROP_VALUE =
-        (OutputStreamFactory.class.getName() + SdcctStringUtils.PERIOD_CHAR + OutputStreamFactory.class.getDeclaredMethods()[0].getName());
+    private static class SdcctHsqlServer extends Server {
+        {
+            this.setDaemon(true);
+            this.setSilent(true);
+        }
 
-    private final static Properties CREATE_PROPS = SdcctPropertiesUtils.singleton(Attribute.CREATE_ATTR, Boolean.toString(true));
+        @Override
+        protected void printStackTrace(Throwable throwable) {
+        }
 
-    private final static Properties SHUTDOWN_PROPS = Stream.of(new ImmutablePair<>(Attribute.DEREGISTER_ATTR, Boolean.toString(true)),
-        new ImmutablePair<>(Attribute.SHUTDOWN_ATTR, Boolean.toString(true))).collect(SdcctPropertiesUtils.toProperties());
-    private final static Set<String> SHUTDOWN_IGNORE_SQL_STATES = Stream.of(SQLState.DATABASE_NOT_FOUND, SQLState.SHUTDOWN_DATABASE)
-        .map(sqlState -> StringUtils.split(sqlState, SdcctStringUtils.PERIOD, 2)[0]).collect(Collectors.toSet());
+        @Override
+        protected void printError(String msg) {
+            LOGGER.error(msg);
+        }
+
+        @Override
+        protected void print(String msg) {
+            LOGGER.debug(msg);
+        }
+    }
+
+    private final static String DB_PATH_FORMAT_STR = ResourceUtils.FILE_URL_PREFIX + "%s/%s;user=%s;password=%s";
 
     private final static Logger LOGGER = LoggerFactory.getLogger(SdcctDataSource.class);
 
@@ -50,37 +56,34 @@ public class SdcctDataSource extends AbstractComboPooledDataSource implements Di
     private EmbeddedPlaceholderResolver embeddedPlaceholderResolver;
 
     private File dbDir;
+    private String dbServerHost;
+    private int dbServerPort;
     private ResourceSource[] dbInitScriptSrcs;
     private String dbName;
+    private SdcctHsqlServer server = new SdcctHsqlServer();
 
     @Override
     public void destroy() throws Exception {
-        try {
-            new EmbeddedDriver().connect(this.getJdbcUrl(), SHUTDOWN_PROPS);
-
-            LOGGER.info(String.format("Shutdown and de-registered Derby database (name=%s, dir=%s).", this.dbName, this.dbDir.getPath()));
-        } catch (SQLException e) {
-            if (!SHUTDOWN_IGNORE_SQL_STATES.contains(e.getSQLState())) {
-                LOGGER.warn(String.format("Unable to shutdown and de-register Derby database (name=%s, dir=%s).", this.dbName, this.dbDir.getPath()), e);
-            }
-        } finally {
-            DataSources.destroy(this);
-        }
+        this.server.stop();
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        System.setProperty(Property.ERRORLOG_METHOD_PROPERTY, NO_OP_ERROR_LOG_METHOD_PROP_VALUE);
+        this.server.setAddress(this.dbServerHost);
+        this.server.setDatabaseName(0, this.dbName);
+        this.server.setDatabasePath(0, String.format(DB_PATH_FORMAT_STR, this.dbDir.getPath(), this.dbName, this.getUser(), this.getPassword()));
+        this.server.setPort(this.dbServerPort);
 
-        this.setDriverClass(EmbeddedDriver.class.getName());
+        this.setDriverClass(JDBCDriver.class.getName());
 
-        String dbDirPath = this.dbDir.getPath();
+        this.setJdbcUrl((DatabaseURL.S_URL_PREFIX + DatabaseURL.S_HSQL + this.dbServerHost + SdcctStringUtils.COLON_CHAR + this.dbServerPort
+            + SdcctUriUtils.PATH_DELIM + this.dbName));
 
-        this.setJdbcUrl((Attribute.PROTOCOL + dbDirPath));
+        boolean initDb = (!this.dbDir.exists() || (this.dbDir.list().length == 0));
 
-        this.setProperties(CREATE_PROPS);
+        this.server.start();
 
-        if (!this.dbDir.exists() || (this.dbDir.list().length == 0)) {
+        if (initDb) {
             Connection conn = null;
 
             try {
@@ -99,6 +102,10 @@ public class SdcctDataSource extends AbstractComboPooledDataSource implements Di
                 }
             }
         }
+    }
+
+    public boolean isRunning() {
+        return (this.server.getState() == ServerConstants.SERVER_STATE_ONLINE);
     }
 
     public File getDatabaseDirectory() {
@@ -123,5 +130,22 @@ public class SdcctDataSource extends AbstractComboPooledDataSource implements Di
 
     public void setDatabaseName(String dbName) {
         this.dbName = dbName;
+    }
+
+    public String getDatabaseServerHost() {
+        return this.dbServerHost;
+    }
+
+    public void setDatabaseServerHost(String dbServerHost) {
+        this.dbServerHost = dbServerHost;
+    }
+
+    @Nonnegative
+    public int getDatabaseServerPort() {
+        return this.dbServerPort;
+    }
+
+    public void setDatabaseServerPort(@Nonnegative int dbServerPort) {
+        this.dbServerPort = dbServerPort;
     }
 }

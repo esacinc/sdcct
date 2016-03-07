@@ -507,11 +507,6 @@
                 <version>3.1.5</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.derby</groupId>
-                <artifactId>derby</artifactId>
-                <version>10.12.1.1</version>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-analyzers-common</artifactId>
                 <version>5.5.0</version>
@@ -654,6 +649,11 @@
                         <artifactId>lucene-misc</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.hsqldb</groupId>
+                <artifactId>hsqldb</artifactId>
+                <version>2.3.3</version>
             </dependency>
             <dependency>
                 <groupId>org.jvnet.jaxb2_commons</groupId>

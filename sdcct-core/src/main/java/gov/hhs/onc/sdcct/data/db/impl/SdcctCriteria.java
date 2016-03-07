@@ -5,6 +5,7 @@ import gov.hhs.onc.sdcct.data.SdcctEntity;
 import gov.hhs.onc.sdcct.data.db.DbColumnNames;
 import gov.hhs.onc.sdcct.data.db.DbFieldNames;
 import gov.hhs.onc.sdcct.data.db.DbPropertyNames;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -21,8 +22,12 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.Weight;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.ScrollMode;
@@ -49,7 +54,7 @@ import org.hibernate.type.LongType;
 import org.hibernate.type.Type;
 
 public class SdcctCriteria<T extends SdcctEntity> extends CriteriaImpl {
-    private class IntrospectingQuery implements CriteriaQuery {
+    private class IntrospectingCriteriaQuery implements CriteriaQuery {
         private String propPath;
 
         @Override
@@ -144,6 +149,60 @@ public class SdcctCriteria<T extends SdcctEntity> extends CriteriaImpl {
         }
     }
 
+    @SuppressWarnings({ CompilerWarnings.DEPRECATION })
+    private class InterceptingQuery extends Query {
+        private Query delegate;
+
+        public InterceptingQuery(Query delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public Query rewrite(IndexReader reader) throws IOException {
+            return SdcctCriteria.this.indexQueryInterceptor.intercept(delegate.rewrite(reader));
+        }
+
+        @Override
+        public Weight createWeight(IndexSearcher searcher, boolean needsScores) throws IOException {
+            return delegate.createWeight(searcher, needsScores);
+        }
+
+        @Override
+        public String toString(String field) {
+            return delegate.toString(field);
+        }
+
+        @Deprecated
+        @Override
+        @SuppressWarnings({ "CloneDoesntCallSuperClone" })
+        public Query clone() {
+            return delegate.clone();
+        }
+
+        @Override
+        @SuppressWarnings({ "EqualsWhichDoesntCheckParameterClass" })
+        public boolean equals(Object obj) {
+            return delegate.equals(obj);
+        }
+
+        @Override
+        public int hashCode() {
+            return delegate.hashCode();
+        }
+
+        @Deprecated
+        @Override
+        public float getBoost() {
+            return delegate.getBoost();
+        }
+
+        @Deprecated
+        @Override
+        public void setBoost(float b) {
+            delegate.setBoost(b);
+        }
+    }
+
     private final static String EQ_OP = "=";
 
     private final static long serialVersionUID = 0L;
@@ -151,16 +210,19 @@ public class SdcctCriteria<T extends SdcctEntity> extends CriteriaImpl {
     private Class<T> entityClass;
     private Class<? extends T> entityImplClass;
     private Map<String, PropertyMetadata> entityPropMetadatas;
+    private LoggingIndexQueryInterceptor indexQueryInterceptor;
     private List<Criterion> criterions = new ArrayList<>();
     private Map<String, String> keywords = new LinkedHashMap<>();
     private List<Order> orders = new ArrayList<>();
     private Boolean idOrderDirection;
 
-    public SdcctCriteria(Class<T> entityClass, Class<? extends T> entityImplClass, EntityMetadata entityMetadata) {
+    public SdcctCriteria(Class<T> entityClass, Class<? extends T> entityImplClass, EntityMetadata entityMetadata,
+        LoggingIndexQueryInterceptor indexQueryInterceptor) {
         super(entityImplClass.getName(), null);
 
         this.entityClass = entityClass;
         this.entityImplClass = entityImplClass;
+        this.indexQueryInterceptor = indexQueryInterceptor;
         this.entityPropMetadatas = entityMetadata.getProperties();
     }
 
@@ -274,7 +336,7 @@ public class SdcctCriteria<T extends SdcctEntity> extends CriteriaImpl {
         if (this.hasCriterions()) {
             Iterator<Criterion> criterionIterator = this.criterions.iterator();
             Criterion criterion;
-            IntrospectingQuery introspectingQuery = new IntrospectingQuery();
+            IntrospectingCriteriaQuery introspectingQuery = new IntrospectingCriteriaQuery();
             SimpleExpression criterionExpr;
             Object criterionValue;
             TypedValue[] typedCriterionValues;
@@ -322,7 +384,7 @@ public class SdcctCriteria<T extends SdcctEntity> extends CriteriaImpl {
                     .matching(this.keywords.get(keywordPropName)).createQuery());
         }
 
-        FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(conjunction.createQuery(), this.entityImplClass);
+        FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(new InterceptingQuery(conjunction.createQuery()), this.entityImplClass);
         fullTextQuery.setProjection(ProjectionConstants.ID);
 
         boolean inCriterionIdsAvailable = !inCriterionIds.isEmpty();

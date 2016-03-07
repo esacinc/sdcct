@@ -22,6 +22,7 @@ public abstract class AbstractSdcctDao<T extends SdcctEntity> extends AbstractSd
     protected SessionFactory sessionFactory;
 
     protected EntityMetadata entityMetadata;
+    protected LoggingIndexQueryInterceptor indexQueryInterceptor;
 
     protected AbstractSdcctDao(Class<T> entityClass, Class<? extends T> entityImplClass) {
         super(entityClass, entityImplClass, entityClass, entityImplClass);
@@ -147,13 +148,16 @@ public abstract class AbstractSdcctDao<T extends SdcctEntity> extends AbstractSd
 
     @Override
     public SdcctCriteria<T> buildCriteria(Criterion ... criterions) {
-        return new SdcctCriteria<>(this.entityClass, this.entityImplClass, this.entityMetadata).addAll(criterions);
+        return new SdcctCriteria<>(this.entityClass, this.entityImplClass, this.entityMetadata, this.indexQueryInterceptor).addAll(criterions);
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        this.entityMetadata =
-            this.sessionFactory.getSessionFactoryOptions().getServiceRegistry().getService(MetadataService.class).getEntities().get(this.entityImplClass);
+        this.indexQueryInterceptor =
+            new LoggingIndexQueryInterceptor(this.entityImplClass,
+                (this.entityMetadata =
+                    this.sessionFactory.getSessionFactoryOptions().getServiceRegistry().getService(MetadataService.class).getEntities()
+                        .get(this.entityImplClass)).getName());
     }
 
     @Nullable
@@ -162,7 +166,7 @@ public abstract class AbstractSdcctDao<T extends SdcctEntity> extends AbstractSd
     }
 
     protected SimpleNaturalIdLoadAccess<? extends T> buildNaturalIdLoadAccess() {
-        return this.sessionFactory.getCurrentSession().bySimpleNaturalId(this.entityImplClass);
+        return this.buildSession().bySimpleNaturalId(this.entityImplClass);
     }
 
     @Nullable
@@ -171,7 +175,7 @@ public abstract class AbstractSdcctDao<T extends SdcctEntity> extends AbstractSd
     }
 
     protected IdentifierLoadAccess<? extends T> buildIdLoadAccess() {
-        return this.sessionFactory.getCurrentSession().byId(this.entityImplClass);
+        return this.buildSession().byId(this.entityImplClass);
     }
 
     protected SessionImpl buildSession() {

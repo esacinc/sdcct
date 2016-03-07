@@ -92,9 +92,8 @@ public class FhirExceptionMapper implements ExceptionMapper<Throwable> {
 
             try {
                 opOutcome.setText(new NarrativeImpl().setDiv(
-                    ((DivImpl) new DivImpl().addContent(new String(this.xmlCodec.encode(
-                        new PreImpl().addContent(SdcctExceptionUtils.buildRootCauseStackTrace(exception)), null), StandardCharsets.UTF_8)))).setStatus(
-                    new NarrativeStatusImpl().setValue(NarrativeStatusList.GENERATED)));
+                    new DivImpl().addContent(new String(this.xmlCodec.encode(new PreImpl().addContent(SdcctExceptionUtils.buildRootCauseStackTrace(exception)),
+                        null), StandardCharsets.UTF_8))).setStatus(new NarrativeStatusImpl().setValue(NarrativeStatusList.GENERATED)));
             } catch (Exception e) {
                 LOGGER.error("Unable to encode FHIR operation outcome narrative.", e);
             }

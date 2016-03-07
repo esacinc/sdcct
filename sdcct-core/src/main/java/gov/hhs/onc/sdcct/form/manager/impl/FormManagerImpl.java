@@ -1,7 +1,6 @@
 package gov.hhs.onc.sdcct.form.manager.impl;
 
 import gov.hhs.onc.sdcct.fhir.Bundle;
-import gov.hhs.onc.sdcct.fhir.BundleEntry;
 import gov.hhs.onc.sdcct.fhir.BundleTypeList;
 import gov.hhs.onc.sdcct.fhir.FhirFormRegistry;
 import gov.hhs.onc.sdcct.fhir.FhirFormSearchService;
@@ -60,8 +59,8 @@ public class FormManagerImpl extends AbstractFormService implements FormManager 
                 new BundleTypeImpl().setValue(BundleTypeList.SEARCHSET));
 
         questionnaires.stream().forEach(
-            questionnaire -> bundle.addEntry(((BundleEntry) new BundleEntryImpl().setId(questionnaire.getId().getValue()))
-                .setResource(new ResourceContainerImpl().setContent(questionnaire))));
+            questionnaire -> bundle.addEntry(new BundleEntryImpl().setId(questionnaire.getId().getValue()).setResource(
+                new ResourceContainerImpl().setContent(questionnaire))));
 
         return bundle;
     }

@@ -29,6 +29,8 @@ public class CacheManagerFactoryBean extends AbstractCacheComponentFactoryBean<E
         Optional.ofNullable(this.maxBytesLocalHeap).ifPresent(this.config::setMaxBytesLocalHeap);
         Optional.ofNullable(this.maxBytesLocalOffHeap).ifPresent(this.config::setMaxBytesLocalOffHeap);
 
-        return (this.cacheManager = new EhCacheCacheManager(new CacheManager(this.config)));
+        (this.cacheManager = new EhCacheCacheManager(new CacheManager(this.config))).setTransactionAware(true);
+
+        return this.cacheManager;
     }
 }

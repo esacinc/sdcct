@@ -238,10 +238,6 @@
             <artifactId>cxf-rt-ws-policy</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derby</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-common</artifactId>
         </dependency>
@@ -329,6 +325,10 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-orm</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
         </dependency>
         <dependency>
             <groupId>org.logback-extensions</groupId>

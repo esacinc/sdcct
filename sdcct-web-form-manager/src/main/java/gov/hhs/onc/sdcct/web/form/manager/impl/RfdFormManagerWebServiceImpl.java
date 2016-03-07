@@ -40,12 +40,15 @@ public class RfdFormManagerWebServiceImpl extends AbstractRfdFormWebService<Form
                 throw new Fault(new Exception(String.format("Form (id=%s) is unavailable.", reqFormId)));
             }
 
-            return new RetrieveFormResponseTypeImpl(new FormDataTypeImpl(new AnyXMLContentTypeImpl().addAny(this.xmlCodec
-                .encode(
-                    new PackageTypeImpl().setPackageModules(new PackageModulesTypeImpl().setMainFormPackage(new FormPackageTypeImpl()
-                        .setFormPackageModules(new FormPackageModulesImpl().setFormDesignPkg(new FormDesignPkgTypeImpl().setFormDesignTemplate(formDesign))))),
-                    new XdmDocumentDestination(this.config).getReceiver(), null).getXdmNode().getDocument().getDocumentElement())),
-                MimeTypeUtils.APPLICATION_XML_VALUE, Integer.toString(HttpStatus.OK.value()));
+            return new RetrieveFormResponseTypeImpl()
+                .setForm(
+                    new FormDataTypeImpl().setContent(new AnyXMLContentTypeImpl().addAny(this.xmlCodec
+                        .encode(
+                            new PackageTypeImpl().setPackageModules(new PackageModulesTypeImpl().setMainFormPackage(new FormPackageTypeImpl()
+                                .setFormPackageModules(new FormPackageModulesImpl().setFormDesignPkg(new FormDesignPkgTypeImpl()
+                                    .setFormDesignTemplate(formDesign))))), new XdmDocumentDestination(this.config).getReceiver(), null).getXdmNode()
+                        .getDocument().getDocumentElement()))).setContentType(MimeTypeUtils.APPLICATION_XML_VALUE)
+                .setResponseCode(Integer.toString(HttpStatus.OK.value()));
         } catch (Fault e) {
             throw e;
         } catch (Exception e) {

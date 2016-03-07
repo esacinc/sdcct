@@ -47,6 +47,8 @@
         p:acquireIncrement="${sdcct.data.db.acquire.increment}"
         p:databaseDirectory="${sdcct.data.db.dir}"
         p:databaseName="${sdcct.data.db.name}"
+        p:databaseServerHost="${sdcct.data.db.server.host}"
+        p:databaseServerPort="${sdcct.data.db.server.port}"
         p:initialPoolSize="${sdcct.data.db.pool.size.min}"
         p:maxIdleTime="${sdcct.data.db.idle.time.max}"
         p:maxPoolSize="${sdcct.data.db.pool.size.max}"
@@ -79,7 +81,7 @@
         <beans:property name="hibernateProperties">
             <beans:map>
                 <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).AUTO_EVICT_COLLECTION_CACHE }" value="true"/>
-                <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).DIALECT }" value="#{ T(org.hibernate.dialect.DerbyTenSevenDialect).name }"/>
+                <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).DIALECT }" value="#{ T(org.hibernate.dialect.HSQLDialect).name }"/>
                 <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).GENERATE_STATISTICS }" value="true"/>
                 <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).LOG_SESSION_METRICS }" value="false"/>
                 <beans:entry key="hibernate.search.default.directory_provider" value="filesystem"/>
