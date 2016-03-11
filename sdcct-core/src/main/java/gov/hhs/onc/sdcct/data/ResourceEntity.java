@@ -5,6 +5,7 @@ import gov.hhs.onc.sdcct.data.search.CoordSearchParam;
 import gov.hhs.onc.sdcct.data.search.DateSearchParam;
 import gov.hhs.onc.sdcct.data.search.NumberSearchParam;
 import gov.hhs.onc.sdcct.data.search.QuantitySearchParam;
+import gov.hhs.onc.sdcct.data.search.RefSearchParam;
 import gov.hhs.onc.sdcct.data.search.StringSearchParam;
 import gov.hhs.onc.sdcct.data.search.TokenSearchParam;
 import gov.hhs.onc.sdcct.data.search.UriSearchParam;
@@ -41,6 +42,12 @@ public interface ResourceEntity extends IdentifiedBean, SdcctEntity {
 
     public void setQuantitySearchParams(Map<String, QuantitySearchParam> quantitySearchParams);
 
+    public void addRefSearchParams(RefSearchParam ... refSearchParams);
+
+    public Map<String, RefSearchParam> getRefSearchParams();
+
+    public void setRefSearchParams(Map<String, RefSearchParam> refSearchParams);
+
     public void addStringSearchParams(StringSearchParam ... strSearchParams);
 
     public Map<String, StringSearchParam> getStringSearchParams();
@@ -52,6 +59,10 @@ public interface ResourceEntity extends IdentifiedBean, SdcctEntity {
     public Map<String, TokenSearchParam> getTokenSearchParams();
 
     public void setTokenSearchParams(Map<String, TokenSearchParam> tokenSearchParams);
+
+    public ResourceType getType();
+
+    public void setType(ResourceType type);
 
     public void addUriSearchParams(UriSearchParam ... uriSearchParams);
 

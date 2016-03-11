@@ -45,7 +45,7 @@ public class MetadataService implements Service {
         String entityPropName, entityPropSearchParamName, entityPropFieldName;
         Getter entityPropGetter;
         Method entityPropGetterMethod;
-        Class<? extends SearchParam> entityPropJoinClass;
+        Class<? extends SearchParam<?>> entityPropJoinClass;
         boolean entityIndexed, entityPropIndexed;
         PropertyDescriptor indexedEntityPropDesc;
         Set<SearchParamDef> entityPropSearchParamDefAnnos;
@@ -72,7 +72,7 @@ public class MetadataService implements Service {
                 entityPropName = entityProp.getName();
                 entityPropJoinClass =
                     ((entityPropGetterMethod = (entityPropGetter = entityProp.getGetter(entityMappedClass)).getMethod()).isAnnotationPresent(OneToMany.class)
-                        ? ((Class<? extends SearchParam>) entityPropGetterMethod.getDeclaredAnnotation(OneToMany.class).targetEntity()) : null);
+                        ? ((Class<? extends SearchParam<?>>) entityPropGetterMethod.getDeclaredAnnotation(OneToMany.class).targetEntity()) : null);
                 entityPropIndexed =
                     (entityIndexed && ((indexedEntityPropDesc = indexedEntityDesc.getProperty(entityPropName)) != null) && !indexedEntityPropDesc.isId() && entityPropGetterMethod
                         .isAnnotationPresent(Fields.class));

@@ -1,5 +1,6 @@
 package gov.hhs.onc.sdcct.fhir.impl;
 
+import gov.hhs.onc.sdcct.data.ResourceType;
 import gov.hhs.onc.sdcct.data.db.DbColumnNames;
 import gov.hhs.onc.sdcct.data.db.DbPropertyNames;
 import gov.hhs.onc.sdcct.data.db.DbTableNames;
@@ -7,6 +8,7 @@ import gov.hhs.onc.sdcct.data.search.CoordSearchParam;
 import gov.hhs.onc.sdcct.data.search.DateSearchParam;
 import gov.hhs.onc.sdcct.data.search.NumberSearchParam;
 import gov.hhs.onc.sdcct.data.search.QuantitySearchParam;
+import gov.hhs.onc.sdcct.data.search.RefSearchParam;
 import gov.hhs.onc.sdcct.data.search.SearchParamDef;
 import gov.hhs.onc.sdcct.data.search.SearchParamNames;
 import gov.hhs.onc.sdcct.data.search.SearchParamType;
@@ -17,59 +19,79 @@ import gov.hhs.onc.sdcct.data.search.impl.CoordSearchParamImpl;
 import gov.hhs.onc.sdcct.data.search.impl.DateSearchParamImpl;
 import gov.hhs.onc.sdcct.data.search.impl.NumberSearchParamImpl;
 import gov.hhs.onc.sdcct.data.search.impl.QuantitySearchParamImpl;
+import gov.hhs.onc.sdcct.data.search.impl.RefSearchParamImpl;
 import gov.hhs.onc.sdcct.data.search.impl.StringSearchParamImpl;
 import gov.hhs.onc.sdcct.data.search.impl.TokenSearchParamImpl;
 import gov.hhs.onc.sdcct.data.search.impl.UriSearchParamImpl;
 import gov.hhs.onc.sdcct.fhir.FhirForm;
 import java.util.Map;
 import javax.persistence.Cacheable;
-import javax.persistence.CascadeType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.search.annotations.Indexed;
 
 @Cache(region = DbTableNames.FORM_FHIR, usage = CacheConcurrencyStrategy.NONE)
 @Cacheable
+@DiscriminatorValue(DbTableNames.FORM_FHIR)
 @Entity(name = "formFhir")
 @Indexed(index = DbTableNames.FORM_FHIR)
 @Table(name = DbTableNames.FORM_FHIR)
 public class FhirFormImpl extends AbstractFhirResource implements FhirForm {
+    public FhirFormImpl() {
+        super(ResourceType.FORM_FHIR);
+    }
+
+    @Cascade({ CascadeType.ALL })
     @MapKey(name = DbColumnNames.NAME)
-    @OneToMany(cascade = { CascadeType.ALL }, mappedBy = DbPropertyNames.RESOURCE_ENTITY_ID, orphanRemoval = true, targetEntity = CoordSearchParamImpl.class)
+    @OneToMany(mappedBy = DbPropertyNames.RESOURCE, orphanRemoval = true, targetEntity = CoordSearchParamImpl.class)
     @Override
     public Map<String, CoordSearchParam> getCoordSearchParams() {
         return super.getCoordSearchParams();
     }
 
+    @Cascade({ CascadeType.ALL })
     @MapKey(name = DbColumnNames.NAME)
-    @OneToMany(cascade = { CascadeType.ALL }, mappedBy = DbPropertyNames.RESOURCE_ENTITY_ID, orphanRemoval = true, targetEntity = DateSearchParamImpl.class)
+    @OneToMany(mappedBy = DbPropertyNames.RESOURCE, orphanRemoval = true, targetEntity = DateSearchParamImpl.class)
     @Override
     @SearchParamDef(name = SearchParamNames.DATE, type = SearchParamType.DATE)
     public Map<String, DateSearchParam> getDateSearchParams() {
         return super.getDateSearchParams();
     }
 
+    @Cascade({ CascadeType.ALL })
     @MapKey(name = DbColumnNames.NAME)
-    @OneToMany(cascade = { CascadeType.ALL }, mappedBy = DbPropertyNames.RESOURCE_ENTITY_ID, orphanRemoval = true, targetEntity = NumberSearchParamImpl.class)
+    @OneToMany(mappedBy = DbPropertyNames.RESOURCE, orphanRemoval = true, targetEntity = NumberSearchParamImpl.class)
     @Override
     public Map<String, NumberSearchParam> getNumberSearchParams() {
         return super.getNumberSearchParams();
     }
 
+    @Cascade({ CascadeType.ALL })
     @MapKey(name = DbColumnNames.NAME)
-    @OneToMany(cascade = { CascadeType.ALL }, mappedBy = DbPropertyNames.RESOURCE_ENTITY_ID, orphanRemoval = true, targetEntity = QuantitySearchParamImpl.class)
+    @OneToMany(mappedBy = DbPropertyNames.RESOURCE, orphanRemoval = true, targetEntity = QuantitySearchParamImpl.class)
     @Override
-    public
-        Map<String, QuantitySearchParam> getQuantitySearchParams() {
+    public Map<String, QuantitySearchParam> getQuantitySearchParams() {
         return super.getQuantitySearchParams();
     }
 
+    @Cascade({ CascadeType.ALL })
     @MapKey(name = DbColumnNames.NAME)
-    @OneToMany(cascade = { CascadeType.ALL }, mappedBy = DbPropertyNames.RESOURCE_ENTITY_ID, orphanRemoval = true, targetEntity = StringSearchParamImpl.class)
+    @OneToMany(mappedBy = DbPropertyNames.RESOURCE, orphanRemoval = true, targetEntity = RefSearchParamImpl.class)
+    @Override
+    public Map<String, RefSearchParam> getRefSearchParams() {
+        return super.getRefSearchParams();
+    }
+
+    @Cascade({ CascadeType.ALL })
+    @MapKey(name = DbColumnNames.NAME)
+    @OneToMany(mappedBy = DbPropertyNames.RESOURCE, orphanRemoval = true, targetEntity = StringSearchParamImpl.class)
     @Override
     @SearchParamDef(name = SearchParamNames.PUBLISHER)
     @SearchParamDef(name = SearchParamNames.TITLE)
@@ -78,8 +100,9 @@ public class FhirFormImpl extends AbstractFhirResource implements FhirForm {
         return super.getStringSearchParams();
     }
 
+    @Cascade({ CascadeType.ALL })
     @MapKey(name = DbColumnNames.NAME)
-    @OneToMany(cascade = { CascadeType.ALL }, mappedBy = DbPropertyNames.RESOURCE_ENTITY_ID, orphanRemoval = true, targetEntity = TokenSearchParamImpl.class)
+    @OneToMany(mappedBy = DbPropertyNames.RESOURCE, orphanRemoval = true, targetEntity = TokenSearchParamImpl.class)
     @Override
     @SearchParamDef(name = SearchParamNames.CODE, type = SearchParamType.TOKEN)
     @SearchParamDef(name = SearchParamNames.IDENTIFIER, type = SearchParamType.TOKEN)
@@ -88,8 +111,9 @@ public class FhirFormImpl extends AbstractFhirResource implements FhirForm {
         return super.getTokenSearchParams();
     }
 
+    @Cascade({ CascadeType.ALL })
     @MapKey(name = DbColumnNames.NAME)
-    @OneToMany(cascade = { CascadeType.ALL }, mappedBy = DbPropertyNames.RESOURCE_ENTITY_ID, orphanRemoval = true, targetEntity = UriSearchParamImpl.class)
+    @OneToMany(mappedBy = DbPropertyNames.RESOURCE, orphanRemoval = true, targetEntity = UriSearchParamImpl.class)
     @Override
     public Map<String, UriSearchParam> getUriSearchParams() {
         return super.getUriSearchParams();

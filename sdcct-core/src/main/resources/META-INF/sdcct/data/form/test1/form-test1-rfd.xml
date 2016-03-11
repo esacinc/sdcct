@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sdc:FormDesign
-    formID="test1"
+    formID="test1-rfd"
     xmlns:sdc="http://healthIT.gov/sdc">
     
     <sdc:Body ID="body">

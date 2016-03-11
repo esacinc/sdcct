@@ -80,7 +80,7 @@
    <soap:Body>
       <urn:RetrieveFormRequest>
          <urn:workflowData>
-            <urn:formID>test1</urn:formID>
+            <urn:formID>test1-rfd</urn:formID>
             <urn:encodedResponse>true</urn:encodedResponse>
          </urn:workflowData>
       </urn:RetrieveFormRequest>

@@ -129,7 +129,7 @@
             <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
             <con:jmsPropertyConfig/>
             <con:parameters>
-              <entry key="id" value="test1" xmlns="http://eviware.com/soapui/config"/>
+              <entry key="id" value="test1-fhir" xmlns="http://eviware.com/soapui/config"/>
             </con:parameters>
           </con:restRequest>
         </con:config>
@@ -152,7 +152,7 @@
             <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
             <con:jmsPropertyConfig/>
             <con:parameters>
-              <entry key="id" value="test1" xmlns="http://eviware.com/soapui/config"/>
+              <entry key="id" value="test1-fhir" xmlns="http://eviware.com/soapui/config"/>
             </con:parameters>
           </con:restRequest>
         </con:config>
@@ -175,7 +175,7 @@
             <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
             <con:jmsPropertyConfig/>
             <con:parameters>
-              <entry key="_id" value="test1" xmlns="http://eviware.com/soapui/config"/>
+              <entry key="_id" value="test1-fhir" xmlns="http://eviware.com/soapui/config"/>
             </con:parameters>
           </con:restRequest>
         </con:config>
@@ -191,14 +191,14 @@
             <con:settings/>
             <con:encoding>UTF-8</con:encoding>
             <con:endpoint>${#Spring#sdcct.tomcat.server.context.url}</con:endpoint>
-            <con:request><![CDATA[_content=test1]]></con:request>
+            <con:request><![CDATA[_content=test1-fhir]]></con:request>
             <con:credentials>
               <con:authType>No Authorization</con:authType>
             </con:credentials>
             <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
             <con:jmsPropertyConfig/>
             <con:parameters>
-              <entry key="_id" value="test1" xmlns="http://eviware.com/soapui/config"/>
+              <entry key="_id" value="test1-fhir" xmlns="http://eviware.com/soapui/config"/>
             </con:parameters>
           </con:restRequest>
         </con:config>

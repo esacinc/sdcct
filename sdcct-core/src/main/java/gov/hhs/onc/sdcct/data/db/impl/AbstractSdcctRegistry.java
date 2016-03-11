@@ -4,10 +4,22 @@ import gov.hhs.onc.sdcct.data.ResourceEntity;
 import gov.hhs.onc.sdcct.data.db.SdcctDao;
 import gov.hhs.onc.sdcct.data.db.SdcctDataService;
 import gov.hhs.onc.sdcct.data.db.SdcctRegistry;
+import gov.hhs.onc.sdcct.data.search.impl.CoordEntityImpl;
+import gov.hhs.onc.sdcct.data.search.impl.CoordSearchParamImpl;
+import gov.hhs.onc.sdcct.data.search.impl.DateSearchParamImpl;
+import gov.hhs.onc.sdcct.data.search.impl.NumberSearchParamImpl;
+import gov.hhs.onc.sdcct.data.search.impl.QuantitySearchParamImpl;
+import gov.hhs.onc.sdcct.data.search.impl.RefSearchParamImpl;
+import gov.hhs.onc.sdcct.data.search.impl.StringSearchParamImpl;
+import gov.hhs.onc.sdcct.data.search.impl.TokenSearchParamImpl;
+import gov.hhs.onc.sdcct.data.search.impl.UriSearchParamImpl;
 import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Supplier;
 import javax.annotation.Nonnegative;
@@ -61,7 +73,7 @@ public abstract class AbstractSdcctRegistry<T, U extends ResourceEntity, V exten
 
         entity.setEntityId(entityId);
 
-        return this.dataService.save(this.buildSearchParams(bean, entity, entityId));
+        return this.dataService.save(this.buildSearchParams(bean, entity));
     }
 
     @Override
@@ -137,16 +149,49 @@ public abstract class AbstractSdcctRegistry<T, U extends ResourceEntity, V exten
         this.reindex();
     }
 
-    protected U buildSearchParams(T bean, U entity, long entityId) throws Exception {
+    protected U buildSearchParams(T bean, U entity) throws Exception {
         entity.getCoordSearchParams().clear();
         entity.getDateSearchParams().clear();
         entity.getNumberSearchParams().clear();
         entity.getQuantitySearchParams().clear();
+        entity.getRefSearchParams().clear();
         entity.getStringSearchParams().clear();
         entity.getTokenSearchParams().clear();
         entity.getUriSearchParams().clear();
 
         return entity;
+    }
+
+    protected void buildCoordSearchParam(U entity, String name, double latitude, double longitude) {
+        entity.addCoordSearchParams(new CoordSearchParamImpl(entity, name, new CoordEntityImpl(latitude, longitude)));
+    }
+
+    protected void buildDateSearchParam(U entity, String name, Date value) {
+        entity.addDateSearchParams(new DateSearchParamImpl(entity, name, value));
+    }
+
+    protected void buildNumberSearchParam(U entity, String name, BigDecimal value) {
+        entity.addNumberSearchParams(new NumberSearchParamImpl(entity, name, value));
+    }
+
+    protected void buildQuantitySearchParam(U entity, String name, @Nullable URI codeSystemUri, @Nullable String units, BigDecimal value) {
+        entity.addQuantitySearchParams(new QuantitySearchParamImpl(entity, name, codeSystemUri, units, value));
+    }
+
+    protected void buildRefSearchParam(U entity, String name, String value) {
+        entity.addRefSearchParams(new RefSearchParamImpl(entity, name, value));
+    }
+
+    protected void buildStringSearchParam(U entity, String name, String value) {
+        entity.addStringSearchParams(new StringSearchParamImpl(entity, name, value));
+    }
+
+    protected void buildTokenSearchParam(U entity, String name, @Nullable URI codeSystemUri, String value) {
+        entity.addTokenSearchParams(new TokenSearchParamImpl(entity, name, codeSystemUri, value));
+    }
+
+    protected void buildUriSearchParam(U entity, String name, URI value) {
+        entity.addUriSearchParams(new UriSearchParamImpl(entity, name, value));
     }
 
     protected U encode(T bean) throws Exception {

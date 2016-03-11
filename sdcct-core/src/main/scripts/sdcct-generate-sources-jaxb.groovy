@@ -16,7 +16,6 @@ import com.sun.tools.ws.processor.generator.CustomExceptionGenerator
 import com.sun.tools.ws.processor.generator.GeneratorBase
 import com.sun.tools.ws.processor.generator.SeiGenerator
 import com.sun.tools.ws.processor.modeler.wsdl.WSDLModeler
-import com.sun.tools.ws.wscompile.Plugin
 import com.sun.tools.ws.wscompile.WSCodeWriter
 import com.sun.tools.ws.wscompile.WsimportOptions
 import com.sun.tools.ws.wsdl.parser.MetadataFinder
@@ -24,6 +23,7 @@ import com.sun.tools.ws.wsdl.parser.WSDLInternalizationLogic
 import com.sun.tools.xjc.Language
 import com.sun.tools.xjc.ModelLoader
 import com.sun.tools.xjc.Options
+import com.sun.tools.xjc.Plugin
 import com.sun.tools.xjc.generator.bean.DualObjectFactoryGenerator
 import com.sun.tools.xjc.model.CClassInfo
 import com.sun.tools.xjc.model.CPropertyInfo
@@ -31,9 +31,12 @@ import com.sun.tools.xjc.model.Model
 import com.sun.tools.xjc.outline.ClassOutline
 import com.sun.tools.xjc.outline.Outline
 import com.sun.xml.ws.util.ServiceFinder
-import gov.hhs.onc.sdcct.tools.codegen.impl.CodegenErrorReceiver
-import gov.hhs.onc.sdcct.tools.codegen.impl.CodegenNameConverter
-import gov.hhs.onc.sdcct.tools.utils.SdcctToolUtils
+import gov.hhs.onc.sdcct.build.utils.SdcctBuildUtils
+import gov.hhs.onc.sdcct.build.xml.jaxb.impl.CodegenErrorReceiver
+import gov.hhs.onc.sdcct.build.xml.jaxb.impl.CodegenNameConverterImpl
+import gov.hhs.onc.sdcct.build.xml.jaxb.impl.CodegenNameConverterProxy
+import gov.hhs.onc.sdcct.build.xml.jaxb.impl.FhirCodegenPlugin
+import gov.hhs.onc.sdcct.build.xml.jaxb.impl.SdcctCodegenPlugin
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.util.stream.Collectors
@@ -49,21 +52,27 @@ import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.ClassUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.maven.plugin.MojoExecutionException
+import org.apache.tools.ant.types.FileSet
 import org.eclipse.persistence.jaxb.JAXBContextFactory
 
 def final JAVA_SRC_FILE_EXT = ".java"
 
 def final IMPL_PKG_NAME_SUFFIX = ".impl"
 
+def final BEANS_PKG_NAME = "gov.hhs.onc.sdcct.beans"
+
 def final ABSTRACT_CLASS_NAME_PREFIX = "Abstract"
 
 def final IMPL_CLASS_NAME_SUFFIX = "Impl"
 
-def final JAXB_CONTEXT_FACTORY_SIMPLE_CLASS_NAME = "JAXBContextFactory"
+def final JAXB_CONTEXT_FACTORY_CLASS_SIMPLE_NAME = "JAXBContextFactory"
 
-def final COMMENTS_FIELD_NAME = "comments"
+def final VOCAB_BEAN_CLASS_NAME = (BEANS_PKG_NAME + ".VocabBean")
+
 def final DATE_MEMBER_NAME = "date"
 def final VALUE_MEMBER_NAME = "value"
+
+def final COMMENTS_FIELD_NAME = "comments"
 
 def final ADD_METHOD_NAME = "add"
 
@@ -84,10 +93,28 @@ def errorReceiver = new CodegenErrorReceiver(log)
 def xjcErrorReceiver = errorReceiver.forXjc()
 def wsimportErrorReceiver = errorReceiver.forWsimport()
 def bindingVars = this.binding.variables
-def jaxbSrcDir = new File(project.properties.getProperty("project.build.jaxbSourceDirectory"))
-def schemaSrcDir = new File(project.properties.getProperty("project.build.schemaSourceDirectory"))
 
-def outDir = new File(outDir)
+def schemaFiles = SdcctBuildUtils.extractFiles(((FileSet) ant.fileset(dir: new File(project.properties.getProperty("project.build.schemaSourceDirectory"))) {
+    SdcctBuildUtils.tokenize(((String) bindingVars["schemaIncludes"])).each {
+        ant.include(name: it)
+    }
+
+    SdcctBuildUtils.tokenize(((String) bindingVars["schemaExcludes"])).each {
+        ant.exclude(name: it)
+    }
+}))
+
+def bindingFiles = SdcctBuildUtils.extractFiles(((FileSet) ant.fileset(dir: new File(project.properties.getProperty("project.build.jaxbSourceDirectory"))) {
+    SdcctBuildUtils.tokenize(((String) bindingVars["bindingIncludes"])).each {
+        ant.include(name: it)
+    }
+
+    SdcctBuildUtils.tokenize(((String) bindingVars["bindingExcludes"])).each {
+        ant.exclude(name: it)
+    }
+}))
+
+def outDir = new File(((String) bindingVars["outDir"]))
 outDir.mkdirs()
 project.addCompileSourceRoot(outDir.path)
 
@@ -117,71 +144,30 @@ if (wsimport) {
     wsimportOpts.sourceDir = outDir
     wsimportOpts.verbose = verbose
 
-    (ant.fileset(dir: jaxbSrcDir) {
-        SdcctToolUtils.tokenize(((String) bindingVars["bindingIncludes"])).each {
+    schemaFiles.each{ wsimportOpts.addSchema(it) }
+
+    SdcctBuildUtils.extractFiles(((FileSet) ant.fileset(dir: new File(project.properties.getProperty("project.build.wsdlSourceDirectory"))) {
+        SdcctBuildUtils.tokenize(((String) bindingVars["wsdlIncludes"])).each {
             ant.include(name: it)
         }
 
-        SdcctToolUtils.tokenize(((String) bindingVars["bindingExcludes"])).each {
+        SdcctBuildUtils.tokenize(((String) bindingVars["wsdlExcludes"])).each {
             ant.exclude(name: it)
         }
-    }).each {
-        wsimportOpts.addBindings(it.file.path)
-    }
+    })).each{ wsimportOpts.addWSDL(it) }
+    
+    bindingFiles.each{ wsimportOpts.addBindings(it.path) }
 
-    (ant.fileset(dir: schemaSrcDir) {
-        SdcctToolUtils.tokenize(((String) bindingVars["schemaIncludes"])).each {
-            ant.include(name: it)
-        }
-
-        SdcctToolUtils.tokenize(((String) bindingVars["schemaExcludes"])).each {
-            ant.exclude(name: it)
-        }
-    }).each {
-        wsimportOpts.addSchema(it.file)
-    }
-
-    (ant.fileset(dir: new File(project.properties.getProperty("project.build.wsdlSourceDirectory"))) {
-        SdcctToolUtils.tokenize(((String) bindingVars["wsdlIncludes"])).each {
-            ant.include(name: it)
-        }
-
-        SdcctToolUtils.tokenize(((String) bindingVars["wsdlExcludes"])).each {
-            ant.exclude(name: it)
-        }
-    }).each {
-        wsimportOpts.addWSDL(it.file)
-    }
-
-    CollectionUtils.addAll((args = DEFAULT_XJC_ARGS.collect(new ArrayList<String>(), { ("-B" + it) })), SdcctToolUtils.tokenize(((String) bindingVars["args"])))
+    CollectionUtils.addAll((args = new ArrayList<String>(DEFAULT_XJC_ARGS)), SdcctBuildUtils.tokenize(((String) bindingVars["args"])))
+    args = args.collect{ ("-B" + it) }
 } else {
     opts = new Options()
     
-    (ant.fileset(dir: jaxbSrcDir) {
-        SdcctToolUtils.tokenize(((String) bindingVars["bindingIncludes"])).each {
-            ant.include(name: it)
-        }
+    schemaFiles.each{ opts.addGrammar(it) }
+    
+    bindingFiles.each{ opts.addBindFile(it) }
 
-        SdcctToolUtils.tokenize(((String) bindingVars["bindingExcludes"])).each {
-            ant.exclude(name: it)
-        }
-    }).each {
-        opts.addBindFile(it.file)
-    }
-
-    (ant.fileset(dir: schemaSrcDir) {
-        SdcctToolUtils.tokenize(((String) bindingVars["schemaIncludes"])).each {
-            ant.include(name: it)
-        }
-
-        SdcctToolUtils.tokenize(((String) bindingVars["schemaExcludes"])).each {
-            ant.exclude(name: it)
-        }
-    }).each {
-        opts.addGrammar(it.file)
-    }
-
-    CollectionUtils.addAll((args = new ArrayList<String>(DEFAULT_XJC_ARGS)), SdcctToolUtils.tokenize(((String) bindingVars["args"])))
+    CollectionUtils.addAll((args = new ArrayList<String>(DEFAULT_XJC_ARGS)), SdcctBuildUtils.tokenize(((String) bindingVars["args"])))
 }
     
 opts.automaticNameConflictResolution = true
@@ -194,7 +180,12 @@ opts.schemaLanguage = Language.XMLSCHEMA
 opts.targetDir = outDir
 opts.verbose = verbose
 
-opts.setNameConverter(new CodegenNameConverter(), null)
+opts.setNameConverter(new CodegenNameConverterProxy(new CodegenNameConverterImpl()), null)
+
+opts.allPlugins.addAll([
+    new SdcctCodegenPlugin(log, project, bindingVars),
+    new FhirCodegenPlugin(log, project, bindingVars)
+] as Plugin[])
 
 try {
     if (wsimport) {
@@ -205,23 +196,13 @@ try {
         opts.parseArguments(args.toArray(new String[args.size()]))
     }
 } catch (e) {
-    throw new MojoExecutionException("Unable to parse arguments: ${StringUtils.join(args, " ")}", e)
+    throw new MojoExecutionException("Unable to parse arguments: ${StringUtils.join(args, StringUtils.SPACE)}", e)
 }
 
-log.info("Parsed arguments: ${StringUtils.join(args, " ")}")
-
-def plugins = []
-
-plugins.each{
-    opts.activePlugins.add(it.forXjc())
-}
+log.info("Parsed arguments: ${StringUtils.join(args, StringUtils.SPACE)}")
 
 try {
     if (wsimport) {
-        plugins.each {
-            wsimportOpts.activePlugins.add(it.forWsimport())
-        }
-
         def metadataFinder = new MetadataFinder(new WSDLInternalizationLogic(), wsimportOpts, wsimportErrorReceiver)
         metadataFinder.parseWSDL()
 
@@ -229,11 +210,11 @@ try {
         def wsdlJaxbModel = wsdlModel.JAXBModel.s2JJAXBModel
         def wsdlJaxbModelClass = wsdlJaxbModel.class
 
-        def wsdlJaxbModelModelField = wsdlJaxbModelClass.declaredFields.find { (it.name == "model") }
+        def wsdlJaxbModelModelField = wsdlJaxbModelClass.declaredFields.find{ (it.name == "model") }
         wsdlJaxbModelModelField.accessible = true
         model = ((Model) wsdlJaxbModelModelField.get(wsdlJaxbModel))
 
-        def wsdlJaxbModelOutlineField = wsdlJaxbModelClass.declaredFields.find { (it.name == "outline") }
+        def wsdlJaxbModelOutlineField = wsdlJaxbModelClass.declaredFields.find{ (it.name == "outline") }
         wsdlJaxbModelOutlineField.accessible = true
         outline = ((Outline)wsdlJaxbModelOutlineField.get(wsdlJaxbModel))
 
@@ -245,7 +226,7 @@ try {
             genBase.doGeneration()
         }
 
-        for (Plugin plugin : wsimportOpts.activePlugins) {
+        for (com.sun.tools.ws.wscompile.Plugin plugin : wsimportOpts.activePlugins) {
             plugin.run(wsdlModel, wsimportOpts, wsimportErrorReceiver)
         }
     } else {
@@ -273,29 +254,29 @@ def numBeans = beans.size()
 
 log.info("Generated code outline for ${numBeans} class(es).")
 
-def xmlNsPrefixes = SdcctToolUtils.tokenizeMap(((String) bindingVars["xmlNsPrefixes"]))
+def xmlNsPrefixes = SdcctBuildUtils.tokenizeMap(((String) bindingVars["xmlNsPrefixes"]))
 def xmlNsPrefixStaticRefs = xmlNsPrefixes.collectEntries(new LinkedHashMap<String, String>(xmlNsPrefixes.size()),
     { [ it.key, codeModel.directClass(ClassUtils.getPackageName(it.value)).staticRef(ClassUtils.getShortClassName(it.value)) ] })
-def xmlNsUris = SdcctToolUtils.tokenizeMap(((String) bindingVars["xmlNsUris"]))
+def xmlNsUris = SdcctBuildUtils.tokenizeMap(((String) bindingVars["xmlNsUris"]))
 def xmlNsUriStaticRefs = xmlNsUris.collectEntries(new LinkedHashMap<String, String>(xmlNsUris.size()),
     { [ it.key, codeModel.directClass(ClassUtils.getPackageName(it.value)).staticRef(ClassUtils.getShortClassName(it.value)) ] })
-def pkgNames = SdcctToolUtils.tokenizeMap(((String) bindingVars["pkgNames"]))
+def pkgNames = SdcctBuildUtils.tokenizeMap(((String) bindingVars["pkgNames"]))
 def implPkgNames = pkgNames.collectEntries{ [ it.key, (it.value + IMPL_PKG_NAME_SUFFIX) ] }
 
 implPkgNames.each{
     def implPkg = codeModel._package(it.value)
-    def xmlSchemaAnno = implPkg.annotations().find{ it.annotationClass.fullName() == XmlSchema.class.name }
+    def xmlSchemaAnno = implPkg.annotations().find{ it.annotationClass.fullName() == XmlSchema.name }
     
     if (xmlSchemaAnno == null) {
-        xmlSchemaAnno = implPkg.annotate(XmlSchema.class)
+        xmlSchemaAnno = implPkg.annotate(XmlSchema)
         xmlSchemaAnno.param("elementFormDefault", codeModel.directClass("javax.xml.bind.annotation.XmlNsForm").staticRef("QUALIFIED"))
     }
     
-    xmlSchemaAnno.param("namespace", xmlNsUriStaticRefs[it.key]).paramArray("xmlns").annotate(XmlNs.class)
+    xmlSchemaAnno.param("namespace", xmlNsUriStaticRefs[it.key]).paramArray("xmlns").annotate(XmlNs)
         .param("prefix", xmlNsPrefixStaticRefs[it.key]).param("namespaceURI", xmlNsUriStaticRefs[it.key])
 }
 
-def compilerWarningsClassName = CompilerWarnings.class.name
+def compilerWarningsClassName = CompilerWarnings.name
 def compilerWarningsClassModel = codeModel.directClass(compilerWarningsClassName)
 def rawTypesFieldName = "RAWTYPES"
 def uncheckedFieldName = "UNCHECKED"
@@ -341,20 +322,20 @@ def CClassInfo superClassModel
 def JMethod superPropAccessor
 def JType superPropAccessorParamType
 
-def Field classModelAnnosField = JDefinedClass.class.getDeclaredField("annotations")
+def Field classModelAnnosField = JDefinedClass.getDeclaredField("annotations")
 classModelAnnosField.accessible = true
 
-def Field methodModelAnnosField = JMethod.class.getDeclaredField("annotations")
+def Field methodModelAnnosField = JMethod.getDeclaredField("annotations")
 methodModelAnnosField.accessible = true
 
-def Method annoModelAddValueMethod = JAnnotationUse.class.declaredMethods.find{ it.name == "addValue" }
+def Method annoModelAddValueMethod = JAnnotationUse.declaredMethods.find{ it.name == "addValue" }
 annoModelAddValueMethod.accessible = true
 
 outline.allPackageContexts.each{
     [
         (objFactoryGen = ((DualObjectFactoryGenerator) it.objectFactoryGenerator())).publicOFG,
         objFactoryGen.privateOFG
-    ].each{ it.objectFactory.annotate(SuppressWarnings.class).paramArray(VALUE_MEMBER_NAME).param(rawTypesStaticRef).param(uncheckedStaticRef) }
+    ].each{ it.objectFactory.annotate(SuppressWarnings).paramArray(VALUE_MEMBER_NAME).param(rawTypesStaticRef).param(uncheckedStaticRef) }
     
     it.classes?.each{
         (implClass = it.implClass).annotate(Generated).param(VALUE_MEMBER_NAME, generatorName).param(DATE_MEMBER_NAME, generationTime)
@@ -369,7 +350,7 @@ outline.allPackageContexts.each{
         classAnnos = classModelAnnosField.get(classRef)
         
         classRef.annotations().findAll{ (it.annotationClass.fullName() == JsonTypeName.class.name) ||
-            (it.annotationClass.fullName() == XmlRootElement.class.name) }?.each{
+            (it.annotationClass.fullName() == XmlRootElement.name) }?.each{
             implAnnoModel = implClass.annotate(it.annotationClass)
             
             it.annotationMembers.each{
@@ -423,8 +404,8 @@ outline.allPackageContexts.each{
                 (implPropSetter = implClassMethods[propSetterName]).type(classRef)
                 implPropSetter.body()._return(JExpr._this())
                 
-                if (StringUtils.startsWith(implPropSetter?.params()[0].type().fullName(), JAXBElement.class.name)) {
-                    implPropSetter.annotate(SuppressWarnings.class).paramArray(VALUE_MEMBER_NAME).param(uncheckedStaticRef)
+                if (StringUtils.startsWith(implPropSetter?.params()[0].type().fullName(), JAXBElement.name)) {
+                    implPropSetter.annotate(SuppressWarnings).paramArray(VALUE_MEMBER_NAME).param(uncheckedStaticRef)
                 } else {
                     propSetters.put(className, publicPropName, propSetter)
                     propSetters.put(implClassName, publicPropName, implPropSetter)
@@ -520,10 +501,6 @@ outline.allPackageContexts.each{
     }
 }
 
-outline.enums.each{
-    it.clazz.annotate(Generated).param(VALUE_MEMBER_NAME, generatorName).param(DATE_MEMBER_NAME, generationTime).param(COMMENTS_FIELD_NAME, generationComments)
-}
-
 try {
     codeModel.build(codeWriter)
 } catch (e) {
@@ -537,7 +514,7 @@ def srcFileBaseName
 def srcFileContent
 
 ant.fileset(dir: outDir, includes: "**/*${JAVA_SRC_FILE_EXT}").each{
-    if ((srcFileBaseName = StringUtils.removeEnd((srcFile = it.file).name, JAVA_SRC_FILE_EXT)) == JAXB_CONTEXT_FACTORY_SIMPLE_CLASS_NAME) {
+    if ((srcFileBaseName = StringUtils.removeEnd((srcFile = it.file).name, JAVA_SRC_FILE_EXT)) == JAXB_CONTEXT_FACTORY_CLASS_SIMPLE_NAME) {
         srcFile.delete()
         
         return

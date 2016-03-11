@@ -4,7 +4,7 @@ import gov.hhs.onc.sdcct.data.cache.impl.CacheRegionFactory;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
+import javax.persistence.AttributeConverter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -20,7 +20,6 @@ import org.hibernate.search.engine.impl.DefaultMutableEntityIndexBinding;
 import org.hibernate.search.engine.impl.MutableEntityIndexBinding;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.hcore.util.impl.ContextHelper;
-import org.hibernate.type.BasicType;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
@@ -68,15 +67,15 @@ public class SdcctLocalSessionFactoryBean extends LocalSessionFactoryBean implem
     @SuppressWarnings({ "SpringJavaAutowiredMembersInspection" })
     private LoggingEntityIndexingInterceptor entityIndexingInterceptor;
 
+    private AttributeConverter<?, ?>[] attrConvs;
     private ClassLoader beanClassLoader;
-    private BasicType[] basicTypes;
     private CacheRegionFactory cacheRegionFactory;
     private MetadataImplementor metadata;
 
     @Override
     protected SessionFactory buildSessionFactory(LocalSessionFactoryBuilder sessionFactoryBuilder) {
-        if (this.hasBasicTypes()) {
-            Stream.of(this.basicTypes).forEach(sessionFactoryBuilder::registerTypeOverride);
+        if (this.hasAttributeConverters()) {
+            Stream.of(this.attrConvs).forEach(sessionFactoryBuilder::addAttributeConverter);
         }
 
         sessionFactoryBuilder.setInterceptor(this.entityInterceptor);
@@ -109,17 +108,16 @@ public class SdcctLocalSessionFactoryBean extends LocalSessionFactoryBean implem
         return sessionFactory;
     }
 
-    public boolean hasBasicTypes() {
-        return !ArrayUtils.isEmpty(this.basicTypes);
+    public boolean hasAttributeConverters() {
+        return !ArrayUtils.isEmpty(this.attrConvs);
     }
 
-    @Nullable
-    public BasicType[] getBasicTypes() {
-        return this.basicTypes;
+    public AttributeConverter<?, ?>[] getAttributeConverters() {
+        return this.attrConvs;
     }
 
-    public void setBasicTypes(BasicType ... basicTypes) {
-        this.basicTypes = basicTypes;
+    public void setAttributeConverters(AttributeConverter<?, ?> ... attrConvs) {
+        this.attrConvs = attrConvs;
     }
 
     @Override

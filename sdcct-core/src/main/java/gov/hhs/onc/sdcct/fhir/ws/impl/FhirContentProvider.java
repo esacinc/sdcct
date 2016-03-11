@@ -1,14 +1,14 @@
 package gov.hhs.onc.sdcct.fhir.ws.impl;
 
-import gov.hhs.onc.sdcct.fhir.ws.FhirWebServiceException;
+import gov.hhs.onc.sdcct.config.utils.SdcctOptionUtils;
+import gov.hhs.onc.sdcct.fhir.FhirException;
 import gov.hhs.onc.sdcct.fhir.FhirFormatType;
+import gov.hhs.onc.sdcct.fhir.IssueTypeList;
 import gov.hhs.onc.sdcct.fhir.ws.FhirWsQueryParamNames;
-import gov.hhs.onc.sdcct.fhir.IssueCodeType;
 import gov.hhs.onc.sdcct.io.utils.SdcctMediaTypeUtils;
 import gov.hhs.onc.sdcct.transform.content.ContentCodec;
 import gov.hhs.onc.sdcct.transform.content.impl.ContentEncodeOptions;
 import gov.hhs.onc.sdcct.utils.SdcctEnumUtils;
-import gov.hhs.onc.sdcct.config.utils.SdcctOptionUtils;
 import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,10 +64,10 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
             String formatQueryParamValue = mergedQueryParams.get(FhirWsQueryParamNames.FORMAT);
 
             if (!this.formatQueryParamValues.containsKey(formatQueryParamValue)) {
-                throw new FhirWebServiceException(
+                throw new FhirException(
                     String.format("Invalid format query parameter (name=%s) value: %s", FhirWsQueryParamNames.FORMAT, formatQueryParamValue))
-                        .setIssueCodeType(IssueCodeType.PROCESSING).setIssueDetailConceptParts("MSG_PARAM_INVALID", FhirWsQueryParamNames.FORMAT)
-                        .setResponseStatus(Status.BAD_REQUEST);
+                    .setIssueType(IssueTypeList.PROCESSING).setIssueDetailConceptParts("MSG_PARAM_INVALID", FhirWsQueryParamNames.FORMAT)
+                    .setResponseStatus(Status.BAD_REQUEST);
             }
 
             format = this.formatQueryParamValues.get(formatQueryParamValue);
@@ -94,10 +94,10 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
             try {
                 encodeOpts.setOption(ContentEncodeOptions.PRETTY, SdcctOptionUtils.getBooleanValue(FhirWsQueryParamNames.PRETTY, prettyQueryParamValue));
             } catch (IllegalArgumentException e) {
-                throw new FhirWebServiceException(
+                throw new FhirException(
                     String.format("Invalid pretty query parameter (name=%s) value: %s", FhirWsQueryParamNames.PRETTY, prettyQueryParamValue), e)
-                        .setIssueCodeType(IssueCodeType.PROCESSING).setIssueDetailConceptParts("MSG_PARAM_INVALID", FhirWsQueryParamNames.PRETTY)
-                        .setResponseStatus(Status.BAD_REQUEST);
+                    .setIssueType(IssueTypeList.PROCESSING).setIssueDetailConceptParts("MSG_PARAM_INVALID", FhirWsQueryParamNames.PRETTY)
+                    .setResponseStatus(Status.BAD_REQUEST);
             }
         }
 
@@ -106,9 +106,8 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
 
             entityStream.close();
         } catch (Exception e) {
-            throw new FhirWebServiceException(
-                String.format("Unable to encode (mediaType=%s) content object (class=%s).", formatEncMediaTypeValue, obj.getClass().getName()), e)
-                    .setIssueCodeType(IssueCodeType.STRUCTURE);
+            throw new FhirException(String.format("Unable to encode (mediaType=%s) content object (class=%s).", formatEncMediaTypeValue, obj.getClass()
+                .getName()), e).setIssueType(IssueTypeList.STRUCTURE);
         }
     }
 
@@ -126,8 +125,8 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
 
             return (type.equals(byte[].class) ? type.cast(entityBytes) : codec.decode(entityBytes, type, null));
         } catch (Exception e) {
-            throw new FhirWebServiceException(String.format("Unable to decode (mediaType=%s) content object (class=%s).", mediaType, type.getName()), e)
-                .setIssueCodeType(IssueCodeType.STRUCTURE);
+            throw new FhirException(String.format("Unable to decode (mediaType=%s) content object (class=%s).", mediaType, type.getName()), e)
+                .setIssueType(IssueTypeList.STRUCTURE);
         }
     }
 
@@ -154,19 +153,19 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
     public void init(List<ClassResourceInfo> classResourceInfos) {
         this.setProduceMediaTypes((this.formatCodecs =
             (this.codecs.stream().collect(SdcctStreamUtils.toMap(ContentCodec::getType, Function.identity(), () -> new LinkedHashMap<>(this.codecs.size()))))
-                .entrySet().stream()
-                .collect(SdcctStreamUtils.toMap(
-                    contentTypeEntry -> SdcctEnumUtils.findByPredicate(FhirFormatType.class,
-                        formatTypeItem -> (formatTypeItem.getContentType() == contentTypeEntry.getKey())),
-                    Entry::getValue, () -> new LinkedHashMap<>(this.codecs.size())))).keySet().stream()
-                        .map(formatType -> formatType.getEncodedMediaType().toString()).collect(Collectors.toList()));
+                .entrySet()
+                .stream()
+                .collect(
+                    SdcctStreamUtils.toMap(contentTypeEntry -> SdcctEnumUtils.findByPredicate(FhirFormatType.class,
+                        formatTypeItem -> (formatTypeItem.getContentType() == contentTypeEntry.getKey())), Entry::getValue, () -> new LinkedHashMap<>(
+                        this.codecs.size())))).keySet().stream().map(formatType -> formatType.getEncodedMediaType().toString()).collect(Collectors.toList()));
 
         FhirFormatType[] formats = FhirFormatType.values();
 
         this.formatQueryParamValues = new LinkedHashMap<>();
 
-        Stream.of(formats)
-            .forEach(format -> format.getQueryParamValues().forEach(formatQueryParamValue -> this.formatQueryParamValues.put(formatQueryParamValue, format)));
+        Stream.of(formats).forEach(
+            format -> format.getQueryParamValues().forEach(formatQueryParamValue -> this.formatQueryParamValues.put(formatQueryParamValue, format)));
     }
 
     public Map<String, String> getDefaultQueryParameters() {

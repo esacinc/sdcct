@@ -28,6 +28,8 @@
         <project.build.schemaDirectory>${project.build.outputDirectory}/META-INF/sdcct/schema</project.build.schemaDirectory>
         <!-- Project build XML schema source properties -->
         <project.build.schemaSourceDirectory>${project.basedir}/src/main/schema</project.build.schemaSourceDirectory>
+        <!-- Project build vocabulary source properties -->
+        <project.build.vocabFhirValueSetDataFile>${project.basedir}/src/main/resources/META-INF/sdcct/data/vocab/fhir/valuesets.xml</project.build.vocabFhirValueSetDataFile>
         <!-- Project build WSDL properties -->
         <project.build.wsdlDirectory>${project.build.outputDirectory}/META-INF/sdcct/wsdl</project.build.wsdlDirectory>
         <!-- Project build WSDL source properties -->
@@ -597,6 +599,24 @@
                 <executions>
                     <execution>
                         <id>compile-scripts</id>
+                        <configuration>
+                            <properties>
+                                <property>
+                                    <name>joint</name>
+                                    <value>true</value>
+                                </property>
+                                <property>
+                                    <name>srcIncludes</name>
+                                    <value>
+                                        gov/hhs/onc/sdcct/beans/*.java
+                                        gov/hhs/onc/sdcct/net/utils/*.java
+                                        gov/hhs/onc/sdcct/xml/SdcctXmlNs.java
+                                        gov/hhs/onc/sdcct/utils/*.java
+                                        **/*.groovy
+                                    </value>
+                                </property>
+                            </properties>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>process-project-properties</id>
@@ -612,6 +632,12 @@
                         </goals>
                         <configuration>
                             <properties>
+                                <property>
+                                    <name>args</name>
+                                    <value>
+                                        -Xsdcct
+                                    </value>
+                                </property>
                                 <property>
                                     <name>bindingIncludes</name>
                                     <value>
@@ -677,6 +703,12 @@
                         <configuration>
                             <properties>
                                 <property>
+                                    <name>args</name>
+                                    <value>
+                                        -Xsdcct
+                                    </value>
+                                </property>
+                                <property>
                                     <name>bindingIncludes</name>
                                     <value>
                                         jaxb-sdcct.xjb
@@ -740,6 +772,12 @@
                         </goals>
                         <configuration>
                             <properties>
+                                <property>
+                                    <name>args</name>
+                                    <value>
+                                        -Xsdcct
+                                    </value>
+                                </property>
                                 <property>
                                     <name>bindingIncludes</name>
                                     <value>
@@ -805,6 +843,12 @@
                         <configuration>
                             <properties>
                                 <property>
+                                    <name>args</name>
+                                    <value>
+                                        -Xsdcct
+                                    </value>
+                                </property>
+                                <property>
                                     <name>bindingIncludes</name>
                                     <value>
                                         jaxb-sdcct.xjb
@@ -857,6 +901,13 @@
                         </goals>
                         <configuration>
                             <properties>
+                                <property>
+                                    <name>args</name>
+                                    <value>
+                                        -Xsdcct
+                                        -Xsdcct-fhir
+                                    </value>
+                                </property>
                                 <property>
                                     <name>bindingIncludes</name>
                                     <value>

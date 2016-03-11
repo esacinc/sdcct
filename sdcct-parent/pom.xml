@@ -1048,20 +1048,21 @@
                             <id>compile-scripts</id>
                             <phase>initialize</phase>
                             <goals>
-                                <goal>compile</goal>
+                                <goal>execute</goal>
                             </goals>
                             <inherited>true</inherited>
                             <configuration>
-                                <debug>true</debug>
-                                <invokeDynamic>true</invokeDynamic>
-                                <sources>
-                                    <source>
-                                        <directory>${project.build.scriptSourceDirectory}/groovy</directory>
-                                    </source>
-                                </sources>
-                                <targetBytecode>${java.version}</targetBytecode>
-                                <verbose>true</verbose>
-                                <warningLevel>3</warningLevel>
+                                <properties combine.children="append">
+                                    <property>
+                                        <name>srcIncludes</name>
+                                        <value>
+                                            **/*.groovy
+                                        </value>
+                                    </property>
+                                </properties>
+                                <scripts>
+                                    <script>file://${project.basedir.all}/sdcct-core/src/main/scripts/sdcct-compile-scripts.groovy</script>
+                                </scripts>
                             </configuration>
                         </execution>
                         <execution>
@@ -1355,19 +1356,4 @@
             </plugin>
         </plugins>
     </build>
-    
-    <profiles>
-        <profile>
-            <id>test-skip-default</id>
-            <activation>
-                <property>
-                    <name>!skipTests</name>
-                </property>
-            </activation>
-            <properties>
-                <skipTestsUnit>false</skipTestsUnit>
-                <skipTestsIt>false</skipTestsIt>
-            </properties>
-        </profile>
-    </profiles>
 </project>

@@ -16,5 +16,5 @@ import java.lang.annotation.Target;
 public @interface SearchParamDef {
     String name();
 
-    SearchParamType type() default SearchParamType.STRING;
+    SearchParamType type() default SearchParamType.STR;
 }

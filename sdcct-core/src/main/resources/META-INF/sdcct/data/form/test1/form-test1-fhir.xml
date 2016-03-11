@@ -2,7 +2,7 @@
 <fhir:Questionnaire
     xmlns:fhir="http://hl7.org/fhir">
     
-    <fhir:id value="test1"/>
+    <fhir:id value="test1-fhir"/>
     
     <fhir:meta>
         <fhir:versionId value="1"/>

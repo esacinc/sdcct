@@ -1,5 +1,6 @@
 package gov.hhs.onc.sdcct.fhir.impl;
 
+import gov.hhs.onc.sdcct.data.ResourceType;
 import gov.hhs.onc.sdcct.data.db.DbAnalyzerNames;
 import gov.hhs.onc.sdcct.data.db.DbColumnNames;
 import gov.hhs.onc.sdcct.data.db.DbFieldNames;
@@ -25,6 +26,22 @@ import org.hibernate.search.annotations.Fields;
 @MappedSuperclass
 public abstract class AbstractFhirResource extends AbstractResourceEntity implements FhirResource {
     protected String text;
+
+    protected AbstractFhirResource(ResourceType type) {
+        super(type);
+    }
+
+    @Column(name = DbColumnNames.CONTENT, nullable = false)
+    @Fields({ @Field(analyzer = @Analyzer(definition = DbAnalyzerNames.EDGE_NGRAM), boost = @Boost(0.75F), name = DbFieldNames.CONTENT_EDGE_NGRAM),
+        @Field(analyzer = @Analyzer(definition = DbAnalyzerNames.LOWERCASE), name = DbFieldNames.CONTENT_LOWERCASE),
+        @Field(analyzer = @Analyzer(definition = DbAnalyzerNames.NGRAM), boost = @Boost(0.5F), name = DbFieldNames.CONTENT_NGRAM),
+        @Field(analyzer = @Analyzer(definition = DbAnalyzerNames.PHONETIC), boost = @Boost(0.25F), name = DbFieldNames.CONTENT_PHONETIC) })
+    @Lob
+    @Override
+    @SearchParamDef(name = SearchParamNames.CONTENT)
+    public String getContent() {
+        return super.getContent();
+    }
 
     @Override
     @SearchParamDef(name = SearchParamNames.LAST_UPDATED, type = SearchParamType.DATE)

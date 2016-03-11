@@ -1,4 +1,4 @@
-package gov.hhs.onc.sdcct.tools.codegen.impl
+package gov.hhs.onc.sdcct.build.xml.jaxb.impl
 
 import com.sun.tools.xjc.ErrorReceiver
 import com.sun.tools.xjc.api.ErrorListener

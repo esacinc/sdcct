@@ -1,12 +1,12 @@
-package gov.hhs.onc.sdcct.tools.codegen.impl
+package gov.hhs.onc.sdcct.build.xml.jaxb.impl
 
-import com.sun.xml.bind.api.impl.NameConverter
+import gov.hhs.onc.sdcct.build.xml.jaxb.CodegenNameConverter
 import java.util.regex.Pattern
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.text.StrBuilder
 
-class CodegenNameConverter implements NameConverter {
-    private final static Pattern UPPERCASE_SEQ_PATTERN = Pattern.compile("[A-Z]{2,}")
+class CodegenNameConverterImpl implements CodegenNameConverter {
+    protected final static Pattern UPPERCASE_SEQ_PATTERN = Pattern.compile("[A-Z]{2,}")
 
     @Override
     String toPackageName(String nsUri) {
@@ -14,13 +14,13 @@ class CodegenNameConverter implements NameConverter {
     }
 
     @Override
-    String toInterfaceName(String token) {
-        return processName(smart.toInterfaceName(token))
-    }
-
-    @Override
     String toClassName(String token) {
         return processName(smart.toClassName(token))
+    }
+    
+    @Override
+    String toInterfaceName(String token) {
+        return processName(smart.toInterfaceName(token))
     }
 
     @Override
@@ -38,7 +38,7 @@ class CodegenNameConverter implements NameConverter {
         return smart.toVariableName(token)
     }
 
-    private static String processName(String name) {
+    protected static String processName(String name) {
         def ucSeqMatcher = UPPERCASE_SEQ_PATTERN.matcher(name)
 
         if (!ucSeqMatcher.matches()) {

@@ -7,10 +7,10 @@ import javax.annotation.Nullable;
 
 public class SearchParamMetadata extends AbstractMetadataComponent {
     private String propName;
-    private Class<? extends SearchParam> joinClass;
+    private Class<? extends SearchParam<?>> joinClass;
     private SearchParamType type;
 
-    public SearchParamMetadata(String name, boolean indexed, String propName, @Nullable Class<? extends SearchParam> joinClass, SearchParamType type) {
+    public SearchParamMetadata(String name, boolean indexed, String propName, @Nullable Class<? extends SearchParam<?>> joinClass, SearchParamType type) {
         super(name, indexed);
 
         this.propName = propName;
@@ -23,7 +23,7 @@ public class SearchParamMetadata extends AbstractMetadataComponent {
     }
 
     @Nullable
-    public Class<? extends SearchParam> getJoinClass() {
+    public Class<? extends SearchParam<?>> getJoinClass() {
         return this.joinClass;
     }
 

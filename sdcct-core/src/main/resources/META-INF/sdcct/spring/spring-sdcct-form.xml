@@ -16,7 +16,7 @@
                 <!--suppress SpringPlaceholdersInspection -->
                 <beans:value>classpath*:${sdcct.data.form.src.dir.path}/adrenal/SDC_Adrenal*.xml</beans:value>
                 <!--suppress SpringPlaceholdersInspection -->
-                <beans:value>classpath*:${sdcct.data.form.src.dir.path}/test1/form-test1-ihe.xml</beans:value>
+                <beans:value>classpath*:${sdcct.data.form.src.dir.path}/test1/form-test1-rfd.xml</beans:value>
             </beans:array>
         </beans:property>
         <beans:property name="internalQuestionnaireSources">

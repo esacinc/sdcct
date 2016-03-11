@@ -4,9 +4,6 @@ import gov.hhs.onc.sdcct.data.db.SdcctDao;
 import gov.hhs.onc.sdcct.data.db.SdcctDataService;
 import gov.hhs.onc.sdcct.data.db.impl.AbstractSdcctRegistry;
 import gov.hhs.onc.sdcct.data.search.SearchParamNames;
-import gov.hhs.onc.sdcct.data.search.impl.DateSearchParamImpl;
-import gov.hhs.onc.sdcct.data.search.impl.TokenSearchParamImpl;
-import gov.hhs.onc.sdcct.data.search.impl.UriSearchParamImpl;
 import gov.hhs.onc.sdcct.fhir.DomainResource;
 import gov.hhs.onc.sdcct.fhir.FhirResource;
 import gov.hhs.onc.sdcct.fhir.FhirResourceRegistry;
@@ -24,36 +21,35 @@ public abstract class AbstractFhirResourceRegistry<T extends DomainResource, U e
     }
 
     @Override
-    protected U buildSearchParams(T bean, U entity, long entityId) throws Exception {
-        super.buildSearchParams(bean, entity, entityId);
+    protected U buildSearchParams(T bean, U entity) throws Exception {
+        super.buildSearchParams(bean, entity);
 
         if (bean.hasMeta()) {
             Meta meta = bean.getMeta();
 
             if (meta.hasLastUpdated()) {
-                entity.addDateSearchParams(new DateSearchParamImpl(entityId, SearchParamNames.LAST_UPDATED, new Date(meta.getLastUpdated().getValue()
-                    .toGregorianCalendar().toInstant().toEpochMilli())));
+                this.buildDateSearchParam(entity, SearchParamNames.LAST_UPDATED, new Date(meta.getLastUpdated().getValue().toGregorianCalendar().toInstant()
+                    .toEpochMilli()));
             }
 
             if (meta.hasProfile()) {
-                meta.getProfile().stream()
-                    .forEach(profile -> entity.addUriSearchParams(new UriSearchParamImpl(SearchParamNames.PROFILE, entityId, URI.create(profile.getValue()))));
+                meta.getProfile().stream().forEach(profile -> this.buildUriSearchParam(entity, SearchParamNames.PROFILE, URI.create(profile.getValue())));
             }
 
             if (meta.hasSecurity()) {
                 meta.getSecurity()
                     .stream()
                     .forEach(
-                        security -> entity.addTokenSearchParams(new TokenSearchParamImpl(entityId, SearchParamNames.SECURITY, security.getSystem().getValue(),
-                            security.getCode().getValue())));
+                        security -> this.buildTokenSearchParam(entity, SearchParamNames.SECURITY,
+                            (security.hasSystem() ? URI.create(security.getSystem().getValue()) : null), security.getCode().getValue()));
             }
 
             if (meta.hasTag()) {
                 meta.getTag()
                     .stream()
                     .forEach(
-                        tag -> entity.addTokenSearchParams(new TokenSearchParamImpl(entityId, SearchParamNames.TAG, tag.getSystem().getValue(), tag.getCode()
-                            .getValue())));
+                        tag -> this.buildTokenSearchParam(entity, SearchParamNames.TAG, (tag.hasSystem() ? URI.create(tag.getSystem().getValue()) : null), tag
+                            .getCode().getValue()));
             }
         }
 

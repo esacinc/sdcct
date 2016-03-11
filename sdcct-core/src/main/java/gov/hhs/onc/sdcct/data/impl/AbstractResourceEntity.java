@@ -1,14 +1,14 @@
 package gov.hhs.onc.sdcct.data.impl;
 
 import gov.hhs.onc.sdcct.data.ResourceEntity;
-import gov.hhs.onc.sdcct.data.db.DbAnalyzerNames;
+import gov.hhs.onc.sdcct.data.ResourceType;
 import gov.hhs.onc.sdcct.data.db.DbColumnNames;
-import gov.hhs.onc.sdcct.data.db.DbFieldNames;
 import gov.hhs.onc.sdcct.data.db.DbSequenceNames;
 import gov.hhs.onc.sdcct.data.search.CoordSearchParam;
 import gov.hhs.onc.sdcct.data.search.DateSearchParam;
 import gov.hhs.onc.sdcct.data.search.NumberSearchParam;
 import gov.hhs.onc.sdcct.data.search.QuantitySearchParam;
+import gov.hhs.onc.sdcct.data.search.RefSearchParam;
 import gov.hhs.onc.sdcct.data.search.SearchParamDef;
 import gov.hhs.onc.sdcct.data.search.SearchParamNames;
 import gov.hhs.onc.sdcct.data.search.StringSearchParam;
@@ -19,22 +19,22 @@ import java.util.Map;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Transient;
 import org.hibernate.annotations.NaturalId;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.SortableField;
 
-@MappedSuperclass
+@DiscriminatorColumn(name = DbColumnNames.TYPE)
+@Entity(name = "resource")
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class AbstractResourceEntity extends AbstractSdcctEntity implements ResourceEntity {
     protected String content;
     protected Map<String, CoordSearchParam> coordSearchParams = new HashMap<>();
@@ -42,18 +42,18 @@ public abstract class AbstractResourceEntity extends AbstractSdcctEntity impleme
     protected String id;
     protected Map<String, NumberSearchParam> numSearchParams = new HashMap<>();
     protected Map<String, QuantitySearchParam> quantitySearchParams = new HashMap<>();
+    protected Map<String, RefSearchParam> refSearchParams = new HashMap<>();
     protected Map<String, StringSearchParam> strSearchParams = new HashMap<>();
     protected Map<String, TokenSearchParam> tokenSearchParams = new HashMap<>();
+    protected ResourceType type;
     protected Map<String, UriSearchParam> uriSearchParams = new HashMap<>();
 
-    @Column(name = DbColumnNames.CONTENT, nullable = false)
-    @Fields({ @Field(analyzer = @Analyzer(definition = DbAnalyzerNames.EDGE_NGRAM), boost = @Boost(0.75F), name = DbFieldNames.CONTENT_EDGE_NGRAM),
-        @Field(analyzer = @Analyzer(definition = DbAnalyzerNames.LOWERCASE), name = DbFieldNames.CONTENT_LOWERCASE),
-        @Field(analyzer = @Analyzer(definition = DbAnalyzerNames.NGRAM), boost = @Boost(0.5F), name = DbFieldNames.CONTENT_NGRAM),
-        @Field(analyzer = @Analyzer(definition = DbAnalyzerNames.PHONETIC), boost = @Boost(0.25F), name = DbFieldNames.CONTENT_PHONETIC) })
-    @Lob
+    protected AbstractResourceEntity(ResourceType type) {
+        this.type = type;
+    }
+
     @Override
-    @SearchParamDef(name = SearchParamNames.CONTENT)
+    @Transient
     public String getContent() {
         return this.content;
     }
@@ -157,6 +157,23 @@ public abstract class AbstractResourceEntity extends AbstractSdcctEntity impleme
     }
 
     @Override
+    public void addRefSearchParams(RefSearchParam ... refSearchParams) {
+        Stream.of(refSearchParams).forEach(refSearchParam -> this.refSearchParams.put(refSearchParam.getName(), refSearchParam));
+    }
+
+    @Override
+    @Transient
+    public Map<String, RefSearchParam> getRefSearchParams() {
+        return this.refSearchParams;
+    }
+
+    @Override
+    public void setRefSearchParams(Map<String, RefSearchParam> refSearchParams) {
+        this.refSearchParams.clear();
+        this.refSearchParams.putAll(refSearchParams);
+    }
+
+    @Override
     public void addStringSearchParams(StringSearchParam ... strSearchParams) {
         Stream.of(strSearchParams).forEach(strSearchParam -> this.strSearchParams.put(strSearchParam.getName(), strSearchParam));
     }
@@ -188,6 +205,17 @@ public abstract class AbstractResourceEntity extends AbstractSdcctEntity impleme
     public void setTokenSearchParams(Map<String, TokenSearchParam> tokenSearchParams) {
         this.tokenSearchParams.clear();
         this.tokenSearchParams.putAll(tokenSearchParams);
+    }
+
+    @Column(name = DbColumnNames.TYPE, nullable = false, updatable = false)
+    @Override
+    public ResourceType getType() {
+        return this.type;
+    }
+
+    @Override
+    public void setType(ResourceType type) {
+        this.type = type;
     }
 
     @Override

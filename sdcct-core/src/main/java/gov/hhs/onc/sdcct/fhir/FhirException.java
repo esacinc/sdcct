@@ -1,38 +1,27 @@
-package gov.hhs.onc.sdcct.fhir.ws;
+package gov.hhs.onc.sdcct.fhir;
 
-import gov.hhs.onc.sdcct.fhir.IssueCodeType;
 import javax.annotation.Nullable;
 import javax.ws.rs.core.Response.Status;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-public class FhirWebServiceException extends RuntimeException {
+public class FhirException extends RuntimeException {
     private final static long serialVersionUID = 0L;
 
-    private IssueCodeType issueCodeType = IssueCodeType.EXCEPTION;
+    private IssueTypeList issueType = IssueTypeList.EXCEPTION;
     private Pair<String, Object[]> issueDetailConceptParts;
     private Status respStatus = Status.INTERNAL_SERVER_ERROR;
 
-    public FhirWebServiceException(@Nullable String msg) {
+    public FhirException(@Nullable String msg) {
         this(msg, null);
     }
 
-    public FhirWebServiceException(@Nullable Throwable cause) {
+    public FhirException(@Nullable Throwable cause) {
         this(null, cause);
     }
 
-    public FhirWebServiceException(@Nullable String msg, @Nullable Throwable cause) {
+    public FhirException(@Nullable String msg, @Nullable Throwable cause) {
         super(msg, cause);
-    }
-
-    public IssueCodeType getIssueCodeType() {
-        return this.issueCodeType;
-    }
-
-    public FhirWebServiceException setIssueCodeType(IssueCodeType issueCodeType) {
-        this.issueCodeType = issueCodeType;
-
-        return this;
     }
 
     public boolean hasIssueDetailConceptParts() {
@@ -43,8 +32,18 @@ public class FhirWebServiceException extends RuntimeException {
         return this.issueDetailConceptParts;
     }
 
-    public FhirWebServiceException setIssueDetailConceptParts(String issueDetailConceptCode, Object ... issueDetailConceptDisplayArgs) {
+    public FhirException setIssueDetailConceptParts(String issueDetailConceptCode, Object ... issueDetailConceptDisplayArgs) {
         this.issueDetailConceptParts = new ImmutablePair<>(issueDetailConceptCode, issueDetailConceptDisplayArgs);
+
+        return this;
+    }
+
+    public IssueTypeList getIssueType() {
+        return this.issueType;
+    }
+
+    public FhirException setIssueType(IssueTypeList issueType) {
+        this.issueType = issueType;
 
         return this;
     }
@@ -53,7 +52,7 @@ public class FhirWebServiceException extends RuntimeException {
         return this.respStatus;
     }
 
-    public FhirWebServiceException setResponseStatus(Status respStatus) {
+    public FhirException setResponseStatus(Status respStatus) {
         this.respStatus = respStatus;
 
         return this;

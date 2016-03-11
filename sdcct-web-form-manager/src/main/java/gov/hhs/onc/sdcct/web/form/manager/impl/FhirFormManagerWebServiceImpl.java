@@ -1,9 +1,9 @@
 package gov.hhs.onc.sdcct.web.form.manager.impl;
 
 import gov.hhs.onc.sdcct.fhir.Bundle;
-import gov.hhs.onc.sdcct.fhir.IssueCodeType;
+import gov.hhs.onc.sdcct.fhir.FhirException;
+import gov.hhs.onc.sdcct.fhir.IssueTypeList;
 import gov.hhs.onc.sdcct.fhir.Questionnaire;
-import gov.hhs.onc.sdcct.fhir.ws.FhirWebServiceException;
 import gov.hhs.onc.sdcct.fhir.ws.impl.AbstractFhirFormWebService;
 import gov.hhs.onc.sdcct.form.manager.FormManager;
 import gov.hhs.onc.sdcct.web.form.manager.FhirFormManagerWebService;
@@ -29,16 +29,15 @@ public class FhirFormManagerWebServiceImpl extends AbstractFhirFormWebService<Fo
             Questionnaire questionnaire = this.service.findQuestionnaire(questionnaireId);
 
             if (questionnaire == null) {
-                throw new FhirWebServiceException(String.format("Questionnaire (id=%s) is unavailable.", questionnaireId))
-                    .setIssueCodeType(IssueCodeType.NOT_FOUND).setIssueDetailConceptParts("MSG_NO_EXIST", questionnaireId).setResponseStatus(Status.NOT_FOUND);
+                throw new FhirException(String.format("Questionnaire (id=%s) is unavailable.", questionnaireId)).setIssueType(IssueTypeList.NOT_FOUND)
+                    .setIssueDetailConceptParts("MSG_NO_EXIST", questionnaireId).setResponseStatus(Status.NOT_FOUND);
             }
 
             return questionnaire;
-        } catch (FhirWebServiceException e) {
+        } catch (FhirException e) {
             throw e;
         } catch (Exception e) {
-            throw new FhirWebServiceException(String.format("Unable to retrieve questionnaire (id=%s)", questionnaireId))
-                .setIssueCodeType(IssueCodeType.PROCESSING);
+            throw new FhirException(String.format("Unable to retrieve questionnaire (id=%s)", questionnaireId)).setIssueType(IssueTypeList.NOT_FOUND);
         }
     }
 }

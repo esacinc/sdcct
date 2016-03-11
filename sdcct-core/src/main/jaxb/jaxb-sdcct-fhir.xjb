@@ -17,27 +17,8 @@
     </jaxb:schemaBindings>
     
     <!--====================================================================================================
-    = SIMPLE TYPES
-    =====================================================================================================-->
-    <jaxb:bindings node="xsd:simpleType[@name='DetectedIssueSeverity-list']">
-        <jaxb:typesafeEnumClass name="DetectedIssueSeverityType"/>
-    </jaxb:bindings>
-    
-    <jaxb:bindings node="xsd:simpleType[@name='IssueSeverity-list']">
-        <jaxb:typesafeEnumClass name="IssueSeverityType"/>
-    </jaxb:bindings>
-    
-    <jaxb:bindings node="xsd:simpleType[@name='IssueType-list']">
-        <jaxb:typesafeEnumClass name="IssueCodeType"/>
-    </jaxb:bindings>
-    
-    <!--====================================================================================================
     = COMPLEX TYPES
     =====================================================================================================-->
-    <jaxb:bindings node="xsd:complexType[@name='IssueType']">
-        <jaxb:class name="IssueCode"/>
-    </jaxb:bindings>
-    
     <jaxb:bindings node="xsd:complexType[@name='ResourceContainer']">
         <jaxb:bindings node="xsd:choice">
             <jaxb:property name="content"/>

@@ -2,22 +2,22 @@ package gov.hhs.onc.sdcct.fhir.ws.impl;
 
 import gov.hhs.onc.sdcct.fhir.CodeableConcept;
 import gov.hhs.onc.sdcct.fhir.Coding;
+import gov.hhs.onc.sdcct.fhir.FhirException;
+import gov.hhs.onc.sdcct.fhir.FhirVocabRepository;
+import gov.hhs.onc.sdcct.fhir.IssueSeverityList;
+import gov.hhs.onc.sdcct.fhir.IssueTypeList;
+import gov.hhs.onc.sdcct.fhir.NarrativeStatusList;
+import gov.hhs.onc.sdcct.fhir.OperationOutcome;
+import gov.hhs.onc.sdcct.fhir.OperationOutcomeIssue;
 import gov.hhs.onc.sdcct.fhir.impl.CodeableConceptImpl;
 import gov.hhs.onc.sdcct.fhir.impl.CodingImpl;
-import gov.hhs.onc.sdcct.fhir.impl.IssueCodeImpl;
 import gov.hhs.onc.sdcct.fhir.impl.IssueSeverityImpl;
+import gov.hhs.onc.sdcct.fhir.impl.IssueTypeImpl;
 import gov.hhs.onc.sdcct.fhir.impl.NarrativeImpl;
 import gov.hhs.onc.sdcct.fhir.impl.NarrativeStatusImpl;
 import gov.hhs.onc.sdcct.fhir.impl.OperationOutcomeImpl;
 import gov.hhs.onc.sdcct.fhir.impl.OperationOutcomeIssueImpl;
 import gov.hhs.onc.sdcct.fhir.impl.StringValueImpl;
-import gov.hhs.onc.sdcct.fhir.ws.FhirWebServiceException;
-import gov.hhs.onc.sdcct.fhir.FhirVocabRepository;
-import gov.hhs.onc.sdcct.fhir.IssueCodeType;
-import gov.hhs.onc.sdcct.fhir.IssueSeverityType;
-import gov.hhs.onc.sdcct.fhir.NarrativeStatusList;
-import gov.hhs.onc.sdcct.fhir.OperationOutcome;
-import gov.hhs.onc.sdcct.fhir.OperationOutcomeIssue;
 import gov.hhs.onc.sdcct.fhir.xhtml.impl.DivImpl;
 import gov.hhs.onc.sdcct.fhir.xhtml.impl.PreImpl;
 import gov.hhs.onc.sdcct.utils.SdcctExceptionUtils;
@@ -51,17 +51,17 @@ public class FhirExceptionMapper implements ExceptionMapper<Throwable> {
 
     @Override
     public Response toResponse(Throwable exception) {
-        IssueCodeType issueCodeType = IssueCodeType.EXCEPTION;
+        IssueTypeList issueType = IssueTypeList.EXCEPTION;
         CodeableConcept issueDetailConcept = null;
         Status respStatus = Status.INTERNAL_SERVER_ERROR;
 
-        if (exception instanceof FhirWebServiceException) {
-            FhirWebServiceException fhirWsException = ((FhirWebServiceException) exception);
-            issueCodeType = fhirWsException.getIssueCodeType();
-            respStatus = fhirWsException.getResponseStatus();
+        if (exception instanceof FhirException) {
+            FhirException fhirException = ((FhirException) exception);
+            issueType = fhirException.getIssueType();
+            respStatus = fhirException.getResponseStatus();
 
-            if (fhirWsException.hasIssueDetailConceptParts()) {
-                Pair<String, Object[]> issueDetailConceptParts = fhirWsException.getIssueDetailConceptParts();
+            if (fhirException.hasIssueDetailConceptParts()) {
+                Pair<String, Object[]> issueDetailConceptParts = fhirException.getIssueDetailConceptParts();
                 String issueDetailConceptCode = issueDetailConceptParts.getKey();
                 CodeableConcept baseIssueDetailConcept = this.vocabRepo.getValueSetConcepts().get(OP_OUTCOME_VALUE_SET_ID, issueDetailConceptCode);
 
@@ -82,8 +82,8 @@ public class FhirExceptionMapper implements ExceptionMapper<Throwable> {
         }
 
         OperationOutcomeIssue opOutcomeIssue =
-            new OperationOutcomeIssueImpl().setCode(new IssueCodeImpl().setValue(issueCodeType)).setDetails(issueDetailConcept)
-                .setSeverity(new IssueSeverityImpl().setValue(IssueSeverityType.ERROR));
+            new OperationOutcomeIssueImpl().setCode(new IssueTypeImpl().setValue(issueType)).setDetails(issueDetailConcept)
+                .setSeverity(new IssueSeverityImpl().setValue(IssueSeverityList.ERROR));
         OperationOutcome opOutcome = new OperationOutcomeImpl().addIssue(opOutcomeIssue);
 
         if (MessageUtils.getContextualBoolean(JAXRSUtils.getCurrentMessage(), WsPropertyNames.ERROR_STACK_TRACE, false)) {
