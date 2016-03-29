@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FormDesign xmlns="http://healthIT.gov/sdc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://healthIT.gov/sdc SDCFormDesign.xsd"
-   formID="ID=129/v=2.004.001/" baseItemURI="https://cap.org/ecc/sdc" responseTypeEnum="initial" formInstanceURI="8w74d7w3678348347b6587423b"
+   ID="ID=129/v=2.004.001/" baseURI="https://cap.org/ecc/sdc" responseTypeEnum="initial" formInstanceURI="8w74d7w3678348347b6587423b"
    formInstanceVersionURI="8w74d7w3678348347b6587423b/v.1">
 
    <!-- @styleClass: left, right, noBreak, header_text, title, body, linkIcon, 
