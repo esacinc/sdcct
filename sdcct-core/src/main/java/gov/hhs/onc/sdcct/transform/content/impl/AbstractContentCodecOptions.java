@@ -9,10 +9,10 @@ import javax.annotation.Nullable;
 import net.sf.saxon.lib.ParseOptions;
 
 public abstract class AbstractContentCodecOptions<T extends ContentCodecOptions<T>> extends AbstractOptions<T> implements ContentCodecOptions<T> {
-    private final static long serialVersionUID = 0L;
-
     protected ParseOptions parseOpts;
     protected Properties outProps;
+
+    private final static long serialVersionUID = 0L;
 
     protected AbstractContentCodecOptions(Supplier<T> optsBuilder) {
         this(optsBuilder, null, null);

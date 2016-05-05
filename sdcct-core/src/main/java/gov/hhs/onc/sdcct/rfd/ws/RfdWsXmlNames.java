@@ -1,8 +1,8 @@
 package gov.hhs.onc.sdcct.rfd.ws;
 
-public final class RfdWsXmlNames {
-    public final static String DELIM = "_";
+import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
 
+public final class RfdWsXmlNames {
     public final static String ARCHIVE_AFFIX = "Archive";
     public final static String CLARIFICATION_AFFIX = "Clarification";
     public final static String FORM_AFFIX = "Form";
@@ -14,11 +14,11 @@ public final class RfdWsXmlNames {
     public final static String RFD_PREFIX = "RFD";
     public final static String RFD_FORM_PREFIX = RFD_PREFIX + FORM_AFFIX;
 
-    public final static String SOAP_12_SUFFIX = DELIM + "Soap12";
-    public final static String BINDING_SOAP_12_SUFFIX = DELIM + "Binding" + SOAP_12_SUFFIX;
-    public final static String MSG_SUFFIX = DELIM + "Message";
-    public final static String SERVICE_SUFFIX = DELIM + "Service";
-    public final static String PORT_SUFFIX = DELIM + "Port";
+    public final static String SOAP_12_SUFFIX = "_Soap12";
+    public final static String BINDING_SOAP_12_SUFFIX = "_Binding" + SOAP_12_SUFFIX;
+    public final static String MSG_SUFFIX = "_Message";
+    public final static String SERVICE_SUFFIX = "_Service";
+    public final static String PORT_SUFFIX = "_Port";
     public final static String PORT_SOAP_12_SUFFIX = PORT_SUFFIX + SOAP_12_SUFFIX;
     public final static String PORT_TYPE_SUFFIX = PORT_SUFFIX + "Type";
 
@@ -47,10 +47,10 @@ public final class RfdWsXmlNames {
     public final static String SUBMIT_FORM_RESP = SUBMIT_FORM + RESP_AFFIX;
     public final static String SUBMIT_FORM_RESP_MSG = SUBMIT_FORM_RESP + MSG_SUFFIX;
 
-    public final static String ARCHIVE_FORM_OP = FORM_ARCHIVER + DELIM + ARCHIVE_FORM;
-    public final static String RETRIEVE_CLARIFICATION_OP = FORM_MANAGER + DELIM + RETRIEVE_CLARIFICATION;
-    public final static String RETRIEVE_FORM_OP = FORM_MANAGER + DELIM + RETRIEVE_FORM;
-    public final static String SUBMIT_FORM_OP = FORM_RECEIVER + DELIM + SUBMIT_FORM;
+    public final static String ARCHIVE_FORM_OP = FORM_ARCHIVER + SdcctStringUtils.UNDERSCORE + ARCHIVE_FORM;
+    public final static String RETRIEVE_CLARIFICATION_OP = FORM_MANAGER + SdcctStringUtils.UNDERSCORE + RETRIEVE_CLARIFICATION;
+    public final static String RETRIEVE_FORM_OP = FORM_MANAGER + SdcctStringUtils.UNDERSCORE + RETRIEVE_FORM;
+    public final static String SUBMIT_FORM_OP = FORM_RECEIVER + SdcctStringUtils.UNDERSCORE + SUBMIT_FORM;
 
     public final static String FORM_ARCHIVER_PORT_TYPE = FORM_ARCHIVER + PORT_TYPE_SUFFIX;
     public final static String FORM_ARCHIVER_BINDING = FORM_ARCHIVER + BINDING_SOAP_12_SUFFIX;

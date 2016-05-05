@@ -4,6 +4,7 @@ import org.springframework.beans.factory.SmartFactoryBean;
 
 public abstract class AbstractSdcctFactoryBean<T> implements SmartFactoryBean<T> {
     protected Class<T> beanClass;
+    protected boolean eagerInit = true;
     protected boolean prototype;
 
     protected AbstractSdcctFactoryBean(Class<T> beanClass) {
@@ -12,7 +13,11 @@ public abstract class AbstractSdcctFactoryBean<T> implements SmartFactoryBean<T>
 
     @Override
     public boolean isEagerInit() {
-        return true;
+        return this.eagerInit;
+    }
+
+    public void setEagerInit(boolean eagerInit) {
+        this.eagerInit = eagerInit;
     }
 
     @Override

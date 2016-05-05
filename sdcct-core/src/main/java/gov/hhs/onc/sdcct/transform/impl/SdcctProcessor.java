@@ -1,5 +1,8 @@
 package gov.hhs.onc.sdcct.transform.impl;
 
+import gov.hhs.onc.sdcct.xml.impl.SdcctDocumentBuilder;
+import gov.hhs.onc.sdcct.xml.impl.SdcctSerializer;
+import gov.hhs.onc.sdcct.xml.xpath.impl.SdcctXpathCompiler;
 import java.io.File;
 import java.io.OutputStream;
 import java.io.Writer;
@@ -42,6 +45,11 @@ public class SdcctProcessor extends Processor {
     @Override
     public SdcctSerializer newSerializer() {
         return new SdcctSerializer(this);
+    }
+
+    @Override
+    public SdcctXpathCompiler newXPathCompiler() {
+        return new SdcctXpathCompiler(this);
     }
 
     @Override

@@ -1,29 +1,22 @@
 package gov.hhs.onc.sdcct.xml.impl;
 
-import com.ctc.wstx.sax.WstxSAXParser;
 import gov.hhs.onc.sdcct.io.impl.ByteArrayResult;
 import gov.hhs.onc.sdcct.io.impl.ByteArraySource;
 import gov.hhs.onc.sdcct.transform.content.SdcctContentType;
 import gov.hhs.onc.sdcct.transform.content.impl.AbstractContentCodec;
 import gov.hhs.onc.sdcct.transform.content.impl.ContentDecodeOptions;
 import gov.hhs.onc.sdcct.transform.content.impl.ContentEncodeOptions;
-import gov.hhs.onc.sdcct.transform.impl.SdcctDocumentBuilder;
-import gov.hhs.onc.sdcct.transform.impl.SdcctSerializer;
 import gov.hhs.onc.sdcct.xml.jaxb.JaxbContextRepository;
 import gov.hhs.onc.sdcct.xml.jaxb.impl.JaxbResult;
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
-import javax.xml.transform.sax.SAXSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class XmlCodec extends AbstractContentCodec {
     @Autowired
     private JaxbContextRepository jaxbContextRepo;
-
-    @Autowired
-    private SdcctSaxParserFactory saxParserFactory;
 
     @Autowired
     private SdcctDocumentBuilder docBuilder;
@@ -65,9 +58,9 @@ public class XmlCodec extends AbstractContentCodec {
     public <T> T decode(Source src, Class<T> resultClass, @Nullable ContentDecodeOptions opts) throws Exception {
         JaxbResult<T> result = this.jaxbContextRepo.buildResult(resultClass, null);
 
-        WstxSAXParser saxParser = this.saxParserFactory.newSAXParser();
-        saxParser.setContentHandler(result.getHandler());
-        saxParser.parse(SAXSource.sourceToInputSource(src));
+        this.encode(src, result, null);
+
+        result.close();
 
         return result.getResult();
     }

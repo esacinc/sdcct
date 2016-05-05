@@ -1,43 +1,50 @@
 package gov.hhs.onc.sdcct.form.manager.impl;
 
+import com.github.sebhoss.warnings.CompilerWarnings;
+import gov.hhs.onc.sdcct.data.db.DbPropertyNames;
 import gov.hhs.onc.sdcct.fhir.Bundle;
-import gov.hhs.onc.sdcct.fhir.BundleTypeList;
-import gov.hhs.onc.sdcct.fhir.FhirFormRegistry;
-import gov.hhs.onc.sdcct.fhir.FhirFormSearchService;
+import gov.hhs.onc.sdcct.fhir.BundleType;
+import gov.hhs.onc.sdcct.fhir.FhirResourceRegistry;
+import gov.hhs.onc.sdcct.fhir.FhirResourceSearchService;
 import gov.hhs.onc.sdcct.fhir.Questionnaire;
 import gov.hhs.onc.sdcct.fhir.impl.BundleEntryImpl;
 import gov.hhs.onc.sdcct.fhir.impl.BundleImpl;
-import gov.hhs.onc.sdcct.fhir.impl.BundleTypeImpl;
+import gov.hhs.onc.sdcct.fhir.impl.BundleTypeComponentImpl;
 import gov.hhs.onc.sdcct.fhir.impl.QuestionnaireImpl;
 import gov.hhs.onc.sdcct.fhir.impl.ResourceContainerImpl;
-import gov.hhs.onc.sdcct.fhir.impl.UnsignedIntImpl;
+import gov.hhs.onc.sdcct.fhir.impl.UnsignedIntTypeImpl;
 import gov.hhs.onc.sdcct.form.impl.AbstractFormService;
 import gov.hhs.onc.sdcct.form.manager.FormManager;
 import gov.hhs.onc.sdcct.io.impl.ResourceSource;
-import gov.hhs.onc.sdcct.rfd.RfdFormRegistry;
-import gov.hhs.onc.sdcct.rfd.RfdFormSearchService;
+import gov.hhs.onc.sdcct.rfd.RfdResourceRegistry;
+import gov.hhs.onc.sdcct.rfd.RfdResourceSearchService;
 import gov.hhs.onc.sdcct.sdc.FormDesignType;
 import gov.hhs.onc.sdcct.sdc.impl.FormDesignTypeImpl;
 import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
 import java.math.BigInteger;
 import java.util.List;
 import javax.annotation.Nullable;
+import javax.annotation.Resource;
 import javax.ws.rs.core.MultivaluedMap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class FormManagerImpl extends AbstractFormService implements FormManager {
-    @Autowired
-    private FhirFormRegistry fhirFormRegistry;
+    @Resource(name = "registryResourceFhirQuestionnaire")
+    @SuppressWarnings({ "SpringJavaAutowiringInspection" })
+    private FhirResourceRegistry<Questionnaire> questionnaireRegistry;
 
-    @Autowired
-    private FhirFormSearchService fhirFormSearchService;
+    @Resource(name = "searchServiceResourceFhirQuestionnaire")
+    @SuppressWarnings({ "SpringJavaAutowiringInspection" })
+    private FhirResourceSearchService<Questionnaire> questionnaireSearchService;
 
-    @Autowired
-    private RfdFormRegistry rfdFormRegistry;
+    @Resource(name = "registryResourceRfdFormDesign")
+    @SuppressWarnings({ "SpringJavaAutowiringInspection" })
+    private RfdResourceRegistry<FormDesignType> formDesignRegistry;
 
-    @Autowired
-    private RfdFormSearchService rfdFormSearchService;
+    @Resource(name = "searchServiceResourceRfdFormDesign")
+    @SuppressWarnings({ "SpringJavaAutowiringInspection" })
+    private RfdResourceSearchService<FormDesignType> formDesignSearchService;
 
     @Autowired
     private XmlCodec xmlCodec;
@@ -47,16 +54,18 @@ public class FormManagerImpl extends AbstractFormService implements FormManager 
 
     @Nullable
     @Override
+    @SuppressWarnings({ CompilerWarnings.UNCHECKED })
     public FormDesignType findFormDesign(String id) throws Exception {
-        return this.rfdFormRegistry.findByNaturalId(id);
+        return this.formDesignRegistry.find(this.formDesignRegistry.buildCriteria((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(
+            root.join(DbPropertyNames.TOKEN_SEARCH_PARAMS).get(DbPropertyNames.VALUE), id)));
     }
 
     @Override
     public Bundle findQuestionnaires(MultivaluedMap<String, String> params) throws Exception {
-        List<Questionnaire> questionnaires = this.fhirFormSearchService.search(params);
+        List<Questionnaire> questionnaires = this.questionnaireSearchService.search(params);
         Bundle bundle =
-            new BundleImpl().setTotal(new UnsignedIntImpl().setValue(BigInteger.valueOf(questionnaires.size()))).setType(
-                new BundleTypeImpl().setValue(BundleTypeList.SEARCHSET));
+            new BundleImpl().setTotal(new UnsignedIntTypeImpl().setValue(BigInteger.valueOf(questionnaires.size()))).setType(
+                new BundleTypeComponentImpl().setValue(BundleType.SEARCHSET));
 
         questionnaires.stream().forEach(
             questionnaire -> bundle.addEntry(new BundleEntryImpl().setId(questionnaire.getId().getValue()).setResource(
@@ -67,19 +76,26 @@ public class FormManagerImpl extends AbstractFormService implements FormManager 
 
     @Nullable
     @Override
+    @SuppressWarnings({ CompilerWarnings.UNCHECKED })
     public Questionnaire findQuestionnaire(String id) throws Exception {
-        return this.fhirFormRegistry.findByNaturalId(id);
+        return this.questionnaireRegistry.find(this.questionnaireRegistry.buildCriteria((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root
+            .join(DbPropertyNames.TOKEN_SEARCH_PARAMS).get(DbPropertyNames.VALUE), id)));
     }
 
     @Override
+    @SuppressWarnings({ CompilerWarnings.UNCHECKED })
     public void afterPropertiesSet() throws Exception {
         if (this.hasInternalQuestionnaireSources()) {
             Questionnaire internalQuestionnaire;
 
             for (ResourceSource internalQuestionnaireSrc : this.internalQuestionnaireSrcs) {
-                if (!this.fhirFormRegistry.existsByNaturalId((internalQuestionnaire =
-                    this.xmlCodec.decode(internalQuestionnaireSrc, QuestionnaireImpl.class, null)).getId().getValue())) {
-                    this.fhirFormRegistry.save(internalQuestionnaire);
+                final String internalIdentifier =
+                    (internalQuestionnaire = this.xmlCodec.decode(internalQuestionnaireSrc, QuestionnaireImpl.class, null)).getIdentifiers().get(0).getValue()
+                        .getValue();
+
+                if (!this.questionnaireRegistry.exists(this.questionnaireRegistry.buildCriteria((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder
+                    .equal(root.join(DbPropertyNames.TOKEN_SEARCH_PARAMS).get(DbPropertyNames.VALUE), internalIdentifier)))) {
+                    this.questionnaireRegistry.save(internalQuestionnaire);
                 }
             }
         }
@@ -88,9 +104,11 @@ public class FormManagerImpl extends AbstractFormService implements FormManager 
             FormDesignType internalFormDesign;
 
             for (ResourceSource internalFormDesignSrc : this.internalFormDesignSrcs) {
-                if (!this.rfdFormRegistry.existsByNaturalId((internalFormDesign = this.xmlCodec.decode(internalFormDesignSrc, FormDesignTypeImpl.class, null))
-                    .getFormID())) {
-                    this.rfdFormRegistry.save(internalFormDesign);
+                final String internalIdentifier = (internalFormDesign = this.xmlCodec.decode(internalFormDesignSrc, FormDesignTypeImpl.class, null)).getId();
+
+                if (!this.formDesignRegistry.exists(this.formDesignRegistry.buildCriteria((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root
+                    .join(DbPropertyNames.TOKEN_SEARCH_PARAMS).get(DbPropertyNames.VALUE), internalIdentifier)))) {
+                    this.formDesignRegistry.save(internalFormDesign);
                 }
             }
         }

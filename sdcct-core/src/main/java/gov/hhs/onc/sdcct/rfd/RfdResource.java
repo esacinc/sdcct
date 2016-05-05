@@ -1,6 +1,6 @@
 package gov.hhs.onc.sdcct.rfd;
 
-import gov.hhs.onc.sdcct.data.ResourceEntity;
+import gov.hhs.onc.sdcct.data.SdcctResource;
 
-public interface RfdResource extends ResourceEntity {
+public interface RfdResource extends SdcctResource {
 }

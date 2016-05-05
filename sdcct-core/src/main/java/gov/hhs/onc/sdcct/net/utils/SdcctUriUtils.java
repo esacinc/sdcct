@@ -1,13 +1,10 @@
 package gov.hhs.onc.sdcct.net.utils;
 
+import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
+
 public final class SdcctUriUtils {
-    public final static String ARCHIVE_PATH_DELIM = "!";
-    public final static String PATH_DELIM = "/";
-
-    public final static String PATH_PARAM_PREFIX = "{";
-
-    public final static String PATH_PARAM_SUFFIX = "}";
-
+    public final static String HIERARCHICAL_DELIM = SdcctStringUtils.COLON + SdcctStringUtils.SLASH + SdcctStringUtils.SLASH;
+    
     private SdcctUriUtils() {
     }
 }

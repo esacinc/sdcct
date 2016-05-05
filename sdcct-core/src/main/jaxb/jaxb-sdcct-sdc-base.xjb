@@ -3,7 +3,7 @@
     jaxb:extensionBindingPrefixes="annox xjc"
     jaxb:version="2.0"
     node="/xsd:schema"
-    schemaLocation="../schema/SDC/SDCBase.xsd"
+    schemaLocation="../schema/sdc/SDCBase.xsd"
     xmlns:annox="http://annox.dev.java.net"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
     xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
@@ -15,15 +15,4 @@
     <jaxb:schemaBindings>
         <jaxb:package name="gov.hhs.onc.sdcct.sdc"/>
     </jaxb:schemaBindings>
-    
-    <!--====================================================================================================
-    = COMPLEX TYPES
-    =====================================================================================================-->
-    <jaxb:bindings node="xsd:complexType[@name='BaseType']">
-        <jaxb:class implClass="gov.hhs.onc.sdcct.sdc.impl.AbstractBaseType"/>
-    </jaxb:bindings>
-    
-    <jaxb:bindings node="xsd:complexType[@name='ExtensionBaseType']">
-        <jaxb:class implClass="gov.hhs.onc.sdcct.sdc.impl.AbstractExtensionBaseType"/>
-    </jaxb:bindings>
  </jaxb:bindings>

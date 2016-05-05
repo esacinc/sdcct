@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    
+    <!--====================================================================================================
+    = OBJECT FACTORIES
+    =====================================================================================================-->
+    <beans:bean id="objFactoryFhir" class="gov.hhs.onc.sdcct.fhir.ObjectFactory"/>
+    
+    <beans:bean id="objFactoryFhirImpl" class="gov.hhs.onc.sdcct.fhir.impl.ObjectFactory"/>
+    
+    <beans:bean id="objFactoryFhirXhtml" class="gov.hhs.onc.sdcct.fhir.xhtml.ObjectFactory"/>
+    
+    <beans:bean id="objFactoryFhirXhtmlImpl" class="gov.hhs.onc.sdcct.fhir.xhtml.impl.ObjectFactory"/>
+    
+    <beans:bean id="objFactoryRfd" class="gov.hhs.onc.sdcct.rfd.ObjectFactory"/>
+    
+    <beans:bean id="objFactoryRfdImpl" class="gov.hhs.onc.sdcct.rfd.impl.ObjectFactory"/>
+    
+    <beans:bean id="objFactorySdc" class="gov.hhs.onc.sdcct.sdc.ObjectFactory"/>
+    
+    <beans:bean id="objFactorySdcImpl" class="gov.hhs.onc.sdcct.sdc.impl.ObjectFactory"/>
+    
+    <!--====================================================================================================
+    = CHARACTER ESCAPE HANDLERS
+    =====================================================================================================-->
+    <beans:bean id="charEscapeHandlerNio" class="com.sun.xml.bind.marshaller.NioEscapeHandler"
+        c:charsetName="#{ T(java.nio.charset.StandardCharsets).UTF_8.name() }"/>
+    
+    <!--====================================================================================================
+    = JAXB CONTEXT INFOS
+    =====================================================================================================-->
+    <beans:bean id="jaxbContextInfo" class="gov.hhs.onc.sdcct.xml.jaxb.impl.JaxbContextInfoImpl" abstract="true"/>
+    
+    <!--====================================================================================================
+    = JAXB CONTEXT REPOSITORIES
+    =====================================================================================================-->
+    <beans:bean id="jaxbContextRepo" class="gov.hhs.onc.sdcct.xml.jaxb.impl.JaxbContextRepositoryImpl">
+        <beans:property name="contextInfos">
+            <beans:array>
+                <beans:bean parent="jaxbContextInfo"
+                    c:id="FHIR">
+                    <beans:property name="objectFactories">
+                        <beans:array>
+                            <beans:ref bean="objFactoryFhirImpl"/>
+                            <beans:ref bean="objFactoryFhirXhtmlImpl"/>
+                        </beans:array>
+                    </beans:property>
+                </beans:bean>
+                <beans:bean parent="jaxbContextInfo"
+                    c:id="RFD">
+                    <beans:property name="objectFactories">
+                        <beans:array>
+                            <beans:ref bean="objFactoryRfdImpl"/>
+                            <beans:ref bean="objFactorySdcImpl"/>
+                        </beans:array>
+                    </beans:property>
+                </beans:bean>
+            </beans:array>
+        </beans:property>
+        <beans:property name="defaultMarshallerProperties">
+            <beans:map>
+                <!--
+                TODO: use canonicalization for marshalling FHIR resources
+                -->
+                <!--<beans:entry key="#{ T(com.sun.xml.bind.api.JAXBRIContext).CANONICALIZATION_SUPPORT }" value="true" value-type="java.lang.Boolean"/>-->
+                <beans:entry key="#{ T(com.sun.xml.bind.marshaller.CharacterEscapeHandler).name }" value-ref="charEscapeHandlerNio"/>
+                <beans:entry key="#{ T(javax.xml.bind.Marshaller).JAXB_ENCODING }" value="#{ T(java.nio.charset.StandardCharsets).UTF_8.name() }"/>
+            </beans:map>
+        </beans:property>
+    </beans:bean>
+</beans:beans>

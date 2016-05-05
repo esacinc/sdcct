@@ -15,11 +15,11 @@ public final class SdcctStringUtils {
         public SdcctToStringStyle() {
             super();
 
-            this.setArrayEnd("]");
+            this.setArrayEnd(R_BRACKET);
             this.setArraySeparator(", ");
-            this.setArrayStart("[");
-            this.setContentEnd("}");
-            this.setContentStart("{");
+            this.setArrayStart(L_BRACKET);
+            this.setContentEnd(R_BRACE);
+            this.setContentStart(L_BRACE);
             this.setFieldSeparator(", ");
             this.setNullText("null");
             this.setUseClassName(false);
@@ -36,11 +36,23 @@ public final class SdcctStringUtils {
         }
     }
 
+    public final static String APOS = "!";
+    public final static char APOS_CHAR = '!';
+
+    public final static String ASTERISK = "*";
+    public final static char ASTERISK_CHAR = '*';
+
+    public final static String CARET = "^";
+    public final static char CARET_CHAR = '^';
+
     public final static String COLON = ":";
     public final static char COLON_CHAR = ':';
 
     public final static String COMMA = ",";
     public final static char COMMA_CHAR = ',';
+
+    public final static String DOLLAR_SIGN = "$";
+    public final static char DOLLAR_SIGN_CHAR = '$';
 
     public final static String EQUALS = "=";
     public final static char EQUALS_CHAR = '=';
@@ -48,8 +60,29 @@ public final class SdcctStringUtils {
     public final static String HYPHEN = "-";
     public final static char HYPHEN_CHAR = '-';
 
+    public final static String L_BRACE = "{";
+    public final static char L_BRACE_CHAR = '{';
+
+    public final static String L_BRACKET = "[";
+    public final static char L_BRACKET_CHAR = '[';
+
     public final static String PERIOD = ".";
     public final static char PERIOD_CHAR = '.';
+
+    public final static String PLUS = "+";
+    public final static char PLUS_CHAR = '+';
+
+    public final static String QUESTION_MARK = "?";
+    public final static char QUESTION_MARK_CHAR = '?';
+
+    public final static String R_BRACE = "}";
+    public final static char R_BRACE_CHAR = '}';
+
+    public final static String R_BRACKET = "]";
+    public final static char R_BRACKET_CHAR = ']';
+
+    public final static String SLASH = "/";
+    public final static char SLASH_CHAR = '/';
 
     public final static String UNDERSCORE = "_";
     public final static char UNDERSCORE_CHAR = '_';
@@ -58,19 +91,28 @@ public final class SdcctStringUtils {
     }
 
     public static String joinCamelCase(String ... strParts) {
+        return joinCamelCase(false, strParts);
+    }
+
+    public static String joinCamelCase(boolean capitalize, String ... strParts) {
         if (strParts.length == 0) {
             return StringUtils.EMPTY;
-        } else if (strParts.length == 1) {
-            return strParts[0].toLowerCase();
+        }
+
+        String strPart;
+
+        if (strParts.length == 1) {
+            strPart = strParts[0].toLowerCase();
+
+            return (capitalize ? StringUtils.capitalize(strPart) : strPart);
         }
 
         StrBuilder strBuilder = new StrBuilder();
-        String strPart;
 
         for (int a = 0; a < strParts.length; a++) {
             strPart = strParts[a].toLowerCase();
 
-            if (a > 0) {
+            if (capitalize || (a > 0)) {
                 strPart = StringUtils.capitalize(strPart);
             }
 

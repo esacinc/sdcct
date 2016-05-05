@@ -50,7 +50,7 @@
                 <beans:bean class="net.logstash.logback.composite.loggingevent.CallerDataJsonProvider"/>
                 <beans:bean class="net.logstash.logback.composite.loggingevent.LoggerNameJsonProvider"/>
                 <beans:bean class="net.logstash.logback.composite.loggingevent.LoggingEventFormattedTimestampJsonProvider"
-                    p:timeZone="#{ timeZoneUtc.ID }"/>
+                    p:timeZone="#{ T(gov.hhs.onc.sdcct.utils.SdcctDateUtils).UTC_TZ_ID }"/>
                 <beans:bean class="net.logstash.logback.composite.loggingevent.LogLevelJsonProvider"/>
                 <beans:bean class="net.logstash.logback.composite.loggingevent.LogLevelValueJsonProvider"/>
                 <beans:ref bean="jsonProvMarkerField"/>

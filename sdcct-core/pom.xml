@@ -19,6 +19,8 @@
     <properties>
         <!-- Project properties -->
         <project.basedir.all>${project.basedir}/..</project.basedir.all>
+        <!-- Project build JAXB properties -->
+        <project.build.jaxbDirectory>${project.build.outputDirectory}/META-INF/sdcct/jaxb</project.build.jaxbDirectory>
         <!-- Project build JAXB source properties -->
         <project.build.jaxbSourceDirectory>${project.basedir}/src/main/jaxb</project.build.jaxbSourceDirectory>
         <project.build.jaxbFhirGeneratedSourceDirectory>${project.build.directory}/generated-sources/jaxb-fhir</project.build.jaxbFhirGeneratedSourceDirectory>
@@ -28,8 +30,8 @@
         <project.build.schemaDirectory>${project.build.outputDirectory}/META-INF/sdcct/schema</project.build.schemaDirectory>
         <!-- Project build XML schema source properties -->
         <project.build.schemaSourceDirectory>${project.basedir}/src/main/schema</project.build.schemaSourceDirectory>
-        <!-- Project build vocabulary source properties -->
-        <project.build.vocabFhirValueSetDataFile>${project.basedir}/src/main/resources/META-INF/sdcct/data/vocab/fhir/valuesets.xml</project.build.vocabFhirValueSetDataFile>
+        <!-- Project build XML schematron properties -->
+        <project.build.schematronDirectory>${project.build.outputDirectory}/META-INF/sdcct/schematron</project.build.schematronDirectory>
         <!-- Project build WSDL properties -->
         <project.build.wsdlDirectory>${project.build.outputDirectory}/META-INF/sdcct/wsdl</project.build.wsdlDirectory>
         <!-- Project build WSDL source properties -->
@@ -254,6 +256,14 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjrt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
         </dependency>
@@ -301,6 +311,18 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-ehcache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-envers</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-java8</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -379,6 +401,14 @@
             <artifactId>spring-boot</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-jpa</artifactId>
+        </dependency>
+        <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
         </dependency>
@@ -433,8 +463,26 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>copy-resources-jaxb</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.jaxbDirectory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.jaxbSourceDirectory}</directory>
+                                    <includes>
+                                        <include>*.xjb</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>copy-resources-schema</id>
-                        <phase>generate-resources</phase>
+                        <phase>generate-sources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -452,7 +500,7 @@
                     </execution>
                     <execution>
                         <id>copy-resources-wsdl</id>
-                        <phase>generate-resources</phase>
+                        <phase>generate-sources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -462,7 +510,7 @@
                                 <resource>
                                     <directory>${project.build.wsdlSourceDirectory}</directory>
                                     <includes>
-                                        <include>*.wsdl</include>
+                                        <include>**/*.wsdl</include>
                                     </includes>
                                 </resource>
                             </resources>
@@ -530,6 +578,16 @@
                         <groupId>com.sun.xml.bind</groupId>
                         <artifactId>jaxb-xjc</artifactId>
                         <version>2.2.11</version>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>com.sun.xml.bind</groupId>
+                                <artifactId>jaxb-impl</artifactId>
+                            </exclusion>
+                            <exclusion>
+                                <groupId>javax.xml.bind</groupId>
+                                <artifactId>jsr173_api</artifactId>
+                            </exclusion>
+                        </exclusions>
                     </dependency>
                     <dependency>
                         <groupId>com.sun.xml.ws</groupId>
@@ -608,10 +666,16 @@
                                 <property>
                                     <name>srcIncludes</name>
                                     <value>
+                                        gov/hhs/onc/sdcct/*.java
                                         gov/hhs/onc/sdcct/beans/*.java
+                                        gov/hhs/onc/sdcct/impl/*.java
+                                        gov/hhs/onc/sdcct/io/**/*.java
+                                        gov/hhs/onc/sdcct/net/*.java
                                         gov/hhs/onc/sdcct/net/utils/*.java
-                                        gov/hhs/onc/sdcct/xml/SdcctXmlNs.java
+                                        gov/hhs/onc/sdcct/rfd/RfdResourceType.java
                                         gov/hhs/onc/sdcct/utils/*.java
+                                        gov/hhs/onc/sdcct/xml/SdcctXmlPrefixes.java
+                                        gov/hhs/onc/sdcct/xml/utils/*.java
                                         **/*.groovy
                                     </value>
                                 </property>
@@ -622,7 +686,10 @@
                         <id>process-project-properties</id>
                     </execution>
                     <execution>
-                        <id>process-project-deps</id>
+                        <id>process-deps-fhir</id>
+                    </execution>
+                    <execution>
+                        <id>process-deps-soapui</id>
                     </execution>
                     <execution>
                         <id>generate-sources-jaxb-rfd-form-archiver</id>
@@ -632,12 +699,6 @@
                         </goals>
                         <configuration>
                             <properties>
-                                <property>
-                                    <name>args</name>
-                                    <value>
-                                        -Xsdcct
-                                    </value>
-                                </property>
                                 <property>
                                     <name>bindingIncludes</name>
                                     <value>
@@ -659,7 +720,7 @@
                                 <property>
                                     <name>schemaIncludes</name>
                                     <value>
-                                        IHE/RFD.xsd
+                                        rfd/RFD.xsd
                                     </value>
                                 </property>
                                 <property>
@@ -669,7 +730,7 @@
                                 <property>
                                     <name>wsdlIncludes</name>
                                     <value>
-                                        RFDFormArchiver.wsdl
+                                        rfd/RFDFormArchiver.wsdl
                                     </value>
                                 </property>
                                 <property>
@@ -679,13 +740,13 @@
                                 <property>
                                     <name>xmlNsPrefixes</name>
                                     <value>
-                                        rfd=gov.hhs.onc.sdcct.xml.SdcctXmlNs.IHE_PREFIX
+                                        rfd=gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes.IHE
                                     </value>
                                 </property>
                                 <property>
                                     <name>xmlNsUris</name>
                                     <value>
-                                        rfd=gov.hhs.onc.sdcct.xml.SdcctXmlNs.IHE_ITI_RFD_URI
+                                        rfd=gov.hhs.onc.sdcct.net.SdcctUris.IHE_ITI_RFD_URN_VALUE
                                     </value>
                                 </property>
                             </properties>
@@ -702,12 +763,6 @@
                         </goals>
                         <configuration>
                             <properties>
-                                <property>
-                                    <name>args</name>
-                                    <value>
-                                        -Xsdcct
-                                    </value>
-                                </property>
                                 <property>
                                     <name>bindingIncludes</name>
                                     <value>
@@ -729,7 +784,7 @@
                                 <property>
                                     <name>schemaIncludes</name>
                                     <value>
-                                        IHE/RFD.xsd
+                                        rfd/RFD.xsd
                                     </value>
                                 </property>
                                 <property>
@@ -739,7 +794,7 @@
                                 <property>
                                     <name>wsdlIncludes</name>
                                     <value>
-                                        RFDFormManager.wsdl
+                                        rfd/RFDFormManager.wsdl
                                     </value>
                                 </property>
                                 <property>
@@ -749,13 +804,13 @@
                                 <property>
                                     <name>xmlNsPrefixes</name>
                                     <value>
-                                        rfd=gov.hhs.onc.sdcct.xml.SdcctXmlNs.IHE_PREFIX
+                                        rfd=gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes.IHE
                                     </value>
                                 </property>
                                 <property>
                                     <name>xmlNsUris</name>
                                     <value>
-                                        rfd=gov.hhs.onc.sdcct.xml.SdcctXmlNs.IHE_ITI_RFD_URI
+                                        rfd=gov.hhs.onc.sdcct.net.SdcctUris.IHE_ITI_RFD_URN_VALUE
                                     </value>
                                 </property>
                             </properties>
@@ -772,12 +827,6 @@
                         </goals>
                         <configuration>
                             <properties>
-                                <property>
-                                    <name>args</name>
-                                    <value>
-                                        -Xsdcct
-                                    </value>
-                                </property>
                                 <property>
                                     <name>bindingIncludes</name>
                                     <value>
@@ -799,7 +848,7 @@
                                 <property>
                                     <name>schemaIncludes</name>
                                     <value>
-                                        IHE/RFD.xsd
+                                        rfd/RFD.xsd
                                     </value>
                                 </property>
                                 <property>
@@ -809,7 +858,7 @@
                                 <property>
                                     <name>wsdlIncludes</name>
                                     <value>
-                                        RFDFormReceiver.wsdl
+                                        rfd/RFDFormReceiver.wsdl
                                     </value>
                                 </property>
                                 <property>
@@ -819,13 +868,13 @@
                                 <property>
                                     <name>xmlNsPrefixes</name>
                                     <value>
-                                        rfd=gov.hhs.onc.sdcct.xml.SdcctXmlNs.IHE_PREFIX
+                                        rfd=gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes.IHE
                                     </value>
                                 </property>
                                 <property>
                                     <name>xmlNsUris</name>
                                     <value>
-                                        rfd=gov.hhs.onc.sdcct.xml.SdcctXmlNs.IHE_ITI_RFD_URI
+                                        rfd=gov.hhs.onc.sdcct.net.SdcctUris.IHE_ITI_RFD_URN_VALUE
                                     </value>
                                 </property>
                             </properties>
@@ -845,7 +894,7 @@
                                 <property>
                                     <name>args</name>
                                     <value>
-                                        -Xsdcct
+                                        -Xsdcct-type-rfd
                                     </value>
                                 </property>
                                 <property>
@@ -868,7 +917,7 @@
                                 <property>
                                     <name>schemaIncludes</name>
                                     <value>
-                                        SDC/SDC*.xsd
+                                        sdc/SDC*.xsd
                                     </value>
                                 </property>
                                 <property>
@@ -878,13 +927,13 @@
                                 <property>
                                     <name>xmlNsPrefixes</name>
                                     <value>
-                                        sdc=gov.hhs.onc.sdcct.xml.SdcctXmlNs.SDC_PREFIX
+                                        sdc=gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes.SDC
                                     </value>
                                 </property>
                                 <property>
                                     <name>xmlNsUris</name>
                                     <value>
-                                        sdc=gov.hhs.onc.sdcct.xml.SdcctXmlNs.SDC_URI
+                                        sdc=gov.hhs.onc.sdcct.net.SdcctUris.SDC_URL_VALUE
                                     </value>
                                 </property>
                             </properties>
@@ -904,8 +953,8 @@
                                 <property>
                                     <name>args</name>
                                     <value>
-                                        -Xsdcct
-                                        -Xsdcct-fhir
+                                        -Xsdcct-term-fhir
+                                        -Xsdcct-type-fhir
                                     </value>
                                 </property>
                                 <property>
@@ -930,7 +979,7 @@
                                 <property>
                                     <name>schemaIncludes</name>
                                     <value>
-                                        FHIR/*.xsd
+                                        fhir/*.xsd
                                     </value>
                                 </property>
                                 <property>
@@ -940,15 +989,15 @@
                                 <property>
                                     <name>xmlNsPrefixes</name>
                                     <value>
-                                        fhir=gov.hhs.onc.sdcct.xml.SdcctXmlNs.FHIR_PREFIX
-                                        fhir-xhtml=gov.hhs.onc.sdcct.xml.SdcctXmlNs.XHTML_PREFIX
-                                        fhir-xml=gov.hhs.onc.sdcct.xml.SdcctXmlNs.XML_PREFIX
+                                        fhir=gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes.FHIR
+                                        fhir-xhtml=gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes.XHTML
+                                        fhir-xml=gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes.XML
                                     </value>
                                 </property>
                                 <property>
                                     <name>xmlNsUris</name>
                                     <value>
-                                        fhir=gov.hhs.onc.sdcct.xml.SdcctXmlNs.FHIR_URI
+                                        fhir=gov.hhs.onc.sdcct.net.SdcctUris.FHIR_URL_VALUE
                                         fhir-xhtml=net.sf.saxon.lib.NamespaceConstant.XHTML
                                         fhir-xml=net.sf.saxon.lib.NamespaceConstant.XML
                                     </value>

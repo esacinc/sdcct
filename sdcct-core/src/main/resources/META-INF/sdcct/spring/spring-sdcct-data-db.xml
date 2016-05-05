@@ -2,11 +2,13 @@
 <beans:beans
     xmlns:beans="http://www.springframework.org/schema/beans"
     xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:jpa="http://www.springframework.org/schema/data/jpa"
     xmlns:p="http://www.springframework.org/schema/p"
     xmlns:tx="http://www.springframework.org/schema/tx"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
     
     <!--====================================================================================================
@@ -23,35 +25,11 @@
     <!--====================================================================================================
     = CACHES
     =====================================================================================================-->
-    <beans:bean id="cacheFormFhir" parent="cache"
+    <beans:bean id="cacheResource" parent="cache"
         p:cacheManager-ref="cacheManagerDb">
         <beans:property name="configuration">
             <beans:bean parent="cacheConfig"
-                p:name="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).FORM_FHIR }"/>
-        </beans:property>
-    </beans:bean>
-    
-    <beans:bean id="cacheFormRfd" parent="cache"
-        p:cacheManager-ref="cacheManagerDb">
-        <beans:property name="configuration">
-            <beans:bean parent="cacheConfig"
-                p:name="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).FORM_RFD }"/>
-        </beans:property>
-    </beans:bean>
-    
-    <beans:bean id="cacheFormRespFhir" parent="cache"
-        p:cacheManager-ref="cacheManagerDb">
-        <beans:property name="configuration">
-            <beans:bean parent="cacheConfig"
-                p:name="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).FORM_RESP_FHIR }"/>
-        </beans:property>
-    </beans:bean>
-    
-    <beans:bean id="cacheFormRespRfd" parent="cache"
-        p:cacheManager-ref="cacheManagerDb">
-        <beans:property name="configuration">
-            <beans:bean parent="cacheConfig"
-                p:name="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).FORM_RESP_RFD }"/>
+                p:name="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).RESOURCE }"/>
         </beans:property>
     </beans:bean>
     
@@ -61,19 +39,27 @@
     <!--suppress SpringPlaceholdersInspection -->
     <beans:bean id="dataSrc" class="gov.hhs.onc.sdcct.data.db.impl.SdcctDataSource"
         p:acquireIncrement="${sdcct.data.db.pool.acquire.increment}"
-        p:adminPassword="${sdcct.data.db.user.admin.pass}"
-        p:adminUser="${sdcct.data.db.user.admin.name}"
-        p:databaseDirectory="${sdcct.data.db.dir}"
-        p:databaseName="${sdcct.data.db.name}"
-        p:databaseServerHostAddress="${sdcct.data.db.server.host.addr}"
-        p:databaseServerPort="${sdcct.data.db.server.port}"
         p:initialPoolSize="${sdcct.data.db.pool.size.min}"
         p:maxIdleTime="${sdcct.data.db.pool.idle.time.max}"
         p:maxPoolSize="${sdcct.data.db.pool.size.max}"
         p:minPoolSize="${sdcct.data.db.pool.size.min}"
         p:password="${sdcct.data.db.user.main.pass}"
+        p:user="${sdcct.data.db.user.main.name}"/>
+    
+    <!--====================================================================================================
+    = DATABASE SERVERS
+    =====================================================================================================-->
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="dbServerHsql" class="gov.hhs.onc.sdcct.data.db.server.impl.HsqlServerImpl"
+        p:adminPassword="${sdcct.data.db.user.admin.pass}"
+        p:adminUser="${sdcct.data.db.user.admin.name}"
+        p:databaseDirectory="${sdcct.data.db.dir}"
+        p:databaseName="${sdcct.data.db.name}"
+        p:hostAddress="${sdcct.data.db.server.host.addr}"
+        p:password="${sdcct.data.db.user.main.pass}"
+        p:port="${sdcct.data.db.server.port}"
         p:user="${sdcct.data.db.user.main.name}">
-        <beans:property name="databaseInitializationScripts">
+        <beans:property name="initializationScriptSources">
             <beans:array>
                 <!--suppress SpringPlaceholdersInspection -->
                 <beans:value>classpath*:${sdcct.data.db.src.dir.path}/db-init-sdcct.sql</beans:value>
@@ -82,27 +68,29 @@
     </beans:bean>
     
     <!--====================================================================================================
-    = SESSION FACTORIES
+    = ENTITY MANAGERS
     =====================================================================================================-->
-    <beans:bean id="sessionFactory" class="gov.hhs.onc.sdcct.data.db.impl.SdcctLocalSessionFactoryBean"
+    <beans:bean id="entityManagerFactory" class="gov.hhs.onc.sdcct.data.db.impl.SdcctEntityManagerFactoryFactoryBean" depends-on="dbServerHsql"
         p:dataSource-ref="dataSrc"
-        p:packagesToScan="gov.hhs.onc.sdcct">
-        <beans:property name="attributeConverters">
-            <beans:array>
-                <beans:ref bean="attrConvResourceType"/>
-                <beans:ref bean="attrConvSearchParamType"/>
-                <beans:ref bean="attrConvUri"/>
-            </beans:array>
-        </beans:property>
+        p:packagesToScan="gov.hhs.onc.sdcct"
+        p:persistenceUnitName="sdcct">
         <beans:property name="cacheRegionFactory">
             <beans:bean class="gov.hhs.onc.sdcct.data.cache.impl.CacheRegionFactory"
                 p:cacheManager-ref="cacheManagerDb"/>
         </beans:property>
-        <beans:property name="hibernateProperties">
+        <beans:property name="jpaPropertyMap">
             <beans:map>
+                <beans:entry key="#{ T(org.hibernate.envers.configuration.EnversSettings).AUDIT_STRATEGY }"
+                    value="#{ T(org.hibernate.envers.strategy.ValidityAuditStrategy).name }"/>
+                <beans:entry key="#{ T(org.hibernate.envers.configuration.EnversSettings).AUDIT_STRATEGY_VALIDITY_END_REV_FIELD_NAME }"
+                    value="#{ T(gov.hhs.onc.sdcct.data.db.DbColumnNames).REVISION_END_ID }"/>
+                <beans:entry key="#{ T(org.hibernate.envers.configuration.EnversSettings).AUDIT_STRATEGY_VALIDITY_REVEND_TIMESTAMP_FIELD_NAME }"
+                    value="#{ T(gov.hhs.onc.sdcct.data.db.DbColumnNames).REVISION_END_TIMESTAMP }"/>
+                <beans:entry key="#{ T(org.hibernate.envers.configuration.EnversSettings).AUDIT_STRATEGY_VALIDITY_STORE_REVEND_TIMESTAMP }" value="true"/>
                 <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).AUTO_EVICT_COLLECTION_CACHE }" value="true"/>
                 <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).DIALECT }" value="#{ T(org.hibernate.dialect.HSQLDialect).name }"/>
                 <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).GENERATE_STATISTICS }" value="true"/>
+                <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).INTERCEPTOR }" value-ref="entityInterceptorLogging"/>
                 <!--suppress SpringPlaceholdersInspection -->
                 <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).STATEMENT_BATCH_SIZE }" value="${sdcct.data.db.batch.size}"/>
                 <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).LOG_SESSION_METRICS }" value="false"/>
@@ -113,6 +101,11 @@
                 <beans:entry key="#{ T(org.hibernate.search.cfg.Environment).GENERATE_STATS }" value="true"/>
                 <beans:entry key="#{ T(org.hibernate.search.cfg.Environment).LUCENE_MATCH_VERSION }"
                     value="#{ T(org.hibernate.search.cfg.Environment).DEFAULT_LUCENE_MATCH_VERSION }"/>
+                <beans:entry key="#{ T(org.hibernate.envers.configuration.EnversSettings).REVISION_FIELD_NAME }"
+                    value="#{ T(gov.hhs.onc.sdcct.data.db.DbColumnNames).REVISION_ID }"/>
+                <beans:entry key="#{ T(org.hibernate.envers.configuration.EnversSettings).REVISION_TYPE_FIELD_NAME }"
+                    value="#{ T(gov.hhs.onc.sdcct.data.db.DbColumnNames).REVISION_TYPE }"/>
+                <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).STATEMENT_INSPECTOR }" value-ref="statementInspectorLogging"/>
                 <beans:entry key="#{ T(org.hibernate.search.cfg.Environment).WORKER_ENLIST_IN_TRANSACTION }" value="true"/>
             </beans:map>
         </beans:property>
@@ -121,10 +114,10 @@
     <!--====================================================================================================
     = TRANSACTION MANAGERS
     =====================================================================================================-->
-    <beans:bean id="txManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager"
+    <beans:bean id="txManager" class="org.springframework.orm.jpa.JpaTransactionManager"
+        p:entityManagerFactory-ref="entityManagerFactory"
         p:nestedTransactionAllowed="true"
         p:rollbackOnCommitFailure="true"
-        p:sessionFactory-ref="sessionFactory"
         p:validateExistingTransaction="true"/>
     
     <!--====================================================================================================
@@ -136,4 +129,11 @@
     = TRANSACTIONS
     =====================================================================================================-->
     <tx:annotation-driven transaction-manager="txManager"/>
+    
+    <!--====================================================================================================
+    = REPOSITORIES
+    =====================================================================================================-->
+    <jpa:repositories base-class="gov.hhs.onc.sdcct.data.db.impl.SdcctRepositoryImpl" base-package="gov.hhs.onc.sdcct"
+        entity-manager-factory-ref="entityManagerFactory" factory-class="gov.hhs.onc.sdcct.data.db.impl.SdcctRepositoryFactoryBean"
+        transaction-manager-ref="txManager"/>
 </beans:beans>

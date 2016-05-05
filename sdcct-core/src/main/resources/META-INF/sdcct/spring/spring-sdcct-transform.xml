@@ -36,37 +36,6 @@
         c:config-ref="config"/>
     
     <!--====================================================================================================
-    = DOCUMENT BUILDERS
-    =====================================================================================================-->
-    <beans:bean id="docBuilder" factory-bean="processor" factory-method="newDocumentBuilder"/>
-    
-    <!--====================================================================================================
-    = SERIALIZERS
-    =====================================================================================================-->
-    <beans:bean id="serializer" class="gov.hhs.onc.sdcct.transform.impl.SdcctSerializer" abstract="true"/>
-    
-    <beans:bean id="serializerXml" parent="serializer" factory-bean="processor" factory-method="newSerializer">
-        <beans:property name="defaultOutputProperties">
-            <beans:map>
-                <beans:entry key="#{ T(javax.xml.transform.OutputKeys).METHOD }" value="xml"/>
-            </beans:map>
-        </beans:property>
-    </beans:bean>
-    
-    <!--suppress SpringBeanConstructorArgInspection -->
-    <beans:bean id="serializerXmlPretty" parent="serializerXml" factory-bean="processor" factory-method="newSerializer">
-        <beans:property name="defaultOutputProperties">
-            <beans:map merge="true">
-                <beans:entry key="#{ T(javax.xml.transform.OutputKeys).INDENT }" value="#{ T(gov.hhs.onc.sdcct.config.utils.SdcctOptionUtils).YES_VALUE }"/>
-                <!--suppress SpringPlaceholdersInspection -->
-                <beans:entry key="#{ T(net.sf.saxon.lib.SaxonOutputKeys).INDENT_SPACES }" value="${sdcct.transform.content.pretty.indent.size}"/>
-                <!--suppress SpringPlaceholdersInspection -->
-                <beans:entry key="#{ T(net.sf.saxon.lib.SaxonOutputKeys).LINE_LENGTH }" value="${sdcct.transform.content.pretty.line.len}"/>
-            </beans:map>
-        </beans:property>
-    </beans:bean>
-    
-    <!--====================================================================================================
     = CONTENT CODECS
     =====================================================================================================-->
     <beans:bean id="contentCodec" class="gov.hhs.onc.sdcct.transform.content.ContentCodec" abstract="true">

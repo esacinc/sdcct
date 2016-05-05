@@ -2,38 +2,38 @@
 <fhir:Questionnaire
     xmlns:fhir="http://hl7.org/fhir">
     
-    <fhir:id value="test1-fhir"/>
-    
-    <fhir:meta>
-        <fhir:versionId value="1"/>
-    </fhir:meta>
-    
     <fhir:language value="en-US"/>
+    
+    <fhir:identifier>
+        <fhir:value value="test1-fhir"/>
+    </fhir:identifier>
+    
+    <fhir:version value="1"/>
     
     <fhir:status value="published"/>
     
-    <fhir:group>
+    <fhir:item>
         <fhir:linkId value="section1"/>
-        <fhir:title value="Section 1"/>
         <fhir:text value="Section 1"/>
+        <fhir:type value="group"/>
         <fhir:required value="true"/>
-        <fhir:question>
+        <fhir:item>
             <fhir:linkId value="question1.1"/>
             <fhir:text value="Question 1.1"/>
             <fhir:type value="string"/>
             <fhir:required value="true"/>
-        </fhir:question>
-        <fhir:question>
+        </fhir:item>
+        <fhir:item>
             <fhir:linkId value="question1.2"/>
             <fhir:text value="Question 1.2"/>
             <fhir:type value="choice"/>
             <fhir:required value="true"/>
             <fhir:option id="question1.2-listItem1">
-                <fhir:display value="Question 1.2 ListItem 1"/>
+                <fhir:valueString value="Question 1.2 ListItem 1"/>
             </fhir:option>
             <fhir:option id="question1.2-listItem2">
-                <fhir:display value="Question 1.2 ListItem 2"/>
+                <fhir:valueString value="Question 1.2 ListItem 2"/>
             </fhir:option>
-        </fhir:question>
-    </fhir:group>
+        </fhir:item>
+    </fhir:item>
 </fhir:Questionnaire>

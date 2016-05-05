@@ -1,17 +1,13 @@
 package gov.hhs.onc.sdcct.data.db;
 
 import gov.hhs.onc.sdcct.data.SdcctEntity;
-import gov.hhs.onc.sdcct.data.db.impl.EntityMetadata;
+import gov.hhs.onc.sdcct.data.metadata.EntityMetadata;
 import org.springframework.beans.factory.InitializingBean;
 
-public interface SdcctEntityAccessor<T, U extends SdcctEntity> extends InitializingBean {
-    public Class<T> getBeanClass();
+public interface SdcctEntityAccessor<T extends SdcctEntity> extends InitializingBean {
+    public Class<T> getEntityClass();
 
-    public Class<? extends T> getBeanImplClass();
-
-    public Class<U> getEntityClass();
-
-    public Class<? extends U> getEntityImplClass();
+    public Class<? extends T> getEntityImplClass();
 
     public EntityMetadata getEntityMetadata();
 }

@@ -36,11 +36,16 @@ public class XdmDocument extends XdmNode {
         return ((DocumentInfo) super.getUnderlyingNode());
     }
 
+    public boolean hasUri() {
+        return (this.uri != null);
+    }
+
+    @Nullable
     public DocumentURI getUri() {
         return this.uri;
     }
 
-    public void setUri(DocumentURI uri) {
+    public void setUri(@Nullable DocumentURI uri) {
         this.uri = uri;
     }
 }

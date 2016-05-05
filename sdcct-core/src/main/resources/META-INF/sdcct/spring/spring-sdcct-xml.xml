@@ -43,68 +43,68 @@
     </beans:bean>
     
     <!--====================================================================================================
-    = OBJECT FACTORIES
+    = DOCUMENT BUILDERS
     =====================================================================================================-->
-    <beans:bean id="objFactoryFhir" class="gov.hhs.onc.sdcct.fhir.ObjectFactory"/>
-    
-    <beans:bean id="objFactoryFhirImpl" class="gov.hhs.onc.sdcct.fhir.impl.ObjectFactory"/>
-    
-    <beans:bean id="objFactoryFhirXhtml" class="gov.hhs.onc.sdcct.fhir.xhtml.ObjectFactory"/>
-    
-    <beans:bean id="objFactoryFhirXhtmlImpl" class="gov.hhs.onc.sdcct.fhir.xhtml.impl.ObjectFactory"/>
-    
-    <beans:bean id="objFactoryRfd" class="gov.hhs.onc.sdcct.rfd.ObjectFactory"/>
-    
-    <beans:bean id="objFactoryRfdImpl" class="gov.hhs.onc.sdcct.rfd.impl.ObjectFactory"/>
-    
-    <beans:bean id="objFactorySdc" class="gov.hhs.onc.sdcct.sdc.ObjectFactory"/>
-    
-    <beans:bean id="objFactorySdcImpl" class="gov.hhs.onc.sdcct.sdc.impl.ObjectFactory"/>
+    <beans:bean id="docBuilder" factory-bean="processor" factory-method="newDocumentBuilder"/>
     
     <!--====================================================================================================
-    = CHARACTER ESCAPE HANDLERS
+    = SERIALIZERS
     =====================================================================================================-->
-    <beans:bean id="charEscapeHandlerNio" class="com.sun.xml.bind.marshaller.NioEscapeHandler"
-        c:charsetName="#{ T(java.nio.charset.StandardCharsets).UTF_8.name() }"/>
-    
-    <!--====================================================================================================
-    = JAXB CONTEXT INFOS
-    =====================================================================================================-->
-    <beans:bean id="jaxbContextInfo" class="gov.hhs.onc.sdcct.xml.jaxb.impl.JaxbContextInfoImpl" abstract="true"/>
-    
-    <!--====================================================================================================
-    = JAXB CONTEXT REPOSITORIES
-    =====================================================================================================-->
-    <beans:bean id="jaxbContextRepo" class="gov.hhs.onc.sdcct.xml.jaxb.impl.JaxbContextRepositoryImpl">
-        <beans:property name="contextInfos">
-            <beans:array>
-                <beans:bean parent="jaxbContextInfo"
-                    c:id="FHIR">
-                    <beans:property name="objectFactories">
-                        <beans:array>
-                            <beans:ref bean="objFactoryFhirImpl"/>
-                            <beans:ref bean="objFactoryFhirXhtmlImpl"/>
-                        </beans:array>
-                    </beans:property>
-                </beans:bean>
-                <beans:bean parent="jaxbContextInfo"
-                    c:id="RFD">
-                    <beans:property name="objectFactories">
-                        <beans:array>
-                            <beans:ref bean="objFactoryRfdImpl"/>
-                            <beans:ref bean="objFactorySdcImpl"/>
-                        </beans:array>
-                    </beans:property>
-                </beans:bean>
-            </beans:array>
-        </beans:property>
-        <beans:property name="defaultMarshallerProperties">
+    <beans:bean id="serializerXml" factory-bean="processor" factory-method="newSerializer">
+        <beans:property name="defaultOutputProperties">
             <beans:map>
-                <beans:entry key="#{ T(com.sun.xml.bind.marshaller.CharacterEscapeHandler).name }" value-ref="charEscapeHandlerNio"/>
-                <beans:entry key="#{ T(javax.xml.bind.Marshaller).JAXB_ENCODING }" value="#{ T(java.nio.charset.StandardCharsets).UTF_8.name() }"/>
+                <beans:entry key="#{ T(javax.xml.transform.OutputKeys).METHOD }" value="xml"/>
             </beans:map>
         </beans:property>
     </beans:bean>
+    
+    <!--suppress SpringBeanConstructorArgInspection -->
+    <beans:bean id="serializerXmlPretty" parent="serializerXml" factory-bean="processor" factory-method="newSerializer">
+        <beans:property name="defaultOutputProperties">
+            <beans:map merge="true">
+                <beans:entry key="#{ T(javax.xml.transform.OutputKeys).INDENT }" value="#{ T(gov.hhs.onc.sdcct.config.utils.SdcctOptionUtils).YES_VALUE }"/>
+                <!--suppress SpringPlaceholdersInspection -->
+                <beans:entry key="#{ T(net.sf.saxon.lib.SaxonOutputKeys).INDENT_SPACES }" value="${sdcct.transform.content.pretty.indent.size}"/>
+                <!--suppress SpringPlaceholdersInspection -->
+                <beans:entry key="#{ T(net.sf.saxon.lib.SaxonOutputKeys).LINE_LENGTH }" value="${sdcct.transform.content.pretty.line.len}"/>
+            </beans:map>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = XML OPTIONS
+    =====================================================================================================-->
+    <beans:bean id="xmlOptsStatic" class="gov.hhs.onc.sdcct.xml.StaticXmlOptions" abstract="true"/>
+    
+    <beans:bean id="xmlOptsDynamic" class="gov.hhs.onc.sdcct.xml.DynamicXmlOptions" abstract="true"/>
+    
+    <!--====================================================================================================
+    = XPATH OPTIONS
+    =====================================================================================================-->
+    <beans:bean id="xpathOptsStatic" class="gov.hhs.onc.sdcct.xml.xpath.impl.StaticXpathOptions" parent="xmlOptsStatic" abstract="true"/>
+    
+    <beans:bean id="xpathOptsStaticFhir" parent="xpathOptsStatic" abstract="true">
+        <beans:property name="namespaces">
+            <beans:map>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes).FHIR_XPATH }" value="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).FHIR_URL_VALUE }"/>
+            </beans:map>
+        </beans:property>
+    </beans:bean>
+    
+    <beans:bean id="xpathOptsStaticRfd" parent="xpathOptsStatic" abstract="true">
+        <beans:property name="namespaces">
+            <beans:map>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes).SDC }" value="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).SDC_URL_VALUE }"/>
+            </beans:map>
+        </beans:property>
+    </beans:bean>
+    
+    <beans:bean id="xpathOptsDynamic" class="gov.hhs.onc.sdcct.xml.xpath.impl.DynamicXpathOptions" parent="xmlOptsDynamic" abstract="true"/>
+    
+    <!--====================================================================================================
+    = XPATH COMPILERS
+    =====================================================================================================-->
+    <beans:bean id="xpathCompiler" factory-bean="processor" factory-method="newXPathCompiler"/>
     
     <!--====================================================================================================
     = CONTENT CODECS

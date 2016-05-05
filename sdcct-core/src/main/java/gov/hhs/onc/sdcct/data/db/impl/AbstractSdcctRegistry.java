@@ -1,37 +1,25 @@
 package gov.hhs.onc.sdcct.data.db.impl;
 
-import gov.hhs.onc.sdcct.data.ResourceEntity;
-import gov.hhs.onc.sdcct.data.db.SdcctDao;
-import gov.hhs.onc.sdcct.data.db.SdcctDataService;
+import com.github.sebhoss.warnings.CompilerWarnings;
+import gov.hhs.onc.sdcct.data.SdcctResource;
+import gov.hhs.onc.sdcct.data.db.SdcctCriteria;
+import gov.hhs.onc.sdcct.data.db.SdcctCriterion;
 import gov.hhs.onc.sdcct.data.db.SdcctRegistry;
-import gov.hhs.onc.sdcct.data.search.impl.CoordEntityImpl;
-import gov.hhs.onc.sdcct.data.search.impl.CoordSearchParamImpl;
-import gov.hhs.onc.sdcct.data.search.impl.DateSearchParamImpl;
-import gov.hhs.onc.sdcct.data.search.impl.NumberSearchParamImpl;
-import gov.hhs.onc.sdcct.data.search.impl.QuantitySearchParamImpl;
-import gov.hhs.onc.sdcct.data.search.impl.RefSearchParamImpl;
-import gov.hhs.onc.sdcct.data.search.impl.StringSearchParamImpl;
-import gov.hhs.onc.sdcct.data.search.impl.TokenSearchParamImpl;
-import gov.hhs.onc.sdcct.data.search.impl.UriSearchParamImpl;
+import gov.hhs.onc.sdcct.data.db.SdcctRepository;
+import gov.hhs.onc.sdcct.data.metadata.EntityMetadata;
 import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Supplier;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
-import org.hibernate.criterion.Criterion;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
-public abstract class AbstractSdcctRegistry<T, U extends ResourceEntity, V extends SdcctDao<U>, W extends SdcctDataService<U, V>> extends
-    AbstractSdcctDataAccessor<T, U> implements SdcctRegistry<T, U, V, W> {
+public abstract class AbstractSdcctRegistry<T, U extends SdcctResource> extends AbstractSdcctDataAccessor<T, U> implements SdcctRegistry<T, U> {
     @Autowired
-    @SuppressWarnings({ "SpringJavaAutowiringInspection" })
-    protected W dataService;
+    protected SdcctRepository<U> repo;
 
     @Autowired
     protected XmlCodec xmlCodec;
@@ -46,39 +34,34 @@ public abstract class AbstractSdcctRegistry<T, U extends ResourceEntity, V exten
     }
 
     @Override
+    @Transactional
     public boolean remove(T bean) throws Exception {
-        return this.dataService.remove(this.encode(bean));
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean removeByNaturalId(Serializable naturalId) throws Exception {
-        return this.dataService.removeByNaturalId(naturalId);
-    }
-
-    @Override
-    public boolean removeById(Serializable id) throws Exception {
-        return this.dataService.removeById(id);
+    @Transactional
+    public boolean removeById(long id) throws Exception {
+        return this.repo.removeById(id);
     }
 
     @Nonnegative
     @Override
+    @Transactional
     public long remove(SdcctCriteria<U> criteria) throws Exception {
-        return this.dataService.remove(criteria);
+        return this.repo.remove(criteria);
     }
 
     @Nonnegative
+    @Transactional
     public long save(T bean) throws Exception {
-        U entity = this.encode(bean);
-        long entityId = this.dataService.save(entity);
-
-        entity.setEntityId(entityId);
-
-        return this.dataService.save(this.buildSearchParams(bean, entity));
+        return this.repo.save(this.encode(bean));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<T> findAll(SdcctCriteria<U> criteria) throws Exception {
-        List<U> entities = this.dataService.findAll(criteria);
+        List<U> entities = this.repo.findAll(criteria);
         List<T> beans = new ArrayList<>(entities.size());
 
         if (!entities.isEmpty()) {
@@ -92,106 +75,53 @@ public abstract class AbstractSdcctRegistry<T, U extends ResourceEntity, V exten
 
     @Nullable
     @Override
-    public T findByNaturalId(Serializable naturalId) throws Exception {
-        return this.decode(this.dataService.findByNaturalId(naturalId));
+    @Transactional(readOnly = true)
+    public T findById(long id) throws Exception {
+        return this.decode(this.repo.findById(id));
     }
 
     @Nullable
     @Override
-    public T findById(Serializable id) throws Exception {
-        return this.decode(this.dataService.findById(id));
-    }
-
-    @Nullable
-    @Override
+    @Transactional(readOnly = true)
     public T find(SdcctCriteria<U> criteria) throws Exception {
-        return this.decode(this.dataService.find(criteria));
+        return this.decode(this.repo.find(criteria));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean exists(T bean) throws Exception {
-        return this.dataService.exists(this.encode(bean));
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean existsByNaturalId(Serializable naturalId) throws Exception {
-        return this.dataService.existsByNaturalId(naturalId);
+    @Transactional(readOnly = true)
+    public boolean existsById(long id) throws Exception {
+        return this.repo.existsById(id);
     }
 
     @Override
-    public boolean existsById(Serializable id) throws Exception {
-        return this.dataService.existsById(id);
-    }
-
-    @Override
+    @Transactional(readOnly = true)
     public boolean exists(SdcctCriteria<U> criteria) throws Exception {
-        return this.dataService.exists(criteria);
+        return this.repo.exists(criteria);
     }
 
     @Nonnegative
     @Override
+    @Transactional(readOnly = true)
     public long count(SdcctCriteria<U> criteria) throws Exception {
-        return this.dataService.count(criteria);
+        return this.repo.count(criteria);
     }
 
     @Override
+    @Transactional
     public void reindex() throws Exception {
-        this.dataService.reindex();
+        this.repo.reindex();
     }
 
     @Override
-    public SdcctCriteria<U> buildCriteria(Criterion ... criterions) {
-        return this.dataService.buildCriteria(criterions);
-    }
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        this.reindex();
-    }
-
-    protected U buildSearchParams(T bean, U entity) throws Exception {
-        entity.getCoordSearchParams().clear();
-        entity.getDateSearchParams().clear();
-        entity.getNumberSearchParams().clear();
-        entity.getQuantitySearchParams().clear();
-        entity.getRefSearchParams().clear();
-        entity.getStringSearchParams().clear();
-        entity.getTokenSearchParams().clear();
-        entity.getUriSearchParams().clear();
-
-        return entity;
-    }
-
-    protected void buildCoordSearchParam(U entity, String name, double latitude, double longitude) {
-        entity.addCoordSearchParams(new CoordSearchParamImpl(entity, name, new CoordEntityImpl(latitude, longitude)));
-    }
-
-    protected void buildDateSearchParam(U entity, String name, Date value) {
-        entity.addDateSearchParams(new DateSearchParamImpl(entity, name, value));
-    }
-
-    protected void buildNumberSearchParam(U entity, String name, BigDecimal value) {
-        entity.addNumberSearchParams(new NumberSearchParamImpl(entity, name, value));
-    }
-
-    protected void buildQuantitySearchParam(U entity, String name, @Nullable URI codeSystemUri, @Nullable String units, BigDecimal value) {
-        entity.addQuantitySearchParams(new QuantitySearchParamImpl(entity, name, codeSystemUri, units, value));
-    }
-
-    protected void buildRefSearchParam(U entity, String name, String value) {
-        entity.addRefSearchParams(new RefSearchParamImpl(entity, name, value));
-    }
-
-    protected void buildStringSearchParam(U entity, String name, String value) {
-        entity.addStringSearchParams(new StringSearchParamImpl(entity, name, value));
-    }
-
-    protected void buildTokenSearchParam(U entity, String name, @Nullable URI codeSystemUri, String value) {
-        entity.addTokenSearchParams(new TokenSearchParamImpl(entity, name, codeSystemUri, value));
-    }
-
-    protected void buildUriSearchParam(U entity, String name, URI value) {
-        entity.addUriSearchParams(new UriSearchParamImpl(entity, name, value));
+    @SuppressWarnings({ CompilerWarnings.UNCHECKED })
+    public SdcctCriteria<U> buildCriteria(SdcctCriterion<U> ... criterions) {
+        return this.repo.buildCriteria(criterions);
     }
 
     protected U encode(T bean) throws Exception {
@@ -208,6 +138,6 @@ public abstract class AbstractSdcctRegistry<T, U extends ResourceEntity, V exten
 
     @Override
     public EntityMetadata getEntityMetadata() {
-        return this.dataService.getEntityMetadata();
+        return this.repo.getEntityMetadata();
     }
 }

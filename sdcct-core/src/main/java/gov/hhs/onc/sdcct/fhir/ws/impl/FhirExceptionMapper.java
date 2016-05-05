@@ -1,23 +1,24 @@
 package gov.hhs.onc.sdcct.fhir.ws.impl;
 
 import gov.hhs.onc.sdcct.fhir.CodeableConcept;
-import gov.hhs.onc.sdcct.fhir.Coding;
-import gov.hhs.onc.sdcct.fhir.FhirException;
-import gov.hhs.onc.sdcct.fhir.FhirVocabRepository;
-import gov.hhs.onc.sdcct.fhir.IssueSeverityList;
-import gov.hhs.onc.sdcct.fhir.IssueTypeList;
-import gov.hhs.onc.sdcct.fhir.NarrativeStatusList;
+import gov.hhs.onc.sdcct.fhir.FhirFormException;
+import gov.hhs.onc.sdcct.fhir.IssueSeverity;
+import gov.hhs.onc.sdcct.fhir.IssueType;
+import gov.hhs.onc.sdcct.fhir.NarrativeStatus;
 import gov.hhs.onc.sdcct.fhir.OperationOutcome;
 import gov.hhs.onc.sdcct.fhir.OperationOutcomeIssue;
+import gov.hhs.onc.sdcct.fhir.OperationOutcomeType;
+import gov.hhs.onc.sdcct.fhir.impl.CodeTypeImpl;
 import gov.hhs.onc.sdcct.fhir.impl.CodeableConceptImpl;
 import gov.hhs.onc.sdcct.fhir.impl.CodingImpl;
-import gov.hhs.onc.sdcct.fhir.impl.IssueSeverityImpl;
-import gov.hhs.onc.sdcct.fhir.impl.IssueTypeImpl;
+import gov.hhs.onc.sdcct.fhir.impl.IssueSeverityComponentImpl;
+import gov.hhs.onc.sdcct.fhir.impl.IssueTypeComponentImpl;
 import gov.hhs.onc.sdcct.fhir.impl.NarrativeImpl;
-import gov.hhs.onc.sdcct.fhir.impl.NarrativeStatusImpl;
+import gov.hhs.onc.sdcct.fhir.impl.NarrativeStatusComponentImpl;
 import gov.hhs.onc.sdcct.fhir.impl.OperationOutcomeImpl;
 import gov.hhs.onc.sdcct.fhir.impl.OperationOutcomeIssueImpl;
-import gov.hhs.onc.sdcct.fhir.impl.StringValueImpl;
+import gov.hhs.onc.sdcct.fhir.impl.StringTypeImpl;
+import gov.hhs.onc.sdcct.fhir.impl.UriTypeImpl;
 import gov.hhs.onc.sdcct.fhir.xhtml.impl.DivImpl;
 import gov.hhs.onc.sdcct.fhir.xhtml.impl.PreImpl;
 import gov.hhs.onc.sdcct.utils.SdcctExceptionUtils;
@@ -27,8 +28,8 @@ import java.nio.charset.StandardCharsets;
 import javax.annotation.Priority;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.ext.ExceptionMapper;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.MessageUtils;
 import org.slf4j.Logger;
@@ -39,74 +40,64 @@ import org.springframework.stereotype.Component;
 @Component("provExceptionMapperFhir")
 @Priority(0)
 public class FhirExceptionMapper implements ExceptionMapper<Throwable> {
-    private final static String OP_OUTCOME_VALUE_SET_ID = "operation-outcome";
-
     private final static Logger LOGGER = LoggerFactory.getLogger(FhirExceptionMapper.class);
-
-    @Autowired
-    private FhirVocabRepository vocabRepo;
 
     @Autowired
     private XmlCodec xmlCodec;
 
     @Override
     public Response toResponse(Throwable exception) {
-        IssueTypeList issueType = IssueTypeList.EXCEPTION;
+        IssueType issueType = IssueType.EXCEPTION;
         CodeableConcept issueDetailConcept = null;
-        Status respStatus = Status.INTERNAL_SERVER_ERROR;
+        StatusType respStatus = Status.INTERNAL_SERVER_ERROR;
 
-        if (exception instanceof FhirException) {
-            FhirException fhirException = ((FhirException) exception);
-            issueType = fhirException.getIssueType();
-            respStatus = fhirException.getResponseStatus();
+        if (exception instanceof FhirFormException) {
+            FhirFormException fhirFormException = ((FhirFormException) exception);
+            issueType = fhirFormException.getIssueType();
+            respStatus = fhirFormException.getResponseStatus();
 
-            if (fhirException.hasIssueDetailConceptParts()) {
-                Pair<String, Object[]> issueDetailConceptParts = fhirException.getIssueDetailConceptParts();
-                String issueDetailConceptCode = issueDetailConceptParts.getKey();
-                CodeableConcept baseIssueDetailConcept = this.vocabRepo.getValueSetConcepts().get(OP_OUTCOME_VALUE_SET_ID, issueDetailConceptCode);
+            if (fhirFormException.hasOperationOutcomeType()) {
+                OperationOutcomeType opOutcomeType = fhirFormException.getOperationOutcomeType();
+                // noinspection ConstantConditions
+                boolean opOutcomeDisplayNameAvailable = opOutcomeType.hasName();
+                String opOutcomeName = null;
 
-                if (baseIssueDetailConcept != null) {
-                    Coding baseIssueDetailConceptCoding = baseIssueDetailConcept.getCoding().get(0);
+                if (opOutcomeDisplayNameAvailable) {
+                    opOutcomeName = opOutcomeType.getName();
 
-                    issueDetailConcept =
-                        new CodeableConceptImpl().addCoding(new CodingImpl()
-                            .setCode(baseIssueDetailConceptCoding.getCode())
-                            .setDisplay(
-                                new StringValueImpl().setValue(String.format(baseIssueDetailConceptCoding.getDisplay().getValue(),
-                                    issueDetailConceptParts.getValue()))).setSystem(baseIssueDetailConceptCoding.getSystem())
-                            .setVersion(baseIssueDetailConceptCoding.getVersion()));
-                } else {
-                    LOGGER.error(String.format("Unknown FHIR operation outcome issue detail concept (code=%s).", issueDetailConceptCode));
+                    if (fhirFormException.hasOperationOutcomeArgs()) {
+                        // noinspection ConstantConditions
+                        opOutcomeName = String.format(opOutcomeName, fhirFormException.getOperationOutcomeArgs());
+                    }
                 }
+
+                // noinspection ConstantConditions
+                issueDetailConcept =
+                    new CodeableConceptImpl().addCoding(new CodingImpl().setCode(new CodeTypeImpl().setValue(opOutcomeType.getId()))
+                        .setDisplay((opOutcomeDisplayNameAvailable ? new StringTypeImpl().setValue(opOutcomeName) : null))
+                        .setSystem(new UriTypeImpl().setValue(opOutcomeType.getCodeSystemUri().toString()))
+                        .setVersion((opOutcomeType.hasCodeSystemVersion() ? new StringTypeImpl().setValue(opOutcomeType.getCodeSystemVersion()) : null)));
             }
         }
 
         OperationOutcomeIssue opOutcomeIssue =
-            new OperationOutcomeIssueImpl().setCode(new IssueTypeImpl().setValue(issueType)).setDetails(issueDetailConcept)
-                .setSeverity(new IssueSeverityImpl().setValue(IssueSeverityList.ERROR));
+            new OperationOutcomeIssueImpl().setCode(new IssueTypeComponentImpl().setValue(issueType)).setDetails(issueDetailConcept)
+                .setSeverity(new IssueSeverityComponentImpl().setValue(IssueSeverity.ERROR));
         OperationOutcome opOutcome = new OperationOutcomeImpl().addIssue(opOutcomeIssue);
 
         if (MessageUtils.getContextualBoolean(JAXRSUtils.getCurrentMessage(), WsPropertyNames.ERROR_STACK_TRACE, false)) {
             // noinspection ThrowableResultOfMethodCallIgnored
-            opOutcomeIssue.setDiagnostics(new StringValueImpl().setValue(SdcctExceptionUtils.getRootCause(exception).getMessage()));
+            opOutcomeIssue.setDiagnostics(new StringTypeImpl().setValue(SdcctExceptionUtils.getRootCause(exception).getMessage()));
 
             try {
                 opOutcome.setText(new NarrativeImpl().setDiv(
                     new DivImpl().addContent(new String(this.xmlCodec.encode(new PreImpl().addContent(SdcctExceptionUtils.buildRootCauseStackTrace(exception)),
-                        null), StandardCharsets.UTF_8))).setStatus(new NarrativeStatusImpl().setValue(NarrativeStatusList.GENERATED)));
+                        null), StandardCharsets.UTF_8))).setStatus(new NarrativeStatusComponentImpl().setValue(NarrativeStatus.GENERATED)));
             } catch (Exception e) {
                 LOGGER.error("Unable to encode FHIR operation outcome narrative.", e);
             }
         }
 
         return Response.status(respStatus).entity(opOutcome).build();
-    }
-
-    public XmlCodec getXmlCodec() {
-        return this.xmlCodec;
-    }
-
-    public void setXmlCodec(XmlCodec xmlCodec) {
-        this.xmlCodec = xmlCodec;
     }
 }

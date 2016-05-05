@@ -1,12 +1,13 @@
 package gov.hhs.onc.sdcct.data;
 
+import java.io.Serializable;
 import javax.annotation.Nullable;
 
-public interface SdcctEntity {
-    public boolean hasEntityId();
+public interface SdcctEntity extends Serializable {
+    public boolean hasId();
 
     @Nullable
-    public Long getEntityId();
+    public Long getId();
 
-    public void setEntityId(@Nullable Long entityId);
+    public void setId(@Nullable Long id);
 }

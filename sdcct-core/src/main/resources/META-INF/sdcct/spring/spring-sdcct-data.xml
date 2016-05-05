@@ -7,4 +7,20 @@
     xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
+    <!--====================================================================================================
+    = SEARCH PARAM METADATAS
+    =====================================================================================================-->
+    <beans:bean id="metadataSearchParam" class="gov.hhs.onc.sdcct.data.metadata.impl.SearchParamMetadataImpl" abstract="true">
+        <beans:constructor-arg name="id">
+            <beans:null/>
+        </beans:constructor-arg>
+        <beans:constructor-arg name="uri">
+            <beans:null/>
+        </beans:constructor-arg>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = METADATA SERVICES
+    =====================================================================================================-->
+    <beans:bean id="metadataService" class="gov.hhs.onc.sdcct.data.metadata.impl.MetadataServiceImpl"/>
 </beans:beans>

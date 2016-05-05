@@ -527,7 +527,7 @@ public class SdcctLoggingFeature extends AbstractFeature implements Initializing
             .ifPresent(soapFaultCodeElem -> soapFaultContentMap.put(SOAP12Constants.QNAME_FAULT_CODE.getLocalPart(),
                 DOMUtils.getContent(DOMUtils.getFirstChildWithName(soapFaultCodeElem, SOAP12Constants.QNAME_FAULT_VALUE))));
 
-        List<Element> soapFaultSubcodeElems = SdcctXmlUtils.findElements(soapFaultElem, SOAP12Constants.QNAME_FAULT_SUBCODE);
+        List<Element> soapFaultSubcodeElems = SdcctXmlUtils.findDescendantElements(soapFaultElem, SOAP12Constants.QNAME_FAULT_SUBCODE);
 
         if (!soapFaultSubcodeElems.isEmpty()) {
             soapFaultContentMap.put(SOAP12Constants.QNAME_FAULT_SUBCODE.getLocalPart(),
@@ -553,7 +553,7 @@ public class SdcctLoggingFeature extends AbstractFeature implements Initializing
     }
 
     private static <T extends WsEvent> void processSoapHeaders(T event, Element docElem) {
-        List<Element> soapHeaderElems = SdcctXmlUtils.findElements(docElem, SOAP12Constants.QNAME_SOAP_HEADER).stream()
+        List<Element> soapHeaderElems = SdcctXmlUtils.findDescendantElements(docElem, SOAP12Constants.QNAME_SOAP_HEADER).stream()
             .flatMap(soapHeaderContainerElem -> DomUtils.getChildElements(soapHeaderContainerElem).stream()).collect(Collectors.toList());
 
         if (!soapHeaderElems.isEmpty()) {

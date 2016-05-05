@@ -46,22 +46,25 @@ import org.hibernate.search.annotations.TokenizerDef;
 @MappedSuperclass
 @Proxy(lazy = false)
 public abstract class AbstractSdcctEntity implements SdcctEntity {
-    protected Long entityId;
+    protected Long id;
+
+    private final static long serialVersionUID = 0L;
 
     @Override
-    public boolean hasEntityId() {
-        return (this.entityId != null);
+    @Transient
+    public boolean hasId() {
+        return (this.id != null);
     }
 
     @Nullable
     @Override
     @Transient
-    public Long getEntityId() {
-        return this.entityId;
+    public Long getId() {
+        return this.id;
     }
 
     @Override
-    public void setEntityId(@Nullable Long entityId) {
-        this.entityId = entityId;
+    public void setId(@Nullable Long id) {
+        this.id = id;
     }
 }

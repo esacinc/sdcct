@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    
+    <!--====================================================================================================
+    = SEARCH PARAM METADATAS
+    =====================================================================================================-->
+    <beans:bean id="metadataSearchParamFhir" parent="metadataSearchParam" abstract="true">
+        <beans:constructor-arg name="specType" value="FHIR"/>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = RESOURCE METADATA BUILDERS
+    =====================================================================================================-->
+    <beans:bean id="resourceMetadataBuilderFhir" class="gov.hhs.onc.sdcct.fhir.impl.FhirResourceMetadataBuilderImpl">
+        <beans:property name="resourceDefXpathExecutable">
+            <beans:bean factory-bean="xpathCompiler" factory-method="compile"
+                c:exprStr="/f:Bundle/f:entry/f:resource/f:StructureDefinition[f:kind[@value = $kind]]">
+                <beans:constructor-arg name="staticOpts">
+                    <beans:bean parent="xpathOptsStaticFhir">
+                        <beans:property name="variables">
+                            <beans:map>
+                                <beans:entry key="kind" value="#{ T(gov.hhs.onc.sdcct.fhir.StructureDefinitionKind).RESOURCE.id }"/>
+                            </beans:map>
+                        </beans:property>
+                    </beans:bean>
+                </beans:constructor-arg>
+            </beans:bean>
+        </beans:property>
+        <beans:property name="resourceDocument">
+            <!--suppress SpringPlaceholdersInspection -->
+            <beans:bean factory-bean="docBuilder" factory-method="build"
+                c:source="classpath*:${sdcct.data.fhir.src.dir.path}/profiles-resources.xml"/>
+        </beans:property>
+        <beans:property name="resourceParamDefXpathExecutable">
+            <beans:bean factory-bean="xpathCompiler" factory-method="compile"
+                c:exprStr="f:snapshot/f:element[f:path[@value = $path]]">
+                <beans:constructor-arg name="staticOpts">
+                    <beans:bean parent="xpathOptsStaticFhir"/>
+                </beans:constructor-arg>
+            </beans:bean>
+        </beans:property>
+        <beans:property name="resourceParamValueSetUriXpathExecutable">
+            <beans:bean factory-bean="xpathCompiler" factory-method="compile"
+                c:exprStr="string(f:binding/f:valueSetReference/f:reference/@value)">
+                <beans:constructor-arg name="staticOpts">
+                    <beans:bean parent="xpathOptsStaticFhir"/>
+                </beans:constructor-arg>
+            </beans:bean>
+        </beans:property>
+        <beans:property name="searchParamDefXpathExecutable">
+            <beans:bean factory-bean="xpathCompiler" factory-method="compile"
+                c:exprStr="/f:Bundle/f:entry/f:resource/f:SearchParameter[f:base[@value = $base]]">
+                <beans:constructor-arg name="staticOpts">
+                    <beans:bean parent="xpathOptsStaticFhir"/>
+                </beans:constructor-arg>
+            </beans:bean>
+        </beans:property>
+        <beans:property name="searchParamDocument">
+            <!--suppress SpringPlaceholdersInspection -->
+            <beans:bean factory-bean="docBuilder" factory-method="build"
+                c:source="classpath*:${sdcct.data.fhir.src.dir.path}/search-parameters.xml"/>
+        </beans:property>
+        <beans:property name="searchParamValueTypes">
+            <beans:map>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.data.search.SearchParamNames).CONTENT }"
+                    value="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).STRING.id }"/>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.data.search.SearchParamNames).ID }" value="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).ID.id }"/>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.data.search.SearchParamNames).LAST_UPDATED }"
+                    value="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).INSTANT.id }"/>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.data.search.SearchParamNames).PROFILE }" value="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).URI.id }"/>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.data.search.SearchParamNames).QUERY }"
+                    value="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).CODE.id }"/>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.data.search.SearchParamNames).SECURITY }"
+                    value="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).CODING.id }"/>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.data.search.SearchParamNames).TAG }"
+                    value="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).CODING.id }"/>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.data.search.SearchParamNames).TEXT }"
+                    value="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).STRING.id }"/>
+            </beans:map>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = RESOURCE PROCESSORS
+    =====================================================================================================-->
+    <beans:bean id="resourceProcFhir" class="gov.hhs.onc.sdcct.fhir.impl.FhirResourceProcessorImpl"/>
+    
+    <!--====================================================================================================
+    = DATABASE EVENT LISTENERS
+    =====================================================================================================-->
+    <beans:bean id="dbEventListenerResourceFhir" class="gov.hhs.onc.sdcct.fhir.impl.FhirResourceDbEventListenerImpl"/>
+</beans:beans>

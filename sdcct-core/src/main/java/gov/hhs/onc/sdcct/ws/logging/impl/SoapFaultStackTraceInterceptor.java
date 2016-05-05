@@ -1,9 +1,9 @@
 package gov.hhs.onc.sdcct.ws.logging.impl;
 
+import gov.hhs.onc.sdcct.net.SdcctUris;
 import gov.hhs.onc.sdcct.utils.SdcctExceptionUtils;
 import gov.hhs.onc.sdcct.ws.WsPropertyNames;
 import gov.hhs.onc.sdcct.ws.WsXmlQnames;
-import gov.hhs.onc.sdcct.xml.SdcctXmlNs;
 import gov.hhs.onc.sdcct.xml.utils.SdcctXmlQnameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -38,7 +38,7 @@ public class SoapFaultStackTraceInterceptor extends AbstractPhaseInterceptor<Soa
         Document faultDetailDoc = faultDetailElem.getOwnerDocument();
 
         Element faultDetailStacktraceElem =
-            faultDetailDoc.createElementNS(SdcctXmlNs.SDCCT_URI, SdcctXmlQnameUtils.buildQualifiedName(WsXmlQnames.STACK_TRACE));
+            faultDetailDoc.createElementNS(SdcctUris.SDCCT_SOAP_URN_VALUE, SdcctXmlQnameUtils.buildQualifiedName(WsXmlQnames.STACK_TRACE));
         faultDetailStacktraceElem
             .appendChild(faultDetailDoc.createCDATASection((StringUtils.LF + SdcctExceptionUtils.buildRootCauseStackTrace(faultCause) + StringUtils.LF)));
         faultDetailElem.appendChild(faultDetailStacktraceElem);

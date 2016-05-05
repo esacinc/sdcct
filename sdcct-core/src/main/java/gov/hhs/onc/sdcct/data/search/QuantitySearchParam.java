@@ -3,7 +3,7 @@ package gov.hhs.onc.sdcct.data.search;
 import java.math.BigDecimal;
 import javax.annotation.Nullable;
 
-public interface QuantitySearchParam extends CodeSearchParam<BigDecimal> {
+public interface QuantitySearchParam extends TermSearchParam<BigDecimal> {
     public boolean hasUnits();
 
     @Nullable

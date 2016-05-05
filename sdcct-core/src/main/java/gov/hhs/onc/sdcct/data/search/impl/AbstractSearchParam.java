@@ -1,11 +1,12 @@
 package gov.hhs.onc.sdcct.data.search.impl;
 
-import gov.hhs.onc.sdcct.data.ResourceEntity;
+import gov.hhs.onc.sdcct.data.SdcctResource;
 import gov.hhs.onc.sdcct.data.db.DbColumnNames;
 import gov.hhs.onc.sdcct.data.db.DbSequenceNames;
 import gov.hhs.onc.sdcct.data.impl.AbstractSdcctEntity;
 import gov.hhs.onc.sdcct.data.search.SearchParam;
 import gov.hhs.onc.sdcct.data.search.SearchParamType;
+import java.io.Serializable;
 import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -17,18 +18,19 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Transient;
-import org.hibernate.search.annotations.DocumentId;
 
 @DiscriminatorColumn(name = DbColumnNames.TYPE)
 @Entity(name = "searchParam")
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class AbstractSearchParam<T> extends AbstractSdcctEntity implements SearchParam<T> {
+public abstract class AbstractSearchParam<T extends Serializable> extends AbstractSdcctEntity implements SearchParam<T> {
     protected String name;
-    protected ResourceEntity resource;
     protected SearchParamType type;
+    protected SdcctResource resource;
     protected T value;
 
-    protected AbstractSearchParam(SearchParamType type, @Nullable ResourceEntity resource, String name, T value) {
+    private final static long serialVersionUID = 0L;
+
+    protected AbstractSearchParam(SearchParamType type, @Nullable SdcctResource resource, String name, T value) {
         this(type);
 
         this.resource = resource;
@@ -40,15 +42,14 @@ public abstract class AbstractSearchParam<T> extends AbstractSdcctEntity impleme
         this.type = type;
     }
 
-    @Column(name = DbColumnNames.ENTITY_ID)
-    @DocumentId(name = DbColumnNames.ENTITY_ID)
-    @GeneratedValue(generator = DbSequenceNames.SEARCH_PARAM_ENTITY_ID, strategy = GenerationType.SEQUENCE)
+    @Column(name = DbColumnNames.ID)
+    @GeneratedValue(generator = DbSequenceNames.SEARCH_PARAM_ID, strategy = GenerationType.SEQUENCE)
     @Id
     @Nullable
     @Override
-    @SequenceGenerator(allocationSize = 1, name = DbSequenceNames.SEARCH_PARAM_ENTITY_ID, sequenceName = DbSequenceNames.SEARCH_PARAM_ENTITY_ID)
-    public Long getEntityId() {
-        return super.getEntityId();
+    @SequenceGenerator(allocationSize = 1, name = DbSequenceNames.SEARCH_PARAM_ID, sequenceName = DbSequenceNames.SEARCH_PARAM_ID)
+    public Long getId() {
+        return super.getId();
     }
 
     @Column(name = DbColumnNames.NAME, nullable = false)
@@ -64,12 +65,12 @@ public abstract class AbstractSearchParam<T> extends AbstractSdcctEntity impleme
 
     @Override
     @Transient
-    public ResourceEntity getResource() {
+    public SdcctResource getResource() {
         return this.resource;
     }
 
     @Override
-    public void setResource(ResourceEntity resource) {
+    public void setResource(SdcctResource resource) {
         this.resource = resource;
     }
 

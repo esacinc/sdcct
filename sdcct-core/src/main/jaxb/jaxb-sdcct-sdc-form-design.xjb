@@ -3,7 +3,7 @@
     jaxb:extensionBindingPrefixes="annox xjc"
     jaxb:version="2.0"
     node="/xsd:schema"
-    schemaLocation="../schema/SDC/SDCFormDesign.xsd"
+    schemaLocation="../schema/sdc/SDCFormDesign.xsd"
     xmlns:annox="http://annox.dev.java.net"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
     xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
@@ -12,12 +12,36 @@
     <!--====================================================================================================
     = ATTRIBUTE GROUPS
     =====================================================================================================-->
+    <jaxb:bindings node="xsd:attributeGroup[@name='BoolAttributes']">
+        <jaxb:bindings node="xsd:attribute[@name='boolOpEnum']/xsd:simpleType">
+            <jaxb:typesafeEnumClass name="BoolOp"/>
+        </jaxb:bindings>
+    </jaxb:bindings>
+    
+    <jaxb:bindings node="xsd:attributeGroup[@name='ResponseAttributes']">
+        <jaxb:bindings node="xsd:attribute[@name='responseStatusEnum']/xsd:simpleType">
+            <jaxb:typesafeEnumClass name="ResponseStatus"/>
+        </jaxb:bindings>
+        <jaxb:bindings node="xsd:attribute[@name='responseTypeEnum']/xsd:simpleType">
+            <jaxb:typesafeEnumClass name="ResponseType"/>
+        </jaxb:bindings>
+    </jaxb:bindings>
+    
     <jaxb:bindings node="xsd:attributeGroup[@name='ResponseReportingAttributes']">
         <jaxb:bindings node="xsd:attribute[@name='instanceGUID']">
             <jaxb:property name="instanceGuid"/>
         </jaxb:bindings>
         <jaxb:bindings node="xsd:attribute[@name='parentGUID']">
             <jaxb:property name="parentGuid"/>
+        </jaxb:bindings>
+    </jaxb:bindings>
+    
+    <!--====================================================================================================
+    = COMPLEX TYPES
+    =====================================================================================================-->
+    <jaxb:bindings node="xsd:complexType[@name='PredicateCompareType']">
+        <jaxb:bindings node="xsd:complexContent/xsd:extension/xsd:attribute[@name='ArithOpEnum']/xsd:simpleType">
+            <jaxb:typesafeEnumClass name="ArithOp"/>
         </jaxb:bindings>
     </jaxb:bindings>
  </jaxb:bindings>

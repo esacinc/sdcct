@@ -1,7 +1,6 @@
 package gov.hhs.onc.sdcct.utils;
 
 import gov.hhs.onc.sdcct.io.SdcctFileNameExtensions;
-import gov.hhs.onc.sdcct.net.utils.SdcctUriUtils;
 import gov.hhs.onc.sdcct.test.impl.AbstractSdcctUnitTests;
 import java.net.MalformedURLException;
 import java.util.Arrays;
@@ -57,7 +56,7 @@ public class SdcctResourceUtilsUnitTests extends AbstractSdcctUnitTests {
     private static UrlResource buildTestJarFileResource(String testJarFilePath, String testResourcePath) {
         String testResourceUrlPath =
             SdcctResourceUtils.JAR_FILE_PATH_PREFIX + testJarFilePath + FilenameUtils.EXTENSION_SEPARATOR + SdcctFileNameExtensions.JAR
-                + SdcctUriUtils.ARCHIVE_PATH_DELIM + testResourcePath;
+                + SdcctStringUtils.APOS + testResourcePath;
 
         try {
             return new UrlResource(testResourceUrlPath);

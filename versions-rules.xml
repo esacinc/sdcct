@@ -6,8 +6,40 @@
     xsi:schemaLocation="
         http://mojo.codehaus.org/versions-maven-plugin/rule/2.0.0 http://www.mojohaus.org/versions-maven-plugin/xsd/rule-2.0.0.xsd">
     
+    <!--====================================================================================================
+    = GLOBAL
+    =====================================================================================================-->
     <ignoreVersions>
         <ignoreVersion type="regex">.*[\-\._](?i:alpha|beta).*</ignoreVersion>
         <ignoreVersion type="regex">.*[\-\._](?i:(?:b|cr|m|rc)\d+).*</ignoreVersion>
     </ignoreVersions>
+    
+    <rules>
+        <!--====================================================================================================
+        = JAXB
+        =====================================================================================================-->
+        <rule groupId="com.sun.xml.bind" artifactId="jaxb-xjc">
+            <ignoreVersions>
+                <ignoreVersion type="exact">2.2.11</ignoreVersion>
+            </ignoreVersions>
+        </rule>
+        
+        <!--====================================================================================================
+        = APACHE MAVEN
+        =====================================================================================================-->
+        <rule groupId="org.apache.maven" artifactId="maven-core">
+            <ignoreVersions>
+                <ignoreVersion type="regex">.*</ignoreVersion>
+            </ignoreVersions>
+        </rule>
+        
+        <!--====================================================================================================
+        = APACHE TOMCAT
+        =====================================================================================================-->
+        <rule groupId="org.apache.tomcat.embed">
+            <ignoreVersions>
+                <ignoreVersion type="regex">8\.5\.\d+.*</ignoreVersion>
+            </ignoreVersions>
+        </rule>
+    </rules>
 </ruleset>

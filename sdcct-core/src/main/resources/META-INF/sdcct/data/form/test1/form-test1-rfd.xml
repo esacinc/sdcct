@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sdc:FormDesign
-    formID="test1-rfd"
+    ID="test1-rfd"
     xmlns:sdc="http://healthIT.gov/sdc">
     
     <sdc:Body ID="body">
@@ -9,7 +9,9 @@
                 <sdc:ChildItems>
                     <sdc:Question ID="question1.1" title="Question 1.1">
                         <sdc:ResponseField>
-                            <sdc:Response/>
+                            <sdc:Response>
+                                <sdc:string/>
+                            </sdc:Response>
                         </sdc:ResponseField>
                     </sdc:Question>
                     <sdc:Question ID="question1.2" title="Question 1.2">

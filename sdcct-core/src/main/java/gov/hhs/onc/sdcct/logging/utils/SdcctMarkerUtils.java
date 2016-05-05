@@ -2,7 +2,6 @@ package gov.hhs.onc.sdcct.logging.utils;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import gov.hhs.onc.sdcct.logging.MarkerFieldName;
-import gov.hhs.onc.sdcct.utils.SdcctIteratorUtils;
 import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
 import java.io.IOException;
@@ -27,8 +26,9 @@ public final class SdcctMarkerUtils {
 
     public static <T> void serializeFields(JsonGenerator jsonGen, Map<String, T> fields, Function<T, ?> fieldValueProcessor) throws IOException {
         if (!fields.isEmpty()) {
-            Map<String, List<String>> fieldNamePrefixes = fields.keySet().stream().sorted(String.CASE_INSENSITIVE_ORDER)
-                .collect(Collectors.groupingBy(fieldName -> StringUtils.split(fieldName, SdcctStringUtils.PERIOD, 2)[0]));
+            Map<String, List<String>> fieldNamePrefixes =
+                fields.keySet().stream().sorted(String.CASE_INSENSITIVE_ORDER)
+                    .collect(Collectors.groupingBy(fieldName -> StringUtils.split(fieldName, SdcctStringUtils.PERIOD, 2)[0]));
             List<String> subFieldNames;
             int numSubFields, subFieldNameStartIndex;
             String subFieldName;
@@ -45,9 +45,8 @@ public final class SdcctMarkerUtils {
                     subFields = new HashMap<>(numSubFields);
 
                     for (String subFieldNameItem : subFieldNames) {
-                        subFields.put(
-                            ((subFieldNameStartIndex < subFieldNameItem.length()) ? subFieldNameItem.substring(subFieldNameStartIndex) : subFieldNameItem),
-                            fields.get(subFieldNameItem));
+                        subFields.put(((subFieldNameStartIndex < subFieldNameItem.length())
+                            ? subFieldNameItem.substring(subFieldNameStartIndex) : subFieldNameItem), fields.get(subFieldNameItem));
                     }
 
                     jsonGen.writeObjectFieldStart(fieldNamePrefix);
@@ -73,6 +72,6 @@ public final class SdcctMarkerUtils {
     }
 
     public static Stream<Marker> stream(@Nullable Marker marker) {
-        return SdcctStreamUtils.ofTree(marker, markerItem -> (markerItem.hasReferences() ? SdcctIteratorUtils.stream(markerItem.iterator()) : Stream.empty()));
+        return SdcctStreamUtils.traverse(Marker::iterator, true, marker);
     }
 }

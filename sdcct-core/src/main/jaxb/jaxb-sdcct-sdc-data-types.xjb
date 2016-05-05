@@ -3,11 +3,20 @@
     jaxb:extensionBindingPrefixes="annox xjc"
     jaxb:version="2.0"
     node="/xsd:schema"
-    schemaLocation="../schema/SDC/SDCDataTypes.xsd"
+    schemaLocation="../schema/sdc/SDCDataTypes.xsd"
     xmlns:annox="http://annox.dev.java.net"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
     xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    
+    <!--====================================================================================================
+    = ATTRIBUTE GROUPS
+    =====================================================================================================-->
+    <jaxb:bindings node="xsd:attributeGroup[@name='QuantAttributes']">
+        <jaxb:bindings node="xsd:attribute[@name='quantEnum']/xsd:simpleType">
+            <jaxb:typesafeEnumClass name="Quant"/>
+        </jaxb:bindings>
+    </jaxb:bindings>
     
     <!--====================================================================================================
     = COMPLEX TYPES

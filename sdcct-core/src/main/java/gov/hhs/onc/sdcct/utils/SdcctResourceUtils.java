@@ -1,6 +1,5 @@
 package gov.hhs.onc.sdcct.utils;
 
-import gov.hhs.onc.sdcct.net.utils.SdcctUriUtils;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Comparator;
@@ -15,8 +14,8 @@ import org.springframework.util.ResourceUtils;
 
 public final class SdcctResourceUtils {
     public final static String JAR_FILE_PATH_PREFIX = ResourceUtils.JAR_URL_PREFIX + ResourceUtils.FILE_URL_PREFIX;
-    public final static String META_INF_PATH_PREFIX = SdcctUriUtils.PATH_DELIM + "META-INF" + SdcctUriUtils.PATH_DELIM;
-    public final static String META_INF_APP_PATH_PREFIX = META_INF_PATH_PREFIX + "sdcct" + SdcctUriUtils.PATH_DELIM;
+    public final static String META_INF_PATH_PREFIX = SdcctStringUtils.SLASH + "META-INF" + SdcctStringUtils.SLASH;
+    public final static String META_INF_APP_PATH_PREFIX = META_INF_PATH_PREFIX + "sdcct" + SdcctStringUtils.SLASH;
     
     public final static String TEST_FILE_NAME_SUFFIX = "-test";
 
@@ -92,7 +91,7 @@ public final class SdcctResourceUtils {
     }
 
     public static String[] extractJarPathParts(String jarPath) {
-        return StringUtils.split(jarPath, SdcctUriUtils.ARCHIVE_PATH_DELIM, 2);
+        return StringUtils.split(jarPath, SdcctStringUtils.APOS, 2);
     }
 
     public static boolean isJarPath(String resourcePath) {

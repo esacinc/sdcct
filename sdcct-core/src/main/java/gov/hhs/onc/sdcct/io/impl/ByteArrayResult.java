@@ -10,7 +10,11 @@ public class ByteArrayResult extends StreamResult {
     }
 
     public ByteArrayResult(@Nullable String sysId) {
-        super(new ByteArrayOutputStream());
+        this(sysId, new ByteArrayOutputStream());
+    }
+
+    public ByteArrayResult(@Nullable String sysId, ByteArrayOutputStream outStream) {
+        super(outStream);
 
         this.setSystemId(sysId);
     }

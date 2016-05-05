@@ -32,24 +32,25 @@ public class LoggingEntityInterceptor extends EmptyInterceptor {
 
     @Override
     public void onDelete(Object entity, Serializable id, Object[] states, String[] propNames, Type[] types) {
-        LOGGER.trace(buildMessage(EntityEventType.DELETED, entity, id, states, propNames, types));
+        LOGGER.trace(buildMessage(EntityEventType.DELETED, entity, id, true, states, propNames, types));
     }
 
     @Override
     public boolean onSave(Object entity, Serializable id, Object[] states, String[] propNames, Type[] types) {
-        LOGGER.trace(buildMessage(EntityEventType.SAVED, entity, id, states, propNames, types));
+        LOGGER.trace(buildMessage(EntityEventType.SAVED, entity, id, true, states, propNames, types));
 
         return super.onSave(entity, id, states, propNames, types);
     }
 
     @Override
     public boolean onLoad(Object entity, Serializable id, Object[] states, String[] propNames, Type[] types) {
-        LOGGER.trace(buildMessage(EntityEventType.LOADED, entity, id, states, propNames, types));
+        LOGGER.trace(buildMessage(EntityEventType.LOADED, entity, id, false, states, propNames, types));
 
         return super.onLoad(entity, id, states, propNames, types);
     }
 
-    private static String buildMessage(EntityEventType eventType, Object entity, Serializable id, Object[] states, String[] propNames, Type[] types) {
+    private static String buildMessage(EntityEventType eventType, Object entity, Serializable id, boolean includeState, Object[] states, String[] propNames,
+        Type[] types) {
         StrBuilder msgBuilder = new StrBuilder("Entity (class=");
         msgBuilder.append(entity.getClass().getName());
         msgBuilder.append(", id=");
@@ -67,8 +68,12 @@ public class LoggingEntityInterceptor extends EmptyInterceptor {
             msgBuilder.append(propNames[a]);
             msgBuilder.append(", type=");
             msgBuilder.append(types[a].getName());
-            msgBuilder.append(", state=");
-            msgBuilder.append(states[a]);
+
+            if (includeState) {
+                msgBuilder.append(", state=");
+                msgBuilder.append(states[a]);
+            }
+
             msgBuilder.append("}");
         }
 

@@ -1,9 +1,10 @@
 package gov.hhs.onc.sdcct.rfd.ws;
 
-import gov.hhs.onc.sdcct.xml.SdcctXmlNs;
+import gov.hhs.onc.sdcct.net.SdcctUris;
+import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
 
 public final class RfdWsaActions {
-    public final static String PREFIX = SdcctXmlNs.IHE_ITI_URI + ":";
+    public final static String PREFIX = SdcctUris.IHE_ITI_URN_VALUE + SdcctStringUtils.COLON;
 
     public final static String ARCHIVE_FORM = PREFIX + RfdWsXmlNames.ARCHIVE_FORM;
     public final static String ARCHIVE_FORM_RESP = PREFIX + RfdWsXmlNames.ARCHIVE_FORM_RESP;

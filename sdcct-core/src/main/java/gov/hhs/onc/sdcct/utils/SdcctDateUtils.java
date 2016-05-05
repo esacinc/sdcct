@@ -1,5 +1,7 @@
 package gov.hhs.onc.sdcct.utils;
 
+import java.util.TimeZone;
+
 public final class SdcctDateUtils {
     public final static long HOURS_IN_DAY = 24L;
 
@@ -31,6 +33,12 @@ public final class SdcctDateUtils {
     public final static long NS_IN_HOUR = NS_IN_US * US_IN_HOUR;
     public final static long NS_IN_DAY = NS_IN_US * US_IN_DAY;
     public final static long NS_IN_YEAR = NS_IN_US * US_IN_YEAR;
+
+    public final static TimeZone DEFAULT_TZ = TimeZone.getDefault();
+
+    public final static String UTC_TZ_ID = "UTC";
+    public final static String UTC_ZULU_TZ_ID = "Z";
+    public final static TimeZone UTC_TZ = TimeZone.getTimeZone(UTC_TZ_ID);
 
     private SdcctDateUtils() {
     }

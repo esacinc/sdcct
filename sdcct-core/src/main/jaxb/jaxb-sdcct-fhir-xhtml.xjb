@@ -3,7 +3,7 @@
     jaxb:extensionBindingPrefixes="annox xjc"
     jaxb:version="2.0"
     node="/xsd:schema"
-    schemaLocation="../schema/FHIR/fhir-xhtml.xsd"
+    schemaLocation="../schema/fhir/fhir-xhtml.xsd"
     xmlns:annox="http://annox.dev.java.net"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
     xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"

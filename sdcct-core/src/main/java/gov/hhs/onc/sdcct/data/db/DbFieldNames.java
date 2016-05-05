@@ -9,7 +9,7 @@ public final class DbFieldNames {
     public final static String CONTENT_NGRAM = CONTENT_PREFIX + DbAnalyzerNames.NGRAM;
     public final static String CONTENT_PHONETIC = CONTENT_PREFIX + DbAnalyzerNames.PHONETIC;
 
-    public final static String ENTITY_ID = "entity_id";
+    public final static String ID = "id";
 
     public final static String TEXT_EDGE_NGRAM = TEXT_PREFIX + DbAnalyzerNames.EDGE_NGRAM;
     public final static String TEXT_LOWERCASE = TEXT_PREFIX + DbAnalyzerNames.LOWERCASE;

@@ -1,0 +1,3 @@
+gov.hhs.onc.sdcct.data.db.impl.EntityManagerFactoryRefImpl$EntityManagerFactoryRefContributor
+gov.hhs.onc.sdcct.data.metadata.impl.MetadataRefImpl$MetadataRefContributor
+gov.hhs.onc.sdcct.data.metadata.impl.MetadataServiceImpl$MetadataServiceContributor

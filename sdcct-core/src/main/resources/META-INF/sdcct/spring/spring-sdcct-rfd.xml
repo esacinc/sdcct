@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    
+    <!--====================================================================================================
+    = SEARCH PARAM METADATAS
+    =====================================================================================================-->
+    <beans:bean id="metadataSearchParamRfd" parent="metadataSearchParam" abstract="true">
+        <beans:constructor-arg name="specType" value="RFD"/>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = RESOURCE METADATA BUILDERS
+    =====================================================================================================-->
+    <beans:bean id="resourceMetadataBuilderRfd" class="gov.hhs.onc.sdcct.rfd.impl.RfdResourceMetadataBuilderImpl">
+        <beans:property name="searchParamMetadatas">
+            <beans:array>
+                <beans:bean parent="metadataSearchParamRfd"
+                    c:id="#{ T(gov.hhs.onc.sdcct.data.search.SearchParamNames).IDENTIFIER }"
+                    c:inline="false"
+                    c:name="#{ T(gov.hhs.onc.sdcct.data.search.SearchParamNames).IDENTIFIER }"
+                    c:type="#{ T(gov.hhs.onc.sdcct.data.search.SearchParamType).TOKEN }">
+                    <beans:constructor-arg name="xpathExec">
+                        <beans:bean factory-bean="xpathCompiler" factory-method="compile"
+                            c:exprStr="/sdc:FormDesignType/@formID">
+                            <beans:constructor-arg name="staticOpts">
+                                <beans:bean parent="xpathOptsStaticRfd"/>
+                            </beans:constructor-arg>
+                        </beans:bean>
+                    </beans:constructor-arg>
+                </beans:bean>
+            </beans:array>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = RESOURCE PROCESSORS
+    =====================================================================================================-->
+    <beans:bean id="resourceProcRfd" class="gov.hhs.onc.sdcct.rfd.impl.RfdResourceProcessorImpl"/>
+    
+    <!--====================================================================================================
+    = DATABASE EVENT LISTENERS
+    =====================================================================================================-->
+    <beans:bean id="dbEventListenerResourceRfd" class="gov.hhs.onc.sdcct.rfd.impl.RfdResourceDbEventListenerImpl"/>
+</beans:beans>
