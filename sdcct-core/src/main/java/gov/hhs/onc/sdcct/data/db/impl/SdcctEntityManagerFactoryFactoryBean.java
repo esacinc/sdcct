@@ -1,9 +1,11 @@
 package gov.hhs.onc.sdcct.data.db.impl;
 
 import com.github.sebhoss.warnings.CompilerWarnings;
-import gov.hhs.onc.sdcct.data.cache.impl.CacheRegionFactory;
+import gov.hhs.onc.sdcct.data.db.cache.impl.CacheRegionFactory;
 import gov.hhs.onc.sdcct.data.db.EntityManagerFactoryRef;
 import gov.hhs.onc.sdcct.data.db.event.DbEventListener;
+import gov.hhs.onc.sdcct.data.db.impl.SdcctHsqlDialect.SdcctHsqlDialectResolver;
+import gov.hhs.onc.sdcct.data.db.logging.impl.LoggingEntityIndexingInterceptor;
 import gov.hhs.onc.sdcct.data.metadata.MetadataRef;
 import gov.hhs.onc.sdcct.data.metadata.MetadataService;
 import java.util.Arrays;
@@ -17,7 +19,6 @@ import org.hibernate.boot.Metadata;
 import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.internal.MetadataImpl;
 import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.cache.spi.RegionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
@@ -45,8 +46,6 @@ public class SdcctEntityManagerFactoryFactoryBean extends LocalContainerEntityMa
 
         @Override
         public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
-            serviceRegistry.locateServiceBinding(RegionFactory.class).setService(SdcctEntityManagerFactoryFactoryBean.this.cacheRegionFactory);
-
             Arrays.sort(SdcctEntityManagerFactoryFactoryBean.this.eventListeners, AnnotationAwareOrderComparator.INSTANCE);
 
             EventListenerRegistry eventListenerRegistry = serviceRegistry.getService(EventListenerRegistry.class);
@@ -91,6 +90,9 @@ public class SdcctEntityManagerFactoryFactoryBean extends LocalContainerEntityMa
         protected void populate(SessionFactoryBuilder sessionFactoryBuilder, StandardServiceRegistry serviceRegistry) {
             serviceRegistry.getService(MetadataRef.class).setMetadata(this.getMetadata());
 
+            serviceRegistry.getService(CacheRegionFactory.class);
+            serviceRegistry.getService(SdcctHsqlDialectResolver.class);
+
             super.populate(sessionFactoryBuilder, serviceRegistry);
         }
 
@@ -126,20 +128,10 @@ public class SdcctEntityManagerFactoryFactoryBean extends LocalContainerEntityMa
     @SuppressWarnings({ "SpringJavaAutowiredMembersInspection" })
     private LoggingEntityIndexingInterceptor entityIndexingInterceptor;
 
-    private CacheRegionFactory cacheRegionFactory;
-
     @Override
     protected EntityManagerFactory createNativeEntityManagerFactory() throws PersistenceException {
         this.setPersistenceProvider(new SdcctPersistenceProvider());
 
         return super.createNativeEntityManagerFactory();
-    }
-
-    public CacheRegionFactory getCacheRegionFactory() {
-        return this.cacheRegionFactory;
-    }
-
-    public void setCacheRegionFactory(CacheRegionFactory cacheRegionFactory) {
-        this.cacheRegionFactory = cacheRegionFactory;
     }
 }

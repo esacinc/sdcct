@@ -34,6 +34,7 @@
         <beans:property name="converters">
             <beans:set>
                 <beans:ref bean="convDocUri"/>
+                <beans:ref bean="convInetAddr"/>
                 <beans:ref bean="convQname"/>
                 <beans:ref bean="convResourceSrc"/>
                 <beans:ref bean="convXdmValue"/>

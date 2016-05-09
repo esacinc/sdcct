@@ -1,7 +1,8 @@
-package gov.hhs.onc.sdcct.data.db.impl;
+package gov.hhs.onc.sdcct.data.search.impl;
 
 import gov.hhs.onc.sdcct.data.SdcctResource;
 import gov.hhs.onc.sdcct.data.db.SdcctRegistry;
+import gov.hhs.onc.sdcct.data.db.impl.AbstractSdcctEntityAccessor;
 import gov.hhs.onc.sdcct.data.metadata.EntityMetadata;
 import gov.hhs.onc.sdcct.data.search.SearchService;
 import java.util.Collections;

@@ -1,7 +1,10 @@
 package gov.hhs.onc.sdcct.utils;
 
+import com.github.sebhoss.warnings.CompilerWarnings;
 import java.lang.reflect.Method;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.aopalliance.intercept.MethodInterceptor;
@@ -35,17 +38,18 @@ public final class SdcctAopUtils {
     }
 
     @FunctionalInterface
-    public static interface SdcctMethodInterceptor extends MethodInterceptor {
+    public static interface SdcctMethodInterceptor<T> extends MethodInterceptor {
         @Nullable
         @Override
+        @SuppressWarnings({ CompilerWarnings.UNCHECKED })
         public default Object invoke(MethodInvocation invocation) throws Throwable {
             Method method = invocation.getMethod();
 
-            return this.invoke(invocation, method, method.getName(), invocation.getArguments(), invocation.getThis());
+            return this.invoke(invocation, method, method.getName(), invocation.getArguments(), ((T) invocation.getThis()));
         }
 
         @Nullable
-        public Object invoke(MethodInvocation invocation, Method method, String methodName, Object[] args, @Nullable Object target) throws Throwable;
+        public Object invoke(MethodInvocation invocation, Method method, String methodName, Object[] args, @Nullable T target) throws Throwable;
     }
 
     @FunctionalInterface
@@ -77,16 +81,17 @@ public final class SdcctAopUtils {
             return this.factory.getProxy();
         }
 
-        public SdcctProxyBuilder<T> addMethodAdvice(MethodMatcher methodMatcher, SdcctMethodInterceptor advice) {
+        public <U> SdcctProxyBuilder<T> addMethodAdvice(MethodMatcher methodMatcher, SdcctMethodInterceptor<U> advice) {
             return this.addMethodAdvice(null, methodMatcher, advice);
         }
 
-        public SdcctProxyBuilder<T> addMethodAdvice(@Nullable ClassFilter classFilter, @Nullable MethodMatcher methodMatcher, SdcctMethodInterceptor advice) {
+        public <U> SdcctProxyBuilder<T> addMethodAdvice(@Nullable ClassFilter classFilter, @Nullable MethodMatcher methodMatcher,
+            SdcctMethodInterceptor<U> advice) {
             return this.addMethodAdvice(new ComposablePointcut(((classFilter != null) ? classFilter : ClassFilter.TRUE), ((methodMatcher != null)
                 ? methodMatcher : MethodMatcher.TRUE)), advice);
         }
 
-        public SdcctProxyBuilder<T> addMethodAdvice(Pointcut pointcut, SdcctMethodInterceptor advice) {
+        public <U> SdcctProxyBuilder<T> addMethodAdvice(Pointcut pointcut, SdcctMethodInterceptor<U> advice) {
             return this.addAdvisors(new DefaultPointcutAdvisor(pointcut, advice));
         }
 
@@ -104,19 +109,29 @@ public final class SdcctAopUtils {
     private SdcctAopUtils() {
     }
 
-    public static SdcctStaticMethodMatcher matchMethodNames(String ... methodNames) {
-        return (method, targetClass) -> {
-            String methodName = method.getName();
+    public static SdcctStaticMethodMatcher matchMethodName(String ... methodNames) {
+        final Set<String> methodNameSet = Stream.of(methodNames).collect(Collectors.toSet());
 
-            return Stream.of(methodNames).anyMatch(methodName::equals);
-        };
+        return matchMethodName(methodNameSet::contains);
     }
 
-    public static SdcctStaticMethodMatcher matchMethods(Method ... methods) {
-        return (method, targetClass) -> Stream.of(methods).anyMatch(method::equals);
+    public static SdcctStaticMethodMatcher matchMethodName(Predicate<String> predicate) {
+        return (method, targetClass) -> predicate.test(method.getName());
     }
 
-    public static SdcctStaticMethodMatcher matchMethods(Predicate<Method> predicate) {
+    public static SdcctStaticMethodMatcher matchMethodReturnType(Class<?> returnClass, boolean assignable) {
+        final Predicate<Class<?>> predicate = (assignable ? returnClass::isAssignableFrom : returnClass::equals);
+
+        return (method, targetClass) -> predicate.test(method.getReturnType());
+    }
+
+    public static SdcctStaticMethodMatcher matchMethod(Method ... methods) {
+        final Set<Method> methodSet = Stream.of(methods).collect(Collectors.toSet());
+
+        return matchMethod(methodSet::contains);
+    }
+
+    public static SdcctStaticMethodMatcher matchMethod(Predicate<Method> predicate) {
         return (method, targetClass) -> predicate.test(method);
     }
 }

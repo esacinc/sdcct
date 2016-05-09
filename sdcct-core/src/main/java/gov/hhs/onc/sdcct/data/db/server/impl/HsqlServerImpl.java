@@ -1,10 +1,9 @@
 package gov.hhs.onc.sdcct.data.db.server.impl;
 
 import gov.hhs.onc.sdcct.data.db.server.HsqlServer;
-import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
 import java.io.File;
-import org.hsqldb.DatabaseURL;
-import org.hsqldb.jdbc.JDBCDriver;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import org.hsqldb.server.Server;
 import org.hsqldb.server.ServerConfiguration;
 import org.hsqldb.server.ServerConstants;
@@ -15,6 +14,11 @@ import org.springframework.util.ResourceUtils;
 
 public class HsqlServerImpl extends AbstractDbServer implements HsqlServer {
     private static class HsqlNetworkServer extends Server {
+        @Override
+        protected boolean allowConnection(Socket socket) {
+            return (super.allowConnection(socket) && ((InetSocketAddress) socket.getRemoteSocketAddress()).getAddress().isLoopbackAddress());
+        }
+
         @Override
         protected void printStackTrace(Throwable throwable) {
         }
@@ -48,20 +52,16 @@ public class HsqlServerImpl extends AbstractDbServer implements HsqlServer {
     public void afterPropertiesSet() throws Exception {
         ServerProperties serverProps = ServerConfiguration.newDefaultProperties(ServerConstants.SC_PROTOCOL_HSQL);
         serverProps.getProperties().clear();
-        serverProps.setProperty(SERVER_MAX_CONN_PROP_NAME, this.dataSrc.getMaxPoolSize());
+        serverProps.setProperty(SERVER_MAX_CONN_PROP_NAME, this.dataSrcConfig.getMaximumPoolSize());
         this.netServer.setProperties(serverProps);
 
-        this.netServer.setAddress(this.hostAddr);
+        this.netServer.setAddress(this.hostAddr.getHostAddress());
         this.netServer.setDatabaseName(0, this.dbName);
-        this.netServer.setDatabasePath(0, String.format(PATH_FORMAT_STR, this.dbDir.getPath(), this.dbName, this.adminUser, this.adminPass));
+        this.netServer.setDatabasePath(0,
+            String.format(PATH_FORMAT_STR, this.dbDir.getPath(), this.dbName, this.adminUser.getName(), this.adminUser.getCredentials()));
         this.netServer.setDaemon(true);
         this.netServer.setPort(this.port);
 
-        this.dataSrc.setDriverClass(JDBCDriver.class.getName());
-
-        this.dataSrc.setJdbcUrl((DatabaseURL.S_URL_PREFIX + DatabaseURL.S_HSQL + this.hostAddr + SdcctStringUtils.COLON_CHAR + this.port
-            + SdcctStringUtils.SLASH + this.dbName));
-        
         super.afterPropertiesSet();
     }
 

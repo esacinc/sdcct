@@ -5,6 +5,7 @@ import gov.hhs.onc.sdcct.data.SdcctEntity;
 import gov.hhs.onc.sdcct.data.db.DbPropertyNames;
 import gov.hhs.onc.sdcct.data.db.SdcctCriteria;
 import gov.hhs.onc.sdcct.data.db.SdcctCriterion;
+import gov.hhs.onc.sdcct.data.db.logging.impl.LoggingIndexQueryInterceptor;
 import gov.hhs.onc.sdcct.data.metadata.EntityMetadata;
 import gov.hhs.onc.sdcct.data.metadata.PropertyMetadata;
 import java.io.IOException;
@@ -64,13 +65,6 @@ public class SdcctCriteriaImpl<T extends SdcctEntity> extends AbstractSdcctEntit
             return delegate.toString(field);
         }
 
-        @Deprecated
-        @Override
-        @SuppressWarnings({ "CloneDoesntCallSuperClone" })
-        public org.apache.lucene.search.Query clone() {
-            return delegate.clone();
-        }
-
         @Override
         @SuppressWarnings({ "EqualsWhichDoesntCheckParameterClass" })
         public boolean equals(Object obj) {
@@ -80,18 +74,6 @@ public class SdcctCriteriaImpl<T extends SdcctEntity> extends AbstractSdcctEntit
         @Override
         public int hashCode() {
             return delegate.hashCode();
-        }
-
-        @Deprecated
-        @Override
-        public float getBoost() {
-            return delegate.getBoost();
-        }
-
-        @Deprecated
-        @Override
-        public void setBoost(float b) {
-            delegate.setBoost(b);
         }
     }
 

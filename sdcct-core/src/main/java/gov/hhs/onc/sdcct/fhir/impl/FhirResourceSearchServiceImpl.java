@@ -1,6 +1,6 @@
 package gov.hhs.onc.sdcct.fhir.impl;
 
-import gov.hhs.onc.sdcct.data.db.impl.AbstractSearchService;
+import gov.hhs.onc.sdcct.data.search.impl.AbstractSearchService;
 import gov.hhs.onc.sdcct.fhir.DomainResource;
 import gov.hhs.onc.sdcct.fhir.FhirResource;
 import gov.hhs.onc.sdcct.fhir.FhirResourceRegistry;

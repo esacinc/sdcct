@@ -1,4 +1,4 @@
-package gov.hhs.onc.sdcct.data.cache.impl;
+package gov.hhs.onc.sdcct.data.db.cache.impl;
 
 import java.util.Optional;
 import java.util.stream.Stream;

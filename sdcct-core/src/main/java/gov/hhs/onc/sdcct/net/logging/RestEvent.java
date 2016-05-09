@@ -9,6 +9,7 @@ public interface RestEvent extends LoggingEvent {
 
     public void setEndpointType(RestEndpointType endpointType);
 
+    @JsonProperty
     public RestEventType getEventType();
 
     @JsonProperty

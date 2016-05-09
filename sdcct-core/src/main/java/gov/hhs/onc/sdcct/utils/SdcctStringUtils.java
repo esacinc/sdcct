@@ -57,6 +57,9 @@ public final class SdcctStringUtils {
     public final static String EQUALS = "=";
     public final static char EQUALS_CHAR = '=';
 
+    public final static String GT = ">";
+    public final static char GT_CHAR = '>';
+
     public final static String HYPHEN = "-";
     public final static char HYPHEN_CHAR = '-';
 
@@ -65,6 +68,9 @@ public final class SdcctStringUtils {
 
     public final static String L_BRACKET = "[";
     public final static char L_BRACKET_CHAR = '[';
+
+    public final static String LT = "<";
+    public final static char LT_CHAR = '<';
 
     public final static String PERIOD = ".";
     public final static char PERIOD_CHAR = '.';

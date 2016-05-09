@@ -2,6 +2,7 @@ package gov.hhs.onc.sdcct.utils;
 
 import gov.hhs.onc.sdcct.beans.IdentifiedBean;
 import gov.hhs.onc.sdcct.beans.NamedBean;
+import gov.hhs.onc.sdcct.beans.OrdinalIdentifiedBean;
 import gov.hhs.onc.sdcct.beans.TypedBean;
 import gov.hhs.onc.sdcct.beans.UriBean;
 import java.net.URI;
@@ -23,6 +24,11 @@ public final class SdcctEnumUtils {
     @Nullable
     public static <T extends Enum<T> & NamedBean> T findByName(Class<T> enumClass, String name) {
         return findByPredicate(enumClass, enumItem -> Objects.equals(enumItem.getName(), name));
+    }
+
+    @Nullable
+    public static <T extends Enum<T> & OrdinalIdentifiedBean> T findByOrdinalId(Class<T> enumClass, int ordinalId) {
+        return findByPredicate(enumClass, enumItem -> Objects.equals(enumItem.getOrdinalId(), ordinalId));
     }
 
     @Nullable

@@ -1,3 +1,5 @@
+gov.hhs.onc.sdcct.data.db.cache.impl.CacheRegionFactory$CacheRegionFactoryContributor
 gov.hhs.onc.sdcct.data.db.impl.EntityManagerFactoryRefImpl$EntityManagerFactoryRefContributor
+gov.hhs.onc.sdcct.data.db.impl.SdcctHsqlDialect$SdcctHsqlDialectResolverContributor
 gov.hhs.onc.sdcct.data.metadata.impl.MetadataRefImpl$MetadataRefContributor
 gov.hhs.onc.sdcct.data.metadata.impl.MetadataServiceImpl$MetadataServiceContributor

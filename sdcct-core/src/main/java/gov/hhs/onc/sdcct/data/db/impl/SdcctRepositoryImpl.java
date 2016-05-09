@@ -6,6 +6,7 @@ import gov.hhs.onc.sdcct.data.db.DbPropertyNames;
 import gov.hhs.onc.sdcct.data.db.SdcctCriteria;
 import gov.hhs.onc.sdcct.data.db.SdcctCriterion;
 import gov.hhs.onc.sdcct.data.db.SdcctRepository;
+import gov.hhs.onc.sdcct.data.db.logging.impl.LoggingIndexQueryInterceptor;
 import gov.hhs.onc.sdcct.data.metadata.EntityMetadata;
 import java.util.List;
 import javax.annotation.Nonnegative;

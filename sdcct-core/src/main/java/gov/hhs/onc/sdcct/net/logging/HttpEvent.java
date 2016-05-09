@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 public interface HttpEvent extends RestEvent {
+    @JsonProperty
     public String getCharacterEncoding();
 
     public void setCharacterEncoding(String charEnc);
@@ -32,6 +33,7 @@ public interface HttpEvent extends RestEvent {
 
     public void setHeaders(Map<String, List<String>> headers);
 
+    @JsonProperty
     public Locale getLocale();
 
     public void setLocale(Locale locale);

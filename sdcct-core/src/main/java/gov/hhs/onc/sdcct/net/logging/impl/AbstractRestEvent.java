@@ -26,6 +26,7 @@ public abstract class AbstractRestEvent extends AbstractLoggingEvent implements 
         this.endpointType = endpointType;
     }
 
+    @JsonProperty
     @Override
     public RestEventType getEventType() {
         return this.eventType;

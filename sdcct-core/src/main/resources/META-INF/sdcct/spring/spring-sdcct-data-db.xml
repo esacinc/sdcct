@@ -12,6 +12,18 @@
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
     
     <!--====================================================================================================
+    = THREAD FACTORIES
+    =====================================================================================================-->
+    <beans:bean id="threadFactoryDataSrc" parent="threadFactory"
+        p:threadNamePrefix="#{ threadGroup.name }-data-src-"/>
+    
+    <!--====================================================================================================
+    = TASK SCHEDULERS
+    =====================================================================================================-->
+    <beans:bean id="taskSchedulerDataSrc" parent="taskSchedulerThreadPool"
+        p:threadNamePrefix="#{ threadGroup.name }-data-src-"/>
+    
+    <!--====================================================================================================
     = CACHE MANAGERS
     =====================================================================================================-->
     <!--suppress SpringPlaceholdersInspection -->
@@ -34,31 +46,148 @@
     </beans:bean>
     
     <!--====================================================================================================
-    = DATA SOURCES
+    = CACHE REGION FACTORIES
+    =====================================================================================================-->
+    <beans:bean id="cacheRegionFactory" class="gov.hhs.onc.sdcct.data.db.cache.impl.CacheRegionFactory"
+        p:cacheManager-ref="cacheManagerDb"/>
+    
+    <!--====================================================================================================
+    = DATABASE AUTHORITIES
+    =====================================================================================================-->
+    <beans:bean id="dbAuthority" class="gov.hhs.onc.sdcct.data.db.security.impl.DbAuthorityImpl" abstract="true"/>
+    
+    <beans:bean id="dbAuthoritySeq" parent="dbAuthority" abstract="true">
+        <beans:constructor-arg name="objType" value="SEQUENCE"/>
+        <beans:constructor-arg name="privileges">
+            <beans:array>
+                <beans:value>USAGE</beans:value>
+            </beans:array>
+        </beans:constructor-arg>
+    </beans:bean>
+    
+    <beans:bean id="dbAuthorityTable" parent="dbAuthority" abstract="true">
+        <beans:constructor-arg name="objType" value="TABLE"/>
+    </beans:bean>
+    
+    <beans:bean id="dbAuthorityTableFull" parent="dbAuthority" abstract="true">
+        <beans:constructor-arg name="objType" value="TABLE"/>
+        <beans:constructor-arg name="privileges">
+            <beans:array>
+                <beans:value>SELECT</beans:value>
+                <beans:value>INSERT</beans:value>
+                <beans:value>UPDATE</beans:value>
+                <beans:value>DELETE</beans:value>
+            </beans:array>
+        </beans:constructor-arg>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = DATABASE USERS
+    =====================================================================================================-->
+    <beans:bean id="dbUser" class="gov.hhs.onc.sdcct.data.db.security.impl.DbUser" abstract="true"/>
+    
+    <!--====================================================================================================
+    = DATA SOURCE CONFIGURATIONS
     =====================================================================================================-->
     <!--suppress SpringPlaceholdersInspection -->
-    <beans:bean id="dataSrc" class="gov.hhs.onc.sdcct.data.db.impl.SdcctDataSource"
-        p:acquireIncrement="${sdcct.data.db.pool.acquire.increment}"
-        p:initialPoolSize="${sdcct.data.db.pool.size.min}"
-        p:maxIdleTime="${sdcct.data.db.pool.idle.time.max}"
-        p:maxPoolSize="${sdcct.data.db.pool.size.max}"
-        p:minPoolSize="${sdcct.data.db.pool.size.min}"
-        p:password="${sdcct.data.db.user.main.pass}"
-        p:user="${sdcct.data.db.user.main.name}"/>
+    <beans:bean id="dataSrcConfig" class="gov.hhs.onc.sdcct.data.db.jdbc.impl.SdcctDataSourceConfig"
+        p:autoCommit="false"
+        p:connectionTestQuery="${sdcct.data.db.pool.conn.test.query}"
+        p:connectionTimeout="${sdcct.data.db.pool.conn.timeout}"
+        p:driverClassName="${sdcct.data.db.jdbc.driver.class.name}"
+        p:idleTimeout="${sdcct.data.db.pool.idle.timeout}"
+        p:initializationFailFast="true"
+        p:isolateInternalQueries="true"
+        p:jdbcUrl="${sdcct.data.db.jdbc.url}"
+        p:loginTimeout="${sdcct.data.db.pool.login.timeout}"
+        p:loginTimeoutPropertyName="${sdcct.data.db.pool.login.timeout.prop.name}"
+        p:maximumPoolSize="${sdcct.data.db.pool.size.max}"
+        p:maxLifetime="${sdcct.data.db.pool.lifetime.max}"
+        p:minimumIdle="${sdcct.data.db.pool.size.min}"
+        p:poolName="${sdcct.data.db.pool.name}"
+        p:scheduledExecutorService="#{ taskSchedulerDataSrc.scheduledThreadPoolExecutor }"
+        p:validationTimeout="${sdcct.data.db.pool.validation.timeout}">
+        <beans:property name="user">
+            <!--suppress SpringPlaceholdersInspection -->
+            <beans:bean parent="dbUser"
+                c:name="${sdcct.data.db.user.main.name}"
+                c:pass="${sdcct.data.db.user.main.pass}">
+                <beans:constructor-arg name="roles">
+                    <beans:array>
+                        <!--suppress SpringPlaceholdersInspection -->
+                        <beans:bean class="gov.hhs.onc.sdcct.data.db.security.impl.DbRole"
+                            c:name="${sdcct.data.db.role.main.name}">
+                            <beans:constructor-arg name="authorities">
+                                <beans:array>
+                                    <beans:bean parent="dbAuthoritySeq"
+                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbSequenceNames).RESOURCE_ID }"/>
+                                    <beans:bean parent="dbAuthoritySeq"
+                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbSequenceNames).REVISION_ID }"/>
+                                    <beans:bean parent="dbAuthoritySeq"
+                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbSequenceNames).SEARCH_PARAM_ID }"/>
+                                    <beans:bean parent="dbAuthorityTableFull"
+                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).RESOURCE }"/>
+                                    <beans:bean parent="dbAuthorityTable"
+                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).RESOURCE_HISTORY }">
+                                        <beans:constructor-arg name="privileges">
+                                            <beans:array>
+                                                <beans:value>SELECT</beans:value>
+                                                <beans:value>INSERT</beans:value>
+                                                <beans:value>UPDATE</beans:value>
+                                            </beans:array>
+                                        </beans:constructor-arg>
+                                    </beans:bean>
+                                    <beans:bean parent="dbAuthorityTable"
+                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).REVISION }">
+                                        <beans:constructor-arg name="privileges">
+                                            <beans:array>
+                                                <beans:value>SELECT</beans:value>
+                                                <beans:value>INSERT</beans:value>
+                                            </beans:array>
+                                        </beans:constructor-arg>
+                                    </beans:bean>
+                                    <beans:bean parent="dbAuthorityTableFull"
+                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).SEARCH_PARAM_DATE }"/>
+                                    <beans:bean parent="dbAuthorityTableFull"
+                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).SEARCH_PARAM_NUMBER }"/>
+                                    <beans:bean parent="dbAuthorityTableFull"
+                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).SEARCH_PARAM_QUANTITY }"/>
+                                    <beans:bean parent="dbAuthorityTableFull"
+                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).SEARCH_PARAM_REF }"/>
+                                    <beans:bean parent="dbAuthorityTableFull"
+                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).SEARCH_PARAM_STRING }"/>
+                                    <beans:bean parent="dbAuthorityTableFull"
+                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).SEARCH_PARAM_TOKEN }"/>
+                                    <beans:bean parent="dbAuthorityTableFull"
+                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).SEARCH_PARAM_URI }"/>
+                                </beans:array>
+                            </beans:constructor-arg>
+                        </beans:bean>
+                    </beans:array>
+                </beans:constructor-arg>
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
     
     <!--====================================================================================================
     = DATABASE SERVERS
     =====================================================================================================-->
     <!--suppress SpringPlaceholdersInspection -->
-    <beans:bean id="dbServerHsql" class="gov.hhs.onc.sdcct.data.db.server.impl.HsqlServerImpl"
-        p:adminPassword="${sdcct.data.db.user.admin.pass}"
-        p:adminUser="${sdcct.data.db.user.admin.name}"
+    <beans:bean id="dbServer" class="gov.hhs.onc.sdcct.data.db.server.impl.HsqlServerImpl"
         p:databaseDirectory="${sdcct.data.db.dir}"
         p:databaseName="${sdcct.data.db.name}"
         p:hostAddress="${sdcct.data.db.server.host.addr}"
-        p:password="${sdcct.data.db.user.main.pass}"
-        p:port="${sdcct.data.db.server.port}"
-        p:user="${sdcct.data.db.user.main.name}">
+        p:port="${sdcct.data.db.server.port}">
+        <beans:property name="adminUser">
+            <!--suppress SpringPlaceholdersInspection -->
+            <beans:bean parent="dbUser"
+                c:name="${sdcct.data.db.user.admin.name}"
+                c:pass="${sdcct.data.db.user.admin.pass}">
+                <beans:constructor-arg name="roles">
+                    <beans:array/>
+                </beans:constructor-arg>
+            </beans:bean>
+        </beans:property>
         <beans:property name="initializationScriptSources">
             <beans:array>
                 <!--suppress SpringPlaceholdersInspection -->
@@ -68,16 +197,19 @@
     </beans:bean>
     
     <!--====================================================================================================
+    = DATA SOURCES
+    =====================================================================================================-->
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="dataSrc" class="gov.hhs.onc.sdcct.data.db.jdbc.impl.SdcctPooledDataSource" depends-on="dbServer"
+        c:config-ref="dataSrcConfig"/>
+    
+    <!--====================================================================================================
     = ENTITY MANAGERS
     =====================================================================================================-->
-    <beans:bean id="entityManagerFactory" class="gov.hhs.onc.sdcct.data.db.impl.SdcctEntityManagerFactoryFactoryBean" depends-on="dbServerHsql"
+    <beans:bean id="entityManagerFactory" class="gov.hhs.onc.sdcct.data.db.impl.SdcctEntityManagerFactoryFactoryBean"
         p:dataSource-ref="dataSrc"
         p:packagesToScan="gov.hhs.onc.sdcct"
         p:persistenceUnitName="sdcct">
-        <beans:property name="cacheRegionFactory">
-            <beans:bean class="gov.hhs.onc.sdcct.data.cache.impl.CacheRegionFactory"
-                p:cacheManager-ref="cacheManagerDb"/>
-        </beans:property>
         <beans:property name="jpaPropertyMap">
             <beans:map>
                 <beans:entry key="#{ T(org.hibernate.envers.configuration.EnversSettings).AUDIT_STRATEGY }"
@@ -88,7 +220,6 @@
                     value="#{ T(gov.hhs.onc.sdcct.data.db.DbColumnNames).REVISION_END_TIMESTAMP }"/>
                 <beans:entry key="#{ T(org.hibernate.envers.configuration.EnversSettings).AUDIT_STRATEGY_VALIDITY_STORE_REVEND_TIMESTAMP }" value="true"/>
                 <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).AUTO_EVICT_COLLECTION_CACHE }" value="true"/>
-                <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).DIALECT }" value="#{ T(org.hibernate.dialect.HSQLDialect).name }"/>
                 <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).GENERATE_STATISTICS }" value="true"/>
                 <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).INTERCEPTOR }" value-ref="entityInterceptorLogging"/>
                 <!--suppress SpringPlaceholdersInspection -->
@@ -105,7 +236,6 @@
                     value="#{ T(gov.hhs.onc.sdcct.data.db.DbColumnNames).REVISION_ID }"/>
                 <beans:entry key="#{ T(org.hibernate.envers.configuration.EnversSettings).REVISION_TYPE_FIELD_NAME }"
                     value="#{ T(gov.hhs.onc.sdcct.data.db.DbColumnNames).REVISION_TYPE }"/>
-                <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).STATEMENT_INSPECTOR }" value-ref="statementInspectorLogging"/>
                 <beans:entry key="#{ T(org.hibernate.search.cfg.Environment).WORKER_ENLIST_IN_TRANSACTION }" value="true"/>
             </beans:map>
         </beans:property>

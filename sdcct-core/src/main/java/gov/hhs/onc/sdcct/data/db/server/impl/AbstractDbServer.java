@@ -2,12 +2,20 @@ package gov.hhs.onc.sdcct.data.db.server.impl;
 
 import gov.hhs.onc.sdcct.beans.factory.impl.EmbeddedPlaceholderResolver;
 import gov.hhs.onc.sdcct.beans.impl.AbstractLifecycleBean;
-import gov.hhs.onc.sdcct.data.db.impl.SdcctDataSource;
+import gov.hhs.onc.sdcct.data.db.impl.SdcctHsqlDialect;
+import gov.hhs.onc.sdcct.data.db.jdbc.impl.SdcctDataSourceConfig;
+import gov.hhs.onc.sdcct.data.db.jdbc.impl.SdcctDriverDataSource;
+import gov.hhs.onc.sdcct.data.db.security.DbAuthority;
+import gov.hhs.onc.sdcct.data.db.security.impl.DbRole;
+import gov.hhs.onc.sdcct.data.db.security.impl.DbUser;
 import gov.hhs.onc.sdcct.data.db.server.DbServer;
 import gov.hhs.onc.sdcct.io.impl.ResourceSource;
+import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
+import java.util.Map;
 import javax.annotation.Nonnegative;
+import org.apache.commons.lang3.text.StrBuilder;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -17,19 +25,16 @@ import org.springframework.jdbc.datasource.init.ScriptUtils;
 
 public abstract class AbstractDbServer extends AbstractLifecycleBean implements DbServer {
     @Autowired
-    protected SdcctDataSource dataSrc;
+    protected SdcctDataSourceConfig dataSrcConfig;
 
     @Autowired
     protected EmbeddedPlaceholderResolver embeddedPlaceholderResolver;
 
-    protected String adminPass;
-    protected String adminUser;
+    protected DbUser adminUser;
     protected String dbName;
-    protected String hostAddr;
+    protected InetAddress hostAddr;
     protected ResourceSource[] initScriptSrcs;
-    protected String pass;
     protected int port;
-    protected String user;
 
     @Override
     public void stop() {
@@ -70,50 +75,57 @@ public abstract class AbstractDbServer extends AbstractLifecycleBean implements 
     protected abstract void startInternal() throws Exception;
 
     protected void executeInitializationScripts() throws Exception {
-        Connection conn = null;
+        SdcctDriverDataSource adminDataSrc = null;
+        Connection adminConn = null;
 
         try {
-            this.dataSrc.setUser(this.adminUser);
-            this.dataSrc.setPassword(this.adminPass);
-
-            conn = DataSourceUtils.getConnection(this.dataSrc);
+            adminConn = DataSourceUtils.getConnection((adminDataSrc = this.dataSrcConfig.buildDataSource(this.adminUser, true)));
 
             for (ResourceSource initScriptSrc : this.initScriptSrcs) {
                 ScriptUtils.executeSqlScript(
-                    conn,
+                    adminConn,
                     new EncodedResource(new ByteArrayResource(this.embeddedPlaceholderResolver.resolvePlaceholders(
                         new String(initScriptSrc.getBytes(), StandardCharsets.UTF_8)).getBytes(StandardCharsets.UTF_8), initScriptSrc.getResource()
                         .getDescription()), StandardCharsets.UTF_8));
             }
-        } finally {
-            this.dataSrc.setUser(this.user);
-            this.dataSrc.setPassword(this.pass);
 
-            if (conn != null) {
-                DataSourceUtils.releaseConnection(conn, this.dataSrc);
+            DbUser user = this.dataSrcConfig.getUser();
+            String userName = user.getName();
+            Map<String, DbRole> roles = user.getRoles();
+            StrBuilder secSqlBuilder = new StrBuilder();
+
+            secSqlBuilder.append(SdcctHsqlDialect.INSTANCE.getCreateUserString(userName, user.getCredentials()));
+            secSqlBuilder.appendNewLine();
+
+            for (String roleName : roles.keySet()) {
+                secSqlBuilder.append(SdcctHsqlDialect.INSTANCE.getCreateRoleString(roleName));
+                secSqlBuilder.appendNewLine();
+                secSqlBuilder.append(SdcctHsqlDialect.INSTANCE.getGrantRoleString(roleName, userName));
+
+                for (DbAuthority authority : roles.get(roleName).getAuthorities()) {
+                    secSqlBuilder.appendNewLine();
+                    secSqlBuilder.append(SdcctHsqlDialect.INSTANCE.getGrantOnString(authority, roleName));
+                }
             }
 
-            this.dataSrc.resetPoolManager(true);
+            ScriptUtils.executeSqlScript(adminConn, new EncodedResource(new ByteArrayResource(secSqlBuilder.build().getBytes(StandardCharsets.UTF_8)),
+                StandardCharsets.UTF_8));
+
+            adminConn.commit();
+        } finally {
+            if (adminConn != null) {
+                DataSourceUtils.releaseConnection(adminConn, adminDataSrc);
+            }
         }
     }
 
     @Override
-    public String getAdminPassword() {
-        return this.adminPass;
-    }
-
-    @Override
-    public void setAdminPassword(String adminPass) {
-        this.adminPass = adminPass;
-    }
-
-    @Override
-    public String getAdminUser() {
+    public DbUser getAdminUser() {
         return this.adminUser;
     }
 
     @Override
-    public void setAdminUser(String adminUser) {
+    public void setAdminUser(DbUser adminUser) {
         this.adminUser = adminUser;
     }
 
@@ -127,16 +139,11 @@ public abstract class AbstractDbServer extends AbstractLifecycleBean implements 
         this.dbName = dbName;
     }
 
-    @Override
-    public SdcctDataSource getDataSource() {
-        return this.dataSrc;
-    }
-
-    public String getHostAddress() {
+    public InetAddress getHostAddress() {
         return this.hostAddr;
     }
 
-    public void setHostAddress(String hostAddr) {
+    public void setHostAddress(InetAddress hostAddr) {
         this.hostAddr = hostAddr;
     }
 
@@ -150,16 +157,6 @@ public abstract class AbstractDbServer extends AbstractLifecycleBean implements 
         this.initScriptSrcs = initScriptSrcs;
     }
 
-    @Override
-    public String getPassword() {
-        return this.pass;
-    }
-
-    @Override
-    public void setPassword(String pass) {
-        this.pass = pass;
-    }
-
     @Nonnegative
     @Override
     public int getPort() {
@@ -169,15 +166,5 @@ public abstract class AbstractDbServer extends AbstractLifecycleBean implements 
     @Override
     public void setPort(@Nonnegative int port) {
         this.port = port;
-    }
-
-    @Override
-    public String getUser() {
-        return this.user;
-    }
-
-    @Override
-    public void setUser(String user) {
-        this.user = user;
     }
 }

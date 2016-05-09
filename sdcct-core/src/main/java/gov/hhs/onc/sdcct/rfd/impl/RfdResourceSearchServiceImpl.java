@@ -1,6 +1,6 @@
 package gov.hhs.onc.sdcct.rfd.impl;
 
-import gov.hhs.onc.sdcct.data.db.impl.AbstractSearchService;
+import gov.hhs.onc.sdcct.data.search.impl.AbstractSearchService;
 import gov.hhs.onc.sdcct.rfd.RfdResource;
 import gov.hhs.onc.sdcct.rfd.RfdResourceRegistry;
 import gov.hhs.onc.sdcct.rfd.RfdResourceSearchService;

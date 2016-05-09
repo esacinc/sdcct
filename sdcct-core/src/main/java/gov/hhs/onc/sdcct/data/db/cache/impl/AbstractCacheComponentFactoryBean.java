@@ -1,4 +1,4 @@
-package gov.hhs.onc.sdcct.data.cache.impl;
+package gov.hhs.onc.sdcct.data.db.cache.impl;
 
 import gov.hhs.onc.sdcct.beans.factory.impl.AbstractSdcctFactoryBean;
 import org.springframework.beans.factory.BeanNameAware;

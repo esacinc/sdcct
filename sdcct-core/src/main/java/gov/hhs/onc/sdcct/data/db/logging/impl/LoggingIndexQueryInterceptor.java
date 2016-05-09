@@ -1,4 +1,4 @@
-package gov.hhs.onc.sdcct.data.db.impl;
+package gov.hhs.onc.sdcct.data.db.logging.impl;
 
 import gov.hhs.onc.sdcct.data.SdcctEntity;
 import org.apache.commons.lang3.text.StrBuilder;
