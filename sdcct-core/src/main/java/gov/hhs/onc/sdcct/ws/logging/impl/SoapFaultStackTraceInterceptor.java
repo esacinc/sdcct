@@ -38,7 +38,7 @@ public class SoapFaultStackTraceInterceptor extends AbstractPhaseInterceptor<Soa
         Document faultDetailDoc = faultDetailElem.getOwnerDocument();
 
         Element faultDetailStacktraceElem =
-            faultDetailDoc.createElementNS(SdcctUris.SDCCT_SOAP_URN_VALUE, SdcctXmlQnameUtils.buildQualifiedName(WsXmlQnames.STACK_TRACE));
+            faultDetailDoc.createElementNS(SdcctUris.SDCCT_WS_URN_VALUE, SdcctXmlQnameUtils.buildQualifiedName(WsXmlQnames.STACK_TRACE));
         faultDetailStacktraceElem
             .appendChild(faultDetailDoc.createCDATASection((StringUtils.LF + SdcctExceptionUtils.buildRootCauseStackTrace(faultCause) + StringUtils.LF)));
         faultDetailElem.appendChild(faultDetailStacktraceElem);

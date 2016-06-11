@@ -7,8 +7,9 @@ public final class SdcctXmlPrefixes {
     public final static String SDC = "sdc";
     public final static String SDCCT = "sdcct";
     public final static String SDCCT_JAXB = SDCCT + "-jaxb";
-    public final static String SDCCT_SOAP = SDCCT + "-soap";
+    public final static String SDCCT_WS = SDCCT + "-ws";
     public final static String XHTML = "xhtml";
+    public final static String XHTML_XPATH = "h";
     public final static String XML = "xml";
 
     private SdcctXmlPrefixes() {

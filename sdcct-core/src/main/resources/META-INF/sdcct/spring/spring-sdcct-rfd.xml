@@ -3,48 +3,152 @@
     xmlns:beans="http://www.springframework.org/schema/beans"
     xmlns:c="http://www.springframework.org/schema/c"
     xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="
-        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
+        urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
     
     <!--====================================================================================================
-    = SEARCH PARAM METADATAS
+    = XPATH OPTIONS
     =====================================================================================================-->
-    <beans:bean id="metadataSearchParamRfd" parent="metadataSearchParam" abstract="true">
+    <sdcct-xml:xpath-static-options id="xpathOptsStaticRfd" parent="xpathOptsStatic" abstract="true">
+        <sdcct-xml:static-namespace prefix="#{ T(gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes).SDC }">
+            #{ T(gov.hhs.onc.sdcct.net.SdcctUris).SDC_URL_VALUE }
+        </sdcct-xml:static-namespace>
+    </sdcct-xml:xpath-static-options>
+    
+    <!--====================================================================================================
+    = RESOURCE PARAM METADATAS
+    =====================================================================================================-->
+    <beans:bean id="metadataResourceParamRfd" parent="metadataResourceParam" abstract="true">
         <beans:constructor-arg name="specType" value="RFD"/>
     </beans:bean>
     
     <!--====================================================================================================
-    = RESOURCE METADATA BUILDERS
+    = RESOURCE METADATAS
     =====================================================================================================-->
-    <beans:bean id="resourceMetadataBuilderRfd" class="gov.hhs.onc.sdcct.rfd.impl.RfdResourceMetadataBuilderImpl">
-        <beans:property name="searchParamMetadatas">
+    <beans:bean id="metadataResourceRfd" class="gov.hhs.onc.sdcct.rfd.metadata.impl.RfdResourceMetadataImpl" abstract="true">
+        <beans:property name="canonicalRemoveXpathExecutables">
             <beans:array>
-                <beans:bean parent="metadataSearchParamRfd"
-                    c:id="#{ T(gov.hhs.onc.sdcct.data.search.SearchParamNames).IDENTIFIER }"
-                    c:inline="false"
-                    c:name="#{ T(gov.hhs.onc.sdcct.data.search.SearchParamNames).IDENTIFIER }"
-                    c:type="#{ T(gov.hhs.onc.sdcct.data.search.SearchParamType).TOKEN }">
-                    <beans:constructor-arg name="xpathExec">
-                        <beans:bean factory-bean="xpathCompiler" factory-method="compile"
-                            c:exprStr="/sdc:FormDesignType/@formID">
-                            <beans:constructor-arg name="staticOpts">
-                                <beans:bean parent="xpathOptsStaticRfd"/>
-                            </beans:constructor-arg>
-                        </beans:bean>
-                    </beans:constructor-arg>
+                <sdcct-xml:xpath-executable>
+                    <sdcct-xml:xpath-expression>//sdc:HTML</sdcct-xml:xpath-expression>
+                    <sdcct-xml:xpath-static-options parent="xpathOptsStaticRfd"/>
+                </sdcct-xml:xpath-executable>
+            </beans:array>
+        </beans:property>
+    </beans:bean>
+    
+    <beans:bean id="metadataResourceRfdFormDesign" parent="metadataResourceRfd"
+        c:id="#{ T(gov.hhs.onc.sdcct.rfd.RfdResourceType).FORM_DESIGN.id }"
+        c:name="#{ T(gov.hhs.onc.sdcct.rfd.RfdResourceType).FORM_DESIGN.name }"
+        c:path="#{ T(gov.hhs.onc.sdcct.rfd.RfdResourceType).FORM_DESIGN.id }"
+        c:beanClass="#{ T(gov.hhs.onc.sdcct.sdc.FormDesignType) }"
+        c:beanImplClass="#{ T(gov.hhs.onc.sdcct.sdc.impl.FormDesignTypeImpl) }">
+        <beans:property name="canonicalRemoveXpathExecutables">
+            <beans:array merge="true">
+                <sdcct-xml:xpath-executable>
+                    <sdcct-xml:xpath-expression>@formInstanceURI</sdcct-xml:xpath-expression>
+                    <sdcct-xml:xpath-static-options parent="xpathOptsStaticRfd"/>
+                </sdcct-xml:xpath-executable>
+                <sdcct-xml:xpath-executable>
+                    <sdcct-xml:xpath-expression>@formInstanceVersionURI</sdcct-xml:xpath-expression>
+                    <sdcct-xml:xpath-static-options parent="xpathOptsStaticRfd"/>
+                </sdcct-xml:xpath-executable>
+            </beans:array>
+        </beans:property>
+        <beans:property name="paramMetadatas">
+            <beans:array>
+                <beans:bean parent="metadataResourceParamRfd"
+                    c:id="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamNames).INSTANCE_ID }"
+                    c:name="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamNames).INSTANCE_ID }"
+                    c:type="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamType).URI }"
+                    p:expression="formInstanceUri"
+                    p:inline="true"
+                    p:meta="true">
+                    <beans:property name="cardinality">
+                        <beans:bean parent="resourceParamCardinality"
+                            c:max="1"
+                            c:min="0"/>
+                    </beans:property>
+                    <beans:property name="xpathExecutable">
+                        <sdcct-xml:xpath-executable>
+                            <sdcct-xml:xpath-expression>@formInstanceURI</sdcct-xml:xpath-expression>
+                            <sdcct-xml:xpath-static-options parent="xpathOptsStaticRfd"/>
+                        </sdcct-xml:xpath-executable>
+                    </beans:property>
+                </beans:bean>
+                <beans:bean parent="metadataResourceParamRfd"
+                    c:id="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamNames).VERSION }"
+                    c:name="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamNames).VERSION }"
+                    c:type="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamType).URI }"
+                    p:expression="formInstanceVersionUri"
+                    p:inline="true"
+                    p:meta="true">
+                    <beans:property name="cardinality">
+                        <beans:bean parent="resourceParamCardinality"
+                            c:max="1"
+                            c:min="0"/>
+                    </beans:property>
+                    <beans:property name="xpathExecutable">
+                        <sdcct-xml:xpath-executable>
+                            <sdcct-xml:xpath-expression>@formInstanceVersionURI</sdcct-xml:xpath-expression>
+                            <sdcct-xml:xpath-static-options parent="xpathOptsStaticRfd"/>
+                        </sdcct-xml:xpath-executable>
+                    </beans:property>
                 </beans:bean>
             </beans:array>
         </beans:property>
     </beans:bean>
     
     <!--====================================================================================================
-    = RESOURCE PROCESSORS
+    = RESOURCE METADATA SERVICES
     =====================================================================================================-->
-    <beans:bean id="resourceProcRfd" class="gov.hhs.onc.sdcct.rfd.impl.RfdResourceProcessorImpl"/>
+    <beans:bean id="resourceMetadataServiceRfd" class="gov.hhs.onc.sdcct.rfd.metadata.impl.RfdResourceMetadataServiceImpl">
+        <beans:property name="baseParamMetadatas">
+            <beans:array>
+                <beans:bean parent="metadataResourceParamRfd"
+                    c:id="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamNames).IDENTIFIER }"
+                    c:name="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamNames).IDENTIFIER }"
+                    c:type="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamType).URI }"
+                    p:expression="ID">
+                    <beans:property name="cardinality">
+                        <beans:bean parent="resourceParamCardinality"
+                            c:max="1"
+                            c:min="0"/>
+                    </beans:property>
+                    <beans:property name="xpathExecutable">
+                        <sdcct-xml:xpath-executable>
+                            <sdcct-xml:xpath-expression>@ID</sdcct-xml:xpath-expression>
+                            <sdcct-xml:xpath-static-options parent="xpathOptsStaticRfd"/>
+                        </sdcct-xml:xpath-executable>
+                    </beans:property>
+                </beans:bean>
+            </beans:array>
+        </beans:property>
+    </beans:bean>
     
     <!--====================================================================================================
-    = DATABASE EVENT LISTENERS
+    = RESOURCE REGISTRIES
     =====================================================================================================-->
-    <beans:bean id="dbEventListenerResourceRfd" class="gov.hhs.onc.sdcct.rfd.impl.RfdResourceDbEventListenerImpl"/>
+    <beans:bean id="resourceRegistryRfd" class="gov.hhs.onc.sdcct.rfd.impl.RfdResourceRegistryImpl" abstract="true"/>
+    
+    <beans:bean id="resourceRegistryRfdFormDesign" parent="resourceRegistryRfd"
+        c:resourceMetadata-ref="metadataResourceRfdFormDesign"/>
+    
+    <!--====================================================================================================
+    = SEARCH SERVICES
+    =====================================================================================================-->
+    <beans:bean id="searchServiceRfd" class="gov.hhs.onc.sdcct.rfd.search.impl.RfdSearchServiceImpl" abstract="true"/>
+    
+    <beans:bean id="searchServiceRfdFormDesign" parent="searchServiceRfd"
+        c:resourceMetadata-ref="metadataResourceRfdFormDesign"
+        c:resourceRegistry-ref="resourceRegistryRfdFormDesign"/>
+    
+    <!--====================================================================================================
+    = FORMS
+    =====================================================================================================-->
+    <beans:bean id="formRfd" class="gov.hhs.onc.sdcct.rfd.impl.RfdFormImpl" abstract="true"/>
 </beans:beans>

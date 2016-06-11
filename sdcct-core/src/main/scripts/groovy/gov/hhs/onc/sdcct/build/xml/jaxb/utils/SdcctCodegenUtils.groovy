@@ -1,30 +1,38 @@
 package gov.hhs.onc.sdcct.build.xml.jaxb.utils
 
+import com.github.sebhoss.warnings.CompilerWarnings
 import com.sun.codemodel.JAnnotatable
+import com.sun.codemodel.JAnnotationArrayMember
 import com.sun.codemodel.JAnnotationUse
 import com.sun.codemodel.JAnnotationValue
 import com.sun.codemodel.JBlock
+import com.sun.codemodel.JClass
 import com.sun.codemodel.JCodeModel
 import com.sun.codemodel.JDefinedClass
 import com.sun.codemodel.JEnumConstant
 import com.sun.codemodel.JExpr
 import com.sun.codemodel.JExpression
+import com.sun.codemodel.JFieldRef
 import com.sun.codemodel.JFieldVar
+import com.sun.codemodel.JInvocation
 import com.sun.codemodel.JMethod
 import com.sun.codemodel.JMod
 import com.sun.codemodel.JPackage
+import com.sun.codemodel.JType
 import com.sun.codemodel.JVar
+import com.sun.tools.xjc.model.CClassInfo
 import gov.hhs.onc.sdcct.build.utils.SdcctBuildUtils
 import gov.hhs.onc.sdcct.utils.SdcctClassUtils
 import gov.hhs.onc.sdcct.utils.SdcctEnumUtils
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils
+import java.lang.annotation.Annotation
 import java.lang.reflect.Field
 import java.lang.reflect.Method
-import java.util.regex.Pattern
 import javax.annotation.Nullable
+import org.apache.commons.collections4.CollectionUtils
 import org.apache.commons.lang3.StringUtils
 
-final class SdcctCodegenUtils {    
+final class SdcctCodegenUtils {
     final static int CONST_FIELD_MODS = (JMod.PUBLIC | JMod.FINAL | JMod.STATIC)
     final static int ENUM_FIELD_MODS = (JMod.PRIVATE | JMod.FINAL)
     
@@ -34,9 +42,16 @@ final class SdcctCodegenUtils {
     final static String VALUE_MEMBER_NAME = "value"
     final static String VALUE_ITEM_MEMBER_NAME = VALUE_MEMBER_NAME + "Item"
     
+    final static String ANNOS_FIELD_NAME = "annotations"
+    final static String ARGS_FIELD_NAME = "args"
     final static String COMMENTS_FIELD_NAME = "comments"
     final static String ENUM_CONSTS_BY_NAME_FIELD_NAME = "enumConstantsByName"
+    final static String EXPR_FIELD_NAME = "expr"
+    final static String FIELDS_FIELD_NAME = "fields"
+    final static String INIT_FIELD_NAME = "init"
     final static String MEMBER_VALUES_FIELD_NAME = "memberValues"
+    final static String VALUES_FIELD_NAME = VALUE_MEMBER_NAME + "s"
+    final static String VAR_FIELD_NAME = "var"
     
     final static String ADDER_METHOD_NAME_PREFIX = "add"
     final static String GETTER_METHOD_NAME_PREFIX = "get"
@@ -57,15 +72,33 @@ final class SdcctCodegenUtils {
     final static String VALUE_GETTER_METHOD_NAME = GETTER_METHOD_NAME_PREFIX + VALUE_METHOD_NAME_SUFFIX
     final static String VALUE_SETTER_METHOD_NAME = SETTER_METHOD_NAME_PREFIX + VALUE_METHOD_NAME_SUFFIX
     
+    final static String ELEM_FORM_DEFAULT_ANNO_PARAM_NAME = "elementFormDefault"
+    final static String NS_ANNO_PARAM_NAME = "namespace"
+    final static String NS_URI_ANNO_PARAM_NAME = NS_ANNO_PARAM_NAME + "URI"
+    final static String PREFIX_ANNO_PARAM_NAME = "prefix"
+    final static String XMLNS_ANNO_PARAM_NAME = "xmlns"
+    
     private final static Field ANNO_MODEL_MEMBER_VALUES_FIELD = JAnnotationUse.declaredFields.find{ (it.name == MEMBER_VALUES_FIELD_NAME) }
+    private final static Field ANNO_ARR_MEMBER_MODEL_VALUES_FIELD = JAnnotationArrayMember.declaredFields.find{ (it.name == VALUES_FIELD_NAME) }
+    private final static Field CLASS_MODEL_ANNOS_FIELD = JDefinedClass.declaredFields.find{ (it.name == ANNOS_FIELD_NAME) }
     private final static Field CLASS_MODEL_ENUM_CONSTS_BY_NAME_FIELD = JDefinedClass.declaredFields.find{ (it.name == ENUM_CONSTS_BY_NAME_FIELD_NAME) }
+    private final static Field CLASS_MODEL_FIELDS_FIELD = JDefinedClass.declaredFields.find{ (it.name == FIELDS_FIELD_NAME) }
     private final static Field CLASS_MODEL_NAME_FIELD = JDefinedClass.declaredFields.find{ (it.name == NAME_MEMBER_NAME) }
+    private final static Field FIELD_REF_MODEL_VAR_FIELD = JFieldRef.declaredFields.find{ (it.name == VAR_FIELD_NAME) }
+    private final static Field INVOCATION_MODEL_ARGS_FIELD = JInvocation.declaredFields.find{ (it.name == ARGS_FIELD_NAME) }
+    private final static Field METHOD_MODEL_ANNOS_FIELD = JMethod.declaredFields.find{ (it.name == ANNOS_FIELD_NAME) }
+    private final static Field RETURN_MODEL_EXPR_FIELD = Class.forName("com.sun.codemodel.JReturn").declaredFields.find{ (it.name == EXPR_FIELD_NAME) }
+    private final static Field VAR_MODEL_ANNOS_FIELD = JVar.declaredFields.find{ (it.name == ANNOS_FIELD_NAME) }
+    private final static Field VAR_MODEL_INIT_FIELD = JVar.declaredFields.find{ (it.name == INIT_FIELD_NAME) }
     
     private final static Method ANNO_MODEL_ADD_VALUE_METHOD = JAnnotationUse.declaredMethods.find{ (it.name == VALUE_ADDER_METHOD_NAME) }
     
     static {
-        [ ANNO_MODEL_MEMBER_VALUES_FIELD, CLASS_MODEL_ENUM_CONSTS_BY_NAME_FIELD, CLASS_MODEL_NAME_FIELD, ANNO_MODEL_ADD_VALUE_METHOD ]
-            .each{ (it.accessible = true) }
+        [
+            ANNO_MODEL_MEMBER_VALUES_FIELD, ANNO_ARR_MEMBER_MODEL_VALUES_FIELD, CLASS_MODEL_ANNOS_FIELD, CLASS_MODEL_ENUM_CONSTS_BY_NAME_FIELD,
+            CLASS_MODEL_FIELDS_FIELD, CLASS_MODEL_NAME_FIELD, FIELD_REF_MODEL_VAR_FIELD, INVOCATION_MODEL_ARGS_FIELD, METHOD_MODEL_ANNOS_FIELD,
+            RETURN_MODEL_EXPR_FIELD, VAR_MODEL_ANNOS_FIELD, VAR_MODEL_INIT_FIELD, ANNO_MODEL_ADD_VALUE_METHOD
+        ].each{ (it.accessible = true) }
     }
     
     private SdcctCodegenUtils() {
@@ -73,30 +106,6 @@ final class SdcctCodegenUtils {
     
     static String buildNormalizedId(String id) {
         return StringUtils.remove(StringUtils.remove(id, SdcctStringUtils.HYPHEN_CHAR), SdcctStringUtils.SLASH_CHAR).toLowerCase()
-    }
-    
-    static <T extends JAnnotatable, U extends JAnnotatable> U copyAnnotations(@Nullable T srcModel, U destModel) {
-        if (srcModel == null) {
-            return destModel
-        }
-        
-        JAnnotationUse destAnnoModel
-        
-        srcModel.annotations().each{
-            destAnnoModel = destModel.annotate(it.annotationClass)
-            
-            ((Map<String, JAnnotationValue>) ANNO_MODEL_MEMBER_VALUES_FIELD.get(it))?.each{
-                addAnnotationValue(destAnnoModel, it.key, it.value)
-            }
-        }
-        
-        return destModel
-    } 
-    
-    static JAnnotationUse addAnnotationValue(JAnnotationUse annoModel, String name, JAnnotationValue value) {
-        ANNO_MODEL_ADD_VALUE_METHOD.invoke(annoModel, name, value)
-        
-        return annoModel
     }
     
     static JDefinedClass clearConstructors(JDefinedClass classModel) {
@@ -151,6 +160,24 @@ final class SdcctCodegenUtils {
         return ((Map<String, JEnumConstant>) CLASS_MODEL_ENUM_CONSTS_BY_NAME_FIELD.get(classModel))
     }
     
+    @Nullable
+    static JVar buildFieldReferenceVariable(JFieldRef fieldRefModel) {
+        return ((JVar) FIELD_REF_MODEL_VAR_FIELD.get(fieldRefModel))
+    }
+    
+    @Nullable
+    static JExpression buildVariableInitializationExpression(JVar varModel) {
+        return ((JExpression) VAR_MODEL_INIT_FIELD.get(varModel))
+    }
+    
+    static List<JExpression> buildInvocationArgs(JInvocation invocationModel) {
+        return ((List<JExpression>) INVOCATION_MODEL_ARGS_FIELD.get(invocationModel))
+    }
+    
+    static JExpression buildReturnExpression(Object returnModel) {
+        return ((JExpression) RETURN_MODEL_EXPR_FIELD.get(returnModel))
+    }
+    
     static JDefinedClass clearFields(JDefinedClass classModel) {
         return removeFields(classModel, SdcctBuildUtils.TRUE_PREDICATE)
     }
@@ -159,6 +186,10 @@ final class SdcctCodegenUtils {
         classModel.fields().values().findAll(predicate).each{ classModel.removeField(it) }
         
         return classModel
+    }
+    
+    static Map<String, JFieldVar> buildFields(JDefinedClass classModel) {
+        return ((Map<String, JFieldVar>) CLASS_MODEL_FIELDS_FIELD.get(classModel))
     }
     
     static JMethod buildEnumValueMethod(JDefinedClass classModel, String fieldName) {
@@ -184,17 +215,51 @@ final class SdcctCodegenUtils {
         return enumFromValueMethodModel
     }
     
-    static JMethod buildFieldSetterMethod(JDefinedClass classModel, int mods, Class<?> type, String name, boolean overridden, boolean nullable) {
-        JMethod setterMethodModel = buildSetterMethod(classModel, mods, type, name, overridden, nullable)
+    static JMethod buildFieldAdderMethod(JDefinedClass classModel, int mods, JType type, JType valueItemType, String name, boolean useIs, boolean overridden) {
+        JMethod adderMethodModel = buildAdderMethod(classModel, mods, type, valueItemType, name, overridden)
         
-        setterMethodModel.body().assign(JExpr._this().ref(name), setterMethodModel.params()[0])
+        JBlock adderMethodModelBody = adderMethodModel.body()
+        adderMethodModelBody.staticInvoke(classModel.owner().directClass(CollectionUtils.name), ADD_ALL_METHOD_NAME)
+            .arg(JExpr._this().invoke(findGetterMethod(classModel, name, useIs))).arg(JExpr.direct(name))
+        adderMethodModelBody._return(JExpr._this())
+        
+        return adderMethodModel
+    }
+    
+    static JMethod buildAdderMethod(JDefinedClass classModel, int mods, JType type, JType valueItemType, String name, boolean overridden) {
+        JMethod adderMethodModel = classModel.method(mods, type, (ADDER_METHOD_NAME_PREFIX + StringUtils.capitalize(StringUtils.removeStart(name,
+            SdcctStringUtils.UNDERSCORE))))
+        adderMethodModel.varParam(valueItemType, name)
+        
+        if (overridden) {
+            adderMethodModel.annotate(Override)
+        }
+        
+        return adderMethodModel
+    }
+    
+    static JMethod buildFieldSetterMethod(JDefinedClass classModel, int mods, JType type, JType fieldType, JType valueType, String name, boolean overridden,
+        boolean nullable) {
+        JMethod setterMethodModel = buildSetterMethod(classModel, mods, type, valueType, name, overridden, nullable)
+        
+        JExpression fieldAssignModel = setterMethodModel.params()[0]
+        
+        if (fieldType != valueType) {
+            fieldAssignModel = JExpr.cast(fieldType, fieldAssignModel)
+        }
+        
+        JBlock setterMethodModelBody = setterMethodModel.body()
+        setterMethodModelBody.assign(JExpr._this().ref(name), fieldAssignModel)
+        setterMethodModelBody._return(JExpr._this())
         
         return setterMethodModel
     }
     
-    static JMethod buildSetterMethod(JDefinedClass classModel, int mods, Class<?> type, String name, boolean overridden, boolean nullable) {
-        JMethod setterMethodModel = classModel.method(mods, type, (SETTER_METHOD_NAME_PREFIX + StringUtils.capitalize(name)))
-        JVar setterMethodParamModel = setterMethodModel.param(type, name)
+    static JMethod buildSetterMethod(JDefinedClass classModel, int mods, JType type, JType valueType, String name, boolean overridden,
+        boolean nullable) {
+        JMethod setterMethodModel = classModel.method(mods, type, (SETTER_METHOD_NAME_PREFIX + StringUtils.capitalize(StringUtils.removeStart(name,
+            SdcctStringUtils.UNDERSCORE))))
+        JVar setterMethodParamModel = setterMethodModel.param(valueType, name)
         
         if (overridden) {
             setterMethodModel.annotate(Override)
@@ -216,7 +281,8 @@ final class SdcctCodegenUtils {
     }
     
     static JMethod buildHasMethod(JDefinedClass classModel, int mods, String name, boolean overridden) {
-        JMethod hasMethodModel = classModel.method(mods, classModel.owner().BOOLEAN, (HAS_METHOD_NAME_PREFIX + StringUtils.capitalize(name)))
+        JMethod hasMethodModel = classModel.method(mods, classModel.owner().BOOLEAN, (HAS_METHOD_NAME_PREFIX + StringUtils.capitalize(StringUtils.removeStart(
+            name, SdcctStringUtils.UNDERSCORE))))
         
         if (overridden) {
             hasMethodModel.annotate(Override)
@@ -225,17 +291,17 @@ final class SdcctCodegenUtils {
         return hasMethodModel
     }
     
-    static JMethod buildFieldGetterMethod(JDefinedClass classModel, int mods, Class<?> type, String name, boolean overridden, boolean nullable) {
-        JMethod getterMethodModel = buildGetterMethod(classModel, mods, type, name, overridden, nullable)
+    static JMethod buildFieldGetterMethod(JDefinedClass classModel, int mods, JType type, String name, boolean useIs, boolean overridden, boolean nullable) {
+        JMethod getterMethodModel = buildGetterMethod(classModel, mods, type, name, useIs, overridden, nullable)
         
         getterMethodModel.body()._return(JExpr._this().ref(name))
         
         return getterMethodModel
     }
     
-    static JMethod buildGetterMethod(JDefinedClass classModel, int mods, Class<?> type, String name, boolean overridden, boolean nullable) {
-        JMethod getterMethodModel = classModel.method(mods, type, ((SdcctClassUtils.BOOLEAN_CLASSES.contains(type) ? IS_GETTER_METHOD_NAME_PREFIX :
-            GETTER_METHOD_NAME_PREFIX) + StringUtils.capitalize(name)))
+    static JMethod buildGetterMethod(JDefinedClass classModel, int mods, JType type, String name, boolean useIs, boolean overridden, boolean nullable) {
+        JMethod getterMethodModel = classModel.method(mods, type, (((useIs && SdcctClassUtils.BOOLEAN_CLASSES.contains(type)) ? IS_GETTER_METHOD_NAME_PREFIX :
+            GETTER_METHOD_NAME_PREFIX) + StringUtils.capitalize(StringUtils.removeStart(name, SdcctStringUtils.UNDERSCORE))))
         
         if (overridden) {
             getterMethodModel.annotate(Override)
@@ -248,26 +314,24 @@ final class SdcctCodegenUtils {
         return getterMethodModel
     }
     
-    static JFieldVar buildEnumField(JDefinedClass classModel, Class<?> type, String name) {
+    static JFieldVar buildEnumField(JDefinedClass classModel, JType type, String name) {
         return classModel.field(ENUM_FIELD_MODS, type, name)
     }
     
-    static JFieldVar buildConstPatternField(JDefinedClass classModel, String name, @Nullable String value) {
-        return buildConstField(classModel, Pattern, name, ((value != null) ? classModel.owner().ref(Pattern).staticInvoke(COMPILE_METHOD_NAME).arg(value) :
-            null))
-    }
-    
     static JFieldVar buildConstUriField(JDefinedClass classModel, String name, @Nullable String value) {
-        return buildConstField(classModel, URI, name, ((value != null) ? classModel.owner().ref(URI).staticInvoke(CREATE_METHOD_NAME).arg(value) : null))
+        JCodeModel codeModel = classModel.owner()
+        
+        return buildConstField(classModel, codeModel.directClass(URI.name), name, ((value != null) ?
+            codeModel.ref(URI).staticInvoke(CREATE_METHOD_NAME).arg(value) : null))
     }
     
-    static JFieldVar buildConstField(JDefinedClass classModel, Class<?> type, String name, @Nullable String value) {
+    static JFieldVar buildConstField(JDefinedClass classModel, JType type, String name, @Nullable String value) {
         return buildConstField(classModel, type, name, buildLiteralExpression(value))
     }
     
-    static JFieldVar buildConstField(JDefinedClass classModel, Class<?> type, String name, @Nullable JExpression value) {
-        JFieldVar constFieldModel = classModel.field(CONST_FIELD_MODS, type,
-            StringUtils.splitByCharacterTypeCamelCase(name).join(SdcctStringUtils.UNDERSCORE).toUpperCase())
+    static JFieldVar buildConstField(JDefinedClass classModel, JType type, String name, @Nullable JExpression value) {
+        JFieldVar constFieldModel = classModel.field(CONST_FIELD_MODS, type, StringUtils.splitByCharacterTypeCamelCase(StringUtils.removeStart(name,
+            SdcctStringUtils.UNDERSCORE)).join(SdcctStringUtils.UNDERSCORE).toUpperCase())
         
         constFieldModel.init(((value != null) ? value : JExpr._null()))
         
@@ -310,22 +374,22 @@ final class SdcctCodegenUtils {
     }
     
     static boolean hasHasMethod(JDefinedClass classModel, String name) {
-        name = (HAS_METHOD_NAME_PREFIX + StringUtils.capitalize(name))
+        name = (HAS_METHOD_NAME_PREFIX + StringUtils.capitalize(StringUtils.removeStart(name, SdcctStringUtils.UNDERSCORE)))
         
         return hasMethod(classModel, { ((it.name() == name) && it.params().isEmpty() && SdcctClassUtils.BOOLEAN_CLASS_NAMES.contains(it.type().fullName())) })
     }
     
     static boolean hasSetterMethod(JDefinedClass classModel, String name) {
-        name = (SETTER_METHOD_NAME_PREFIX + StringUtils.capitalize(name))
+        name = (SETTER_METHOD_NAME_PREFIX + StringUtils.capitalize(StringUtils.removeStart(name, SdcctStringUtils.UNDERSCORE)))
         
         return hasMethod(classModel, { ((it.name() == name) && (it.params().size() == 1)) })
     }
     
-    static boolean hasGetterMethod(JDefinedClass classModel, String name) {
-        name = StringUtils.capitalize(name)
+    static boolean hasGetterMethod(JDefinedClass classModel, String name, boolean useIs) {
+        name = StringUtils.capitalize(StringUtils.removeStart(name, SdcctStringUtils.UNDERSCORE))
         
-        return hasMethod(classModel, { (it.name() == (SdcctClassUtils.BOOLEAN_CLASS_NAMES.contains(it.type().fullName()) ? IS_GETTER_METHOD_NAME_PREFIX :
-            GETTER_METHOD_NAME_PREFIX) + name) })
+        return hasMethod(classModel, { (it.name() == ((useIs && SdcctClassUtils.BOOLEAN_CLASS_NAMES.contains(it.type().fullName())) ?
+            IS_GETTER_METHOD_NAME_PREFIX : GETTER_METHOD_NAME_PREFIX) + name) })
     }
     
     static boolean hasMethod(JDefinedClass classModel, String name) {
@@ -345,9 +409,9 @@ final class SdcctCodegenUtils {
         return classModel.methods().findAll({ (StringUtils.startsWith(it.name(), SETTER_METHOD_NAME_PREFIX) && (it.params().size() == 1)) })
     }
     
-    static List<JMethod> findGetterMethods(JDefinedClass classModel) {
-        return classModel.methods().findAll({ (StringUtils.startsWith(it.name(), (SdcctClassUtils.BOOLEAN_CLASS_NAMES.contains(it.type().fullName()) ?
-            IS_GETTER_METHOD_NAME_PREFIX : GETTER_METHOD_NAME_PREFIX)) && it.params().isEmpty()) })
+    static List<JMethod> findGetterMethods(JDefinedClass classModel, boolean useIs) {
+        return classModel.methods().findAll({ (StringUtils.startsWith(it.name(), ((useIs && SdcctClassUtils.BOOLEAN_CLASS_NAMES.contains(it.type().fullName()))
+            ? IS_GETTER_METHOD_NAME_PREFIX : GETTER_METHOD_NAME_PREFIX)) && it.params().isEmpty()) })
     }
     
     static List<JMethod> findMethods(JDefinedClass classModel, Closure<Boolean> predicate) {
@@ -356,24 +420,24 @@ final class SdcctCodegenUtils {
     
     @Nullable
     static JMethod findHasMethod(JDefinedClass classModel, String name) {
-        name = (HAS_METHOD_NAME_PREFIX + StringUtils.capitalize(name))
+        name = (HAS_METHOD_NAME_PREFIX + StringUtils.capitalize(StringUtils.removeStart(name, SdcctStringUtils.UNDERSCORE)))
         
         return findMethod(classModel, { ((it.name() == name) && it.params().isEmpty() && SdcctClassUtils.BOOLEAN_CLASS_NAMES.contains(it.type().fullName())) })
     }
     
     @Nullable
     static JMethod findSetterMethod(JDefinedClass classModel, String name) {
-        name = (SETTER_METHOD_NAME_PREFIX + StringUtils.capitalize(name))
+        name = (SETTER_METHOD_NAME_PREFIX + StringUtils.capitalize(StringUtils.removeStart(name, SdcctStringUtils.UNDERSCORE)))
         
         return findMethod(classModel, { ((it.name() == name) && (it.params().size() == 1)) })
     }
     
     @Nullable
-    static JMethod findGetterMethod(JDefinedClass classModel, String name) {
-        name = StringUtils.capitalize(name)
+    static JMethod findGetterMethod(JDefinedClass classModel, String name, boolean useIs) {
+        name = StringUtils.capitalize(StringUtils.removeStart(name, SdcctStringUtils.UNDERSCORE))
         
-        return findMethod(classModel, { (it.name() == (SdcctClassUtils.BOOLEAN_CLASS_NAMES.contains(it.type().fullName()) ? IS_GETTER_METHOD_NAME_PREFIX :
-            GETTER_METHOD_NAME_PREFIX) + name) })
+        return findMethod(classModel, { (it.name() == ((useIs && SdcctClassUtils.BOOLEAN_CLASS_NAMES.contains(it.type().fullName())) ?
+            IS_GETTER_METHOD_NAME_PREFIX : GETTER_METHOD_NAME_PREFIX) + name) })
     }
     
     @Nullable
@@ -444,6 +508,12 @@ final class SdcctCodegenUtils {
         return ((JDefinedClass) pkgModel.classes().find(predicate))
     }
     
+    static String buildUserImplClassName(CClassInfo classInfoModel) {
+        String implClassName = classInfoModel.userSpecifiedImplClass
+        
+        return ((implClassName != null) ? implClassName : classInfoModel.fullName())
+    }
+    
     static boolean hasPackage(JCodeModel codeModel, String name) {
         return hasPackage(codeModel, { (it.name == name) })
     }
@@ -464,5 +534,139 @@ final class SdcctCodegenUtils {
     @Nullable
     static JPackage findPackage(JCodeModel codeModel, Closure<Boolean> predicate) {
         return ((JPackage) codeModel.packages().find(predicate))
+    }
+    
+    static <T extends JAnnotatable> T buildSuppressWarningsAnnotation(JCodeModel codeModel, T annotatableModel, String ... warnings) {
+        JClass compilerWarningsClassModel = codeModel.directClass(CompilerWarnings.name)
+        JAnnotationArrayMember suppressWarningsValueAnnoMemberModel = annotatableModel.annotate(SuppressWarnings).paramArray(VALUE_MEMBER_NAME)
+        
+        warnings.each{
+            suppressWarningsValueAnnoMemberModel.param(compilerWarningsClassModel.staticRef(StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(
+                StringUtils.replace(it, SdcctStringUtils.HYPHEN, SdcctStringUtils.UNDERSCORE)), SdcctStringUtils.UNDERSCORE).toUpperCase()))
+        }
+        
+        return annotatableModel
+    }
+    
+    static <T extends JAnnotatable, U extends JAnnotatable> U copyAnnotations(@Nullable T srcModel, U destModel) {
+        return copyAnnotations(srcModel, destModel, SdcctBuildUtils.TRUE_PREDICATE)
+    }
+    
+    static <T extends JAnnotatable, U extends JAnnotatable> U copyAnnotations(@Nullable T srcModel, U destModel, Closure<Boolean> predicate) {
+        if (srcModel == null) {
+            return destModel
+        }
+        
+        srcModel.annotations().findAll(predicate).each{
+            getAnnotationValues(destModel.annotate(it.annotationClass)).putAll(getAnnotationValues(it))
+        }
+        
+        return destModel
+    }
+    
+    static Map<String, JAnnotationValue> getAnnotationValues(JAnnotationUse annoModel) {
+        Map<String, JAnnotationValue> annoValueModels = ((Map<String, JAnnotationValue>) ANNO_MODEL_MEMBER_VALUES_FIELD.get(annoModel))
+        
+        if (annoValueModels == null) {
+            ANNO_MODEL_MEMBER_VALUES_FIELD.set(annoModel, (annoValueModels = new LinkedHashMap<>()))
+        }
+        
+        return annoValueModels
+    }
+    
+    static JMethod clearAnnotations(JMethod methodModel) {
+        return removeAnnotations(methodModel, SdcctBuildUtils.TRUE_PREDICATE)
+    }
+    
+    static JVar clearAnnotations(JVar varModel) {
+        return removeAnnotations(varModel, SdcctBuildUtils.TRUE_PREDICATE)
+    }
+    
+    static JDefinedClass clearAnnotations(JDefinedClass classModel) {
+        return removeAnnotations(classModel, SdcctBuildUtils.TRUE_PREDICATE)
+    }
+    
+    static JMethod removeAnnotations(JMethod methodModel, Closure<Boolean> predicate) {
+        Iterator<JAnnotationUse> annoModelIterator = buildAnnotations(methodModel).iterator()
+        
+        while (annoModelIterator.hasNext()) {
+            if (predicate(annoModelIterator.next())) {
+                annoModelIterator.remove()
+            }
+        }
+        
+        return methodModel
+    }
+    
+    static JVar removeAnnotations(JVar varModel, Closure<Boolean> predicate) {
+        Iterator<JAnnotationUse> annoModelIterator = buildAnnotations(varModel).iterator()
+        
+        while (annoModelIterator.hasNext()) {
+            if (predicate(annoModelIterator.next())) {
+                annoModelIterator.remove()
+            }
+        }
+        
+        return varModel
+    }
+    
+    static JDefinedClass removeAnnotations(JDefinedClass classModel, Closure<Boolean> predicate) {
+        Iterator<JAnnotationUse> annoModelIterator = buildAnnotations(classModel).iterator()
+        
+        while (annoModelIterator.hasNext()) {
+            if (predicate(annoModelIterator.next())) {
+                annoModelIterator.remove()
+            }
+        }
+        
+        return classModel
+    }
+    
+    static List<JAnnotationUse> buildAnnotations(JMethod methodModel) {
+        List<JAnnotationUse> annoModels = ((List<JAnnotationUse>) METHOD_MODEL_ANNOS_FIELD.get(methodModel))
+        
+        if (annoModels == null) {
+            METHOD_MODEL_ANNOS_FIELD.set(methodModel, (annoModels = new ArrayList<>()))
+        }
+        
+        return annoModels
+    }
+    
+    static List<JAnnotationUse> buildAnnotations(JVar varModel) {
+        List<JAnnotationUse> annoModels = ((List<JAnnotationUse>) VAR_MODEL_ANNOS_FIELD.get(varModel))
+        
+        if (annoModels == null) {
+            VAR_MODEL_ANNOS_FIELD.set(varModel, (annoModels = new ArrayList<>()))
+        }
+        
+        return annoModels
+    }
+    
+    static List<JAnnotationUse> buildAnnotations(JDefinedClass classModel) {
+        List<JAnnotationUse> annoModels = ((List<JAnnotationUse>) CLASS_MODEL_ANNOS_FIELD.get(classModel))
+        
+        if (annoModels == null) {
+            CLASS_MODEL_ANNOS_FIELD.set(classModel, (annoModels = new ArrayList<>()))
+        }
+        
+        return annoModels
+    }
+    
+    static boolean hasAnnotation(JAnnotatable annotatableModel, Class<? extends Annotation> annoClass) {
+        return hasAnnotation(annotatableModel, { (it.annotationClass.fullName() == annoClass.name) })
+    }
+    
+    static boolean hasAnnotation(JAnnotatable annotatableModel, Closure<Boolean> predicate) {
+        return annotatableModel.annotations().any(predicate)
+    }
+    
+    @Nullable
+    static JAnnotationUse findAnnotation(JAnnotatable annotatableModel, Class<? extends Annotation> annoClass) {
+        return findAnnotation(annotatableModel, { (it.annotationClass.fullName() == annoClass.name) })
+    }
+    
+    @Nullable
+    static JAnnotationUse findAnnotation(JAnnotatable annotatableModel, Closure<Boolean> predicate) {
+        return annotatableModel.annotations().find(predicate)
     }
 }

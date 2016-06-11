@@ -13,6 +13,9 @@ public interface Options<T extends Options<T>> extends Cloneable, SortedMap<Stri
     @Nullable
     public <U> U getOption(Option<U> opt);
 
+    @Nullable
+    public <U> U getOption(Option<U> opt, @Nullable U defaultOptValue);
+
     public boolean hasOption(Option<?> opt);
 
     @SuppressWarnings({ CompilerWarnings.UNCHECKED })

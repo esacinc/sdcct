@@ -1,5 +1,6 @@
 package gov.hhs.onc.sdcct.fhir.ws.impl;
 
+import com.github.sebhoss.warnings.CompilerWarnings;
 import gov.hhs.onc.sdcct.config.utils.SdcctOptionUtils;
 import gov.hhs.onc.sdcct.fhir.FhirFormException;
 import gov.hhs.onc.sdcct.fhir.FhirFormatType;
@@ -8,8 +9,8 @@ import gov.hhs.onc.sdcct.fhir.OperationOutcomeType;
 import gov.hhs.onc.sdcct.fhir.ws.FhirWsQueryParamNames;
 import gov.hhs.onc.sdcct.io.utils.SdcctMediaTypeUtils;
 import gov.hhs.onc.sdcct.transform.content.ContentCodec;
+import gov.hhs.onc.sdcct.transform.content.ContentCodecOptions;
 import gov.hhs.onc.sdcct.transform.content.SdcctContentType;
-import gov.hhs.onc.sdcct.transform.content.impl.ContentEncodeOptions;
 import gov.hhs.onc.sdcct.utils.SdcctEnumUtils;
 import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
 import java.io.IOException;
@@ -44,13 +45,14 @@ import org.springframework.http.MediaType;
 @Priority(2)
 public class FhirContentProvider<T> extends AbstractConfigurableProvider implements MessageBodyReader<T>, MessageBodyWriter<T> {
     @Autowired
-    private List<ContentCodec> codecs;
+    private List<ContentCodec<?, ?>> codecs;
 
     private Map<String, String> defaultQueryParams = new HashMap<>();
-    private Map<FhirFormatType, ContentCodec> formatCodecs;
+    private Map<FhirFormatType, ContentCodec<?, ?>> formatCodecs;
     private Map<String, FhirFormatType> formatQueryParamValues;
 
     @Override
+    @SuppressWarnings({ CompilerWarnings.RAWTYPES, CompilerWarnings.UNCHECKED })
     public void writeTo(T obj, Class<?> type, Type genericType, Annotation[] annos, javax.ws.rs.core.MediaType mediaType,
         MultivaluedMap<String, Object> headers, OutputStream entityStream) throws IOException, WebApplicationException {
         Message msg = JAXRSUtils.getCurrentMessage();
@@ -59,7 +61,6 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
 
         queryParams.keySet().stream().forEach(queryParamName -> mergedQueryParams.put(queryParamName, queryParams.getFirst(queryParamName)));
 
-        ContentEncodeOptions encodeOpts = new ContentEncodeOptions();
         FhirFormatType format;
 
         if (mergedQueryParams.containsKey(FhirWsQueryParamNames.FORMAT)) {
@@ -85,7 +86,8 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
         msg.put(Message.CONTENT_TYPE, formatEncMediaTypeValue);
         msg.put(Message.ENCODING, formatEncMediaType.getCharSet().name());
 
-        ContentCodec codec = this.formatCodecs.get(format);
+        ContentCodec<?, ?> codec = this.formatCodecs.get(format);
+        ContentCodecOptions<?> encodeOpts = codec.getDefaultEncodeOptions().clone();
 
         msg.put(ContentCodec.class, codec);
 
@@ -93,7 +95,7 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
             String prettyQueryParamValue = mergedQueryParams.get(FhirWsQueryParamNames.PRETTY);
 
             try {
-                encodeOpts.setOption(ContentEncodeOptions.PRETTY, SdcctOptionUtils.getBooleanValue(FhirWsQueryParamNames.PRETTY, prettyQueryParamValue));
+                encodeOpts.setOption(ContentCodecOptions.PRETTY, SdcctOptionUtils.getBooleanValue(FhirWsQueryParamNames.PRETTY, prettyQueryParamValue));
             } catch (IllegalArgumentException e) {
                 throw new FhirFormException(String.format("Invalid pretty query parameter (name=%s) value: %s", FhirWsQueryParamNames.PRETTY,
                     prettyQueryParamValue), e).setIssueType(IssueType.PROCESSING).setOperationOutcomeArgs(FhirWsQueryParamNames.PRETTY)
@@ -102,7 +104,7 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
         }
 
         try {
-            entityStream.write(codec.encode(obj, encodeOpts));
+            entityStream.write(((ContentCodec) codec).encode(obj, encodeOpts));
 
             entityStream.close();
         } catch (Exception e) {
@@ -114,7 +116,7 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
     @Override
     public T readFrom(Class<T> type, Type genericType, Annotation[] annos, javax.ws.rs.core.MediaType mediaType, MultivaluedMap<String, String> headers,
         InputStream entityStream) throws IOException, WebApplicationException {
-        ContentCodec codec = this.formatCodecs.get(SdcctMediaTypeUtils.findCompatible(FhirFormatType.class, MediaType.valueOf(mediaType.toString())));
+        ContentCodec<?, ?> codec = this.formatCodecs.get(SdcctMediaTypeUtils.findCompatible(FhirFormatType.class, MediaType.valueOf(mediaType.toString())));
 
         // JAXRSUtils.getCurrentMessage().put(ContentCodec.class, codec);
 
@@ -156,9 +158,9 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
                 .entrySet()
                 .stream()
                 .collect(
-                    SdcctStreamUtils.toMap((Entry<SdcctContentType, ContentCodec> contentTypeEntry) -> SdcctEnumUtils.findByPredicate(FhirFormatType.class,
-                        formatTypeItem -> (formatTypeItem.getContentType() == contentTypeEntry.getKey())), Entry::getValue,
-                        () -> new LinkedHashMap<FhirFormatType, ContentCodec>(this.codecs.size())))).keySet().stream()
+                    SdcctStreamUtils.toMap((Entry<SdcctContentType, ContentCodec<?, ?>> contentTypeEntry) -> SdcctEnumUtils.findByPredicate(
+                        FhirFormatType.class, formatTypeItem -> (formatTypeItem.getContentType() == contentTypeEntry.getKey())), Entry::getValue,
+                        () -> new LinkedHashMap<FhirFormatType, ContentCodec<?, ?>>(this.codecs.size())))).keySet().stream()
             .map(formatType -> formatType.getEncodedMediaType().toString()).collect(Collectors.toList()));
 
         FhirFormatType[] formats = FhirFormatType.values();

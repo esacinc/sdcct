@@ -3,17 +3,19 @@
     xmlns:beans="http://www.springframework.org/schema/beans"
     xmlns:c="http://www.springframework.org/schema/c"
     xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="
-        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
+        urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
     
     <!--====================================================================================================
     = SOAP BINDINGS
     =====================================================================================================-->
-    <beans:bean id="soapBindingConfig" class="org.apache.cxf.binding.soap.SoapBindingConfiguration" abstract="true"
-        p:style="#{ T(org.apache.cxf.binding.soap.SoapBindingConstants).PARAMETER_STYLE_BARE }"/>
-    
-    <beans:bean id="soapBindingConfig12" parent="soapBindingConfig"
+    <beans:bean id="soapBindingConfig12" class="org.apache.cxf.binding.soap.SoapBindingConfiguration"
+        p:style="#{ T(org.apache.cxf.binding.soap.SoapBindingConstants).PARAMETER_STYLE_BARE }"
         p:transportURI="#{ T(org.apache.cxf.wsdl.WSDLConstants).NS_SOAP12_HTTP_BINDING }"
         p:version="#{ T(org.apache.cxf.binding.soap.Soap12).instance }"/>
     

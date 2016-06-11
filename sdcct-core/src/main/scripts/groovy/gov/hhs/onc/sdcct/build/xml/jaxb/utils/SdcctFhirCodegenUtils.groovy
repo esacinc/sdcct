@@ -37,7 +37,6 @@ final class SdcctFhirCodegenUtils {
     final static String INCLUDE_ELEM_NAME = "include"
     final static String KIND_ELEM_NAME = "kind"
     final static String NAME_ELEM_NAME = "name"
-    final static String SNAPSHOT_ELEM_NAME = "snapshot"
     final static String STRUCTURE_DEFINITION_ELEM_NAME = "StructureDefinition"
     final static String SYSTEM_ELEM_NAME = "system"
     final static String VALUE_SET_ELEM_NAME = "ValueSet"
@@ -49,7 +48,6 @@ final class SdcctFhirCodegenUtils {
     final static String URI_ATTR_NAME = "uri"
     
     final static String CODE_MEMBER_NAME_PREFIX = "code"
-    final static String TYPE_MEMBER_NAME_PREFIX = "type"
     final static String VALUE_SET_MEMBER_NAME_PREFIX = "valueSet"
     
     final static String ID_MEMBER_NAME_SUFFIX = "Id"
@@ -64,11 +62,7 @@ final class SdcctFhirCodegenUtils {
     final static String CODE_SYSTEM_OID_MEMBER_NAME = CODE_MEMBER_NAME_PREFIX + SYSTEM_MEMBER_NAME_SUFFIX + OID_MEMBER_NAME_SUFFIX
     final static String CODE_SYSTEM_URI_MEMBER_NAME = CODE_MEMBER_NAME_PREFIX + SYSTEM_MEMBER_NAME_SUFFIX + URI_MEMBER_NAME_SUFFIX
     final static String CODE_SYSTEM_VERSION_MEMBER_NAME = CODE_MEMBER_NAME_PREFIX + SYSTEM_MEMBER_NAME_SUFFIX + VERSION_MEMBER_NAME_SUFFIX
-    final static String TYPE_ID_MEMBER_NAME = TYPE_MEMBER_NAME_PREFIX + ID_MEMBER_NAME_SUFFIX
-    final static String TYPE_NAME_MEMBER_NAME = TYPE_MEMBER_NAME_PREFIX + NAME_MEMBER_NAME_SUFFIX
-    final static String TYPE_PATTERN_MEMBER_NAME = TYPE_MEMBER_NAME_PREFIX + "Pattern"
-    final static String TYPE_URI_MEMBER_NAME = TYPE_MEMBER_NAME_PREFIX + URI_MEMBER_NAME_SUFFIX
-    final static String TYPE_VERSION_MEMBER_NAME = TYPE_MEMBER_NAME_PREFIX + VERSION_MEMBER_NAME_SUFFIX
+    final static String TYPE_PATH_MEMBER_NAME = "typePath"
     final static String VALUE_SET_ID_MEMBER_NAME = VALUE_SET_MEMBER_NAME_PREFIX + ID_MEMBER_NAME_SUFFIX
     final static String VALUE_SET_NAME_MEMBER_NAME = VALUE_SET_MEMBER_NAME_PREFIX + NAME_MEMBER_NAME_SUFFIX
     final static String VALUE_SET_OID_MEMBER_NAME = VALUE_SET_MEMBER_NAME_PREFIX + OID_MEMBER_NAME_SUFFIX

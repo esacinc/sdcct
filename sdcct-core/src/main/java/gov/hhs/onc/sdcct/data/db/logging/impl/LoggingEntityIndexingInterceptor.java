@@ -1,7 +1,6 @@
 package gov.hhs.onc.sdcct.data.db.logging.impl;
 
 import gov.hhs.onc.sdcct.beans.IdentifiedBean;
-import gov.hhs.onc.sdcct.data.SdcctResource;
 import gov.hhs.onc.sdcct.data.SdcctEntity;
 import javax.persistence.Entity;
 import org.apache.commons.lang3.text.StrBuilder;
@@ -66,13 +65,7 @@ public class LoggingEntityIndexingInterceptor implements EntityIndexingIntercept
         msgBuilder.append(", name=");
         msgBuilder.append(entityClass.getAnnotation(Entity.class).name());
         msgBuilder.append(", id=");
-        msgBuilder.append(entity.getId());
-
-        if (entity instanceof SdcctResource) {
-            msgBuilder.append(", id=");
-            msgBuilder.append(((SdcctResource) entity).getId());
-        }
-
+        msgBuilder.append(entity.getEntityId());
         msgBuilder.append(") ");
         msgBuilder.append(eventType.getId());
         msgBuilder.append(" in index.");

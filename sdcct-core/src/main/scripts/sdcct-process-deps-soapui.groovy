@@ -6,4 +6,4 @@ import org.apache.maven.artifact.handler.DefaultArtifactHandler
 
 SdcctBuildUtils.resolveRemoteArtifact(log, project, ant, new DefaultArtifact("com.smartbear.soapui", "soapui-project",
     project.properties.getProperty("project.build.soapuiVersion"), Artifact.SCOPE_TEST, "pom", StringUtils.EMPTY, new DefaultArtifactHandler()),
-    new URL("${project.properties.getProperty("project.build.soapuiRepoUrlPrefix")}/pom.xml"))
+    new URL("${project.properties.getProperty("project.build.soapuiRepoUrlPrefix")}/pom.xml"), true)

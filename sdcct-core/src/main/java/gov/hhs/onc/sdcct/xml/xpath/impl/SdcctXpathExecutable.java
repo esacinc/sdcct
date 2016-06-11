@@ -4,6 +4,8 @@ import gov.hhs.onc.sdcct.transform.impl.SdcctController;
 import gov.hhs.onc.sdcct.transform.impl.SdcctProcessor;
 import gov.hhs.onc.sdcct.utils.SdcctIteratorUtils;
 import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
+import gov.hhs.onc.sdcct.xml.xpath.DynamicXpathOptions;
+import gov.hhs.onc.sdcct.xml.xpath.StaticXpathOptions;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;

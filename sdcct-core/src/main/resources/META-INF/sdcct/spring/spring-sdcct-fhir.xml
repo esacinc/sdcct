@@ -3,96 +3,215 @@
     xmlns:beans="http://www.springframework.org/schema/beans"
     xmlns:c="http://www.springframework.org/schema/c"
     xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="
-        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
+        urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
     
     <!--====================================================================================================
-    = SEARCH PARAM METADATAS
+    = XPATH OPTIONS
     =====================================================================================================-->
-    <beans:bean id="metadataSearchParamFhir" parent="metadataSearchParam" abstract="true">
+    <sdcct-xml:xpath-static-options id="xpathOptsStaticFhir" parent="xpathOptsStatic" abstract="true">
+        <sdcct-xml:static-namespace prefix="#{ T(gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes).FHIR_XPATH }">
+            #{ T(gov.hhs.onc.sdcct.net.SdcctUris).FHIR_URL_VALUE }
+        </sdcct-xml:static-namespace>
+        <sdcct-xml:static-namespace prefix="#{ T(gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes).XHTML_XPATH }">
+            #{ T(net.sf.saxon.lib.NamespaceConstant).XHTML }
+        </sdcct-xml:static-namespace>
+    </sdcct-xml:xpath-static-options>
+    
+    <!--====================================================================================================
+    = RESOURCE PARAM METADATAS
+    =====================================================================================================-->
+    <beans:bean id="metadataResourceParamFhir" parent="metadataResourceParam" abstract="true">
         <beans:constructor-arg name="specType" value="FHIR"/>
     </beans:bean>
     
     <!--====================================================================================================
-    = RESOURCE METADATA BUILDERS
+    = RESOURCE METADATAS
     =====================================================================================================-->
-    <beans:bean id="resourceMetadataBuilderFhir" class="gov.hhs.onc.sdcct.fhir.impl.FhirResourceMetadataBuilderImpl">
-        <beans:property name="resourceDefXpathExecutable">
-            <beans:bean factory-bean="xpathCompiler" factory-method="compile"
-                c:exprStr="/f:Bundle/f:entry/f:resource/f:StructureDefinition[f:kind[@value = $kind]]">
-                <beans:constructor-arg name="staticOpts">
-                    <beans:bean parent="xpathOptsStaticFhir">
-                        <beans:property name="variables">
-                            <beans:map>
-                                <beans:entry key="kind" value="#{ T(gov.hhs.onc.sdcct.fhir.StructureDefinitionKind).RESOURCE.id }"/>
-                            </beans:map>
-                        </beans:property>
-                    </beans:bean>
-                </beans:constructor-arg>
-            </beans:bean>
+    <beans:bean id="metadataResourceFhir" class="gov.hhs.onc.sdcct.fhir.metadata.impl.FhirResourceMetadataImpl" abstract="true">
+        <beans:property name="canonicalRemoveXpathExecutables">
+            <beans:array>
+                <sdcct-xml:xpath-executable>
+                    <sdcct-xml:xpath-expression>f:id</sdcct-xml:xpath-expression>
+                    <sdcct-xml:xpath-static-options parent="xpathOptsStaticFhir"/>
+                </sdcct-xml:xpath-executable>
+                <sdcct-xml:xpath-executable>
+                    <sdcct-xml:xpath-expression>f:meta</sdcct-xml:xpath-expression>
+                    <sdcct-xml:xpath-static-options parent="xpathOptsStaticFhir"/>
+                </sdcct-xml:xpath-executable>
+                <sdcct-xml:xpath-executable>
+                    <sdcct-xml:xpath-expression>f:text</sdcct-xml:xpath-expression>
+                    <sdcct-xml:xpath-static-options parent="xpathOptsStaticFhir"/>
+                </sdcct-xml:xpath-executable>
+            </beans:array>
         </beans:property>
-        <beans:property name="resourceDocument">
-            <!--suppress SpringPlaceholdersInspection -->
-            <beans:bean factory-bean="docBuilder" factory-method="build"
-                c:source="classpath*:${sdcct.data.fhir.src.dir.path}/profiles-resources.xml"/>
+    </beans:bean>
+    
+    <beans:bean id="metadataResourceFhirBinary" parent="metadataResourceFhir"
+        c:id="#{ T(gov.hhs.onc.sdcct.fhir.ResourceType).BINARY.id }"
+        c:name="#{ T(gov.hhs.onc.sdcct.fhir.ResourceType).BINARY.name }"
+        c:path="#{ T(gov.hhs.onc.sdcct.fhir.ResourceType).BINARY.id }"
+        c:beanClass="#{ T(gov.hhs.onc.sdcct.fhir.Binary) }"
+        c:beanImplClass="#{ T(gov.hhs.onc.sdcct.fhir.impl.BinaryImpl) }"/>
+    
+    <beans:bean id="metadataResourceFhirQuestionnaire" parent="metadataResourceFhir"
+        c:id="sdc-questionnaire"
+        c:name="SDC-Questionnaire"
+        c:path="#{ T(gov.hhs.onc.sdcct.fhir.ResourceType).QUESTIONNAIRE.id }"
+        c:beanClass="#{ T(gov.hhs.onc.sdcct.fhir.Questionnaire) }"
+        c:beanImplClass="#{ T(gov.hhs.onc.sdcct.fhir.impl.QuestionnaireImpl) }"/>
+    
+    <beans:bean id="metadataResourceFhirQuestionnaireResp" parent="metadataResourceFhir"
+        c:id="sdc-response"
+        c:name="SDC-Response"
+        c:path="#{ T(gov.hhs.onc.sdcct.fhir.ResourceType).QUESTIONNAIRE_RESPONSE.id }"
+        c:beanClass="#{ T(gov.hhs.onc.sdcct.fhir.QuestionnaireResponse) }"
+        c:beanImplClass="#{ T(gov.hhs.onc.sdcct.fhir.impl.QuestionnaireResponseImpl) }"/>
+    
+    <beans:bean id="metadataResourceFhirValueSet" parent="metadataResourceFhir"
+        c:id="sdc-valueset"
+        c:name="SDC-ValueSet"
+        c:path="#{ T(gov.hhs.onc.sdcct.fhir.ResourceType).VALUE_SET.id }"
+        c:beanClass="#{ T(gov.hhs.onc.sdcct.fhir.ValueSet) }"
+        c:beanImplClass="#{ T(gov.hhs.onc.sdcct.fhir.impl.ValueSetImpl) }"/>
+    
+    <!--====================================================================================================
+    = RESOURCE METADATA SERVICES
+    =====================================================================================================-->
+    <beans:bean id="resourceMetadataServiceFhir" class="gov.hhs.onc.sdcct.fhir.metadata.impl.FhirResourceMetadataServiceImpl">
+        <beans:property name="baseParamMetadatas">
+            <beans:array>
+                <beans:bean parent="metadataResourceParamFhir"
+                    c:id="Resource-content"
+                    c:name="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamNames).CONTENT }"
+                    c:type="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamType).STRING }"
+                    p:inline="true"
+                    p:valueType="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).STRING.id }"/>
+                <beans:bean parent="metadataResourceParamFhir"
+                    c:id="Resource-id"
+                    c:name="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamNames).ID }"
+                    c:type="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamType).STRING }"
+                    p:inline="true"
+                    p:valueType="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).ID.id }"/>
+                <beans:bean parent="metadataResourceParamFhir"
+                    c:id="Resource-lastUpdated"
+                    c:name="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamNames).LAST_UPDATED }"
+                    c:type="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamType).DATE }"
+                    p:inline="true"
+                    p:meta="true"
+                    p:valueType="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).INSTANT.id }"/>
+                <beans:bean parent="metadataResourceParamFhir"
+                    c:id="Resource-profile"
+                    c:name="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamNames).PROFILE }"
+                    c:type="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamType).URI }"
+                    p:meta="true"
+                    p:valueType="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).URI.id }"/>
+                <beans:bean parent="metadataResourceParamFhir"
+                    c:id="Resource-security"
+                    c:name="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamNames).SECURITY }"
+                    c:type="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamType).TOKEN }"
+                    p:meta="true"
+                    p:valueType="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).CODING.id }"/>
+                <beans:bean parent="metadataResourceParamFhir"
+                    c:id="Resource-tag"
+                    c:name="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamNames).TAG }"
+                    c:type="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamType).TOKEN }"
+                    p:meta="true"
+                    p:valueType="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).CODING.id }"/>
+                <beans:bean parent="metadataResourceParamFhir"
+                    c:id="Resource-text"
+                    c:name="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamNames).TEXT }"
+                    c:type="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamType).STRING }"
+                    p:inline="true"
+                    p:valueType="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).STRING.id }"/>
+            </beans:array>
         </beans:property>
-        <beans:property name="resourceParamDefXpathExecutable">
-            <beans:bean factory-bean="xpathCompiler" factory-method="compile"
-                c:exprStr="f:snapshot/f:element[f:path[@value = $path]]">
-                <beans:constructor-arg name="staticOpts">
-                    <beans:bean parent="xpathOptsStaticFhir"/>
-                </beans:constructor-arg>
-            </beans:bean>
+        <beans:property name="elementDefXpathExecutable">
+            <sdcct-xml:xpath-executable>
+                <sdcct-xml:xpath-expression>f:snapshot/f:element[f:path[@value = $path]]</sdcct-xml:xpath-expression>
+                <sdcct-xml:xpath-static-options parent="xpathOptsStaticFhir"/>
+            </sdcct-xml:xpath-executable>
         </beans:property>
-        <beans:property name="resourceParamValueSetUriXpathExecutable">
-            <beans:bean factory-bean="xpathCompiler" factory-method="compile"
-                c:exprStr="string(f:binding/f:valueSetReference/f:reference/@value)">
-                <beans:constructor-arg name="staticOpts">
-                    <beans:bean parent="xpathOptsStaticFhir"/>
-                </beans:constructor-arg>
-            </beans:bean>
+        <beans:property name="profileDocuments">
+            <beans:array>
+                <sdcct-xml:document>classpath*:${sdcct.data.fhir.src.dir.path}/profiles-resources.xml</sdcct-xml:document>
+                <sdcct-xml:document>classpath*:${sdcct.data.fhir.src.dir.path}/sdc-questionnaire.profile.xml</sdcct-xml:document>
+                <sdcct-xml:document>classpath*:${sdcct.data.fhir.src.dir.path}/sdc-response.profile.xml</sdcct-xml:document>
+                <sdcct-xml:document>classpath*:${sdcct.data.fhir.src.dir.path}/sdc-valueset.profile.xml</sdcct-xml:document>
+            </beans:array>
+        </beans:property>
+        <beans:property name="searchParamDefsXpathExecutable">
+            <sdcct-xml:xpath-executable>
+                <sdcct-xml:xpath-expression>
+                    /f:Bundle/f:entry/f:resource/f:SearchParameter[f:base[@value = $base] and (empty(f:status) or f:status[@value != $status])]
+                </sdcct-xml:xpath-expression>
+                <sdcct-xml:xpath-static-options parent="xpathOptsStaticFhir">
+                    <sdcct-xml:static-variable name="status">#{ T(gov.hhs.onc.sdcct.fhir.ConformanceResourceStatus).RETIRED.id }</sdcct-xml:static-variable>
+                </sdcct-xml:xpath-static-options>
+            </sdcct-xml:xpath-executable>
         </beans:property>
         <beans:property name="searchParamDefXpathExecutable">
-            <beans:bean factory-bean="xpathCompiler" factory-method="compile"
-                c:exprStr="/f:Bundle/f:entry/f:resource/f:SearchParameter[f:base[@value = $base]]">
-                <beans:constructor-arg name="staticOpts">
-                    <beans:bean parent="xpathOptsStaticFhir"/>
-                </beans:constructor-arg>
-            </beans:bean>
+            <sdcct-xml:xpath-executable>
+                <sdcct-xml:xpath-expression>/f:Bundle/f:entry/f:resource/f:SearchParameter[f:id[@value = $id]]</sdcct-xml:xpath-expression>
+                <sdcct-xml:xpath-static-options parent="xpathOptsStaticFhir"/>
+            </sdcct-xml:xpath-executable>
         </beans:property>
         <beans:property name="searchParamDocument">
-            <!--suppress SpringPlaceholdersInspection -->
-            <beans:bean factory-bean="docBuilder" factory-method="build"
-                c:source="classpath*:${sdcct.data.fhir.src.dir.path}/search-parameters.xml"/>
+            <sdcct-xml:document>classpath*:${sdcct.data.fhir.src.dir.path}/search-parameters.xml</sdcct-xml:document>
         </beans:property>
-        <beans:property name="searchParamValueTypes">
-            <beans:map>
-                <beans:entry key="#{ T(gov.hhs.onc.sdcct.data.search.SearchParamNames).CONTENT }"
-                    value="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).STRING.id }"/>
-                <beans:entry key="#{ T(gov.hhs.onc.sdcct.data.search.SearchParamNames).ID }" value="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).ID.id }"/>
-                <beans:entry key="#{ T(gov.hhs.onc.sdcct.data.search.SearchParamNames).LAST_UPDATED }"
-                    value="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).INSTANT.id }"/>
-                <beans:entry key="#{ T(gov.hhs.onc.sdcct.data.search.SearchParamNames).PROFILE }" value="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).URI.id }"/>
-                <beans:entry key="#{ T(gov.hhs.onc.sdcct.data.search.SearchParamNames).QUERY }"
-                    value="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).CODE.id }"/>
-                <beans:entry key="#{ T(gov.hhs.onc.sdcct.data.search.SearchParamNames).SECURITY }"
-                    value="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).CODING.id }"/>
-                <beans:entry key="#{ T(gov.hhs.onc.sdcct.data.search.SearchParamNames).TAG }"
-                    value="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).CODING.id }"/>
-                <beans:entry key="#{ T(gov.hhs.onc.sdcct.data.search.SearchParamNames).TEXT }"
-                    value="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).STRING.id }"/>
-            </beans:map>
+        <beans:property name="structDefXpathExecutable">
+            <sdcct-xml:xpath-executable>
+                <sdcct-xml:xpath-expression>//f:StructureDefinition[f:id[@value = $id]]</sdcct-xml:xpath-expression>
+                <sdcct-xml:xpath-static-options parent="xpathOptsStaticFhir"/>
+            </sdcct-xml:xpath-executable>
         </beans:property>
     </beans:bean>
     
     <!--====================================================================================================
-    = RESOURCE PROCESSORS
+    = RESOURCE REGISTRIES
     =====================================================================================================-->
-    <beans:bean id="resourceProcFhir" class="gov.hhs.onc.sdcct.fhir.impl.FhirResourceProcessorImpl"/>
+    <beans:bean id="resourceRegistryFhir" class="gov.hhs.onc.sdcct.fhir.impl.FhirResourceRegistryImpl" abstract="true"/>
+    
+    <beans:bean id="resourceRegistryFhirBinary" parent="resourceRegistryFhir"
+        c:resourceMetadata-ref="metadataResourceFhirBinary"/>
+    
+    <beans:bean id="resourceRegistryFhirQuestionnaire" parent="resourceRegistryFhir"
+        c:resourceMetadata-ref="metadataResourceFhirQuestionnaire"/>
+    
+    <beans:bean id="resourceRegistryFhirQuestionnaireResp" parent="resourceRegistryFhir"
+        c:resourceMetadata-ref="metadataResourceFhirQuestionnaireResp"/>
+    
+    <beans:bean id="resourceRegistryFhirValueSet" parent="resourceRegistryFhir"
+        c:resourceMetadata-ref="metadataResourceFhirValueSet"/>
     
     <!--====================================================================================================
-    = DATABASE EVENT LISTENERS
+    = SEARCH SERVICES
     =====================================================================================================-->
-    <beans:bean id="dbEventListenerResourceFhir" class="gov.hhs.onc.sdcct.fhir.impl.FhirResourceDbEventListenerImpl"/>
+    <beans:bean id="searchServiceFhir" class="gov.hhs.onc.sdcct.fhir.search.impl.FhirSearchServiceImpl" abstract="true"/>
+    
+    <beans:bean id="searchServiceFhirBinary" parent="searchServiceFhir"
+        c:resourceMetadata-ref="metadataResourceFhirBinary"
+        c:resourceRegistry-ref="resourceRegistryFhirBinary"/>
+    
+    <beans:bean id="searchServiceFhirQuestionnaire" parent="searchServiceFhir"
+        c:resourceMetadata-ref="metadataResourceFhirQuestionnaire"
+        c:resourceRegistry-ref="resourceRegistryFhirQuestionnaire"/>
+    
+    <beans:bean id="searchServiceFhirQuestionnaireResp" parent="searchServiceFhir"
+        c:resourceMetadata-ref="metadataResourceFhirQuestionnaireResp"
+        c:resourceRegistry-ref="resourceRegistryFhirQuestionnaireResp"/>
+    
+    <beans:bean id="searchServiceFhirValueSet" parent="searchServiceFhir"
+        c:resourceMetadata-ref="metadataResourceFhirValueSet"
+        c:resourceRegistry-ref="resourceRegistryFhirValueSet"/>
+    
+    <!--====================================================================================================
+    = FORMS
+    =====================================================================================================-->
+    <beans:bean id="formFhir" class="gov.hhs.onc.sdcct.fhir.impl.FhirFormImpl" abstract="true"/>
 </beans:beans>

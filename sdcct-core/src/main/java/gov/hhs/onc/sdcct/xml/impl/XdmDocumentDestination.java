@@ -2,10 +2,9 @@ package gov.hhs.onc.sdcct.xml.impl;
 
 import gov.hhs.onc.sdcct.transform.impl.SdcctConfiguration;
 import net.sf.saxon.Configuration;
+import net.sf.saxon.dom.DOMNodeWrapper;
 import net.sf.saxon.event.ProxyReceiver;
 import net.sf.saxon.event.Receiver;
-import net.sf.saxon.om.DocumentInfo;
-import net.sf.saxon.om.NodeInfo;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmDestination;
 
@@ -27,14 +26,14 @@ public class XdmDocumentDestination extends XdmDestination {
     private SdcctConfiguration config;
 
     public XdmDocumentDestination(SdcctConfiguration config) {
-        this.config = config;
+        this.setTreeModel((this.config = config).getParseOptions().getModel());
     }
 
     @Override
     public XdmDocument getXdmNode() {
-        NodeInfo nodeInfo = super.getXdmNode().getUnderlyingNode();
+        DOMNodeWrapper docInfo = ((DOMNodeWrapper) super.getXdmNode().getUnderlyingNode());
 
-        return new XdmDocument(((nodeInfo instanceof DocumentInfo) ? ((DocumentInfo) nodeInfo) : new DocumentInfo(nodeInfo)), nodeInfo.getSystemId());
+        return new XdmDocument(docInfo, docInfo);
     }
 
     public XdmDocumentReceiver getReceiver() throws SaxonApiException {

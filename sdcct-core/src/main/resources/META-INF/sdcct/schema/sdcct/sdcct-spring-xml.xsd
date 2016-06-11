@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+    attributeFormDefault="unqualified"
+    elementFormDefault="qualified"
+    targetNamespace="urn:sdcct:spring:xml"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
+    xmlns:tool="http://www.springframework.org/schema/tool"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    
+    <!--====================================================================================================
+    = IMPORTS
+    =====================================================================================================-->
+    <xsd:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"/>
+    
+    <xsd:import namespace="http://www.springframework.org/schema/tool" schemaLocation="http://www.springframework.org/schema/tool/spring-tool.xsd"/>
+    
+    <xsd:import namespace="urn:sdcct:spring" schemaLocation="urn:sdcct:spring:sdcct-spring.xsd"/>
+    
+    <!--====================================================================================================
+    = COMPLEX TYPES
+    =====================================================================================================-->
+    <xsd:complexType name="Document">
+        <xsd:complexContent mixed="true">
+            <xsd:extension base="beans:identifiedType">
+                <xsd:attribute name="document-uri" type="sdcct:NotBlankString"/>
+                <xsd:attribute name="public-id" type="sdcct:NotBlankString"/>
+                <xsd:attribute name="system-id" type="sdcct:NotBlankString"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:complexType name="StaticNamespace">
+        <xsd:simpleContent>
+            <xsd:extension base="sdcct:NotBlankString">
+                <xsd:attribute name="prefix" type="xsd:string" use="required"/>
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+    
+    <xsd:complexType name="StaticVariable">
+        <xsd:simpleContent>
+            <xsd:extension base="sdcct:NotBlankString">
+                <xsd:attribute name="name" type="sdcct:NotBlankString" use="required"/>
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+    
+    <xsd:complexType name="StaticTransformOptions" abstract="true">
+        <xsd:complexContent>
+            <xsd:extension base="beans:identifiedType">
+                <xsd:sequence>
+                    <xsd:element name="static-namespace" type="sdcct-xml:StaticNamespace" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="static-variable" type="sdcct-xml:StaticVariable" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attributeGroup ref="sdcct:AbstractAttributes"/>
+                <xsd:attributeGroup ref="sdcct:ParentAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:complexType name="XpathExpression">
+        <xsd:simpleContent>
+            <xsd:extension base="sdcct:NotBlankString"/>
+        </xsd:simpleContent>
+    </xsd:complexType>
+    
+    <xsd:complexType name="XpathStaticOptions">
+        <xsd:complexContent>
+            <xsd:extension base="sdcct-xml:StaticTransformOptions"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:complexType name="XpathExecutable">
+        <xsd:complexContent>
+            <xsd:extension base="beans:identifiedType">
+                <xsd:sequence>
+                    <xsd:element name="xpath-expression" type="sdcct-xml:XpathExpression"/>
+                    <xsd:element name="xpath-static-options" type="sdcct-xml:XpathStaticOptions" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <!--====================================================================================================
+    = ELEMENTS
+    =====================================================================================================-->
+    <xsd:element name="document" type="sdcct-xml:Document">
+        <xsd:annotation>
+            <xsd:documentation source="java:org.springframework.beans.factory.config.BeanDefinition"/>
+            <xsd:appinfo>
+                <tool:annotation>
+                    <tool:exports type="gov.hhs.onc.sdcct.xml.impl.XdmDocument"/>
+                </tool:annotation>
+            </xsd:appinfo>
+        </xsd:annotation>
+    </xsd:element>
+    
+    <xsd:element name="xpath-executable" type="sdcct-xml:XpathExecutable">
+        <xsd:annotation>
+            <xsd:documentation source="java:org.springframework.beans.factory.config.BeanDefinition"/>
+            <xsd:appinfo>
+                <tool:annotation>
+                    <tool:exports type="gov.hhs.onc.sdcct.xml.xpath.impl.SdcctXpathExecutable"/>
+                </tool:annotation>
+            </xsd:appinfo>
+        </xsd:annotation>
+    </xsd:element>
+    
+    <xsd:element name="xpath-static-options" type="sdcct-xml:XpathStaticOptions">
+        <xsd:annotation>
+            <xsd:documentation source="java:org.springframework.beans.factory.config.BeanDefinition"/>
+            <xsd:appinfo>
+                <tool:annotation>
+                    <tool:exports type="gov.hhs.onc.sdcct.xml.xpath.impl.StaticXpathOptionsImpl"/>
+                </tool:annotation>
+            </xsd:appinfo>
+        </xsd:annotation>
+    </xsd:element>
+</xsd:schema>

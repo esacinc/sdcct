@@ -4,10 +4,9 @@ import com.github.sebhoss.warnings.CompilerWarnings;
 import gov.hhs.onc.sdcct.data.SdcctEntity;
 import gov.hhs.onc.sdcct.data.db.SdcctEntityAccessor;
 import gov.hhs.onc.sdcct.data.db.SdcctRepository;
-import gov.hhs.onc.sdcct.data.metadata.EntityMetadata;
-import gov.hhs.onc.sdcct.data.metadata.MetadataService;
+import gov.hhs.onc.sdcct.data.db.metadata.DbMetadataService;
+import gov.hhs.onc.sdcct.data.db.metadata.EntityMetadata;
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -15,6 +14,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.metamodel.Metamodel;
 import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.data.jpa.repository.support.JpaMetamodelEntityInformation;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.repository.core.EntityInformation;
@@ -25,8 +25,8 @@ import org.springframework.data.repository.core.support.RepositoryFactorySupport
 import org.springframework.data.repository.core.support.TransactionalRepositoryFactoryBeanSupport;
 import org.springframework.data.util.ClassTypeInformation;
 
-public class SdcctRepositoryFactoryBean<T extends SdcctEntity> extends TransactionalRepositoryFactoryBeanSupport<SdcctRepository<T>, T, BigInteger> implements
-    SdcctEntityAccessor<T> {
+public class SdcctRepositoryFactoryBean<T extends SdcctEntity> extends TransactionalRepositoryFactoryBeanSupport<SdcctRepository<T>, T, Long>
+    implements SdcctEntityAccessor<T> {
     private class SdcctRepositoryMetadata extends AbstractRepositoryMetadata {
         public SdcctRepositoryMetadata() {
             super(SdcctRepositoryFactoryBean.this.repoInterface);
@@ -44,7 +44,7 @@ public class SdcctRepositoryFactoryBean<T extends SdcctEntity> extends Transacti
 
         @Override
         public Class<? extends Serializable> getIdType() {
-            return BigInteger.class;
+            return Long.class;
         }
     }
 
@@ -84,18 +84,9 @@ public class SdcctRepositoryFactoryBean<T extends SdcctEntity> extends Transacti
     @Override
     @SuppressWarnings({ CompilerWarnings.UNCHECKED })
     public void afterPropertiesSet() {
-        this.entityMetadata =
-            this.entityManager
-                .getEntityManagerFactory()
-                .unwrap(SessionFactory.class)
-                .getSessionFactoryOptions()
-                .getServiceRegistry()
-                .getService(MetadataService.class)
-                .getEntityMetadatas()
-                .get(
-                    (this.entityClass =
-                        ((Class<T>) ClassTypeInformation.from(this.repoInterface).getSuperTypeInformation(SdcctRepository.class).getTypeArguments().get(0)
-                            .getType())));
+        this.entityMetadata = this.entityManager.getEntityManagerFactory().unwrap(SessionFactory.class).getSessionFactoryOptions().getServiceRegistry()
+            .getService(DbMetadataService.class).getEntityMetadatas().get((this.entityClass =
+                ((Class<T>) ClassTypeInformation.from(this.repoInterface).getSuperTypeInformation(SdcctRepository.class).getTypeArguments().get(0).getType())));
         this.entityClasses =
             Stream.of(this.entityClass, (this.entityImplClass = ((Class<? extends T>) this.entityMetadata.getMappedClass()))).collect(Collectors.toSet());
         this.metamodel = this.entityManager.getMetamodel();
@@ -106,6 +97,13 @@ public class SdcctRepositoryFactoryBean<T extends SdcctEntity> extends Transacti
     @Override
     protected RepositoryFactorySupport doCreateRepositoryFactory() {
         return new SdcctRepositoryFactory();
+    }
+
+    @Override
+    public void setBeanFactory(BeanFactory beanFactory) {
+        this.setEnableDefaultTransactions(false);
+
+        super.setBeanFactory(beanFactory);
     }
 
     @Override
@@ -121,11 +119,6 @@ public class SdcctRepositoryFactoryBean<T extends SdcctEntity> extends Transacti
     @PersistenceContext
     public void setEntityManager(EntityManager entityManager) {
         this.entityManager = entityManager;
-    }
-
-    @Override
-    public EntityMetadata getEntityMetadata() {
-        return this.entityMetadata;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package gov.hhs.onc.sdcct.xml.impl;
 
+import gov.hhs.onc.sdcct.convert.SdcctConditionalGenericConverter;
 import java.net.URI;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -9,11 +10,10 @@ import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmAtomicValue;
 import net.sf.saxon.s9api.XdmValue;
 import org.springframework.core.convert.TypeDescriptor;
-import org.springframework.core.convert.converter.ConditionalGenericConverter;
 import org.springframework.stereotype.Component;
 
 @Component("convXdmValue")
-public class XdmValueConverter implements ConditionalGenericConverter {
+public class XdmValueConverter implements SdcctConditionalGenericConverter {
     private final static Set<ConvertiblePair> CONV_TYPES = Stream.of(Boolean.class, Number.class, QName.class, String.class, URI.class)
         .map(srcClass -> new ConvertiblePair(srcClass, XdmValue.class)).collect(Collectors.toSet());
 
@@ -41,13 +41,6 @@ public class XdmValueConverter implements ConditionalGenericConverter {
         } else {
             return new XdmAtomicValue(((String) src));
         }
-    }
-
-    @Override
-    public boolean matches(TypeDescriptor srcType, TypeDescriptor targetType) {
-        return CONV_TYPES.stream().anyMatch(
-            convType -> (srcType.isAssignableTo(TypeDescriptor.valueOf(convType.getSourceType())) && targetType.isAssignableTo(TypeDescriptor.valueOf(convType
-                .getTargetType()))));
     }
 
     @Override

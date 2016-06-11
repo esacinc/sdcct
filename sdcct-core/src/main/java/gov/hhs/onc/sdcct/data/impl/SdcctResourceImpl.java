@@ -5,26 +5,27 @@ import gov.hhs.onc.sdcct.data.SdcctResource;
 import gov.hhs.onc.sdcct.data.db.DbAnalyzerNames;
 import gov.hhs.onc.sdcct.data.db.DbColumnNames;
 import gov.hhs.onc.sdcct.data.db.DbFieldNames;
-import gov.hhs.onc.sdcct.data.db.DbPropertyNames;
 import gov.hhs.onc.sdcct.data.db.DbSequenceNames;
 import gov.hhs.onc.sdcct.data.db.DbTableNames;
-import gov.hhs.onc.sdcct.data.search.DateSearchParam;
-import gov.hhs.onc.sdcct.data.search.NumberSearchParam;
-import gov.hhs.onc.sdcct.data.search.QuantitySearchParam;
-import gov.hhs.onc.sdcct.data.search.RefSearchParam;
-import gov.hhs.onc.sdcct.data.search.StringSearchParam;
-import gov.hhs.onc.sdcct.data.search.TokenSearchParam;
-import gov.hhs.onc.sdcct.data.search.UriSearchParam;
-import gov.hhs.onc.sdcct.data.search.impl.DateSearchParamImpl;
-import gov.hhs.onc.sdcct.data.search.impl.NumberSearchParamImpl;
-import gov.hhs.onc.sdcct.data.search.impl.QuantitySearchParamImpl;
-import gov.hhs.onc.sdcct.data.search.impl.RefSearchParamImpl;
-import gov.hhs.onc.sdcct.data.search.impl.StringSearchParamImpl;
-import gov.hhs.onc.sdcct.data.search.impl.TokenSearchParamImpl;
-import gov.hhs.onc.sdcct.data.search.impl.UriSearchParamImpl;
+import gov.hhs.onc.sdcct.data.parameter.DateResourceParam;
+import gov.hhs.onc.sdcct.data.parameter.NumberResourceParam;
+import gov.hhs.onc.sdcct.data.parameter.QuantityResourceParam;
+import gov.hhs.onc.sdcct.data.parameter.RefResourceParam;
+import gov.hhs.onc.sdcct.data.parameter.StringResourceParam;
+import gov.hhs.onc.sdcct.data.parameter.TokenResourceParam;
+import gov.hhs.onc.sdcct.data.parameter.UriResourceParam;
+import gov.hhs.onc.sdcct.data.parameter.impl.DateResourceParamImpl;
+import gov.hhs.onc.sdcct.data.parameter.impl.NumberResourceParamImpl;
+import gov.hhs.onc.sdcct.data.parameter.impl.QuantityResourceParamImpl;
+import gov.hhs.onc.sdcct.data.parameter.impl.RefResourceParamImpl;
+import gov.hhs.onc.sdcct.data.parameter.impl.StringResourceParamImpl;
+import gov.hhs.onc.sdcct.data.parameter.impl.TokenResourceParamImpl;
+import gov.hhs.onc.sdcct.data.parameter.impl.UriResourceParamImpl;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Stream;
+import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -33,15 +34,16 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Version;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
-import org.hibernate.envers.AuditTable;
-import org.hibernate.envers.Audited;
-import org.hibernate.envers.NotAudited;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.DocumentId;
@@ -49,26 +51,39 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
 import org.hibernate.search.annotations.SortableField;
 
-@Audited
-@AuditTable(DbTableNames.RESOURCE_HISTORY)
 @DiscriminatorColumn(name = DbColumnNames.SPEC_TYPE)
 @Entity(name = "resource")
 @Table(name = DbTableNames.RESOURCE)
 public class SdcctResourceImpl extends AbstractSdcctEntity implements SdcctResource {
     protected SpecificationType specType;
     protected String content;
-    protected Set<DateSearchParam> dateSearchParams = new LinkedHashSet<>();
-    protected Set<NumberSearchParam> numberSearchParams = new LinkedHashSet<>();
-    protected Set<QuantitySearchParam> quantitySearchParams = new LinkedHashSet<>();
-    protected Set<RefSearchParam> refSearchParams = new LinkedHashSet<>();
-    protected Set<StringSearchParam> strSearchParams = new LinkedHashSet<>();
-    protected Set<TokenSearchParam> tokenSearchParams = new LinkedHashSet<>();
+    protected Set<DateResourceParam> dateParams = new LinkedHashSet<>();
+    protected Date deletedTimestamp;
+    protected Long entityVersion;
+    protected Long id;
+    protected Long instanceId;
+    protected Date modifiedTimestamp;
+    protected Set<NumberResourceParam> numberParams = new LinkedHashSet<>();
+    protected Date publishedTimestamp;
+    protected Set<QuantityResourceParam> quantityParams = new LinkedHashSet<>();
+    protected Set<RefResourceParam> refParams = new LinkedHashSet<>();
+    protected Set<StringResourceParam> strParams = new LinkedHashSet<>();
+    protected Set<TokenResourceParam> tokenParams = new LinkedHashSet<>();
     protected String text;
     protected String type;
-    protected Set<UriSearchParam> uriSearchParams = new LinkedHashSet<>();
+    protected Set<UriResourceParam> uriParams = new LinkedHashSet<>();
     protected Long version;
 
     private final static long serialVersionUID = 0L;
+
+    public SdcctResourceImpl(SpecificationType specType) {
+        this();
+
+        this.specType = specType;
+    }
+
+    public SdcctResourceImpl() {
+    }
 
     @Column(name = DbColumnNames.CONTENT, nullable = false)
     @Fields({ @Field(analyzer = @Analyzer(definition = DbAnalyzerNames.EDGE_NGRAM), boost = @Boost(0.75F), name = DbFieldNames.CONTENT_EDGE_NGRAM),
@@ -87,87 +102,190 @@ public class SdcctResourceImpl extends AbstractSdcctEntity implements SdcctResou
     }
 
     @Override
-    public void addDateSearchParams(DateSearchParam ... dateSearchParams) {
-        Stream.of(dateSearchParams).forEach(this.dateSearchParams::add);
+    public void addDateParams(DateResourceParam ... dateParams) {
+        Stream.of(dateParams).forEach(this.dateParams::add);
     }
 
     @Cascade({ CascadeType.ALL })
-    @NotAudited
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = DbPropertyNames.RESOURCE, orphanRemoval = true, targetEntity = DateSearchParamImpl.class)
+    @JoinColumn(name = DbColumnNames.RESOURCE_ENTITY_ID, referencedColumnName = DbColumnNames.ENTITY_ID)
+    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, targetEntity = DateResourceParamImpl.class)
     @Override
-    public Set<DateSearchParam> getDateSearchParams() {
-        return this.dateSearchParams;
+    public Set<DateResourceParam> getDateParams() {
+        return this.dateParams;
     }
 
-    @Override
-    public void setDateSearchParams(Set<DateSearchParam> dateSearchParams) {
-        this.dateSearchParams = dateSearchParams;
+    public void setDateParams(Set<DateResourceParam> dateParams) {
+        this.dateParams = dateParams;
     }
 
-    @Column(name = DbColumnNames.ID)
-    @DocumentId(name = DbColumnNames.ID)
-    @GeneratedValue(generator = DbSequenceNames.RESOURCE_ID, strategy = GenerationType.SEQUENCE)
-    @Id
+    public boolean hasDeletedTimestamp() {
+        return (this.deletedTimestamp != null);
+    }
+
+    @Column(name = DbColumnNames.DELETED_TIMESTAMP)
     @Nullable
     @Override
-    @SequenceGenerator(allocationSize = 1, name = DbSequenceNames.RESOURCE_ID, sequenceName = DbSequenceNames.RESOURCE_ID)
-    @SortableField(forField = DbColumnNames.ID)
+    @Temporal(TemporalType.TIMESTAMP)
+    public Date getDeletedTimestamp() {
+        return this.deletedTimestamp;
+    }
+
+    @Override
+    public void setDeletedTimestamp(@Nullable Date deletedTimestamp) {
+        this.deletedTimestamp = deletedTimestamp;
+    }
+
+    @Column(name = DbColumnNames.ENTITY_ID)
+    @DocumentId(name = DbFieldNames.ENTITY_ID)
+    @GeneratedValue(generator = DbSequenceNames.RESOURCE_ENTITY_ID, strategy = GenerationType.SEQUENCE)
+    @Id
+    @Nonnegative
+    @Nullable
+    @Override
+    @SequenceGenerator(allocationSize = 1, name = DbSequenceNames.RESOURCE_ENTITY_ID, sequenceName = DbSequenceNames.RESOURCE_ENTITY_ID)
+    @SortableField(forField = DbColumnNames.ENTITY_ID)
+    public Long getEntityId() {
+        return super.getEntityId();
+    }
+
+    @Override
+    public boolean hasEntityVersion() {
+        return (this.entityVersion != null);
+    }
+
+    @Column(name = DbColumnNames.ENTITY_VERSION)
+    @Nullable
+    @Override
+    @Version
+    public Long getEntityVersion() {
+        return this.entityVersion;
+    }
+
+    @Override
+    public void setEntityVersion(@Nonnegative @Nullable Long entityVersion) {
+        this.entityVersion = entityVersion;
+    }
+
+    @Override
+    public boolean hasId() {
+        return (this.id != null);
+    }
+
+    @Column(name = DbColumnNames.ID, nullable = false)
+    @Nonnegative
+    @Nullable
+    @Override
     public Long getId() {
-        return super.getId();
+        return this.id;
     }
 
     @Override
-    public void addNumberSearchParams(NumberSearchParam ... numberSearchParams) {
-        Stream.of(numberSearchParams).forEach(this.numberSearchParams::add);
+    public void setId(@Nonnegative @Nullable Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public boolean hasInstanceId() {
+        return (this.instanceId != null);
+    }
+
+    @Column(name = DbColumnNames.INSTANCE_ID, nullable = false)
+    @Nullable
+    @Override
+    public Long getInstanceId() {
+        return this.instanceId;
+    }
+
+    @Override
+    public void setInstanceId(@Nullable Long instanceId) {
+        this.instanceId = instanceId;
+    }
+
+    @Override
+    public boolean hasModifiedTimestamp() {
+        return (this.modifiedTimestamp != null);
+    }
+
+    @Column(name = DbColumnNames.MODIFIED_TIMESTAMP, nullable = false)
+    @Nullable
+    @Override
+    @Temporal(TemporalType.TIMESTAMP)
+    public Date getModifiedTimestamp() {
+        return this.modifiedTimestamp;
+    }
+
+    @Override
+    public void setModifiedTimestamp(@Nullable Date modifiedTimestamp) {
+        this.modifiedTimestamp = modifiedTimestamp;
+    }
+
+    @Override
+    public void addNumberParams(NumberResourceParam ... numberParams) {
+        Stream.of(numberParams).forEach(this.numberParams::add);
     }
 
     @Cascade({ CascadeType.ALL })
-    @NotAudited
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = DbPropertyNames.RESOURCE, orphanRemoval = true, targetEntity = NumberSearchParamImpl.class)
+    @JoinColumn(name = DbColumnNames.RESOURCE_ENTITY_ID, referencedColumnName = DbColumnNames.ENTITY_ID)
+    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, targetEntity = NumberResourceParamImpl.class)
     @Override
-    public Set<NumberSearchParam> getNumberSearchParams() {
-        return this.numberSearchParams;
+    public Set<NumberResourceParam> getNumberParams() {
+        return this.numberParams;
+    }
+
+    public void setNumberParams(Set<NumberResourceParam> numberParams) {
+        this.numberParams = numberParams;
     }
 
     @Override
-    public void setNumberSearchParams(Set<NumberSearchParam> numberSearchParams) {
-        this.numberSearchParams = numberSearchParams;
+    public boolean hasPublishedTimestamp() {
+        return (this.publishedTimestamp != null);
+    }
+
+    @Column(name = DbColumnNames.PUBLISHED_TIMESTAMP, nullable = false)
+    @Nullable
+    @Override
+    @Temporal(TemporalType.TIMESTAMP)
+    public Date getPublishedTimestamp() {
+        return this.publishedTimestamp;
     }
 
     @Override
-    public void addQuantitySearchParams(QuantitySearchParam ... quantitySearchParams) {
-        Stream.of(quantitySearchParams).forEach(this.quantitySearchParams::add);
+    public void setPublishedTimestamp(@Nullable Date publishedTimestamp) {
+        this.publishedTimestamp = publishedTimestamp;
+    }
+
+    @Override
+    public void addQuantityParams(QuantityResourceParam ... quantityParams) {
+        Stream.of(quantityParams).forEach(this.quantityParams::add);
     }
 
     @Cascade({ CascadeType.ALL })
-    @NotAudited
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = DbPropertyNames.RESOURCE, orphanRemoval = true, targetEntity = QuantitySearchParamImpl.class)
+    @JoinColumn(name = DbColumnNames.RESOURCE_ENTITY_ID, referencedColumnName = DbColumnNames.ENTITY_ID)
+    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, targetEntity = QuantityResourceParamImpl.class)
     @Override
-    public Set<QuantitySearchParam> getQuantitySearchParams() {
-        return this.quantitySearchParams;
+    public Set<QuantityResourceParam> getQuantityParams() {
+        return this.quantityParams;
+    }
+
+    public void setQuantityParams(Set<QuantityResourceParam> quantityParams) {
+        this.quantityParams = quantityParams;
     }
 
     @Override
-    public void setQuantitySearchParams(Set<QuantitySearchParam> quantitySearchParams) {
-        this.quantitySearchParams = quantitySearchParams;
-    }
-
-    @Override
-    public void addRefSearchParams(RefSearchParam ... refSearchParams) {
-        Stream.of(refSearchParams).forEach(this.refSearchParams::add);
+    public void addRefParams(RefResourceParam ... refParams) {
+        Stream.of(refParams).forEach(this.refParams::add);
     }
 
     @Cascade({ CascadeType.ALL })
-    @NotAudited
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = DbPropertyNames.RESOURCE, orphanRemoval = true, targetEntity = RefSearchParamImpl.class)
+    @JoinColumn(name = DbColumnNames.RESOURCE_ENTITY_ID, referencedColumnName = DbColumnNames.ENTITY_ID)
+    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, targetEntity = RefResourceParamImpl.class)
     @Override
-    public Set<RefSearchParam> getRefSearchParams() {
-        return this.refSearchParams;
+    public Set<RefResourceParam> getRefParams() {
+        return this.refParams;
     }
 
-    @Override
-    public void setRefSearchParams(Set<RefSearchParam> refSearchParams) {
-        this.refSearchParams = refSearchParams;
+    public void setRefParams(Set<RefResourceParam> refParams) {
+        this.refParams = refParams;
     }
 
     @Column(insertable = false, name = DbColumnNames.SPEC_TYPE, nullable = false, updatable = false)
@@ -182,21 +300,21 @@ public class SdcctResourceImpl extends AbstractSdcctEntity implements SdcctResou
     }
 
     @Override
-    public void addStringSearchParams(StringSearchParam ... strSearchParams) {
-        Stream.of(strSearchParams).forEach(this.strSearchParams::add);
+    public void addStringParams(StringResourceParam ... strParams) {
+        Stream.of(strParams).forEach(this.strParams::add);
     }
 
     @Cascade({ CascadeType.ALL })
-    @NotAudited
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = DbPropertyNames.RESOURCE, orphanRemoval = true, targetEntity = StringSearchParamImpl.class)
+    @JoinColumn(name = DbColumnNames.RESOURCE_ENTITY_ID, referencedColumnName = DbColumnNames.ENTITY_ID)
+    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, targetEntity = StringResourceParamImpl.class)
     @Override
-    public Set<StringSearchParam> getStringSearchParams() {
-        return this.strSearchParams;
+    public Set<StringResourceParam> getStringParams() {
+        return this.strParams;
     }
 
     @Override
-    public void setStringSearchParams(Set<StringSearchParam> strSearchParams) {
-        this.strSearchParams = strSearchParams;
+    public void setStringParams(Set<StringResourceParam> strParams) {
+        this.strParams = strParams;
     }
 
     @Override
@@ -222,21 +340,20 @@ public class SdcctResourceImpl extends AbstractSdcctEntity implements SdcctResou
     }
 
     @Override
-    public void addTokenSearchParams(TokenSearchParam ... tokenSearchParams) {
-        Stream.of(tokenSearchParams).forEach(this.tokenSearchParams::add);
+    public void addTokenParams(TokenResourceParam ... tokenParams) {
+        Stream.of(tokenParams).forEach(this.tokenParams::add);
     }
 
     @Cascade({ CascadeType.ALL })
-    @NotAudited
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = DbPropertyNames.RESOURCE, orphanRemoval = true, targetEntity = TokenSearchParamImpl.class)
+    @JoinColumn(name = DbColumnNames.RESOURCE_ENTITY_ID, referencedColumnName = DbColumnNames.ENTITY_ID)
+    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, targetEntity = TokenResourceParamImpl.class)
     @Override
-    public Set<TokenSearchParam> getTokenSearchParams() {
-        return this.tokenSearchParams;
+    public Set<TokenResourceParam> getTokenParams() {
+        return this.tokenParams;
     }
 
-    @Override
-    public void setTokenSearchParams(Set<TokenSearchParam> tokenSearchParams) {
-        this.tokenSearchParams = tokenSearchParams;
+    public void setTokenParams(Set<TokenResourceParam> tokenParams) {
+        this.tokenParams = tokenParams;
     }
 
     @Column(name = DbColumnNames.TYPE, nullable = false, updatable = false)
@@ -251,21 +368,20 @@ public class SdcctResourceImpl extends AbstractSdcctEntity implements SdcctResou
     }
 
     @Override
-    public void addUriSearchParams(UriSearchParam ... uriSearchParams) {
-        Stream.of(uriSearchParams).forEach(this.uriSearchParams::add);
+    public void addUriParams(UriResourceParam ... uriParams) {
+        Stream.of(uriParams).forEach(this.uriParams::add);
     }
 
     @Cascade({ CascadeType.ALL })
-    @NotAudited
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = DbPropertyNames.RESOURCE, orphanRemoval = true, targetEntity = UriSearchParamImpl.class)
+    @JoinColumn(name = DbColumnNames.RESOURCE_ENTITY_ID, referencedColumnName = DbColumnNames.ENTITY_ID)
+    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, targetEntity = UriResourceParamImpl.class)
     @Override
-    public Set<UriSearchParam> getUriSearchParams() {
-        return this.uriSearchParams;
+    public Set<UriResourceParam> getUriParams() {
+        return this.uriParams;
     }
 
-    @Override
-    public void setUriSearchParams(Set<UriSearchParam> uriSearchParams) {
-        this.uriSearchParams = uriSearchParams;
+    public void setUriParams(Set<UriResourceParam> uriParams) {
+        this.uriParams = uriParams;
     }
 
     @Override
@@ -274,7 +390,7 @@ public class SdcctResourceImpl extends AbstractSdcctEntity implements SdcctResou
     }
 
     @Column(name = DbColumnNames.VERSION, nullable = false)
-    @NotAudited
+    @Nonnegative
     @Nullable
     @Override
     public Long getVersion() {
@@ -282,7 +398,7 @@ public class SdcctResourceImpl extends AbstractSdcctEntity implements SdcctResou
     }
 
     @Override
-    public void setVersion(@Nullable Long version) {
+    public void setVersion(@Nonnegative @Nullable Long version) {
         this.version = version;
     }
 }

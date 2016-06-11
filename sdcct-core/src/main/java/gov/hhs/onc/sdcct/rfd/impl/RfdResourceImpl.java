@@ -10,17 +10,17 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.envers.Audited;
+import org.hibernate.search.annotations.Indexed;
 
-@Audited
 @Cache(region = DbTableNames.RESOURCE, usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 @Cacheable
 @DiscriminatorValue(SpecificationNames.RFD)
 @Entity(name = "resourceRfd")
+@Indexed(index = DbTableNames.RESOURCE)
 public class RfdResourceImpl extends SdcctResourceImpl implements RfdResource {
     private final static long serialVersionUID = 0L;
 
     public RfdResourceImpl() {
-        this.specType = SpecificationType.RFD;
+        super(SpecificationType.RFD);
     }
 }

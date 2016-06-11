@@ -1,10 +1,17 @@
 package gov.hhs.onc.sdcct.beans.impl;
 
 import gov.hhs.onc.sdcct.beans.LifecycleBean;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class AbstractLifecycleBean implements LifecycleBean {
+    protected final Lock lock;
     protected boolean autoStartup = true;
     protected int phase;
+
+    protected AbstractLifecycleBean() {
+        this.lock = new ReentrantLock();
+    }
 
     @Override
     public void stop(Runnable stopCallback) {
@@ -12,6 +19,36 @@ public abstract class AbstractLifecycleBean implements LifecycleBean {
 
         stopCallback.run();
     }
+
+    @Override
+    public void stop() {
+        this.lock.lock();
+
+        try {
+            if (this.isRunning()) {
+                this.stopInternal();
+            }
+        } finally {
+            this.lock.unlock();
+        }
+    }
+
+    @Override
+    public void start() {
+        this.lock.lock();
+
+        try {
+            if (!this.isRunning()) {
+                this.startInternal();
+            }
+        } finally {
+            this.lock.unlock();
+        }
+    }
+
+    protected abstract void stopInternal();
+
+    protected abstract void startInternal();
 
     @Override
     public boolean isAutoStartup() {

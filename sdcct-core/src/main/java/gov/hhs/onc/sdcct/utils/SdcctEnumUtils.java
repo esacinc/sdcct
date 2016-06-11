@@ -3,14 +3,12 @@ package gov.hhs.onc.sdcct.utils;
 import gov.hhs.onc.sdcct.beans.IdentifiedBean;
 import gov.hhs.onc.sdcct.beans.NamedBean;
 import gov.hhs.onc.sdcct.beans.OrdinalIdentifiedBean;
-import gov.hhs.onc.sdcct.beans.TypedBean;
 import gov.hhs.onc.sdcct.beans.UriBean;
 import java.net.URI;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.apache.commons.lang3.ClassUtils;
 
 public final class SdcctEnumUtils {
     private SdcctEnumUtils() {
@@ -29,11 +27,6 @@ public final class SdcctEnumUtils {
     @Nullable
     public static <T extends Enum<T> & OrdinalIdentifiedBean> T findByOrdinalId(Class<T> enumClass, int ordinalId) {
         return findByPredicate(enumClass, enumItem -> Objects.equals(enumItem.getOrdinalId(), ordinalId));
-    }
-
-    @Nullable
-    public static <T extends Enum<T> & TypedBean> T findByType(Class<T> enumClass, Class<?> type) {
-        return findByPredicate(enumClass, enumItem -> ClassUtils.isAssignable(type, enumItem.getType()));
     }
 
     @Nullable

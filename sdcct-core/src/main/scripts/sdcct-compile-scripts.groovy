@@ -1,16 +1,15 @@
 import org.apache.commons.lang3.ArrayUtils
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.ObjectUtils
+import org.apache.commons.lang3.StringUtils
 import org.codehaus.groovy.ant.Groovyc
-import org.springframework.context.ConfigurableApplicationContext
-import org.springframework.util.StringUtils
 
-def bindingVars = this.binding.variables
-def joint = BooleanUtils.toBooleanObject(((String) bindingVars["joint"]))
-def String javaVersion = project.properties.getProperty("java.version")
-def File javaSrcDir = new File(project.build.sourceDirectory)
-def File groovyScriptSrcDir = new File(project.build.scriptSourceDirectory, "groovy")
-def File outDir = new File(project.build.outputDirectory)
+Map<String, String> bindingVars = ((Map<String, String>) this.binding.variables)
+Boolean joint = BooleanUtils.toBooleanObject(bindingVars["joint"])
+String javaVersion = project.properties.getProperty("java.version")
+File javaSrcDir = new File(project.build.sourceDirectory)
+File groovyScriptSrcDir = new File(project.build.scriptSourceDirectory, "groovy")
+File outDir = new File(project.build.outputDirectory)
 
 if (!joint && !groovyScriptSrcDir.exists()) {
     return
@@ -30,13 +29,13 @@ ant.groovyc(destdir: outDir, encoding: project.properties.getProperty("project.b
         ant.pathelement(path: groovyScriptSrcDir)
     }
     
-    ObjectUtils.defaultIfNull(StringUtils.tokenizeToStringArray(ObjectUtils.defaultIfNull(((String) bindingVars["srcIncludes"]), null),
-        ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS), ArrayUtils.EMPTY_STRING_ARRAY).each{
+    ObjectUtils.defaultIfNull(org.springframework.util.StringUtils.tokenizeToStringArray(ObjectUtils.defaultIfNull(bindingVars["srcIncludes"], null),
+        StringUtils.LF), ArrayUtils.EMPTY_STRING_ARRAY).each{
         ant.include(name: it)
     }
     
-    ObjectUtils.defaultIfNull(StringUtils.tokenizeToStringArray(ObjectUtils.defaultIfNull(((String) bindingVars["srcExcludes"]), null),
-        ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS), ArrayUtils.EMPTY_STRING_ARRAY).each{
+    ObjectUtils.defaultIfNull(org.springframework.util.StringUtils.tokenizeToStringArray(ObjectUtils.defaultIfNull(bindingVars["srcExcludes"], null),
+        StringUtils.LF), ArrayUtils.EMPTY_STRING_ARRAY).each{
         ant.exclude(name: it)
     }
     

@@ -31,13 +31,13 @@ public class RfdFormManagerWebServiceImpl extends AbstractRfdFormWebService<Form
     @Override
     @SuppressWarnings({ "ValidExternallyBoundObject" })
     public RetrieveFormResponseType retrieveForm(RetrieveFormRequestType reqParams) {
-        String reqFormId = reqParams.getWorkflowData().getFormId();
+        String reqFormIdentifier = reqParams.getWorkflowData().getFormId();
 
         try {
-            FormDesignType formDesign = this.service.findFormDesign(reqFormId);
+            FormDesignType formDesign = this.service.findFormDesign(reqFormIdentifier);
 
             if (formDesign == null) {
-                throw new Fault(new Exception(String.format("Form (id=%s) is unavailable.", reqFormId)));
+                throw new Fault(new Exception(String.format("Form (identifier=%s) is unavailable.", reqFormIdentifier)));
             }
 
             return new RetrieveFormResponseTypeImpl()
@@ -51,7 +51,7 @@ public class RfdFormManagerWebServiceImpl extends AbstractRfdFormWebService<Form
         } catch (Fault e) {
             throw e;
         } catch (Exception e) {
-            throw new Fault(new Exception(String.format("Unable to retrieve form (id=%s)", reqFormId), e));
+            throw new Fault(new Exception(String.format("Unable to retrieve form (identifier=%s)", reqFormIdentifier), e));
         }
     }
 

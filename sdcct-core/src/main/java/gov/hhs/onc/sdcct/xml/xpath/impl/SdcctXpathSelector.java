@@ -1,6 +1,8 @@
 package gov.hhs.onc.sdcct.xml.xpath.impl;
 
 import gov.hhs.onc.sdcct.xml.utils.SdcctXmlUtils;
+import gov.hhs.onc.sdcct.xml.xpath.DynamicXpathOptions;
+import gov.hhs.onc.sdcct.xml.xpath.StaticXpathOptions;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

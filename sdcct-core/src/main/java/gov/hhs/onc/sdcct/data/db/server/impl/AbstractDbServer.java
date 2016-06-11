@@ -9,7 +9,7 @@ import gov.hhs.onc.sdcct.data.db.security.DbAuthority;
 import gov.hhs.onc.sdcct.data.db.security.impl.DbRole;
 import gov.hhs.onc.sdcct.data.db.security.impl.DbUser;
 import gov.hhs.onc.sdcct.data.db.server.DbServer;
-import gov.hhs.onc.sdcct.io.impl.ResourceSource;
+import gov.hhs.onc.sdcct.transform.impl.ResourceSource;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
@@ -22,8 +22,16 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
+import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 
 public abstract class AbstractDbServer extends AbstractLifecycleBean implements DbServer {
+    public class DbServerShutdownHookTask implements Runnable {
+        @Override
+        public void run() {
+            AbstractDbServer.this.stop();
+        }
+    }
+
     @Autowired
     protected SdcctDataSourceConfig dataSrcConfig;
 
@@ -35,29 +43,11 @@ public abstract class AbstractDbServer extends AbstractLifecycleBean implements 
     protected InetAddress hostAddr;
     protected ResourceSource[] initScriptSrcs;
     protected int port;
+    protected CustomizableThreadFactory threadFactory;
+    protected Thread shutdownHookThread;
 
-    @Override
-    public void stop() {
-        if (this.isRunning()) {
-            try {
-                this.stopInternal();
-            } catch (Exception e) {
-                throw new HibernateException(String.format("Unable to stop database (name=%s) server (hostAddr=%s, port=%d).", this.dbName, this.hostAddr,
-                    this.port), e);
-            }
-        }
-    }
-
-    @Override
-    public void start() {
-        if (!this.isRunning()) {
-            try {
-                this.startInternal();
-            } catch (Exception e) {
-                throw new HibernateException(String.format("Unable to start database (name=%s) server (hostAddr=%s, port=%d).", this.dbName, this.hostAddr,
-                    this.port), e);
-            }
-        }
+    public AbstractDbServer() {
+        super();
     }
 
     @Override
@@ -67,14 +57,12 @@ public abstract class AbstractDbServer extends AbstractLifecycleBean implements 
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        Runtime.getRuntime().addShutdownHook((this.shutdownHookThread = this.threadFactory.newThread(new DbServerShutdownHookTask())));
+
         this.start();
     }
 
-    protected abstract void stopInternal() throws Exception;
-
-    protected abstract void startInternal() throws Exception;
-
-    protected void executeInitializationScripts() throws Exception {
+    protected void executeInitializationScripts() {
         SdcctDriverDataSource adminDataSrc = null;
         Connection adminConn = null;
 
@@ -82,11 +70,11 @@ public abstract class AbstractDbServer extends AbstractLifecycleBean implements 
             adminConn = DataSourceUtils.getConnection((adminDataSrc = this.dataSrcConfig.buildDataSource(this.adminUser, true)));
 
             for (ResourceSource initScriptSrc : this.initScriptSrcs) {
-                ScriptUtils.executeSqlScript(
-                    adminConn,
-                    new EncodedResource(new ByteArrayResource(this.embeddedPlaceholderResolver.resolvePlaceholders(
-                        new String(initScriptSrc.getBytes(), StandardCharsets.UTF_8)).getBytes(StandardCharsets.UTF_8), initScriptSrc.getResource()
-                        .getDescription()), StandardCharsets.UTF_8));
+                ScriptUtils
+                    .executeSqlScript(adminConn,
+                        new EncodedResource(new ByteArrayResource(this.embeddedPlaceholderResolver
+                            .resolvePlaceholders(new String(initScriptSrc.getBytes(), StandardCharsets.UTF_8)).getBytes(StandardCharsets.UTF_8),
+                            initScriptSrc.getResource().getDescription()), StandardCharsets.UTF_8));
             }
 
             DbUser user = this.dataSrcConfig.getUser();
@@ -108,10 +96,13 @@ public abstract class AbstractDbServer extends AbstractLifecycleBean implements 
                 }
             }
 
-            ScriptUtils.executeSqlScript(adminConn, new EncodedResource(new ByteArrayResource(secSqlBuilder.build().getBytes(StandardCharsets.UTF_8)),
-                StandardCharsets.UTF_8));
+            ScriptUtils.executeSqlScript(adminConn,
+                new EncodedResource(new ByteArrayResource(secSqlBuilder.build().getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
 
             adminConn.commit();
+        } catch (Exception e) {
+            throw new HibernateException(String.format("Unable to execute database (name=%s) server (hostAddr=%s, port=%d) initialization scripts.",
+                this.dbName, this.hostAddr, this.port), e);
         } finally {
             if (adminConn != null) {
                 DataSourceUtils.releaseConnection(adminConn, adminDataSrc);
@@ -166,5 +157,15 @@ public abstract class AbstractDbServer extends AbstractLifecycleBean implements 
     @Override
     public void setPort(@Nonnegative int port) {
         this.port = port;
+    }
+
+    @Override
+    public CustomizableThreadFactory getThreadFactory() {
+        return this.threadFactory;
+    }
+
+    @Override
+    public void setThreadFactory(CustomizableThreadFactory threadFactory) {
+        this.threadFactory = threadFactory;
     }
 }

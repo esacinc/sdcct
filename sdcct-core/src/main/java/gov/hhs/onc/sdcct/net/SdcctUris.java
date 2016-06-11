@@ -42,9 +42,17 @@ public final class SdcctUris {
     public final static String SDCCT_JAXB_URN_VALUE = SDCCT_URN_PREFIX + SDCCT_JAXB_URN_NSS;
     public final static URI SDCCT_JAXB_URN = URI.create(SDCCT_JAXB_URN_VALUE);
 
-    public final static String SDCCT_SOAP_URN_NSS = "soap";
-    public final static String SDCCT_SOAP_URN_VALUE = SDCCT_URN_PREFIX + SDCCT_SOAP_URN_NSS;
-    public final static URI SDCCT_SOAP_URN = URI.create(SDCCT_SOAP_URN_VALUE);
+    public final static String SDCCT_SPRING_URN_NSS = "spring";
+    public final static String SDCCT_SPRING_URN_VALUE = SDCCT_URN_PREFIX + SDCCT_SPRING_URN_NSS;
+    public final static URI SDCCT_SPRING_URN = URI.create(SDCCT_SPRING_URN_VALUE);
+
+    public final static String SDCCT_SPRING_XML_URN_NSS = SDCCT_SPRING_URN_NSS + ":xml";
+    public final static String SDCCT_SPRING_XML_URN_VALUE = SDCCT_URN_PREFIX + SDCCT_SPRING_XML_URN_NSS;
+    public final static URI SDCCT_SPRING_XML_URN = URI.create(SDCCT_SPRING_XML_URN_VALUE);
+
+    public final static String SDCCT_WS_URN_NSS = "ws";
+    public final static String SDCCT_WS_URN_VALUE = SDCCT_URN_PREFIX + SDCCT_WS_URN_NSS;
+    public final static URI SDCCT_WS_URN = URI.create(SDCCT_WS_URN_VALUE);
 
     private SdcctUris() {
     }

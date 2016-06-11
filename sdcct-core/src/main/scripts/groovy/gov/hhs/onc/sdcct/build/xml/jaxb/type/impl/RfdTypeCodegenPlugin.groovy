@@ -24,7 +24,7 @@ class RfdTypeCodegenPlugin extends AbstractTypeCodegenPlugin {
     protected void runInternal(Outline outline, Model model, JCodeModel codeModel, Options opts, ErrorHandler errorHandler) throws Exception {
         this.types.each{
             buildTypeClassModel(codeModel, it.value, SdcctCodegenUtils.findClass(codeModel, (SdcctPackages.SDC_NAME + ClassUtils.PACKAGE_SEPARATOR +
-                it.value.id)), SdcctCodegenUtils.findClass(codeModel, (SdcctPackages.SDC_IMPL_NAME + ClassUtils.PACKAGE_SEPARATOR + it.value.id +
+                it.value.path)), SdcctCodegenUtils.findClass(codeModel, (SdcctPackages.SDC_IMPL_NAME + ClassUtils.PACKAGE_SEPARATOR + it.value.path +
                 SdcctClassUtils.IMPL_CLASS_NAME_SUFFIX)), true)
         }
     }
@@ -34,7 +34,7 @@ class RfdTypeCodegenPlugin extends AbstractTypeCodegenPlugin {
         super.onActivatedInternal(opts)
         
         RfdResourceType.values().each{
-            this.types[it.id] = new TypeCodegenModel(null, it.id, it.name, null, null, CodegenTypeKind.RESOURCE, null)
+            this.types[it.id] = new TypeCodegenModel(null, CodegenTypeKind.RESOURCE, it.id)
         }
     }
 }

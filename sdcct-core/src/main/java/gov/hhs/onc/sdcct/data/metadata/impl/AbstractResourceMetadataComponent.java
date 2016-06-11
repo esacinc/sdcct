@@ -2,6 +2,7 @@ package gov.hhs.onc.sdcct.data.metadata.impl;
 
 import gov.hhs.onc.sdcct.beans.SpecificationType;
 import gov.hhs.onc.sdcct.data.metadata.ResourceMetadataComponent;
+import gov.hhs.onc.sdcct.metadata.impl.AbstractMetadataComponent;
 import java.net.URI;
 import javax.annotation.Nullable;
 
@@ -10,18 +11,21 @@ public abstract class AbstractResourceMetadataComponent extends AbstractMetadata
     protected String id;
     protected URI uri;
 
-    public AbstractResourceMetadataComponent(SpecificationType specType, String id, String name, @Nullable URI uri) {
+    protected AbstractResourceMetadataComponent(SpecificationType specType, String id, String name) {
         super(name);
 
         this.specType = specType;
         this.id = id;
-        this.name = name;
-        this.uri = uri;
     }
 
     @Override
     public String getId() {
         return this.id;
+    }
+
+    @Override
+    public void setId(String id) {
+        this.id = id;
     }
 
     @Override

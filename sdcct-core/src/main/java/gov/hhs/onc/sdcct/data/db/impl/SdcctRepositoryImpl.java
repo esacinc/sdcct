@@ -3,86 +3,65 @@ package gov.hhs.onc.sdcct.data.db.impl;
 import com.github.sebhoss.warnings.CompilerWarnings;
 import gov.hhs.onc.sdcct.data.SdcctEntity;
 import gov.hhs.onc.sdcct.data.db.DbPropertyNames;
-import gov.hhs.onc.sdcct.data.db.SdcctCriteria;
-import gov.hhs.onc.sdcct.data.db.SdcctCriterion;
 import gov.hhs.onc.sdcct.data.db.SdcctRepository;
+import gov.hhs.onc.sdcct.data.db.criteria.SdcctCriteria;
+import gov.hhs.onc.sdcct.data.db.criteria.SdcctCriterion;
+import gov.hhs.onc.sdcct.data.db.criteria.impl.SdcctCriteriaImpl;
 import gov.hhs.onc.sdcct.data.db.logging.impl.LoggingIndexQueryInterceptor;
-import gov.hhs.onc.sdcct.data.metadata.EntityMetadata;
+import gov.hhs.onc.sdcct.data.db.metadata.EntityMetadata;
 import java.util.List;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
-import org.apache.commons.collections4.CollectionUtils;
 import org.hibernate.Session;
 import org.hibernate.search.Search;
 import org.springframework.transaction.annotation.Transactional;
 
-public class SdcctRepositoryImpl<T extends SdcctEntity> extends AbstractSdcctDataAccessor<T, T> implements SdcctRepository<T> {
+public class SdcctRepositoryImpl<T extends SdcctEntity> extends AbstractSdcctEntityAccessor<T> implements SdcctRepository<T> {
     private EntityManager entityManager;
     private CriteriaBuilder criteriaBuilder;
     private EntityMetadata entityMetadata;
     private LoggingIndexQueryInterceptor indexQueryInterceptor;
 
     public SdcctRepositoryImpl(EntityManager entityManager, Class<T> entityClass, Class<? extends T> entityImplClass, EntityMetadata entityMetadata) {
-        super(entityClass, entityImplClass, entityClass, entityImplClass);
+        super(entityClass, entityImplClass);
 
         this.criteriaBuilder = (this.entityManager = entityManager).getCriteriaBuilder();
         this.indexQueryInterceptor = new LoggingIndexQueryInterceptor(this.entityImplClass, (this.entityMetadata = entityMetadata).getName());
     }
 
     @Override
+    @SuppressWarnings({ CompilerWarnings.UNCHECKED })
     @Transactional
-    public boolean remove(T bean) throws Exception {
-        // noinspection ConstantConditions
-        return (bean.hasId() && this.removeById(bean.getId()));
-    }
-
-    @Override
-    @Transactional
-    public boolean removeById(long id) throws Exception {
-        T bean = this.findById(id);
-
-        if (bean != null) {
-            this.entityManager.remove(bean);
-
-            return true;
-        } else {
-            return false;
-        }
+    public boolean removeByEntityId(@Nonnegative long entityId) throws Exception {
+        return (this.remove(this.buildCriteria((builder, query, root) -> builder.equal(root.get(DbPropertyNames.ENTITY_ID), entityId))) > 0);
     }
 
     @Nonnegative
     @Override
     @Transactional
     public long remove(SdcctCriteria<T> criteria) throws Exception {
-        List<T> beans = this.findAll(criteria);
-
-        if (CollectionUtils.isEmpty(beans)) {
-            return 0;
-        }
-
-        Session session = this.buildSession();
-
-        beans.forEach(session::delete);
-
-        return beans.size();
+        return criteria.delete(this.entityManager);
     }
 
     @Override
     @Transactional
-    public long save(T bean) throws Exception {
+    public T save(T entity) throws Exception {
         Session session = this.buildSession();
+        long entityId;
 
         // noinspection ConstantConditions
-        if (bean.hasId()) {
-            session.update(bean);
-            
+        if (entity.hasEntityId()) {
+            session.update(entity);
+
             // noinspection ConstantConditions
-            return bean.getId();
+            entityId = entity.getEntityId();
         } else {
-            return ((long) session.save(bean));
+            entityId = ((long) session.save(entity));
         }
+
+        return this.findByEntityId(entityId);
     }
 
     @Override
@@ -95,8 +74,8 @@ public class SdcctRepositoryImpl<T extends SdcctEntity> extends AbstractSdcctDat
     @Override
     @SuppressWarnings({ CompilerWarnings.UNCHECKED })
     @Transactional(readOnly = true)
-    public T findById(long id) throws Exception {
-        return this.find(this.buildCriteria((root, query, builder) -> builder.equal(root.get(DbPropertyNames.ID), id)));
+    public T findByEntityId(@Nonnegative long entityId) throws Exception {
+        return this.find(this.buildCriteria((builder, query, root) -> builder.equal(root.get(DbPropertyNames.ENTITY_ID), entityId)));
     }
 
     @Nullable
@@ -107,17 +86,10 @@ public class SdcctRepositoryImpl<T extends SdcctEntity> extends AbstractSdcctDat
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public boolean exists(T bean) throws Exception {
-        // noinspection ConstantConditions
-        return (bean.hasId() && this.existsById(bean.getId()));
-    }
-
-    @Override
     @SuppressWarnings({ CompilerWarnings.UNCHECKED })
     @Transactional(readOnly = true)
-    public boolean existsById(long id) throws Exception {
-        return this.exists(this.buildCriteria((root, query, builder) -> builder.equal(root.get(DbPropertyNames.ID), id)));
+    public boolean existsByEntityId(@Nonnegative long entityId) throws Exception {
+        return this.exists(this.buildCriteria((builder, query, root) -> builder.equal(root.get(DbPropertyNames.ENTITY_ID), entityId)));
     }
 
     @Override
@@ -150,10 +122,5 @@ public class SdcctRepositoryImpl<T extends SdcctEntity> extends AbstractSdcctDat
 
     private Session buildSession() {
         return this.entityManager.unwrap(Session.class);
-    }
-
-    @Override
-    public EntityMetadata getEntityMetadata() {
-        return this.entityMetadata;
     }
 }

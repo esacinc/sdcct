@@ -6,7 +6,6 @@ import gov.hhs.onc.sdcct.config.Options;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.ArrayUtils;
@@ -14,12 +13,8 @@ import org.apache.commons.lang3.ArrayUtils;
 public abstract class AbstractOptions<T extends Options<T>> extends TreeMap<String, Object> implements Options<T> {
     private final static long serialVersionUID = 0L;
 
-    protected Supplier<T> optsBuilder;
-
-    protected AbstractOptions(Supplier<T> optsBuilder) {
+    protected AbstractOptions() {
         super();
-
-        this.optsBuilder = optsBuilder;
     }
 
     @Override
@@ -41,7 +36,13 @@ public abstract class AbstractOptions<T extends Options<T>> extends TreeMap<Stri
     @Nullable
     @Override
     public <U> U getOption(Option<U> opt) {
-        return (this.hasOption(opt) ? opt.getValueClass().cast(this.get(opt.getName())) : null);
+        return this.getOption(opt, null);
+    }
+
+    @Nullable
+    @Override
+    public <U> U getOption(Option<U> opt, @Nullable U defaultOptValue) {
+        return (this.hasOption(opt) ? opt.getValueClass().cast(this.get(opt.getName())) : defaultOptValue);
     }
 
     @Override
@@ -62,10 +63,12 @@ public abstract class AbstractOptions<T extends Options<T>> extends TreeMap<Stri
     @Override
     @SuppressWarnings({ "CloneDoesntCallSuperClone", CompilerWarnings.UNCHECKED })
     public T clone() {
-        return this.optsBuilder.get().merge(((T) this));
+        return this.cloneInternal().merge(((T) this));
     }
 
     protected void mergeInternal(T mergeOpts) {
         this.putAll(mergeOpts);
     }
+
+    protected abstract T cloneInternal();
 }

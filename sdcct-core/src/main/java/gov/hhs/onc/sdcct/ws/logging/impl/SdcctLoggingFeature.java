@@ -2,9 +2,10 @@ package gov.hhs.onc.sdcct.ws.logging.impl;
 
 import com.sun.xml.ws.encoding.soap.SOAP12Constants;
 import gov.hhs.onc.sdcct.context.SdcctPropertyNames;
-import gov.hhs.onc.sdcct.io.impl.ByteArraySource;
+import gov.hhs.onc.sdcct.transform.impl.ByteArraySource;
 import gov.hhs.onc.sdcct.io.utils.SdcctMediaTypeUtils;
 import gov.hhs.onc.sdcct.json.impl.JsonCodec;
+import gov.hhs.onc.sdcct.json.impl.JsonEncodeOptionsImpl;
 import gov.hhs.onc.sdcct.logging.LoggingEvent;
 import gov.hhs.onc.sdcct.net.logging.HttpRequestEvent;
 import gov.hhs.onc.sdcct.net.logging.HttpResponseEvent;
@@ -14,8 +15,8 @@ import gov.hhs.onc.sdcct.net.logging.RestEventType;
 import gov.hhs.onc.sdcct.net.logging.impl.HttpRequestEventImpl;
 import gov.hhs.onc.sdcct.net.logging.impl.HttpResponseEventImpl;
 import gov.hhs.onc.sdcct.transform.content.ContentCodec;
+import gov.hhs.onc.sdcct.transform.content.ContentCodecOptions;
 import gov.hhs.onc.sdcct.transform.content.SdcctContentType;
-import gov.hhs.onc.sdcct.transform.content.impl.ContentEncodeOptions;
 import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
 import gov.hhs.onc.sdcct.ws.WsDirection;
 import gov.hhs.onc.sdcct.ws.WsPropertyNames;
@@ -24,6 +25,7 @@ import gov.hhs.onc.sdcct.ws.logging.WsMessageType;
 import gov.hhs.onc.sdcct.ws.logging.WsRequestEvent;
 import gov.hhs.onc.sdcct.ws.logging.WsResponseEvent;
 import gov.hhs.onc.sdcct.ws.utils.SdcctWsPropertyUtils;
+import gov.hhs.onc.sdcct.xml.impl.SdcctDocumentBuilder;
 import gov.hhs.onc.sdcct.xml.impl.XdmDocument;
 import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
 import gov.hhs.onc.sdcct.xml.utils.SdcctXmlUtils;
@@ -353,14 +355,15 @@ public class SdcctLoggingFeature extends AbstractFeature implements Initializing
         }
     }
 
-    private final static ContentEncodeOptions PRETTY_PAYLOAD_ENC_OPTS = new ContentEncodeOptions().setOption(ContentEncodeOptions.PRETTY, true);
-
     private final static Logger LOGGER = LoggerFactory.getLogger(SdcctLoggingFeature.class);
 
     @Autowired
-    private List<ContentCodec> codecs;
+    private List<ContentCodec<?, ?>> codecs;
 
-    private Map<SdcctContentType, ContentCodec> contentTypeCodecs;
+    @Autowired
+    private SdcctDocumentBuilder docBuilder;
+
+    private Map<SdcctContentType, ContentCodec<?, ?>> contentTypeCodecs;
     private ServerLoggingHookInInterceptor restServerHookInInterceptor = new ServerLoggingHookInInterceptor(WsMessageType.REST),
         soapServerHookInInterceptor = new ServerLoggingHookInInterceptor(WsMessageType.SOAP);
     private ServerLoggingProcessInInterceptor restServerProcessInInterceptor = new ServerLoggingProcessInInterceptor(WsMessageType.REST),
@@ -461,7 +464,7 @@ public class SdcctLoggingFeature extends AbstractFeature implements Initializing
         event.setPayload(new String(payloadBytes, enc));
 
         if (payloadBytes.length > 0) {
-            ContentCodec codec = null;
+            ContentCodec<?, ?> codec = null;
 
             if (restMsgType) {
                 OperationResourceInfo opResourceInfo = exchange.get(OperationResourceInfo.class);
@@ -502,10 +505,12 @@ public class SdcctLoggingFeature extends AbstractFeature implements Initializing
 
     private <T extends WsEvent> void processXmlPayload(Exchange exchange, Message msg, T event, WsMessageType msgType, Charset enc, XmlCodec codec,
         byte ... payloadBytes) throws Exception {
-        event.setPrettyPayload(new String(codec.encode(new ByteArraySource(payloadBytes), PRETTY_PAYLOAD_ENC_OPTS), enc));
+        ByteArraySource src = new ByteArraySource(payloadBytes);
+
+        event.setPrettyPayload(new String(codec.encode(src, codec.getDefaultEncodeOptions().clone().setOption(ContentCodecOptions.PRETTY, true)), enc));
 
         if (msgType == WsMessageType.SOAP) {
-            XdmDocument doc = codec.decode(payloadBytes, null);
+            XdmDocument doc = this.docBuilder.build(src);
             Element docElem = doc.getDocument().getDocumentElement();
 
             processSoapHeaders(event, docElem);
@@ -563,7 +568,8 @@ public class SdcctLoggingFeature extends AbstractFeature implements Initializing
 
     private <T extends WsEvent> void processJsonPayload(Exchange exchange, Message msg, T event, WsMessageType msgType, Charset enc, JsonCodec codec,
         byte ... payloadBytes) throws Exception {
-        event.setPrettyPayload(new String(codec.encode(codec.decode(payloadBytes, null), PRETTY_PAYLOAD_ENC_OPTS), enc));
+        event.setPrettyPayload(
+            new String(codec.encode(codec.decode(payloadBytes, null), new JsonEncodeOptionsImpl().setOption(ContentCodecOptions.PRETTY, true)), enc));
     }
 
     private void logEvent(LoggingEvent event) {

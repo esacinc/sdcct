@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.io.SerializedString;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.IOException;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
@@ -39,16 +38,13 @@ public class SdcctObjectMapperFactoryBean extends Jackson2ObjectMapperFactoryBea
         super.afterPropertiesSet();
 
         ObjectMapper objMapper = this.getObject();
+        DefaultIndenter indenter = new DefaultIndenter(StringUtils.repeat(StringUtils.SPACE, this.indentSize), StringUtils.LF);
 
-        if (objMapper.isEnabled(SerializationFeature.INDENT_OUTPUT) && (this.indentSize > 0)) {
-            DefaultIndenter indenter = new DefaultIndenter(StringUtils.repeat(StringUtils.SPACE, this.indentSize), StringUtils.LF);
+        SdcctPrettyPrinter prettyPrinter = new SdcctPrettyPrinter(indenter.getIndent());
+        prettyPrinter.indentArraysWith(indenter);
+        prettyPrinter.indentObjectsWith(indenter);
 
-            SdcctPrettyPrinter prettyPrinter = new SdcctPrettyPrinter(indenter.getIndent());
-            prettyPrinter.indentArraysWith(indenter);
-            prettyPrinter.indentObjectsWith(indenter);
-
-            objMapper.setDefaultPrettyPrinter(prettyPrinter);
-        }
+        objMapper.setDefaultPrettyPrinter(prettyPrinter);
     }
 
     public void setFeatures(Map<Object, Boolean> features) {

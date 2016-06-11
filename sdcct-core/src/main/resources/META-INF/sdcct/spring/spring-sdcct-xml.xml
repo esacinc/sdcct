@@ -3,14 +3,25 @@
     xmlns:beans="http://www.springframework.org/schema/beans"
     xmlns:c="http://www.springframework.org/schema/c"
     xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="
-        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
+        urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
+    
+    <!--====================================================================================================
+    = XML RESOLVERS
+    =====================================================================================================-->
+    <beans:bean id="xmlResolver" class="gov.hhs.onc.sdcct.xml.impl.CompositeXmlResolver"
+        c:resourceSrcResolver-ref="resourceSrcResolver"/>
     
     <!--====================================================================================================
     = XML INPUT FACTORIES
     =====================================================================================================-->
-    <beans:bean id="xmlInFactory" class="gov.hhs.onc.sdcct.xml.impl.SdcctXmlInputFactory">
+    <beans:bean id="xmlInFactory" class="gov.hhs.onc.sdcct.xml.impl.SdcctXmlInputFactory"
+        p:XMLResolver-ref="xmlResolver">
         <beans:property name="properties">
             <beans:map>
                 <beans:entry key="#{ T(javax.xml.stream.XMLInputFactory).IS_REPLACING_ENTITY_REFERENCES }" value="false" value-type="java.lang.Boolean"/>
@@ -51,7 +62,7 @@
     = SERIALIZERS
     =====================================================================================================-->
     <beans:bean id="serializerXml" factory-bean="processor" factory-method="newSerializer">
-        <beans:property name="defaultOutputProperties">
+        <beans:property name="localOutputProperties">
             <beans:map>
                 <beans:entry key="#{ T(javax.xml.transform.OutputKeys).METHOD }" value="xml"/>
             </beans:map>
@@ -60,54 +71,46 @@
     
     <!--suppress SpringBeanConstructorArgInspection -->
     <beans:bean id="serializerXmlPretty" parent="serializerXml" factory-bean="processor" factory-method="newSerializer">
-        <beans:property name="defaultOutputProperties">
+        <beans:property name="localOutputProperties">
             <beans:map merge="true">
                 <beans:entry key="#{ T(javax.xml.transform.OutputKeys).INDENT }" value="#{ T(gov.hhs.onc.sdcct.config.utils.SdcctOptionUtils).YES_VALUE }"/>
                 <!--suppress SpringPlaceholdersInspection -->
                 <beans:entry key="#{ T(net.sf.saxon.lib.SaxonOutputKeys).INDENT_SPACES }" value="${sdcct.transform.content.pretty.indent.size}"/>
-                <!--suppress SpringPlaceholdersInspection -->
-                <beans:entry key="#{ T(net.sf.saxon.lib.SaxonOutputKeys).LINE_LENGTH }" value="${sdcct.transform.content.pretty.line.len}"/>
             </beans:map>
         </beans:property>
     </beans:bean>
-    
-    <!--====================================================================================================
-    = XML OPTIONS
-    =====================================================================================================-->
-    <beans:bean id="xmlOptsStatic" class="gov.hhs.onc.sdcct.xml.StaticXmlOptions" abstract="true"/>
-    
-    <beans:bean id="xmlOptsDynamic" class="gov.hhs.onc.sdcct.xml.DynamicXmlOptions" abstract="true"/>
-    
-    <!--====================================================================================================
-    = XPATH OPTIONS
-    =====================================================================================================-->
-    <beans:bean id="xpathOptsStatic" class="gov.hhs.onc.sdcct.xml.xpath.impl.StaticXpathOptions" parent="xmlOptsStatic" abstract="true"/>
-    
-    <beans:bean id="xpathOptsStaticFhir" parent="xpathOptsStatic" abstract="true">
-        <beans:property name="namespaces">
-            <beans:map>
-                <beans:entry key="#{ T(gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes).FHIR_XPATH }" value="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).FHIR_URL_VALUE }"/>
-            </beans:map>
-        </beans:property>
-    </beans:bean>
-    
-    <beans:bean id="xpathOptsStaticRfd" parent="xpathOptsStatic" abstract="true">
-        <beans:property name="namespaces">
-            <beans:map>
-                <beans:entry key="#{ T(gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes).SDC }" value="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).SDC_URL_VALUE }"/>
-            </beans:map>
-        </beans:property>
-    </beans:bean>
-    
-    <beans:bean id="xpathOptsDynamic" class="gov.hhs.onc.sdcct.xml.xpath.impl.DynamicXpathOptions" parent="xmlOptsDynamic" abstract="true"/>
-    
-    <!--====================================================================================================
-    = XPATH COMPILERS
-    =====================================================================================================-->
-    <beans:bean id="xpathCompiler" factory-bean="processor" factory-method="newXPathCompiler"/>
     
     <!--====================================================================================================
     = CONTENT CODECS
     =====================================================================================================-->
-    <beans:bean id="contentCodecXml" class="gov.hhs.onc.sdcct.xml.impl.XmlCodec" parent="contentCodec"/>
+    <beans:bean id="contentCodecXml" class="gov.hhs.onc.sdcct.xml.impl.XmlCodec">
+        <beans:constructor-arg name="defaultDecodeOpts">
+            <beans:bean class="gov.hhs.onc.sdcct.xml.impl.XmlDecodeOptionsImpl"
+                c:parseOpts="#{ config.parseOptions }">
+                <beans:property name="options">
+                    <beans:map>
+                        <beans:entry key="#{ T(gov.hhs.onc.sdcct.transform.content.ContentCodecOptions).CANONICALIZE }" value="false"
+                            value-type="java.lang.Boolean"/>
+                        <beans:entry key="#{ T(gov.hhs.onc.sdcct.transform.content.ContentCodecOptions).VALIDATE }" value="false"
+                            value-type="java.lang.Boolean"/>
+                    </beans:map>
+                </beans:property>
+            </beans:bean>
+        </beans:constructor-arg>
+        <beans:constructor-arg name="defaultEncodeOpts">
+            <beans:bean class="gov.hhs.onc.sdcct.xml.impl.XmlEncodeOptionsImpl"
+                c:parseOpts="#{ config.parseOptions }">
+                <beans:property name="options">
+                    <beans:map>
+                        <beans:entry key="#{ T(gov.hhs.onc.sdcct.transform.content.ContentCodecOptions).CANONICALIZE }" value="false"
+                            value-type="java.lang.Boolean"/>
+                        <beans:entry key="#{ T(gov.hhs.onc.sdcct.transform.content.ContentCodecOptions).PRETTY }" value="false"
+                            value-type="java.lang.Boolean"/>
+                        <beans:entry key="#{ T(gov.hhs.onc.sdcct.transform.content.ContentCodecOptions).VALIDATE }" value="false"
+                            value-type="java.lang.Boolean"/>
+                    </beans:map>
+                </beans:property>
+            </beans:bean>
+        </beans:constructor-arg>
+    </beans:bean>
 </beans:beans>

@@ -17,6 +17,11 @@ public final class SdcctPackages {
     public final static String FHIR_IMPL_NAME = FHIR_NAME + ClassUtils.PACKAGE_SEPARATOR + SdcctClassUtils.IMPL_PKG_NAME;
     public final static Package FHIR_IMPL = Package.getPackage(FHIR_IMPL_NAME);
 
+    public final static String FHIR_XHTML_NAME = FHIR_NAME + ".xhtml";
+    public final static Package FHIR_XHTML = Package.getPackage(FHIR_XHTML_NAME);
+    public final static String FHIR_XHTML_IMPL_NAME = FHIR_XHTML_NAME + ClassUtils.PACKAGE_SEPARATOR + SdcctClassUtils.IMPL_PKG_NAME;
+    public final static Package FHIR_XHTML_IMPL = Package.getPackage(FHIR_XHTML_IMPL_NAME);
+
     public final static String RFD_NAME = ROOT_NAME + ".rfd";
     public final static Package RFD = Package.getPackage(RFD_NAME);
     public final static String RFD_IMPL_NAME = RFD_NAME + ClassUtils.PACKAGE_SEPARATOR + SdcctClassUtils.IMPL_PKG_NAME;

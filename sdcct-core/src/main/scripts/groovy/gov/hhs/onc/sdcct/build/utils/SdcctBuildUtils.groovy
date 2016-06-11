@@ -1,7 +1,8 @@
 package gov.hhs.onc.sdcct.build.utils
 
+import gov.hhs.onc.sdcct.utils.SdcctResourceUtils
+import gov.hhs.onc.sdcct.utils.SdcctStringUtils
 import javax.annotation.Nullable
-import org.apache.commons.lang3.ArrayUtils
 import org.apache.commons.lang3.ObjectUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.maven.artifact.Artifact
@@ -11,7 +12,6 @@ import org.apache.maven.plugin.logging.Log
 import org.apache.maven.project.MavenProject
 import org.apache.tools.ant.types.FileSet
 import org.apache.tools.ant.types.resources.FileResource
-import org.springframework.context.ConfigurableApplicationContext
 
 final class SdcctBuildUtils {
     final static Closure<Boolean> FALSE_PREDICATE = { false }
@@ -22,9 +22,8 @@ final class SdcctBuildUtils {
     private SdcctBuildUtils() {
     }
     
-    static File resolveRemoteArtifact(Log log, MavenProject project, AntBuilder ant, Artifact artifact, URL artifactUrl) {
-        ArtifactRepository localRepo = project.projectBuildingRequest.localRepository
-        File artifactLocalRepoFile = new File(localRepo.basedir, "${localRepo.pathOf(artifact)}.${artifact.type}")
+    static File resolveRemoteArtifact(Log log, MavenProject project, AntBuilder ant, Artifact artifact, URL artifactUrl, boolean install) {
+        File artifactLocalRepoFile = buildArtifactLocalRepositoryFile(project, artifact)
         
         if (artifactLocalRepoFile.exists()) {
             log.info(
@@ -33,18 +32,17 @@ final class SdcctBuildUtils {
             return artifactLocalRepoFile
         }
         
-        File artifactDir = new File(project.properties.getProperty(DEPS_DIR_PROJECT_PROP_NAME), artifact.artifactId),
-            artifactFile = new File(artifactDir, artifactLocalRepoFile.name)
+        File artifactDepsFile = buildDependenciesArtifactFile(project, artifact)
         
-        if (!artifactDir.exists()) {
-            artifactDir.mkdirs()
-        }
-        
-        ant.get(src: artifactUrl, dest: artifactFile)
+        ant.get(src: artifactUrl, dest: artifactDepsFile)
         
         log.info(
-            "Downloaded remote artifact (groupId=${artifact.groupId}, artifactId=${artifact.artifactId}, version=${artifact.version}, scope=${artifact.scope}, type=${artifact.type}): ${artifactUrl} => ${artifactFile.path}")
+            "Downloaded remote artifact (groupId=${artifact.groupId}, artifactId=${artifact.artifactId}, version=${artifact.version}, scope=${artifact.scope}, type=${artifact.type}): ${artifactUrl} => ${artifactDepsFile.path}")
         
+        return (install ? installArtifact(ant, artifact, artifactDepsFile) : artifactDepsFile)
+    }
+    
+    static File installArtifact(AntBuilder ant, Artifact artifact, File artifactFile) {
         ant.exec(executable: "mvn", failonerror: true) {
             ant.arg(value: "-q")
             ant.arg(value: "install:install-file")
@@ -56,6 +54,26 @@ final class SdcctBuildUtils {
         }
         
         return artifactFile
+    }
+    
+    static File buildDependenciesArtifactFile(MavenProject project, Artifact artifact) {
+        return new File(buildDependenciesArtifactDirectory(project, artifact.artifactId), "${artifact.artifactId}-${artifact.version}.${artifact.type}")
+    }
+    
+    static File buildDependenciesArtifactDirectory(MavenProject project, String artifactDepsDirName) {
+        File artifactDepsDir = new File(project.properties.getProperty(DEPS_DIR_PROJECT_PROP_NAME), artifactDepsDirName)
+        
+        if (!artifactDepsDir.exists()) {
+            artifactDepsDir.mkdirs()
+        }
+        
+        return artifactDepsDir
+    }
+    
+    static File buildArtifactLocalRepositoryFile(MavenProject project, Artifact artifact) {
+        ArtifactRepository localRepo = project.projectBuildingRequest.localRepository
+        
+        return new File(localRepo.basedir, "${localRepo.pathOf(artifact)}.${artifact.type}")
     }
     
     static String getExecutionProperty(MavenProject project, MavenSession session, String propName) {
@@ -77,11 +95,10 @@ final class SdcctBuildUtils {
     }
 
     static Map<String, String> tokenizeMap(@Nullable String str) {
-        def tokens = tokenize(str)
-        def tokenMap = new LinkedHashMap<String, String>(tokens.length)
-        def tokenParts
+        String[] tokens = tokenize(str), tokenParts
+        Map<String, String> tokenMap = new LinkedHashMap<>(tokens.length)
 
-        tokens.each{ tokenMap.put((tokenParts = StringUtils.split(it, "=", 2))[0], tokenParts[1]) }
+        tokens.each{ tokenMap.put((tokenParts = StringUtils.split(it, SdcctStringUtils.EQUALS, 2))[0], tokenParts[1]) }
 
         return tokenMap
     }
@@ -91,7 +108,6 @@ final class SdcctBuildUtils {
     }
 
     static String[] tokenize(@Nullable String str, @Nullable String defaultStr) {
-        return ObjectUtils.defaultIfNull(org.springframework.util.StringUtils.tokenizeToStringArray(ObjectUtils.defaultIfNull(str, defaultStr),
-            ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS), ArrayUtils.EMPTY_STRING_ARRAY)
+        return SdcctResourceUtils.tokenizeLocations(ObjectUtils.defaultIfNull(str, defaultStr))
     }
 }

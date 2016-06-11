@@ -1,9 +1,12 @@
 package gov.hhs.onc.sdcct.utils;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Comparator;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
@@ -13,10 +16,12 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.util.ResourceUtils;
 
 public final class SdcctResourceUtils {
+    public final static String LOC_DELIMS = ",;\t\n";
+
     public final static String JAR_FILE_PATH_PREFIX = ResourceUtils.JAR_URL_PREFIX + ResourceUtils.FILE_URL_PREFIX;
     public final static String META_INF_PATH_PREFIX = SdcctStringUtils.SLASH + "META-INF" + SdcctStringUtils.SLASH;
     public final static String META_INF_APP_PATH_PREFIX = META_INF_PATH_PREFIX + "sdcct" + SdcctStringUtils.SLASH;
-    
+
     public final static String TEST_FILE_NAME_SUFFIX = "-test";
 
     public final static Comparator<Resource> LOC_FILE_NAME_COMPARATOR =
@@ -78,10 +83,10 @@ public final class SdcctResourceUtils {
 
     public final static Comparator<Resource> LOC_COMPARATOR =
         LOC_FILE_NAME_COMPARATOR.thenComparing(LOC_FILE_PATH_COMPARATOR).thenComparing(LOC_PROTOCOL_COMPARATOR).thenComparing(LOC_ARCHIVE_FILE_PATH_COMPARATOR);
-    
+
     private SdcctResourceUtils() {
     }
-    
+
     public static String extractFilePath(String resourcePath) {
         return extractFilePath(resourcePath, false);
     }
@@ -123,5 +128,33 @@ public final class SdcctResourceUtils {
         }
 
         return null;
+    }
+
+    @Nullable
+    public static URL extractUrl(Resource resource) {
+        try {
+            return resource.getURL();
+        } catch (IOException ignored) {
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static URI extractUri(Resource resource) {
+        try {
+            return resource.getURI();
+        } catch (IOException ignored) {
+        }
+
+        return null;
+    }
+
+    public static String[] tokenizeLocations(@Nullable String ... locs) {
+        return ((locs != null)
+            ? Stream.of(locs)
+                .flatMap(loc -> ((loc != null) ? Stream.of(org.springframework.util.StringUtils.tokenizeToStringArray(loc, LOC_DELIMS)) : Stream.empty()))
+                .toArray(String[]::new)
+            : ArrayUtils.toArray());
     }
 }

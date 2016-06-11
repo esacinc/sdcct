@@ -2,102 +2,99 @@ package gov.hhs.onc.sdcct.data.db.impl;
 
 import com.github.sebhoss.warnings.CompilerWarnings;
 import gov.hhs.onc.sdcct.data.db.DbPropertyNames;
-import gov.hhs.onc.sdcct.data.db.SdcctRepository;
-import gov.hhs.onc.sdcct.data.search.SearchParamNames;
+import gov.hhs.onc.sdcct.data.db.criteria.utils.SdcctCriterionUtils;
+import gov.hhs.onc.sdcct.data.parameter.ResourceParamNames;
+import gov.hhs.onc.sdcct.fhir.FhirForm;
 import gov.hhs.onc.sdcct.fhir.FhirResource;
 import gov.hhs.onc.sdcct.fhir.FhirResourceRegistry;
 import gov.hhs.onc.sdcct.fhir.Questionnaire;
+import gov.hhs.onc.sdcct.fhir.QuestionnaireStatus;
 import gov.hhs.onc.sdcct.fhir.impl.IdentifierImpl;
 import gov.hhs.onc.sdcct.fhir.impl.QuestionnaireImpl;
 import gov.hhs.onc.sdcct.fhir.impl.StringTypeImpl;
 import gov.hhs.onc.sdcct.test.impl.AbstractSdcctUnitTests;
 import javax.annotation.Resource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-@Test(dependsOnGroups = { "sdcct.test.unit.utils.all" }, groups = { "sdcct.test.unit.data.all", "sdcct.test.unit.data.db" })
+@Test(dependsOnGroups = { "sdcct.test.unit.utils.all", "sdcct.test.unit.xml.all" }, groups = { "sdcct.test.unit.data.all", "sdcct.test.unit.data.db" })
 public class DbUnitTests extends AbstractSdcctUnitTests {
-    @Value("${sdcct.test.data.db.form.1.identifier}")
-    private String testFormIdentifier1;
+    private final static String NEW_TEST_FORM_IDENTIFIER = "sdcct-test-form-new";
 
-    @Value("${sdcct.test.data.db.form.2.identifier}")
-    private String testFormIdentifier2;
+    @Resource(name = "formFhirTest1")
+    @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
+    private FhirForm testForm;
 
-    @Value("${sdcct.test.data.db.search.param.1.name}")
-    private String testSearchParamName1;
-
-    @Value("${sdcct.test.data.db.search.param.1.value}")
-    private String testSearchParamValue1;
-
-    @Resource(name = "registryResourceFhirQuestionnaire")
+    @Resource(name = "resourceRegistryFhirQuestionnaire")
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
     private FhirResourceRegistry<Questionnaire> registry;
 
-    @Autowired
-    @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
-    private SdcctRepository<FhirResource> repo;
-
-    private Long testFormId1;
+    private String testFormIdentifier;
+    private Long testFormEntityId;
 
     @SuppressWarnings({ CompilerWarnings.UNCHECKED })
     @Test(dependsOnMethods = { "testFind", "testSave" })
     public void testRemove() throws Exception {
-        this.repo.remove(this.registry.buildCriteria((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(
-            root.join(DbPropertyNames.TOKEN_SEARCH_PARAMS).get(DbPropertyNames.VALUE), this.testFormIdentifier2)));
+        this.registry.remove(
+            this.registry.buildCriteria(SdcctCriterionUtils.matchParam(DbPropertyNames.TOKEN_PARAMS, ResourceParamNames.IDENTIFIER, NEW_TEST_FORM_IDENTIFIER)));
 
         Assert.assertFalse(
-            this.repo.exists(this.registry.buildCriteria((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(
-                root.join(DbPropertyNames.TOKEN_SEARCH_PARAMS).get(DbPropertyNames.VALUE), this.testFormIdentifier2))),
-            String.format("Removed test form (identifier=%s) still exists.", this.testFormIdentifier2));
+            this.registry.exists(this.registry.buildCriteria(SdcctCriterionUtils.<FhirResource>matchDeleted().not(),
+                SdcctCriterionUtils.matchParam(DbPropertyNames.TOKEN_PARAMS, ResourceParamNames.IDENTIFIER, NEW_TEST_FORM_IDENTIFIER))),
+            String.format("New test form (identifier=%s) still exists.", NEW_TEST_FORM_IDENTIFIER));
     }
 
     @SuppressWarnings({ CompilerWarnings.UNCHECKED })
     @Test(dependsOnMethods = { "testFind" })
     public void testSave() throws Exception {
         // noinspection ConstantConditions
-        Questionnaire testQuestionnaire1 =
-            this.registry.find(this.registry.buildCriteria((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(
-                root.join(DbPropertyNames.TOKEN_SEARCH_PARAMS).get(DbPropertyNames.VALUE), this.testFormIdentifier1))), testQuestionnaire2 =
-            new QuestionnaireImpl().setItems(testQuestionnaire1.getItems()).setStatus(testQuestionnaire1.getStatus())
-                .setVersion(testQuestionnaire1.getVersion());
-        testQuestionnaire2.addIdentifiers(new IdentifierImpl().setValue(new StringTypeImpl().setValue(this.testFormIdentifier2)));
-        testQuestionnaire2.setMeta(testQuestionnaire1.getMeta());
+        Questionnaire testFormBean =
+            this.registry.findBean(this.registry
+                .buildCriteria(SdcctCriterionUtils.matchParam(DbPropertyNames.TOKEN_PARAMS, ResourceParamNames.IDENTIFIER, this.testFormIdentifier))),
+            newTestFormBean =
+                new QuestionnaireImpl().setItems(testFormBean.getItems()).setStatus(testFormBean.getStatus()).setVersion(testFormBean.getVersion());
+        newTestFormBean.addIdentifiers(new IdentifierImpl().setValue(new StringTypeImpl().setValue(NEW_TEST_FORM_IDENTIFIER)));
 
-        this.registry.save(testQuestionnaire2);
-
-        // noinspection ConstantConditions
-        Long testFormId2 =
-            this.repo.find(
-                this.registry.buildCriteria((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(
-                    root.join(DbPropertyNames.TOKEN_SEARCH_PARAMS).get(DbPropertyNames.VALUE), this.testFormIdentifier2))).getId();
+        FhirResource newTestFormEntity = this.registry.saveBean(newTestFormBean);
+        Long newTestFormEntityId = newTestFormEntity.getEntityId(), newTestFormVersion = newTestFormEntity.getVersion();
 
         // noinspection ConstantConditions
-        Assert.assertNotEquals(this.testFormId1, testFormId2,
-            String.format("Re-inserted test form (identifier=%s) IDs match: %d == %d", this.testFormIdentifier2, this.testFormId1, testFormId2));
+        Assert.assertNotEquals(this.testFormEntityId, newTestFormEntityId,
+            String.format("New test form (identifier=%s) entity ID matches that of existing test form (identifier=%s): {%s} == {%s}", NEW_TEST_FORM_IDENTIFIER,
+                this.testFormIdentifier, newTestFormEntityId, this.testFormEntityId));
+
+        newTestFormBean.getStatus().setValue(QuestionnaireStatus.RETIRED);
+
+        FhirResource newTestFormEntityUpdated = this.registry.saveBean(newTestFormBean, newTestFormEntity);
+        Long newTestFormUpdatedEntityId = newTestFormEntityUpdated.getEntityId(), newTestFormUpdatedVersion = newTestFormEntityUpdated.getVersion();
+
+        Assert.assertNotEquals(newTestFormEntityId, newTestFormUpdatedEntityId,
+            String.format("Updated new test form (identifier=%s) entity ID matches that of existing new test form (identifier=%s): {%s} == {%s}",
+                NEW_TEST_FORM_IDENTIFIER, NEW_TEST_FORM_IDENTIFIER, newTestFormUpdatedEntityId, newTestFormEntityId));
+
+        Assert.assertNotEquals(newTestFormVersion, newTestFormUpdatedVersion,
+            String.format("Updated new test form (identifier=%s) version matches that of existing new test form (identifier=%s): {%s} == {%s}",
+                NEW_TEST_FORM_IDENTIFIER, NEW_TEST_FORM_IDENTIFIER, newTestFormVersion, newTestFormUpdatedVersion));
     }
 
     @SuppressWarnings({ CompilerWarnings.UNCHECKED })
     @Test
     public void testFind() throws Exception {
         Assert.assertTrue(
-            this.repo.exists(this.registry.buildCriteria((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(
-                root.join(DbPropertyNames.TOKEN_SEARCH_PARAMS).get(DbPropertyNames.VALUE), this.testFormIdentifier1))),
-            String.format("Test form (identifier=%s) does not exist by natural ID.", this.testFormIdentifier1));
+            this.registry.exists(this.registry.buildCriteria(SdcctCriterionUtils.matchParam(DbPropertyNames.TOKEN_PARAMS, ResourceParamNames.IDENTIFIER,
+                (this.testFormIdentifier = this.testForm.getIdentifier())))),
+            String.format("Test form (identifier=%s) does not exist.", this.testFormIdentifier));
 
-        FhirResource testForm1 =
-            this.repo.find(this.registry.buildCriteria((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(
-                root.join(DbPropertyNames.TOKEN_SEARCH_PARAMS).get(DbPropertyNames.VALUE), this.testFormIdentifier1)));
+        FhirResource testForm = this.registry.find(
+            this.registry.buildCriteria(SdcctCriterionUtils.matchParam(DbPropertyNames.TOKEN_PARAMS, ResourceParamNames.IDENTIFIER, this.testFormIdentifier)));
 
         // noinspection ConstantConditions
-        this.testFormId1 = testForm1.getId();
+        this.testFormEntityId = testForm.getEntityId();
 
-        String actualTestFormIdentifier1 =
-            testForm1.getTokenSearchParams().stream().filter(tokenSearchParam -> tokenSearchParam.getName().equals(SearchParamNames.IDENTIFIER)).findFirst()
-                .get().getValue();
+        String actualTestFormIdentifier = testForm.getTokenParams().stream()
+            .filter(tokenSearchParam -> tokenSearchParam.getName().equals(ResourceParamNames.IDENTIFIER)).findFirst().get().getValue();
 
-        Assert.assertEquals(actualTestFormIdentifier1, this.testFormIdentifier1,
-            String.format("Test form identifiers do not match: %s != %s", actualTestFormIdentifier1, this.testFormIdentifier1));
+        Assert.assertEquals(actualTestFormIdentifier, this.testFormIdentifier,
+            String.format("Test form identifiers do not match: %s != %s", actualTestFormIdentifier, this.testFormIdentifier));
     }
 }

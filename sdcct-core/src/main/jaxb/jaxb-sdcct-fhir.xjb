@@ -33,25 +33,6 @@
     <!--====================================================================================================
     = COMPLEX TYPES
     =====================================================================================================-->
-    <jaxb:bindings node="xsd:complexType[@name='DomainResource']">
-        <jaxb:bindings node="xsd:complexContent/xsd:extension/xsd:sequence">
-            <jaxb:bindings node="xsd:element[@name='extension']">
-                <jaxb:property name="extensions"/>
-            </jaxb:bindings>
-            <jaxb:bindings node="xsd:element[@name='modifierExtension']">
-                <jaxb:property name="modifierExtensions"/>
-            </jaxb:bindings>
-        </jaxb:bindings>
-    </jaxb:bindings>
-    
-    <jaxb:bindings node="xsd:complexType[@name='Element']">
-        <jaxb:bindings node="xsd:sequence">
-            <jaxb:bindings node="xsd:element[@name='extension']">
-                <jaxb:property name="extensions"/>
-            </jaxb:bindings>
-        </jaxb:bindings>
-    </jaxb:bindings>
-    
     <jaxb:bindings node="xsd:complexType[@name='ElementDefinition']">
         <jaxb:bindings node="xsd:complexContent/xsd:extension/xsd:sequence">
             <jaxb:bindings node="xsd:choice[1]">
@@ -75,86 +56,18 @@
         </jaxb:bindings>
     </jaxb:bindings>
     
-    <jaxb:bindings node="xsd:complexType[@name='Meta']">
+    <jaxb:bindings node="xsd:complexType[@name='ElementDefinition.Binding']">
         <jaxb:bindings node="xsd:complexContent/xsd:extension/xsd:sequence">
-            <jaxb:bindings node="xsd:element[@name='profile']">
-                <jaxb:property name="profiles"/>
-            </jaxb:bindings>
-            <jaxb:bindings node="xsd:element[@name='security']">
-                <jaxb:property name="securityLabels"/>
-            </jaxb:bindings>
-            <jaxb:bindings node="xsd:element[@name='tag']">
-                <jaxb:property name="tags"/>
-            </jaxb:bindings>
-        </jaxb:bindings>
-    </jaxb:bindings>
-    
-    <jaxb:bindings node="xsd:complexType[@name='Questionnaire']">
-        <jaxb:bindings node="xsd:complexContent/xsd:extension/xsd:sequence">
-            <jaxb:bindings node="xsd:element[@name='concept']">
-                <jaxb:property name="concepts"/>
-            </jaxb:bindings>
-            <jaxb:bindings node="xsd:element[@name='identifier']">
-                <jaxb:property name="identifiers"/>
-            </jaxb:bindings>
-            <jaxb:bindings node="xsd:element[@name='item']">
-                <jaxb:property name="items"/>
-            </jaxb:bindings>
-            <jaxb:bindings node="xsd:element[@name='subjectType']">
-                <jaxb:property name="subjectTypes"/>
-            </jaxb:bindings>
-            <jaxb:bindings node="xsd:element[@name='telecom']">
-                <jaxb:property name="telecoms"/>
-            </jaxb:bindings>
-            <jaxb:bindings node="xsd:element[@name='useContext']">
-                <jaxb:property name="useContexts"/>
+            <jaxb:bindings node="xsd:choice">
+                <jaxb:property name="valueSet"/>
             </jaxb:bindings>
         </jaxb:bindings>
     </jaxb:bindings>
     
     <jaxb:bindings node="xsd:complexType[@name='Questionnaire.Item']">
         <jaxb:bindings node="xsd:complexContent/xsd:extension/xsd:sequence">
-            <jaxb:bindings node="xsd:element[@name='concept']">
-                <jaxb:property name="concepts"/>
-            </jaxb:bindings>
-            <jaxb:bindings node="xsd:element[@name='enableWhen']">
-                <jaxb:property name="enableWhens"/>
-            </jaxb:bindings>
-            <jaxb:bindings node="xsd:element[@name='item']">
-                <jaxb:property name="items"/>
-            </jaxb:bindings>
-            <jaxb:bindings node="xsd:element[@name='option']">
-                <jaxb:property name="options"/>
-            </jaxb:bindings>
             <jaxb:bindings node="xsd:element[@name='options']">
                 <jaxb:property name="optionSet"/>
-            </jaxb:bindings>
-        </jaxb:bindings>
-    </jaxb:bindings>
-    
-    <jaxb:bindings node="xsd:complexType[@name='QuestionnaireResponse']">
-        <jaxb:bindings node="xsd:complexContent/xsd:extension/xsd:sequence">
-            <jaxb:bindings node="xsd:element[@name='item']">
-                <jaxb:property name="items"/>
-            </jaxb:bindings>
-        </jaxb:bindings>
-    </jaxb:bindings>
-    
-    <jaxb:bindings node="xsd:complexType[@name='QuestionnaireResponse.Answer']">
-        <jaxb:bindings node="xsd:complexContent/xsd:extension/xsd:sequence">
-            <jaxb:bindings node="xsd:element[@name='item']">
-                <jaxb:property name="items"/>
-            </jaxb:bindings>
-        </jaxb:bindings>
-    </jaxb:bindings>
-    
-    <jaxb:bindings node="xsd:complexType[@name='QuestionnaireResponse.Item']">
-        <jaxb:bindings node="xsd:complexContent/xsd:extension/xsd:sequence">
-            <jaxb:bindings node="xsd:element[@name='answer']">
-                <jaxb:property name="answers"/>
-            </jaxb:bindings>
-            <jaxb:bindings node="xsd:element[@name='item']">
-                <jaxb:property name="items"/>
             </jaxb:bindings>
         </jaxb:bindings>
     </jaxb:bindings>
@@ -162,14 +75,6 @@
     <jaxb:bindings node="xsd:complexType[@name='ResourceContainer']">
         <jaxb:bindings node="xsd:choice">
             <jaxb:property name="content"/>
-        </jaxb:bindings>
-    </jaxb:bindings>
-    
-    <jaxb:bindings node="xsd:complexType[@name='StructureDefinition.Snapshot']">
-        <jaxb:bindings node="xsd:complexContent/xsd:extension/xsd:sequence">
-            <jaxb:bindings node="xsd:element[@name='element']">
-                <jaxb:property name="elements"/>
-            </jaxb:bindings>
         </jaxb:bindings>
     </jaxb:bindings>
     

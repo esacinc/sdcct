@@ -1,6 +1,6 @@
 package gov.hhs.onc.sdcct.web.form.manager.impl;
 
-import gov.hhs.onc.sdcct.io.impl.ResourceSource;
+import gov.hhs.onc.sdcct.transform.impl.ResourceSource;
 import gov.hhs.onc.sdcct.web.test.soapui.impl.AbstractSoapUiWebServiceIntegrationTests;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

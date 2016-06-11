@@ -1,27 +1,25 @@
 package gov.hhs.onc.sdcct.data.search.impl;
 
 import gov.hhs.onc.sdcct.data.SdcctResource;
-import gov.hhs.onc.sdcct.data.db.SdcctRegistry;
-import gov.hhs.onc.sdcct.data.db.impl.AbstractSdcctEntityAccessor;
-import gov.hhs.onc.sdcct.data.metadata.EntityMetadata;
+import gov.hhs.onc.sdcct.data.db.SdcctResourceRegistry;
+import gov.hhs.onc.sdcct.data.db.impl.AbstractSdcctResourceAccessor;
+import gov.hhs.onc.sdcct.data.metadata.ResourceMetadata;
 import gov.hhs.onc.sdcct.data.search.SearchService;
 import java.util.Collections;
 import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 
-public abstract class AbstractSearchService<T, U extends SdcctResource, V extends SdcctRegistry<T, U>> extends AbstractSdcctEntityAccessor<U> implements
-    SearchService<T, U, V> {
-    protected Class<T> beanClass;
-    protected Class<? extends T> beanImplClass;
-    protected V registry;
-    protected EntityMetadata entityMetadata;
+public abstract class AbstractSearchService<T, U extends ResourceMetadata<T>, V extends SdcctResource, W extends SdcctResourceRegistry<T, U, V>>
+    extends AbstractSdcctResourceAccessor<T, U, V> implements SearchService<T, U, V, W> {
+    protected U resourceMetadata;
+    protected W resourceRegistry;
 
-    protected AbstractSearchService(Class<T> beanClass, Class<? extends T> beanImplClass, Class<U> entityClass, Class<? extends U> entityImplClass, V registry) {
-        super(entityClass, entityImplClass);
+    protected AbstractSearchService(U resourceMetadata, W resourceRegistry) {
+        super(resourceMetadata.getSpecificationType(), resourceMetadata.getBeanClass(), resourceMetadata.getBeanImplClass(), resourceRegistry.getEntityClass(),
+            resourceRegistry.getEntityImplClass());
 
-        this.beanClass = beanClass;
-        this.beanImplClass = beanImplClass;
-        this.registry = registry;
+        this.resourceMetadata = resourceMetadata;
+        this.resourceRegistry = resourceRegistry;
     }
 
     @Override
@@ -31,10 +29,5 @@ public abstract class AbstractSearchService<T, U extends SdcctResource, V extend
 
     @Override
     public void afterPropertiesSet() throws Exception {
-    }
-
-    @Override
-    public EntityMetadata getEntityMetadata() {
-        return this.entityMetadata;
     }
 }

@@ -21,6 +21,7 @@
         <project.basedir.all>${project.basedir}/..</project.basedir.all>
         <!-- Project build JAXB properties -->
         <project.build.jaxbDirectory>${project.build.outputDirectory}/META-INF/sdcct/jaxb</project.build.jaxbDirectory>
+        <project.build.jaxbPluralsPropertyFile>${project.build.jaxbDirectory}/jaxb-sdcct-plurals.properties</project.build.jaxbPluralsPropertyFile>
         <!-- Project build JAXB source properties -->
         <project.build.jaxbSourceDirectory>${project.basedir}/src/main/jaxb</project.build.jaxbSourceDirectory>
         <project.build.jaxbFhirGeneratedSourceDirectory>${project.build.directory}/generated-sources/jaxb-fhir</project.build.jaxbFhirGeneratedSourceDirectory>
@@ -28,14 +29,10 @@
         <project.build.jaxbSdcGeneratedSourceDirectory>${project.build.directory}/generated-sources/jaxb-sdc</project.build.jaxbSdcGeneratedSourceDirectory>
         <!-- Project build XML schema properties -->
         <project.build.schemaDirectory>${project.build.outputDirectory}/META-INF/sdcct/schema</project.build.schemaDirectory>
-        <!-- Project build XML schema source properties -->
-        <project.build.schemaSourceDirectory>${project.basedir}/src/main/schema</project.build.schemaSourceDirectory>
         <!-- Project build XML schematron properties -->
         <project.build.schematronDirectory>${project.build.outputDirectory}/META-INF/sdcct/schematron</project.build.schematronDirectory>
         <!-- Project build WSDL properties -->
         <project.build.wsdlDirectory>${project.build.outputDirectory}/META-INF/sdcct/wsdl</project.build.wsdlDirectory>
-        <!-- Project build WSDL source properties -->
-        <project.build.wsdlSourceDirectory>${project.basedir}/src/main/wsdl</project.build.wsdlSourceDirectory>
     </properties>
     
     <dependencies>
@@ -91,7 +88,6 @@
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-xjc</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.ws</groupId>
@@ -256,6 +252,18 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.santuario</groupId>
+            <artifactId>xmlsec</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ws.xmlschema</groupId>
+            <artifactId>xmlschema-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ws.xmlschema</groupId>
+            <artifactId>xmlschema-walker</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
         </dependency>
@@ -315,10 +323,6 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-envers</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -461,6 +465,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>META-INF/sdcct/jaxb/**</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <id>default-jar</id>
@@ -486,6 +495,7 @@
                                 <resource>
                                     <directory>${project.build.jaxbSourceDirectory}</directory>
                                     <includes>
+                                        <include>*.properties</include>
                                         <include>*.xjb</include>
                                     </includes>
                                 </resource>
@@ -493,36 +503,30 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>copy-resources-schema</id>
-                        <phase>generate-sources</phase>
+                        <id>copy-resources-jaxb-generated</id>
+                        <phase>process-sources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.schemaDirectory}</outputDirectory>
+                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.build.schemaSourceDirectory}</directory>
+                                    <directory>${project.build.jaxbFhirGeneratedSourceDirectory}</directory>
                                     <includes>
-                                        <include>**/*.xsd</include>
+                                        <include>**/*.properties</include>
                                     </includes>
                                 </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-resources-wsdl</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.wsdlDirectory}</outputDirectory>
-                            <resources>
                                 <resource>
-                                    <directory>${project.build.wsdlSourceDirectory}</directory>
+                                    <directory>${project.build.jaxbRfdGeneratedSourceDirectory}</directory>
                                     <includes>
-                                        <include>**/*.wsdl</include>
+                                        <include>**/*.properties</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>${project.build.jaxbSdcGeneratedSourceDirectory}</directory>
+                                    <includes>
+                                        <include>**/*.properties</include>
                                     </includes>
                                 </resource>
                             </resources>
@@ -680,13 +684,22 @@
                                     <value>
                                         gov/hhs/onc/sdcct/*.java
                                         gov/hhs/onc/sdcct/beans/*.java
+                                        gov/hhs/onc/sdcct/config/utils/*.java
                                         gov/hhs/onc/sdcct/impl/*.java
                                         gov/hhs/onc/sdcct/io/**/*.java
                                         gov/hhs/onc/sdcct/net/*.java
                                         gov/hhs/onc/sdcct/net/utils/*.java
                                         gov/hhs/onc/sdcct/rfd/RfdResourceType.java
+                                        gov/hhs/onc/sdcct/transform/ResourceSourceResolver.java
+                                        gov/hhs/onc/sdcct/transform/impl/ByteArrayResult.java
+                                        gov/hhs/onc/sdcct/transform/impl/ByteArraySource.java
+                                        gov/hhs/onc/sdcct/transform/impl/ResourceSource.java
+                                        gov/hhs/onc/sdcct/transform/impl/ResourceSourceResolverImpl.java
                                         gov/hhs/onc/sdcct/utils/*.java
                                         gov/hhs/onc/sdcct/xml/SdcctXmlPrefixes.java
+                                        gov/hhs/onc/sdcct/xml/SdcctXmlResolver.java
+                                        gov/hhs/onc/sdcct/xml/impl/AbstractSdcctXmlResolver.java
+                                        gov/hhs/onc/sdcct/xml/impl/CompositeXmlResolver.java
                                         gov/hhs/onc/sdcct/xml/utils/*.java
                                         **/*.groovy
                                     </value>
@@ -699,9 +712,39 @@
                     </execution>
                     <execution>
                         <id>process-deps-fhir</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <scripts>
+                                <script>file://${project.build.scriptSourceDirectory}/sdcct-process-deps-fhir.groovy</script>
+                            </scripts>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>process-deps-sdc</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <scripts>
+                                <script>file://${project.build.scriptSourceDirectory}/sdcct-process-deps-sdc.groovy</script>
+                            </scripts>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>process-deps-soapui</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <scripts>
+                                <script>file://${project.build.scriptSourceDirectory}/sdcct-process-deps-soapui.groovy</script>
+                            </scripts>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>generate-sources-jaxb-rfd-form-archiver</id>
@@ -985,7 +1028,6 @@
                                     <value>
                                         fhir=gov.hhs.onc.sdcct.fhir
                                         fhir-xhtml=gov.hhs.onc.sdcct.fhir.xhtml
-                                        fhir-xml=gov.hhs.onc.sdcct.fhir.xml
                                     </value>
                                 </property>
                                 <property>
@@ -1003,7 +1045,6 @@
                                     <value>
                                         fhir=gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes.FHIR
                                         fhir-xhtml=gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes.XHTML
-                                        fhir-xml=gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes.XML
                                     </value>
                                 </property>
                                 <property>
@@ -1011,13 +1052,32 @@
                                     <value>
                                         fhir=gov.hhs.onc.sdcct.net.SdcctUris.FHIR_URL_VALUE
                                         fhir-xhtml=net.sf.saxon.lib.NamespaceConstant.XHTML
-                                        fhir-xml=net.sf.saxon.lib.NamespaceConstant.XML
                                     </value>
                                 </property>
                             </properties>
                             <scripts>
                                 <script>file://${project.build.scriptSourceDirectory}/sdcct-generate-sources-jaxb.groovy</script>
                             </scripts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-sources-jaxb</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.jaxbFhirGeneratedSourceDirectory}</source>
+                                <source>${project.build.jaxbRfdGeneratedSourceDirectory}</source>
+                                <source>${project.build.jaxbSdcGeneratedSourceDirectory}</source>
+                            </sources>
                         </configuration>
                     </execution>
                 </executions>

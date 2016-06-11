@@ -3,24 +3,21 @@
     xmlns:beans="http://www.springframework.org/schema/beans"
     xmlns:c="http://www.springframework.org/schema/c"
     xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="
-        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
+        urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
     
     <!--====================================================================================================
-    = SEARCH PARAM METADATAS
+    = RESOURCE PARAM CARDINALITIES
     =====================================================================================================-->
-    <beans:bean id="metadataSearchParam" class="gov.hhs.onc.sdcct.data.metadata.impl.SearchParamMetadataImpl" abstract="true">
-        <beans:constructor-arg name="id">
-            <beans:null/>
-        </beans:constructor-arg>
-        <beans:constructor-arg name="uri">
-            <beans:null/>
-        </beans:constructor-arg>
-    </beans:bean>
+    <beans:bean id="resourceParamCardinality" class="gov.hhs.onc.sdcct.data.metadata.impl.ResourceParamCardinalityImpl" abstract="true"/>
     
     <!--====================================================================================================
-    = METADATA SERVICES
+    = RESOURCE PARAM METADATAS
     =====================================================================================================-->
-    <beans:bean id="metadataService" class="gov.hhs.onc.sdcct.data.metadata.impl.MetadataServiceImpl"/>
+    <beans:bean id="metadataResourceParam" class="gov.hhs.onc.sdcct.data.metadata.impl.ResourceParamMetadataImpl" abstract="true"/>
 </beans:beans>

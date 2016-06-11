@@ -3,9 +3,13 @@
     xmlns:beans="http://www.springframework.org/schema/beans"
     xmlns:c="http://www.springframework.org/schema/c"
     xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="
-        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
+        urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
     
     <!--====================================================================================================
     = MODULES
@@ -17,9 +21,11 @@
     <!--====================================================================================================
     = OBJECT MAPPERS
     =====================================================================================================-->
+    <!--suppress SpringPlaceholdersInspection -->
     <beans:bean id="objMapper" class="gov.hhs.onc.sdcct.json.impl.SdcctObjectMapperFactoryBean"
         p:autoDetectFields="false"
         p:autoDetectGettersSetters="false"
+        p:indentSize="${sdcct.transform.content.pretty.indent.size}"
         p:serializationInclusion="NON_DEFAULT">
         <beans:property name="features">
             <beans:map>
@@ -37,13 +43,30 @@
         </beans:property>
     </beans:bean>
     
-    <!--suppress SpringPlaceholdersInspection -->
+    
     <beans:bean id="objMapperPretty" parent="objMapper"
-        p:indentOutput="true"
-        p:indentSize="${sdcct.transform.content.pretty.indent.size}"/>
+        p:indentOutput="true"/>
     
     <!--====================================================================================================
     = CONTENT CODECS
     =====================================================================================================-->
-    <beans:bean id="contentCodecJson" class="gov.hhs.onc.sdcct.json.impl.JsonCodec" parent="contentCodec"/>
+    <beans:bean id="contentCodecJson" class="gov.hhs.onc.sdcct.json.impl.JsonCodec">
+        <beans:constructor-arg name="defaultDecodeOpts">
+            <beans:bean class="gov.hhs.onc.sdcct.json.impl.JsonDecodeOptionsImpl"/>
+        </beans:constructor-arg>
+        <beans:constructor-arg name="defaultEncodeOpts">
+            <beans:bean class="gov.hhs.onc.sdcct.json.impl.JsonEncodeOptionsImpl">
+                <beans:property name="options">
+                    <beans:map>
+                        <beans:entry key="#{ T(gov.hhs.onc.sdcct.transform.content.ContentCodecOptions).CANONICALIZE }" value="false"
+                            value-type="java.lang.Boolean"/>
+                        <beans:entry key="#{ T(gov.hhs.onc.sdcct.transform.content.ContentCodecOptions).PRETTY }" value="false"
+                            value-type="java.lang.Boolean"/>
+                        <beans:entry key="#{ T(gov.hhs.onc.sdcct.transform.content.ContentCodecOptions).VALIDATE }" value="true"
+                            value-type="java.lang.Boolean"/>
+                    </beans:map>
+                </beans:property>
+            </beans:bean>
+        </beans:constructor-arg>
+    </beans:bean>
 </beans:beans>

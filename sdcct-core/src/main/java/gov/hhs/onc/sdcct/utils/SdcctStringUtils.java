@@ -51,6 +51,8 @@ public final class SdcctStringUtils {
     public final static String COMMA = ",";
     public final static char COMMA_CHAR = ',';
 
+    public final static char CR_CHAR = '\r';
+
     public final static String DOLLAR_SIGN = "$";
     public final static char DOLLAR_SIGN_CHAR = '$';
 
@@ -60,6 +62,9 @@ public final class SdcctStringUtils {
     public final static String GT = ">";
     public final static char GT_CHAR = '>';
 
+    public final static String HASH = "#";
+    public final static char HASH_CHAR = '#';
+
     public final static String HYPHEN = "-";
     public final static char HYPHEN_CHAR = '-';
 
@@ -68,6 +73,8 @@ public final class SdcctStringUtils {
 
     public final static String L_BRACKET = "[";
     public final static char L_BRACKET_CHAR = '[';
+
+    public final static char LF_CHAR = '\n';
 
     public final static String LT = "<";
     public final static char LT_CHAR = '<';
@@ -89,6 +96,8 @@ public final class SdcctStringUtils {
 
     public final static String SLASH = "/";
     public final static char SLASH_CHAR = '/';
+
+    public final static char SPACE_CHAR = ' ';
 
     public final static String UNDERSCORE = "_";
     public final static char UNDERSCORE_CHAR = '_';

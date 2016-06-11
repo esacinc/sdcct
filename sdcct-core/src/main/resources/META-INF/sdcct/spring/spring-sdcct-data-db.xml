@@ -4,24 +4,29 @@
     xmlns:c="http://www.springframework.org/schema/c"
     xmlns:jpa="http://www.springframework.org/schema/data/jpa"
     xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
     xmlns:tx="http://www.springframework.org/schema/tx"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
-        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+        urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
+        urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
     
     <!--====================================================================================================
     = THREAD FACTORIES
     =====================================================================================================-->
-    <beans:bean id="threadFactoryDataSrc" parent="threadFactory"
-        p:threadNamePrefix="#{ threadGroup.name }-data-src-"/>
+    <beans:bean id="threadFactoryDataDbServer" parent="threadFactory"
+        p:daemon="false"
+        p:threadNamePrefix="#{ threadGroup.name }-data-db-server-"/>
     
     <!--====================================================================================================
     = TASK SCHEDULERS
     =====================================================================================================-->
-    <beans:bean id="taskSchedulerDataSrc" parent="taskSchedulerThreadPool"
-        p:threadNamePrefix="#{ threadGroup.name }-data-src-"/>
+    <beans:bean id="taskSchedulerDataDbSrc" parent="taskSchedulerThreadPool"
+        p:threadNamePrefix="#{ threadGroup.name }-data-db-src-"/>
     
     <!--====================================================================================================
     = CACHE MANAGERS
@@ -105,7 +110,7 @@
         p:maxLifetime="${sdcct.data.db.pool.lifetime.max}"
         p:minimumIdle="${sdcct.data.db.pool.size.min}"
         p:poolName="${sdcct.data.db.pool.name}"
-        p:scheduledExecutorService="#{ taskSchedulerDataSrc.scheduledThreadPoolExecutor }"
+        p:scheduledExecutorService="#{ taskSchedulerDataDbSrc.scheduledThreadPoolExecutor }"
         p:validationTimeout="${sdcct.data.db.pool.validation.timeout}">
         <beans:property name="user">
             <!--suppress SpringPlaceholdersInspection -->
@@ -120,46 +125,25 @@
                             <beans:constructor-arg name="authorities">
                                 <beans:array>
                                     <beans:bean parent="dbAuthoritySeq"
-                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbSequenceNames).RESOURCE_ID }"/>
+                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbSequenceNames).RESOURCE_ENTITY_ID }"/>
                                     <beans:bean parent="dbAuthoritySeq"
-                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbSequenceNames).REVISION_ID }"/>
-                                    <beans:bean parent="dbAuthoritySeq"
-                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbSequenceNames).SEARCH_PARAM_ID }"/>
+                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbSequenceNames).RESOURCE_PARAM_ENTITY_ID }"/>
                                     <beans:bean parent="dbAuthorityTableFull"
                                         c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).RESOURCE }"/>
-                                    <beans:bean parent="dbAuthorityTable"
-                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).RESOURCE_HISTORY }">
-                                        <beans:constructor-arg name="privileges">
-                                            <beans:array>
-                                                <beans:value>SELECT</beans:value>
-                                                <beans:value>INSERT</beans:value>
-                                                <beans:value>UPDATE</beans:value>
-                                            </beans:array>
-                                        </beans:constructor-arg>
-                                    </beans:bean>
-                                    <beans:bean parent="dbAuthorityTable"
-                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).REVISION }">
-                                        <beans:constructor-arg name="privileges">
-                                            <beans:array>
-                                                <beans:value>SELECT</beans:value>
-                                                <beans:value>INSERT</beans:value>
-                                            </beans:array>
-                                        </beans:constructor-arg>
-                                    </beans:bean>
                                     <beans:bean parent="dbAuthorityTableFull"
-                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).SEARCH_PARAM_DATE }"/>
+                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).RESOURCE_PARAM_DATE }"/>
                                     <beans:bean parent="dbAuthorityTableFull"
-                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).SEARCH_PARAM_NUMBER }"/>
+                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).RESOURCE_PARAM_NUMBER }"/>
                                     <beans:bean parent="dbAuthorityTableFull"
-                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).SEARCH_PARAM_QUANTITY }"/>
+                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).RESOURCE_PARAM_QUANTITY }"/>
                                     <beans:bean parent="dbAuthorityTableFull"
-                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).SEARCH_PARAM_REF }"/>
+                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).RESOURCE_PARAM_REF }"/>
                                     <beans:bean parent="dbAuthorityTableFull"
-                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).SEARCH_PARAM_STRING }"/>
+                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).RESOURCE_PARAM_STRING }"/>
                                     <beans:bean parent="dbAuthorityTableFull"
-                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).SEARCH_PARAM_TOKEN }"/>
+                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).RESOURCE_PARAM_TOKEN }"/>
                                     <beans:bean parent="dbAuthorityTableFull"
-                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).SEARCH_PARAM_URI }"/>
+                                        c:objName="#{ T(gov.hhs.onc.sdcct.data.db.DbTableNames).RESOURCE_PARAM_URI }"/>
                                 </beans:array>
                             </beans:constructor-arg>
                         </beans:bean>
@@ -177,7 +161,8 @@
         p:databaseDirectory="${sdcct.data.db.dir}"
         p:databaseName="${sdcct.data.db.name}"
         p:hostAddress="${sdcct.data.db.server.host.addr}"
-        p:port="${sdcct.data.db.server.port}">
+        p:port="${sdcct.data.db.server.port}"
+        p:threadFactory-ref="threadFactoryDataDbServer">
         <beans:property name="adminUser">
             <!--suppress SpringPlaceholdersInspection -->
             <beans:bean parent="dbUser"
@@ -208,17 +193,10 @@
     =====================================================================================================-->
     <beans:bean id="entityManagerFactory" class="gov.hhs.onc.sdcct.data.db.impl.SdcctEntityManagerFactoryFactoryBean"
         p:dataSource-ref="dataSrc"
-        p:packagesToScan="gov.hhs.onc.sdcct"
+        p:packagesToScan="#{ T(gov.hhs.onc.sdcct.SdcctPackages).ROOT_NAME }"
         p:persistenceUnitName="sdcct">
         <beans:property name="jpaPropertyMap">
             <beans:map>
-                <beans:entry key="#{ T(org.hibernate.envers.configuration.EnversSettings).AUDIT_STRATEGY }"
-                    value="#{ T(org.hibernate.envers.strategy.ValidityAuditStrategy).name }"/>
-                <beans:entry key="#{ T(org.hibernate.envers.configuration.EnversSettings).AUDIT_STRATEGY_VALIDITY_END_REV_FIELD_NAME }"
-                    value="#{ T(gov.hhs.onc.sdcct.data.db.DbColumnNames).REVISION_END_ID }"/>
-                <beans:entry key="#{ T(org.hibernate.envers.configuration.EnversSettings).AUDIT_STRATEGY_VALIDITY_REVEND_TIMESTAMP_FIELD_NAME }"
-                    value="#{ T(gov.hhs.onc.sdcct.data.db.DbColumnNames).REVISION_END_TIMESTAMP }"/>
-                <beans:entry key="#{ T(org.hibernate.envers.configuration.EnversSettings).AUDIT_STRATEGY_VALIDITY_STORE_REVEND_TIMESTAMP }" value="true"/>
                 <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).AUTO_EVICT_COLLECTION_CACHE }" value="true"/>
                 <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).GENERATE_STATISTICS }" value="true"/>
                 <beans:entry key="#{ T(org.hibernate.cfg.AvailableSettings).INTERCEPTOR }" value-ref="entityInterceptorLogging"/>
@@ -232,10 +210,6 @@
                 <beans:entry key="#{ T(org.hibernate.search.cfg.Environment).GENERATE_STATS }" value="true"/>
                 <beans:entry key="#{ T(org.hibernate.search.cfg.Environment).LUCENE_MATCH_VERSION }"
                     value="#{ T(org.hibernate.search.cfg.Environment).DEFAULT_LUCENE_MATCH_VERSION }"/>
-                <beans:entry key="#{ T(org.hibernate.envers.configuration.EnversSettings).REVISION_FIELD_NAME }"
-                    value="#{ T(gov.hhs.onc.sdcct.data.db.DbColumnNames).REVISION_ID }"/>
-                <beans:entry key="#{ T(org.hibernate.envers.configuration.EnversSettings).REVISION_TYPE_FIELD_NAME }"
-                    value="#{ T(gov.hhs.onc.sdcct.data.db.DbColumnNames).REVISION_TYPE }"/>
                 <beans:entry key="#{ T(org.hibernate.search.cfg.Environment).WORKER_ENLIST_IN_TRANSACTION }" value="true"/>
             </beans:map>
         </beans:property>
@@ -246,8 +220,6 @@
     =====================================================================================================-->
     <beans:bean id="txManager" class="org.springframework.orm.jpa.JpaTransactionManager"
         p:entityManagerFactory-ref="entityManagerFactory"
-        p:nestedTransactionAllowed="true"
-        p:rollbackOnCommitFailure="true"
         p:validateExistingTransaction="true"/>
     
     <!--====================================================================================================
@@ -258,7 +230,7 @@
     <!--====================================================================================================
     = TRANSACTIONS
     =====================================================================================================-->
-    <tx:annotation-driven transaction-manager="txManager"/>
+    <tx:annotation-driven proxy-target-class="true" transaction-manager="txManager"/>
     
     <!--====================================================================================================
     = REPOSITORIES

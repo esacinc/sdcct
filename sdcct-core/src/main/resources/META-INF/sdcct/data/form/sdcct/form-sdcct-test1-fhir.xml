@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Questionnaire
+    xmlns="http://hl7.org/fhir">
+    
+    <language value="en-US"/>
+    
+    <identifier>
+        <value value="sdcct-test1-fhir"/>
+    </identifier>
+    
+    <version value="1"/>
+    
+    <status value="published"/>
+    
+    <item>
+        <linkId value="section1"/>
+        <text value="Section 1"/>
+        <type value="group"/>
+        <required value="true"/>
+        <item>
+            <linkId value="question1.1"/>
+            <text value="Question 1.1"/>
+            <type value="string"/>
+            <required value="true"/>
+        </item>
+        <item>
+            <linkId value="question1.2"/>
+            <text value="Question 1.2"/>
+            <type value="choice"/>
+            <required value="true"/>
+            <option id="question1.2-listItem1">
+                <valueString value="Question 1.2 ListItem 1"/>
+            </option>
+            <option id="question1.2-listItem2">
+                <valueString value="Question 1.2 ListItem 2"/>
+            </option>
+        </item>
+    </item>
+</Questionnaire>

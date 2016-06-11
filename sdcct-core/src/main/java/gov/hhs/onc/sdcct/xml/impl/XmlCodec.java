@@ -1,25 +1,26 @@
 package gov.hhs.onc.sdcct.xml.impl;
 
-import gov.hhs.onc.sdcct.io.impl.ByteArrayResult;
-import gov.hhs.onc.sdcct.io.impl.ByteArraySource;
+import gov.hhs.onc.sdcct.transform.content.ContentCodecOptions;
 import gov.hhs.onc.sdcct.transform.content.SdcctContentType;
 import gov.hhs.onc.sdcct.transform.content.impl.AbstractContentCodec;
-import gov.hhs.onc.sdcct.transform.content.impl.ContentDecodeOptions;
-import gov.hhs.onc.sdcct.transform.content.impl.ContentEncodeOptions;
+import gov.hhs.onc.sdcct.transform.impl.ByteArrayResult;
+import gov.hhs.onc.sdcct.transform.impl.ByteArraySource;
+import gov.hhs.onc.sdcct.transform.impl.SdcctConfiguration;
+import gov.hhs.onc.sdcct.xml.XmlDecodeOptions;
+import gov.hhs.onc.sdcct.xml.XmlEncodeOptions;
 import gov.hhs.onc.sdcct.xml.jaxb.JaxbContextRepository;
-import gov.hhs.onc.sdcct.xml.jaxb.impl.JaxbResult;
+import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbTypeMetadata;
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
+import org.codehaus.stax2.XMLStreamWriter2;
+import org.codehaus.stax2.ri.Stax2WriterAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class XmlCodec extends AbstractContentCodec {
+public class XmlCodec extends AbstractContentCodec<XmlDecodeOptions, XmlEncodeOptions> {
     @Autowired
     private JaxbContextRepository jaxbContextRepo;
-
-    @Autowired
-    private SdcctDocumentBuilder docBuilder;
 
     @Resource(name = "serializerXml")
     private SdcctSerializer serializer;
@@ -27,49 +28,61 @@ public class XmlCodec extends AbstractContentCodec {
     @Resource(name = "serializerXmlPretty")
     private SdcctSerializer prettySerializer;
 
-    public XmlCodec() {
-        super(SdcctContentType.XML);
+    @Autowired
+    private SdcctXmlInputFactory xmlInFactory;
+
+    @Autowired
+    private SdcctConfiguration config;
+
+    public XmlCodec(XmlDecodeOptions defaultDecodeOpts, XmlEncodeOptions defaultEncodeOpts) {
+        super(SdcctContentType.XML, defaultDecodeOpts, defaultEncodeOpts);
     }
 
     @Override
-    public byte[] encode(Object src, @Nullable ContentEncodeOptions opts) throws Exception {
+    public byte[] encode(Object src, @Nullable XmlEncodeOptions opts) throws Exception {
         return this.encode(src, new ByteArrayResult(), opts).getBytes();
     }
 
-    public <T extends Result> T encode(Object src, T result, @Nullable ContentEncodeOptions opts) throws Exception {
-        return this.encode(this.jaxbContextRepo.buildSource(src, null), result, opts);
-    }
-
-    public byte[] encode(Source src, @Nullable ContentEncodeOptions opts) throws Exception {
-        return this.encode(src, new ByteArrayResult(), opts).getBytes();
-    }
-
-    public <T extends Result> T encode(Source src, T result, @Nullable ContentEncodeOptions opts) throws Exception {
+    public <T extends Result> T encode(Object src, T result, @Nullable XmlEncodeOptions opts) throws Exception {
         // noinspection ConstantConditions
-        return ((opts = this.defaultEncodeOpts.clone().merge(opts)).getOption(ContentEncodeOptions.PRETTY) ? this.prettySerializer : this.serializer)
+        XMLStreamWriter2 resultWriter = Stax2WriterAdapter.wrapIfNecessary(
+            ((opts = this.defaultEncodeOpts.clone().merge(opts)).getOption(ContentCodecOptions.PRETTY) ? this.prettySerializer : this.serializer)
+                .getXMLStreamWriter(this.config, this.config.makePipelineConfiguration(), result, opts.getParseOptions(), opts.getOutputProperties()));
+        JaxbTypeMetadata<?, ?> srcTypeMetadata = this.jaxbContextRepo.findTypeMetadata(src.getClass());
+
+        // noinspection ConstantConditions
+        if (opts.getOption(ContentCodecOptions.VALIDATE)) {
+            // TODO: validate
+        }
+
+        this.jaxbContextRepo.buildMarshaller(src, null).marshal(this.jaxbContextRepo.buildSource(srcTypeMetadata, src), resultWriter);
+
+        resultWriter.close();
+
+        return result;
+    }
+
+    public byte[] encode(Source src, @Nullable XmlEncodeOptions opts) throws Exception {
+        return this.encode(src, new ByteArrayResult(), opts).getBytes();
+    }
+
+    public <T extends Result> T encode(Source src, T result, @Nullable XmlEncodeOptions opts) throws Exception {
+        // noinspection ConstantConditions
+        return ((opts = this.defaultEncodeOpts.clone().merge(opts)).getOption(ContentCodecOptions.PRETTY) ? this.prettySerializer : this.serializer)
             .serialize(src, result, opts.getParseOptions(), opts.getOutputProperties());
     }
 
     @Override
-    public <T> T decode(byte[] src, Class<T> resultClass, @Nullable ContentDecodeOptions opts) throws Exception {
+    public <T> T decode(byte[] src, Class<T> resultClass, @Nullable XmlDecodeOptions opts) throws Exception {
         return this.decode(new ByteArraySource(src), resultClass, opts);
     }
 
-    public <T> T decode(Source src, Class<T> resultClass, @Nullable ContentDecodeOptions opts) throws Exception {
-        JaxbResult<T> result = this.jaxbContextRepo.buildResult(resultClass, null);
+    public <T> T decode(Source src, Class<T> resultClass, @Nullable XmlDecodeOptions opts) throws Exception {
+        // noinspection ConstantConditions
+        if ((opts = this.defaultDecodeOpts.clone().merge(opts)).getOption(ContentCodecOptions.VALIDATE)) {
+            // TODO: validate
+        }
 
-        this.encode(src, result, null);
-
-        result.close();
-
-        return result.getResult();
-    }
-
-    public XdmDocument decode(byte[] src, @Nullable ContentDecodeOptions opts) throws Exception {
-        return this.decode(new ByteArraySource(src), opts);
-    }
-
-    public XdmDocument decode(Source src, @Nullable ContentDecodeOptions opts) throws Exception {
-        return this.docBuilder.build(src);
+        return this.jaxbContextRepo.buildUnmarshaller(resultClass, null).unmarshal(this.xmlInFactory.createXMLStreamReader(src), resultClass).getValue();
     }
 }

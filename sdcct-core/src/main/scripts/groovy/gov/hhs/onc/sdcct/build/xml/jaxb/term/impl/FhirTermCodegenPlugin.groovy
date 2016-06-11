@@ -93,8 +93,8 @@ class FhirTermCodegenPlugin extends AbstractTermCodegenPlugin {
             
             SdcctCodegenUtils.findField(enumComponentImplClassModel, SdcctCodegenUtils.VALUE_MEMBER_NAME).type(enumClassModel)
             
-            [ SdcctCodegenUtils.findGetterMethod(enumComponentClassModel, SdcctCodegenUtils.VALUE_MEMBER_NAME),
-                SdcctCodegenUtils.findGetterMethod(enumComponentImplClassModel, SdcctCodegenUtils.VALUE_MEMBER_NAME) ].each{ it.type(enumClassModel) }
+            [ SdcctCodegenUtils.findGetterMethod(enumComponentClassModel, SdcctCodegenUtils.VALUE_MEMBER_NAME, false),
+                SdcctCodegenUtils.findGetterMethod(enumComponentImplClassModel, SdcctCodegenUtils.VALUE_MEMBER_NAME, false) ].each{ it.type(enumClassModel) }
             
             [ SdcctCodegenUtils.findSetterMethod(enumComponentClassModel, SdcctCodegenUtils.VALUE_MEMBER_NAME),
                 SdcctCodegenUtils.findSetterMethod(enumComponentImplClassModel, SdcctCodegenUtils.VALUE_MEMBER_NAME) ]

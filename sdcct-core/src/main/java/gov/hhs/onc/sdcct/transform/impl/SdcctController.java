@@ -21,7 +21,9 @@ public class SdcctController extends Controller {
 
     public void registerDocuments(List<XdmDocument> pooledDocs) throws XPathException {
         for (XdmDocument pooledDoc : pooledDocs) {
-            this.registerDocument(pooledDoc.getUnderlyingNode().getTreeInfo(), pooledDoc.getUri());
+            if (pooledDoc.hasDocumentUri()) {
+                this.registerDocument(pooledDoc.getUnderlyingNode().getTreeInfo(), pooledDoc.getDocumentUri());
+            }
         }
     }
 

@@ -5,9 +5,9 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
 
 public class FormException extends RuntimeException {
-    private final static long serialVersionUID = 0L;
-
     protected StatusType respStatus = Status.INTERNAL_SERVER_ERROR;
+
+    private final static long serialVersionUID = 0L;
 
     public FormException(@Nullable String msg) {
         this(msg, null);

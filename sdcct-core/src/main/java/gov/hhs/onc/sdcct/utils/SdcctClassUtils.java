@@ -22,11 +22,11 @@ public final class SdcctClassUtils {
     @SuppressWarnings({ CompilerWarnings.UNCHECKED })
     public static <T, U extends T> Class<? extends U> buildImplClass(ClassLoader classLoader, Class<U> superClass, Class<? extends T> interfaceClass)
         throws ClassNotFoundException {
-        String implClassNamePrefix = (interfaceClass.getPackage().getName() + ClassUtils.PACKAGE_SEPARATOR + IMPL_PKG_NAME + ClassUtils.PACKAGE_SEPARATOR), interfaceClassSimpleName =
-            interfaceClass.getSimpleName(), implClassName = (implClassNamePrefix + ABSTRACT_CLASS_NAME_PREFIX + interfaceClassSimpleName);
+        String interfacePkgName = interfaceClass.getPackage().getName(), interfaceClassSimpleName = interfaceClass.getSimpleName(),
+            implClassName = buildImplClassName(interfacePkgName, interfaceClassSimpleName, true);
 
         if (!org.springframework.util.ClassUtils.isPresent(implClassName, classLoader)) {
-            implClassName = (implClassNamePrefix + interfaceClassSimpleName + IMPL_CLASS_NAME_SUFFIX);
+            implClassName = buildImplClassName(interfacePkgName, interfaceClassSimpleName, false);
         }
 
         return ((Class<? extends U>) Class.forName(implClassName, true, classLoader));
@@ -35,6 +35,30 @@ public final class SdcctClassUtils {
     @SuppressWarnings({ CompilerWarnings.UNCHECKED })
     public static <T> Class<? extends T> buildInterfaceClass(ClassLoader classLoader, Class<T> superInterface, Package pkg, String simpleName)
         throws ClassNotFoundException {
-        return ((Class<? extends T>) Class.forName((pkg.getName() + ClassUtils.PACKAGE_SEPARATOR + simpleName), true, classLoader));
+        return ((Class<? extends T>) Class.forName(buildInterfaceClassName(pkg, simpleName), true, classLoader));
+    }
+
+    public static String buildImplClassName(String interfacePkgName, String interfaceClassSimpleName, boolean abztract) {
+        String pkgName = buildImplPackageName(interfacePkgName);
+
+        return (abztract
+            ? buildClassName(pkgName, (ABSTRACT_CLASS_NAME_PREFIX + interfaceClassSimpleName))
+            : buildClassName(pkgName, (interfaceClassSimpleName + IMPL_CLASS_NAME_SUFFIX)));
+    }
+
+    public static String buildInterfaceClassName(Package pkg, String simpleName) {
+        return buildClassName(pkg.getName(), simpleName);
+    }
+
+    public static String buildClassName(String pkgName, String simpleName) {
+        return (pkgName + ClassUtils.PACKAGE_SEPARATOR + simpleName);
+    }
+
+    public static Package buildImplPackage(Package pkg) {
+        return Package.getPackage(buildImplPackageName(pkg.getName()));
+    }
+
+    public static String buildImplPackageName(String pkgName) {
+        return (pkgName + ClassUtils.PACKAGE_SEPARATOR + IMPL_PKG_NAME);
     }
 }

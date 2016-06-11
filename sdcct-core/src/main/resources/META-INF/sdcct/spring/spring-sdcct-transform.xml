@@ -3,9 +3,13 @@
     xmlns:beans="http://www.springframework.org/schema/beans"
     xmlns:c="http://www.springframework.org/schema/c"
     xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="
-        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
+        urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
     
     <!--====================================================================================================
     = CONFIGURATIONS
@@ -15,10 +19,12 @@
         p:recoveryPolicy="#{ T(net.sf.saxon.Configuration).DO_NOT_RECOVER }"
         p:stripsAllWhiteSpace="false"
         p:stripsWhiteSpace="#{ T(net.sf.saxon.value.Whitespace).NONE }"
+        p:URIResolver-ref="xmlResolver"
         p:xsltVersion="2.0">
         <beans:property name="configurationProperties">
             <beans:map>
                 <beans:entry key="#{ T(net.sf.saxon.lib.FeatureKeys).GENERATE_BYTE_CODE }" value="true" value-type="java.lang.Boolean"/>
+                <beans:entry key="#{ T(net.sf.saxon.lib.FeatureKeys).MARK_DEFAULTED_ATTRIBUTES }" value="true" value-type="java.lang.Boolean"/>
             </beans:map>
         </beans:property>
         <beans:property name="defaultSerializationProperties">
@@ -34,20 +40,4 @@
     =====================================================================================================-->
     <beans:bean id="processor" class="gov.hhs.onc.sdcct.transform.impl.SdcctProcessor"
         c:config-ref="config"/>
-    
-    <!--====================================================================================================
-    = CONTENT CODECS
-    =====================================================================================================-->
-    <beans:bean id="contentCodec" class="gov.hhs.onc.sdcct.transform.content.ContentCodec" abstract="true">
-        <beans:property name="defaultEncodeOptions">
-            <beans:bean class="gov.hhs.onc.sdcct.transform.content.impl.ContentEncodeOptions">
-                <beans:property name="options">
-                    <beans:map>
-                        <beans:entry key="#{ T(gov.hhs.onc.sdcct.transform.content.impl.ContentEncodeOptions).PRETTY }" value="false"
-                            value-type="java.lang.Boolean"/>
-                    </beans:map>
-                </beans:property>
-            </beans:bean>
-        </beans:property>
-    </beans:bean>
 </beans:beans>

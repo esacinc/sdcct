@@ -39,9 +39,19 @@
     <!--====================================================================================================
     = COMPLEX TYPES
     =====================================================================================================-->
+    <jaxb:bindings node="xsd:complexType[@name='ChildItemsType']">
+        <jaxb:bindings node="xsd:complexContent/xsd:extension">
+            <jaxb:bindings node="xsd:choice">
+                <jaxb:property name="content"/>
+            </jaxb:bindings>
+        </jaxb:bindings>
+    </jaxb:bindings>
+    
     <jaxb:bindings node="xsd:complexType[@name='PredicateCompareType']">
-        <jaxb:bindings node="xsd:complexContent/xsd:extension/xsd:attribute[@name='ArithOpEnum']/xsd:simpleType">
-            <jaxb:typesafeEnumClass name="ArithOp"/>
+        <jaxb:bindings node="xsd:complexContent/xsd:extension">
+            <jaxb:bindings node="xsd:attribute[@name='ArithOpEnum']/xsd:simpleType">
+                <jaxb:typesafeEnumClass name="ArithOp"/>
+            </jaxb:bindings>
         </jaxb:bindings>
     </jaxb:bindings>
  </jaxb:bindings>

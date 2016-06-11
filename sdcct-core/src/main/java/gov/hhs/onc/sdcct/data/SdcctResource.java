@@ -2,14 +2,16 @@ package gov.hhs.onc.sdcct.data;
 
 import gov.hhs.onc.sdcct.beans.SpecificationType;
 import gov.hhs.onc.sdcct.beans.SpecifiedBean;
-import gov.hhs.onc.sdcct.data.search.DateSearchParam;
-import gov.hhs.onc.sdcct.data.search.NumberSearchParam;
-import gov.hhs.onc.sdcct.data.search.QuantitySearchParam;
-import gov.hhs.onc.sdcct.data.search.RefSearchParam;
-import gov.hhs.onc.sdcct.data.search.StringSearchParam;
-import gov.hhs.onc.sdcct.data.search.TokenSearchParam;
-import gov.hhs.onc.sdcct.data.search.UriSearchParam;
+import gov.hhs.onc.sdcct.data.parameter.DateResourceParam;
+import gov.hhs.onc.sdcct.data.parameter.NumberResourceParam;
+import gov.hhs.onc.sdcct.data.parameter.QuantityResourceParam;
+import gov.hhs.onc.sdcct.data.parameter.RefResourceParam;
+import gov.hhs.onc.sdcct.data.parameter.StringResourceParam;
+import gov.hhs.onc.sdcct.data.parameter.TokenResourceParam;
+import gov.hhs.onc.sdcct.data.parameter.UriResourceParam;
+import java.util.Date;
 import java.util.Set;
+import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 
 public interface SdcctResource extends SdcctEntity, SpecifiedBean {
@@ -17,37 +19,81 @@ public interface SdcctResource extends SdcctEntity, SpecifiedBean {
 
     public void setContent(String content);
 
-    public void addDateSearchParams(DateSearchParam ... dateSearchParams);
+    public void addDateParams(DateResourceParam ... dateParams);
 
-    public Set<DateSearchParam> getDateSearchParams();
+    public Set<DateResourceParam> getDateParams();
 
-    public void setDateSearchParams(Set<DateSearchParam> dateSearchParams);
+    public void setDateParams(Set<DateResourceParam> dateParams);
 
-    public void addNumberSearchParams(NumberSearchParam ... numberSearchParams);
+    public boolean hasDeletedTimestamp();
 
-    public Set<NumberSearchParam> getNumberSearchParams();
+    @Nullable
+    public Date getDeletedTimestamp();
 
-    public void setNumberSearchParams(Set<NumberSearchParam> numberSearchParams);
+    public void setDeletedTimestamp(@Nullable Date deletedTimestamp);
 
-    public void addQuantitySearchParams(QuantitySearchParam ... quantitySearchParams);
+    public boolean hasEntityVersion();
 
-    public Set<QuantitySearchParam> getQuantitySearchParams();
+    @Nonnegative
+    @Nullable
+    public Long getEntityVersion();
 
-    public void setQuantitySearchParams(Set<QuantitySearchParam> quantitySearchParams);
+    public void setEntityVersion(@Nonnegative @Nullable Long entityVersion);
 
-    public void addRefSearchParams(RefSearchParam ... refSearchParams);
+    public boolean hasId();
 
-    public Set<RefSearchParam> getRefSearchParams();
+    @Nonnegative
+    @Nullable
+    public Long getId();
 
-    public void setRefSearchParams(Set<RefSearchParam> refSearchParams);
+    public void setId(@Nonnegative @Nullable Long id);
+
+    public boolean hasInstanceId();
+
+    @Nullable
+    public Long getInstanceId();
+
+    public void setInstanceId(@Nullable Long instanceId);
+
+    public boolean hasModifiedTimestamp();
+
+    @Nullable
+    public Date getModifiedTimestamp();
+
+    public void setModifiedTimestamp(@Nullable Date modifiedTimestamp);
+
+    public void addNumberParams(NumberResourceParam ... numberParams);
+
+    public Set<NumberResourceParam> getNumberParams();
+
+    public void setNumberParams(Set<NumberResourceParam> numberParams);
+
+    public boolean hasPublishedTimestamp();
+
+    @Nullable
+    public Date getPublishedTimestamp();
+
+    public void setPublishedTimestamp(@Nullable Date publishedTimestamp);
+
+    public void addQuantityParams(QuantityResourceParam ... quantityParams);
+
+    public Set<QuantityResourceParam> getQuantityParams();
+
+    public void setQuantityParams(Set<QuantityResourceParam> quantityParams);
+
+    public void addRefParams(RefResourceParam ... refParams);
+
+    public Set<RefResourceParam> getRefParams();
+
+    public void setRefParams(Set<RefResourceParam> refParams);
 
     public void setSpecificationType(SpecificationType specType);
 
-    public void addStringSearchParams(StringSearchParam ... strSearchParams);
+    public void addStringParams(StringResourceParam ... strParams);
 
-    public Set<StringSearchParam> getStringSearchParams();
+    public Set<StringResourceParam> getStringParams();
 
-    public void setStringSearchParams(Set<StringSearchParam> strSearchParams);
+    public void setStringParams(Set<StringResourceParam> strParams);
 
     public boolean hasText();
 
@@ -56,26 +102,28 @@ public interface SdcctResource extends SdcctEntity, SpecifiedBean {
 
     public void setText(@Nullable String text);
 
-    public void addTokenSearchParams(TokenSearchParam ... tokenSearchParams);
+    public void addTokenParams(TokenResourceParam ... tokenParams);
 
-    public Set<TokenSearchParam> getTokenSearchParams();
+    public Set<TokenResourceParam> getTokenParams();
 
-    public void setTokenSearchParams(Set<TokenSearchParam> tokenSearchParams);
+    public void setTokenParams(Set<TokenResourceParam> tokenParams);
 
     public String getType();
 
     public void setType(String type);
 
-    public void addUriSearchParams(UriSearchParam ... uriSearchParams);
+    public void addUriParams(UriResourceParam ... uriParams);
 
-    public Set<UriSearchParam> getUriSearchParams();
+    public Set<UriResourceParam> getUriParams();
 
-    public void setUriSearchParams(Set<UriSearchParam> uriSearchParams);
+    public void setUriParams(Set<UriResourceParam> uriParams);
 
     public boolean hasVersion();
 
+    @Nonnegative
     @Nullable
     public Long getVersion();
 
-    public void setVersion(@Nullable Long version);
+    public void setVersion(@Nonnegative @Nullable Long version);
+
 }

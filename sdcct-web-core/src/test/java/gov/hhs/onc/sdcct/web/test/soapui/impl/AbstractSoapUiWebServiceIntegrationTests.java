@@ -19,7 +19,7 @@ import com.eviware.soapui.model.testsuite.TestStepResult;
 import com.eviware.soapui.model.testsuite.TestStepResult.TestStepStatus;
 import com.eviware.soapui.model.testsuite.TestSuite;
 import gov.hhs.onc.sdcct.beans.factory.impl.EmbeddedPlaceholderResolver;
-import gov.hhs.onc.sdcct.io.impl.ResourceSource;
+import gov.hhs.onc.sdcct.transform.impl.ResourceSource;
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
 import gov.hhs.onc.sdcct.web.test.impl.AbstractSdcctWebIntegrationTests;
 import gov.hhs.onc.sdcct.web.test.soapui.SoapUiException;

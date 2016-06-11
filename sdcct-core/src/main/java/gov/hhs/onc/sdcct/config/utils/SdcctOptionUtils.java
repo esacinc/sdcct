@@ -12,10 +12,6 @@ public final class SdcctOptionUtils {
     private SdcctOptionUtils() {
     }
 
-    public static boolean getBooleanValue(Map<?, ?> opts, String optName, Map<?, ?> defaultOpts) {
-        return getBooleanValue(opts, optName, ((Boolean) defaultOpts.get(optName)));
-    }
-
     public static boolean getBooleanValue(Map<?, ?> opts, String optName) {
         return getBooleanValue(optName, opts.get(optName));
     }
@@ -44,10 +40,6 @@ public final class SdcctOptionUtils {
         }
 
         throw new IllegalArgumentException(String.format("Invalid boolean option (name=%s) value: %s", optName, optValue));
-    }
-
-    public static int getIntegerValue(Map<?, ?> opts, String optName, Map<?, ?> defaultOpts) {
-        return getIntegerValue(opts, optName, ((Integer) defaultOpts.get(optName)));
     }
 
     public static int getIntegerValue(Map<?, ?> opts, String optName) {

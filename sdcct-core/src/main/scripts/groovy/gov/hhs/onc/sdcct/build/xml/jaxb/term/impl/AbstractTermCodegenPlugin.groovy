@@ -1,6 +1,7 @@
 package gov.hhs.onc.sdcct.build.xml.jaxb.term.impl
 
 import com.sun.codemodel.JBlock
+import com.sun.codemodel.JClass
 import com.sun.codemodel.JCodeModel
 import com.sun.codemodel.JDefinedClass
 import com.sun.codemodel.JDocComment
@@ -89,38 +90,40 @@ abstract class AbstractTermCodegenPlugin extends AbstractCodegenPlugin {
         JDefinedClass valueSetEnumClassModel) {
         valueSetEnumClassModel._implements(StaticValueSetBean)
         
-        SdcctCodegenUtils.buildConstField(valueSetEnumClassModel, String, SdcctFhirCodegenUtils.VALUE_SET_ID_MEMBER_NAME, valueSet.id)
-        SdcctCodegenUtils.buildConstField(valueSetEnumClassModel, String, SdcctFhirCodegenUtils.VALUE_SET_NAME_MEMBER_NAME, valueSet.name)
-        SdcctCodegenUtils.buildConstField(valueSetEnumClassModel, String, SdcctFhirCodegenUtils.VALUE_SET_OID_MEMBER_NAME, valueSet.oid)
-        SdcctCodegenUtils.buildConstUriField(valueSetEnumClassModel, SdcctFhirCodegenUtils.VALUE_SET_URI_MEMBER_NAME, valueSet.uri)
-        SdcctCodegenUtils.buildConstField(valueSetEnumClassModel, String, SdcctFhirCodegenUtils.VALUE_SET_VERSION_MEMBER_NAME, valueSet.version)
+        JClass strClassModel = codeModel.directClass(String.name), uriClassModel = codeModel.directClass(URI.name)
         
-        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, String, SdcctFhirCodegenUtils.VALUE_SET_ID_MEMBER_NAME)
-        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, String, SdcctFhirCodegenUtils.VALUE_SET_NAME_MEMBER_NAME)
-        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, String, SdcctFhirCodegenUtils.VALUE_SET_OID_MEMBER_NAME)
-        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, URI, SdcctFhirCodegenUtils.VALUE_SET_URI_MEMBER_NAME)
-        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, String, SdcctFhirCodegenUtils.VALUE_SET_VERSION_MEMBER_NAME)
-        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, String, SdcctFhirCodegenUtils.CODE_SYSTEM_ID_MEMBER_NAME)
-        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, String, SdcctFhirCodegenUtils.CODE_SYSTEM_NAME_MEMBER_NAME)
-        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, String, SdcctFhirCodegenUtils.CODE_SYSTEM_OID_MEMBER_NAME)
-        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, URI, SdcctFhirCodegenUtils.CODE_SYSTEM_URI_MEMBER_NAME)
-        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, String, SdcctFhirCodegenUtils.CODE_SYSTEM_VERSION_MEMBER_NAME)
-        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, String, SdcctCodegenUtils.ID_MEMBER_NAME)
-        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, String, SdcctCodegenUtils.NAME_MEMBER_NAME)
+        SdcctCodegenUtils.buildConstField(valueSetEnumClassModel, strClassModel, SdcctFhirCodegenUtils.VALUE_SET_ID_MEMBER_NAME, valueSet.id)
+        SdcctCodegenUtils.buildConstField(valueSetEnumClassModel, strClassModel, SdcctFhirCodegenUtils.VALUE_SET_NAME_MEMBER_NAME, valueSet.name)
+        SdcctCodegenUtils.buildConstField(valueSetEnumClassModel, strClassModel, SdcctFhirCodegenUtils.VALUE_SET_OID_MEMBER_NAME, valueSet.oid)
+        SdcctCodegenUtils.buildConstUriField(valueSetEnumClassModel, SdcctFhirCodegenUtils.VALUE_SET_URI_MEMBER_NAME, valueSet.uri)
+        SdcctCodegenUtils.buildConstField(valueSetEnumClassModel, strClassModel, SdcctFhirCodegenUtils.VALUE_SET_VERSION_MEMBER_NAME, valueSet.version)
+        
+        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, strClassModel, SdcctFhirCodegenUtils.VALUE_SET_ID_MEMBER_NAME)
+        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, strClassModel, SdcctFhirCodegenUtils.VALUE_SET_NAME_MEMBER_NAME)
+        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, strClassModel, SdcctFhirCodegenUtils.VALUE_SET_OID_MEMBER_NAME)
+        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, uriClassModel, SdcctFhirCodegenUtils.VALUE_SET_URI_MEMBER_NAME)
+        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, strClassModel, SdcctFhirCodegenUtils.VALUE_SET_VERSION_MEMBER_NAME)
+        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, strClassModel, SdcctFhirCodegenUtils.CODE_SYSTEM_ID_MEMBER_NAME)
+        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, strClassModel, SdcctFhirCodegenUtils.CODE_SYSTEM_NAME_MEMBER_NAME)
+        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, strClassModel, SdcctFhirCodegenUtils.CODE_SYSTEM_OID_MEMBER_NAME)
+        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, uriClassModel, SdcctFhirCodegenUtils.CODE_SYSTEM_URI_MEMBER_NAME)
+        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, strClassModel, SdcctFhirCodegenUtils.CODE_SYSTEM_VERSION_MEMBER_NAME)
+        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, strClassModel, SdcctCodegenUtils.ID_MEMBER_NAME)
+        SdcctCodegenUtils.buildEnumField(valueSetEnumClassModel, strClassModel, SdcctCodegenUtils.NAME_MEMBER_NAME)
         
         JMethod valueSetEnumConstructorModel = valueSetEnumClassModel.constructor(JMod.PRIVATE)
-        valueSetEnumConstructorModel.param(String, SdcctFhirCodegenUtils.VALUE_SET_ID_MEMBER_NAME)
-        valueSetEnumConstructorModel.param(String, SdcctFhirCodegenUtils.VALUE_SET_NAME_MEMBER_NAME)
-        valueSetEnumConstructorModel.param(String, SdcctFhirCodegenUtils.VALUE_SET_OID_MEMBER_NAME)
-        valueSetEnumConstructorModel.param(URI, SdcctFhirCodegenUtils.VALUE_SET_URI_MEMBER_NAME)
-        valueSetEnumConstructorModel.param(String, SdcctFhirCodegenUtils.VALUE_SET_VERSION_MEMBER_NAME).annotate(Nullable)
-        valueSetEnumConstructorModel.param(String, SdcctFhirCodegenUtils.CODE_SYSTEM_ID_MEMBER_NAME)
-        valueSetEnumConstructorModel.param(String, SdcctFhirCodegenUtils.CODE_SYSTEM_NAME_MEMBER_NAME)
-        valueSetEnumConstructorModel.param(String, SdcctFhirCodegenUtils.CODE_SYSTEM_OID_MEMBER_NAME)
-        valueSetEnumConstructorModel.param(URI, SdcctFhirCodegenUtils.CODE_SYSTEM_URI_MEMBER_NAME)
-        valueSetEnumConstructorModel.param(String, SdcctFhirCodegenUtils.CODE_SYSTEM_VERSION_MEMBER_NAME).annotate(Nullable)
-        valueSetEnumConstructorModel.param(String, SdcctCodegenUtils.ID_MEMBER_NAME)
-        valueSetEnumConstructorModel.param(String, SdcctCodegenUtils.NAME_MEMBER_NAME).annotate(Nullable)
+        valueSetEnumConstructorModel.param(strClassModel, SdcctFhirCodegenUtils.VALUE_SET_ID_MEMBER_NAME)
+        valueSetEnumConstructorModel.param(strClassModel, SdcctFhirCodegenUtils.VALUE_SET_NAME_MEMBER_NAME)
+        valueSetEnumConstructorModel.param(strClassModel, SdcctFhirCodegenUtils.VALUE_SET_OID_MEMBER_NAME)
+        valueSetEnumConstructorModel.param(uriClassModel, SdcctFhirCodegenUtils.VALUE_SET_URI_MEMBER_NAME)
+        valueSetEnumConstructorModel.param(strClassModel, SdcctFhirCodegenUtils.VALUE_SET_VERSION_MEMBER_NAME).annotate(Nullable)
+        valueSetEnumConstructorModel.param(strClassModel, SdcctFhirCodegenUtils.CODE_SYSTEM_ID_MEMBER_NAME)
+        valueSetEnumConstructorModel.param(strClassModel, SdcctFhirCodegenUtils.CODE_SYSTEM_NAME_MEMBER_NAME)
+        valueSetEnumConstructorModel.param(strClassModel, SdcctFhirCodegenUtils.CODE_SYSTEM_OID_MEMBER_NAME)
+        valueSetEnumConstructorModel.param(uriClassModel, SdcctFhirCodegenUtils.CODE_SYSTEM_URI_MEMBER_NAME)
+        valueSetEnumConstructorModel.param(strClassModel, SdcctFhirCodegenUtils.CODE_SYSTEM_VERSION_MEMBER_NAME).annotate(Nullable)
+        valueSetEnumConstructorModel.param(strClassModel, SdcctCodegenUtils.ID_MEMBER_NAME)
+        valueSetEnumConstructorModel.param(strClassModel, SdcctCodegenUtils.NAME_MEMBER_NAME).annotate(Nullable)
         
         JBlock valueSetEnumConstructorModelBody = valueSetEnumConstructorModel.body()
         
@@ -129,32 +132,42 @@ abstract class AbstractTermCodegenPlugin extends AbstractCodegenPlugin {
         SdcctCodegenUtils.buildEnumFromValueMethod(valueSetEnumClassModel)
         SdcctCodegenUtils.buildEnumValueMethod(valueSetEnumClassModel, SdcctCodegenUtils.ID_MEMBER_NAME)
         
-        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, String, SdcctFhirCodegenUtils.VALUE_SET_ID_MEMBER_NAME, true, false)
+        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, strClassModel, SdcctFhirCodegenUtils.VALUE_SET_ID_MEMBER_NAME, false,
+            true, false)
         
-        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, String, SdcctFhirCodegenUtils.VALUE_SET_NAME_MEMBER_NAME, true, false)
+        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, strClassModel, SdcctFhirCodegenUtils.VALUE_SET_NAME_MEMBER_NAME, false,
+            true, false)
         
-        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, String, SdcctFhirCodegenUtils.VALUE_SET_OID_MEMBER_NAME, true, false)
+        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, strClassModel, SdcctFhirCodegenUtils.VALUE_SET_OID_MEMBER_NAME, false,
+            true, false)
         
-        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, URI, SdcctFhirCodegenUtils.VALUE_SET_URI_MEMBER_NAME, true, false)
+        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, uriClassModel, SdcctFhirCodegenUtils.VALUE_SET_URI_MEMBER_NAME, false,
+            true, false)
         
         SdcctCodegenUtils.buildFieldHasMethod(valueSetEnumClassModel, JMod.PUBLIC, SdcctFhirCodegenUtils.VALUE_SET_VERSION_MEMBER_NAME, true)
-        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, String, SdcctFhirCodegenUtils.VALUE_SET_VERSION_MEMBER_NAME, true, true)
+        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, strClassModel, SdcctFhirCodegenUtils.VALUE_SET_VERSION_MEMBER_NAME,
+            false, true, true)
         
-        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, String, SdcctFhirCodegenUtils.CODE_SYSTEM_ID_MEMBER_NAME, true, false)
+        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, strClassModel, SdcctFhirCodegenUtils.CODE_SYSTEM_ID_MEMBER_NAME, false,
+            true, false)
         
-        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, String, SdcctFhirCodegenUtils.CODE_SYSTEM_NAME_MEMBER_NAME, true, false)
+        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, strClassModel, SdcctFhirCodegenUtils.CODE_SYSTEM_NAME_MEMBER_NAME, false,
+            true, false)
         
-        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, String, SdcctFhirCodegenUtils.CODE_SYSTEM_OID_MEMBER_NAME, true, false)
+        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, strClassModel, SdcctFhirCodegenUtils.CODE_SYSTEM_OID_MEMBER_NAME, false,
+            true, false)
         
-        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, URI, SdcctFhirCodegenUtils.CODE_SYSTEM_URI_MEMBER_NAME, true, false)
+        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, uriClassModel, SdcctFhirCodegenUtils.CODE_SYSTEM_URI_MEMBER_NAME, false,
+            true, false)
         
         SdcctCodegenUtils.buildFieldHasMethod(valueSetEnumClassModel, JMod.PUBLIC, SdcctFhirCodegenUtils.CODE_SYSTEM_VERSION_MEMBER_NAME, true)
-        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, String, SdcctFhirCodegenUtils.CODE_SYSTEM_VERSION_MEMBER_NAME, true, true)
+        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, strClassModel, SdcctFhirCodegenUtils.CODE_SYSTEM_VERSION_MEMBER_NAME,
+            false, true, true)
         
-        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, String, SdcctCodegenUtils.ID_MEMBER_NAME, true, false)
+        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, strClassModel, SdcctCodegenUtils.ID_MEMBER_NAME, false, true, false)
         
         SdcctCodegenUtils.buildFieldHasMethod(valueSetEnumClassModel, JMod.PUBLIC, SdcctCodegenUtils.NAME_MEMBER_NAME, false)
-        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, String, SdcctCodegenUtils.NAME_MEMBER_NAME, true, true)
+        SdcctCodegenUtils.buildFieldGetterMethod(valueSetEnumClassModel, JMod.PUBLIC, strClassModel, SdcctCodegenUtils.NAME_MEMBER_NAME, false, true, true)
         
         return valueSetEnumClassModel
     }

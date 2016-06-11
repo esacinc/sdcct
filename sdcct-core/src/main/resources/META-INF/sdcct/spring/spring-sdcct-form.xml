@@ -3,27 +3,52 @@
     xmlns:beans="http://www.springframework.org/schema/beans"
     xmlns:c="http://www.springframework.org/schema/c"
     xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="
-        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
+        urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
+    
+    <!--====================================================================================================
+    = FORMS
+    =====================================================================================================-->
+    <beans:bean id="formFhirTest1" parent="formFhir"
+        c:name="sdcct-test1-fhir">
+        <beans:constructor-arg name="doc">
+            <sdcct-xml:document>classpath*:${sdcct.data.form.src.dir.path}/sdcct/form-sdcct-test1-fhir.xml</sdcct-xml:document>
+        </beans:constructor-arg>
+    </beans:bean>
+    
+    <beans:bean id="formRfdTest1" parent="formRfd"
+        c:name="sdcct-test1-rfd">
+        <beans:constructor-arg name="doc">
+            <sdcct-xml:document>classpath*:${sdcct.data.form.src.dir.path}/sdcct/form-sdcct-test1-rfd.xml</sdcct-xml:document>
+        </beans:constructor-arg>
+    </beans:bean>
+    
+    <!--
+    TODO: re-enable once initial SDC initiative example forms are in the main sdc-schema-package GitHub repository
+    -->
+    <!--
+    <beans:bean id="formRfdSdcAdrenal" parent="formRfd"
+        c:name="sdc-adrenal">
+        <beans:constructor-arg name="doc">
+            <sdcct-xml:document>classpath*:${sdcct.data.form.src.dir.path}/sdc/SDC_Adrenal.xml</sdcct-xml:document>
+        </beans:constructor-arg>
+    </beans:bean>
+    
+    <beans:bean id="formRfdSdcCtLungScreeningTemplate" parent="formRfd"
+        c:name="sdc-ct-lung-screening-template">
+        <beans:constructor-arg name="doc">
+            <sdcct-xml:document>classpath*:${sdcct.data.form.src.dir.path}/sdc/CT_Lung_Screening_Template.xml</sdcct-xml:document>
+        </beans:constructor-arg>
+    </beans:bean>
+    -->
     
     <!--====================================================================================================
     = FORM MANAGERS
     =====================================================================================================-->
-    <beans:bean id="formManager" class="gov.hhs.onc.sdcct.form.manager.impl.FormManagerImpl">
-        <beans:property name="internalFormDesignSources">
-            <beans:array>
-                <!--suppress SpringPlaceholdersInspection -->
-                <beans:value>classpath*:${sdcct.data.form.src.dir.path}/adrenal/SDC_Adrenal*.xml</beans:value>
-                <!--suppress SpringPlaceholdersInspection -->
-                <beans:value>classpath*:${sdcct.data.form.src.dir.path}/test1/form-test1-rfd.xml</beans:value>
-            </beans:array>
-        </beans:property>
-        <beans:property name="internalQuestionnaireSources">
-            <beans:array>
-                <!--suppress SpringPlaceholdersInspection -->
-                <beans:value>classpath*:${sdcct.data.form.src.dir.path}/test1/form-test1-fhir.xml</beans:value>
-            </beans:array>
-        </beans:property>
-    </beans:bean>
+    <beans:bean id="formManager" class="gov.hhs.onc.sdcct.form.manager.impl.FormManagerImpl"/>
 </beans:beans>

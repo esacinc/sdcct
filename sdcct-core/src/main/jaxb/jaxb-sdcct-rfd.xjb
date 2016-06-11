@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jaxb:bindings
-    jaxb:extensionBindingPrefixes="annox xjc"
+    jaxb:extensionBindingPrefixes="annox wildcard xjc"
     jaxb:version="2.0"
     node="/xsd:schema"
     schemaLocation="../schema/rfd/RFD.xsd"
     xmlns:annox="http://annox.dev.java.net"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:wildcard="http://jaxb2-commons.dev.java.net/basic/wildcard"
     xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     
@@ -19,6 +20,10 @@
     <!--====================================================================================================
     = COMPLEX TYPES
     =====================================================================================================-->
+    <jaxb:bindings node="xsd:complexType[@name='anyXMLContentType']">
+        <wildcard:lax/>
+    </jaxb:bindings>
+    
     <jaxb:bindings node="xsd:complexType[@name='formDataType']">
         <jaxb:bindings node="xsd:sequence/xsd:choice">
             <jaxb:property name="content"/>

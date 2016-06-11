@@ -4,6 +4,7 @@ import gov.hhs.onc.sdcct.data.db.server.HsqlServer;
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import org.hibernate.HibernateException;
 import org.hsqldb.server.Server;
 import org.hsqldb.server.ServerConfiguration;
 import org.hsqldb.server.ServerConstants;
@@ -66,18 +67,28 @@ public class HsqlServerImpl extends AbstractDbServer implements HsqlServer {
     }
 
     @Override
-    protected void stopInternal() throws Exception {
-        this.netServer.stop();
+    protected void stopInternal() {
+        try {
+            this.netServer.shutdown();
+        } catch (Exception e) {
+            throw new HibernateException(String.format("Unable to stop database (name=%s) server (hostAddr=%s, port=%d, dir=%s).", this.dbName, this.hostAddr,
+                this.port, this.dbDir.getPath()), e);
+        }
     }
 
     @Override
-    protected void startInternal() throws Exception {
+    protected void startInternal() {
         boolean initDb = (!this.dbDir.exists() || (this.dbDir.list().length == 0));
 
-        this.netServer.start();
+        try {
+            this.netServer.start();
 
-        if (initDb) {
-            this.executeInitializationScripts();
+            if (initDb) {
+                this.executeInitializationScripts();
+            }
+        } catch (Exception e) {
+            throw new HibernateException(String.format("Unable to start database (name=%s) server (hostAddr=%s, port=%d, dir=%s).", this.dbName, this.hostAddr,
+                this.port, this.dbDir.getPath()), e);
         }
     }
 

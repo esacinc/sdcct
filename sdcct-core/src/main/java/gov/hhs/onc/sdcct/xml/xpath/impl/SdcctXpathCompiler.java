@@ -1,6 +1,7 @@
 package gov.hhs.onc.sdcct.xml.xpath.impl;
 
 import gov.hhs.onc.sdcct.transform.impl.SdcctProcessor;
+import gov.hhs.onc.sdcct.xml.xpath.StaticXpathOptions;
 import java.util.Map;
 import javax.annotation.Nullable;
 import net.sf.saxon.functions.FunctionLibraryList;
@@ -16,19 +17,23 @@ import net.sf.saxon.sxpath.XPathEvaluator;
 import net.sf.saxon.trans.XPathException;
 
 public class SdcctXpathCompiler extends XPathCompiler {
+    public final static String BEAN_NAME = "xpathCompiler";
+
+    public final static String COMPILE_METHOD_NAME = "compile";
+
     public SdcctXpathCompiler(SdcctProcessor proc) {
         super(proc);
     }
 
     @Override
     public XdmValue evaluate(String exprStr, @Nullable XdmItem contextItem) throws SaxonApiException {
-        return this.compile(exprStr).load(new DynamicXpathOptions().setContextNode(((XdmNode) contextItem))).evaluate();
+        return this.compile(exprStr).load(new DynamicXpathOptionsImpl().setContextNode(((XdmNode) contextItem))).evaluate();
     }
 
     @Nullable
     @Override
     public XdmItem evaluateSingle(String exprStr, @Nullable XdmItem contextItem) throws SaxonApiException {
-        return this.compile(exprStr).load(new DynamicXpathOptions().setContextNode(((XdmNode) contextItem))).evaluateSingle();
+        return this.compile(exprStr).load(new DynamicXpathOptionsImpl().setContextNode(((XdmNode) contextItem))).evaluateSingle();
     }
 
     @Override

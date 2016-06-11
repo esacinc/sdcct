@@ -17,7 +17,6 @@ import gov.hhs.onc.sdcct.net.SdcctUris
 import gov.hhs.onc.sdcct.utils.SdcctClassUtils
 import gov.hhs.onc.sdcct.utils.SdcctEnumUtils
 import gov.hhs.onc.sdcct.xml.utils.SdcctXmlUtils
-import javax.annotation.Nullable
 import org.apache.commons.lang3.ClassUtils
 import org.apache.maven.plugin.logging.Log
 import org.apache.maven.project.MavenProject
@@ -31,8 +30,6 @@ class FhirTypeCodegenPlugin extends AbstractTypeCodegenPlugin {
     private final static String PRIMITIVE_TYPE_CLASS_NAME_SUFFIX = "Type"
     
     private final static String RESOURCE_TYPE_CLASS_NAME = "Resource"
-    
-    private final static String STRUCT_DEF_REGEX_EXT_URL_VALUE = SdcctUris.FHIR_URL_VALUE + "/StructureDefinition/structuredefinition-regex"
 
     FhirTypeCodegenPlugin(Log log, MavenProject project, Map<String, String> bindingVars, JCodeModel codeModel, CodegenSchemaContext schemaContext) {
         super(log, project, bindingVars, SdcctPackages.FHIR_NAME, SdcctPackages.FHIR_IMPL_NAME, codeModel, schemaContext, SpecificationType.FHIR,
@@ -42,13 +39,11 @@ class FhirTypeCodegenPlugin extends AbstractTypeCodegenPlugin {
     @Override
     protected void runInternal(Outline outline, Model model, JCodeModel codeModel, Options opts, ErrorHandler errorHandler) throws Exception {
         JDefinedClass typeClassModel, typeImplClassModel
-        String typeId, typeClassSimpleName
+        String typeClassSimpleName
         
         this.types.each{
-            typeId = it.value.id
-            
             if (((typeClassModel = SdcctCodegenUtils.findClass(codeModel, (this.basePkgName + ClassUtils.PACKAGE_SEPARATOR +
-                (typeClassSimpleName = this.typeClassSimpleNames[typeId])))) == null) || ((typeImplClassModel = SdcctCodegenUtils.findClass(codeModel,
+                (typeClassSimpleName = this.typeClassSimpleNames[it.key])))) == null) || ((typeImplClassModel = SdcctCodegenUtils.findClass(codeModel,
                 (this.baseImplPkgName + ClassUtils.PACKAGE_SEPARATOR + typeClassSimpleName + SdcctClassUtils.IMPL_CLASS_NAME_SUFFIX))) == null)) {
                 return
             }
@@ -90,8 +85,7 @@ class FhirTypeCodegenPlugin extends AbstractTypeCodegenPlugin {
         nameConv.delegates.add(new FhirTypeCodegenNameConverter(this.typeClassSimpleNames))
         
         CodegenTypeKind typeKind
-        String typeUri, typeId
-        boolean primitiveType
+        String typeId
         TypeCodegenModel type
         
         for (Element typeElem : SdcctFhirCodegenUtils.buildResourceItemElements(SdcctFhirCodegenUtils.STRUCTURE_DEFINITION_ELEM_NAME,
@@ -100,21 +94,13 @@ class FhirTypeCodegenPlugin extends AbstractTypeCodegenPlugin {
                 continue
             }
             
-            typeUri = SdcctFhirCodegenUtils.buildUri(typeElem)
+            typeId = SdcctFhirCodegenUtils.buildId(typeElem)
             
-            this.types[typeUri] = type = new TypeCodegenModel(typeElem, (typeId = SdcctFhirCodegenUtils.buildId(typeElem)),
-                SdcctFhirCodegenUtils.buildName(typeElem), typeUri, SdcctFhirCodegenUtils.buildFhirVersion(typeElem),
-                ((primitiveType = ((typeKind == CodegenTypeKind.DATATYPE) && Character.isLowerCase( typeId.toCharArray()[0]))) ?
-                (typeKind = CodegenTypeKind.PRIMITIVE) : typeKind), (primitiveType ? buildPattern(typeElem) : null))
+            this.types[typeId] = type = new TypeCodegenModel(typeElem, (((typeKind == CodegenTypeKind.DATATYPE) &&
+                Character.isLowerCase(typeId.toCharArray()[0])) ? CodegenTypeKind.PRIMITIVE : typeKind), typeId)
             
             this.normalizedTypes[SdcctCodegenUtils.buildNormalizedId(typeId)] = type
         }
-    }
-    
-    @Nullable
-    protected static String buildPattern(Element elem) {
-        return SdcctFhirCodegenUtils.buildExtensionValue(SdcctXmlUtils.findChildElement(elem, SdcctUris.FHIR_URL_VALUE,
-            SdcctFhirCodegenUtils.SNAPSHOT_ELEM_NAME), STRUCT_DEF_REGEX_EXT_URL_VALUE, SdcctFhirCodegenUtils.VALUE_STRING_ELEM_NAME, false)
     }
     
     protected static String buildKind(Element elem) {

@@ -1,35 +1,28 @@
 package gov.hhs.onc.sdcct.transform.content.impl;
 
 import gov.hhs.onc.sdcct.transform.content.ContentCodec;
+import gov.hhs.onc.sdcct.transform.content.ContentCodecOptions;
 import gov.hhs.onc.sdcct.transform.content.SdcctContentType;
 
-public abstract class AbstractContentCodec implements ContentCodec {
-    protected ContentDecodeOptions defaultDecodeOpts = new ContentDecodeOptions();
-    protected ContentEncodeOptions defaultEncodeOpts = new ContentEncodeOptions();
+public abstract class AbstractContentCodec<T extends ContentCodecOptions<T>, U extends ContentCodecOptions<U>> implements ContentCodec<T, U> {
     protected SdcctContentType type;
+    protected T defaultDecodeOpts;
+    protected U defaultEncodeOpts;
 
-    protected AbstractContentCodec(SdcctContentType type) {
+    protected AbstractContentCodec(SdcctContentType type, T defaultDecodeOpts, U defaultEncodeOpts) {
         this.type = type;
+        this.defaultDecodeOpts = defaultDecodeOpts;
+        this.defaultEncodeOpts = defaultEncodeOpts;
     }
 
     @Override
-    public ContentDecodeOptions getDefaultDecodeOptions() {
+    public T getDefaultDecodeOptions() {
         return this.defaultDecodeOpts;
     }
 
     @Override
-    public void setDefaultDecodeOptions(ContentDecodeOptions defaultDecodeOpts) {
-        this.defaultDecodeOpts = defaultDecodeOpts.clone();
-    }
-
-    @Override
-    public ContentEncodeOptions getDefaultEncodeOptions() {
+    public U getDefaultEncodeOptions() {
         return this.defaultEncodeOpts;
-    }
-
-    @Override
-    public void setDefaultEncodeOptions(ContentEncodeOptions defaultEncodeOpts) {
-        this.defaultEncodeOpts = defaultEncodeOpts.clone();
     }
 
     @Override
