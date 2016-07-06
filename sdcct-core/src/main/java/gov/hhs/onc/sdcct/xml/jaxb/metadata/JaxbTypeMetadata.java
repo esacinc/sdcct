@@ -1,9 +1,9 @@
 package gov.hhs.onc.sdcct.xml.jaxb.metadata;
 
-import java.io.Serializable;
+import com.sun.msv.grammar.xmlschema.XMLSchemaTypeExp;
 import javax.annotation.Nullable;
 
-public interface JaxbTypeMetadata<T extends Serializable, U> extends JaxbSchemaMetadataComponent<T> {
+public interface JaxbTypeMetadata<T extends XMLSchemaTypeExp, U> extends JaxbSchemaMetadataComponent<T> {
     public boolean hasBeanClass();
 
     @Nullable

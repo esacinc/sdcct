@@ -10,7 +10,6 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stax.StAXSource;
 import net.sf.saxon.Configuration;
-import net.sf.saxon.dom.DOMObjectModel;
 import net.sf.saxon.lib.FeatureKeys;
 import net.sf.saxon.trans.XPathException;
 import org.apache.commons.lang3.StringUtils;
@@ -40,8 +39,6 @@ public class SdcctConfiguration extends Configuration implements InitializingBea
     public void afterPropertiesSet() throws Exception {
         this.setSourceParserClass(StringUtils.EMPTY);
         this.setStyleParserClass(StringUtils.EMPTY);
-
-        this.getParseOptions().setModel(DOMObjectModel.getInstance());
     }
 
     public void setConfigurationProperties(Map<String, ?> configProps) {

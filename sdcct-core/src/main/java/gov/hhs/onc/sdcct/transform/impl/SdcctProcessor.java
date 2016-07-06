@@ -3,6 +3,7 @@ package gov.hhs.onc.sdcct.transform.impl;
 import gov.hhs.onc.sdcct.xml.impl.SdcctDocumentBuilder;
 import gov.hhs.onc.sdcct.xml.impl.SdcctSerializer;
 import gov.hhs.onc.sdcct.xml.xpath.impl.SdcctXpathCompiler;
+import gov.hhs.onc.sdcct.xml.xslt.impl.SdcctXsltCompiler;
 import java.io.File;
 import java.io.OutputStream;
 import java.io.Writer;
@@ -50,6 +51,11 @@ public class SdcctProcessor extends Processor {
     @Override
     public SdcctXpathCompiler newXPathCompiler() {
         return new SdcctXpathCompiler(this);
+    }
+
+    @Override
+    public SdcctXsltCompiler newXsltCompiler() {
+        return new SdcctXsltCompiler(this);
     }
 
     @Override

@@ -42,6 +42,9 @@ public final class SdcctStringUtils {
     public final static String ASTERISK = "*";
     public final static char ASTERISK_CHAR = '*';
 
+    public final static String AT = "@";
+    public final static char AT_CHAR = '@';
+
     public final static String CARET = "^";
     public final static char CARET_CHAR = '^';
 

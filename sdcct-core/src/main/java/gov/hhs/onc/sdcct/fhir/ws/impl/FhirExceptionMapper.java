@@ -1,7 +1,8 @@
 package gov.hhs.onc.sdcct.fhir.ws.impl;
 
-import gov.hhs.onc.sdcct.fhir.CodeableConcept;
-import gov.hhs.onc.sdcct.fhir.FhirFormException;
+import gov.hhs.onc.sdcct.api.ApiException;
+import gov.hhs.onc.sdcct.api.SdcctIssue;
+import gov.hhs.onc.sdcct.fhir.FhirIssue;
 import gov.hhs.onc.sdcct.fhir.IssueSeverity;
 import gov.hhs.onc.sdcct.fhir.IssueType;
 import gov.hhs.onc.sdcct.fhir.NarrativeStatus;
@@ -11,6 +12,7 @@ import gov.hhs.onc.sdcct.fhir.OperationOutcomeType;
 import gov.hhs.onc.sdcct.fhir.impl.CodeTypeImpl;
 import gov.hhs.onc.sdcct.fhir.impl.CodeableConceptImpl;
 import gov.hhs.onc.sdcct.fhir.impl.CodingImpl;
+import gov.hhs.onc.sdcct.fhir.impl.ExtensionImpl;
 import gov.hhs.onc.sdcct.fhir.impl.IssueSeverityComponentImpl;
 import gov.hhs.onc.sdcct.fhir.impl.IssueTypeComponentImpl;
 import gov.hhs.onc.sdcct.fhir.impl.NarrativeImpl;
@@ -21,10 +23,13 @@ import gov.hhs.onc.sdcct.fhir.impl.StringTypeImpl;
 import gov.hhs.onc.sdcct.fhir.impl.UriTypeImpl;
 import gov.hhs.onc.sdcct.fhir.xhtml.impl.DivImpl;
 import gov.hhs.onc.sdcct.fhir.xhtml.impl.PreImpl;
+import gov.hhs.onc.sdcct.net.SdcctUris;
+import gov.hhs.onc.sdcct.transform.content.path.ContentPath;
+import gov.hhs.onc.sdcct.transform.impl.SdcctLocation;
+import gov.hhs.onc.sdcct.utils.SdcctEnumUtils;
 import gov.hhs.onc.sdcct.utils.SdcctExceptionUtils;
 import gov.hhs.onc.sdcct.ws.WsPropertyNames;
-import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
-import java.nio.charset.StandardCharsets;
+import java.io.Serializable;
 import javax.annotation.Priority;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -32,69 +37,71 @@ import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.ext.ExceptionMapper;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.MessageUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component("provExceptionMapperFhir")
 @Priority(0)
 public class FhirExceptionMapper implements ExceptionMapper<Throwable> {
-    private final static Logger LOGGER = LoggerFactory.getLogger(FhirExceptionMapper.class);
-
-    @Autowired
-    private XmlCodec xmlCodec;
+    private final static String OP_OUTCOME_ISSUE_SRC_EXT_URL_VALUE = (SdcctUris.FHIR_URL_VALUE + "/StructureDefinition/operationoutcome-issue-source");
 
     @Override
     public Response toResponse(Throwable exception) {
-        IssueType issueType = IssueType.EXCEPTION;
-        CodeableConcept issueDetailConcept = null;
+        OperationOutcome opOutcome = new OperationOutcomeImpl();
         StatusType respStatus = Status.INTERNAL_SERVER_ERROR;
 
-        if (exception instanceof FhirFormException) {
-            FhirFormException fhirFormException = ((FhirFormException) exception);
-            issueType = fhirFormException.getIssueType();
-            respStatus = fhirFormException.getResponseStatus();
+        if (exception instanceof ApiException) {
+            ApiException apiException = ((ApiException) exception);
 
-            if (fhirFormException.hasOperationOutcomeType()) {
-                OperationOutcomeType opOutcomeType = fhirFormException.getOperationOutcomeType();
-                // noinspection ConstantConditions
-                boolean opOutcomeDisplayNameAvailable = opOutcomeType.hasName();
-                String opOutcomeName = null;
+            respStatus = apiException.getResponseStatus();
 
-                if (opOutcomeDisplayNameAvailable) {
-                    opOutcomeName = opOutcomeType.getName();
+            if (apiException.hasIssues()) {
+                OperationOutcomeIssue opOutcomeIssue;
+                IssueType issueType = IssueType.EXCEPTION;
+                FhirIssue fhirIssue;
+                OperationOutcomeType issueDetailType;
+                SdcctLocation issueLoc;
+                ContentPath issueLocPath;
 
-                    if (fhirFormException.hasOperationOutcomeArgs()) {
+                for (SdcctIssue issue : apiException.getIssues()) {
+                    opOutcome.addIssue((opOutcomeIssue = new OperationOutcomeIssueImpl()
+                        .setSeverity(new IssueSeverityComponentImpl().setValue(SdcctEnumUtils.findById(IssueSeverity.class, issue.getLevel().getId())))));
+
+                    if (issue instanceof FhirIssue) {
+                        issueType = (fhirIssue = ((FhirIssue) issue)).getType();
+
+                        if (fhirIssue.hasDetailType()) {
+                            // noinspection ConstantConditions
+                            opOutcomeIssue.setDetails(new CodeableConceptImpl().addCoding(new CodingImpl()
+                                .setCode(new CodeTypeImpl().setValue((issueDetailType = fhirIssue.getDetailType()).getId()))
+                                .setSystem(new UriTypeImpl().setValue(issueDetailType.getCodeSystemUri().toString())).setVersion(
+                                    (issueDetailType.hasCodeSystemVersion() ? new StringTypeImpl().setValue(issueDetailType.getCodeSystemVersion()) : null))));
+                        }
+                    }
+
+                    opOutcomeIssue.setCode(new IssueTypeComponentImpl().setValue(issueType));
+
+                    if (issue.hasMessage()) {
+                        opOutcomeIssue.setDiagnostics(new StringTypeImpl().setValue(issue.getMessage()));
+                    }
+
+                    // noinspection ConstantConditions
+                    if (issue.hasLocation() && (issueLoc = issue.getLocation()).hasContentPath()) {
                         // noinspection ConstantConditions
-                        opOutcomeName = String.format(opOutcomeName, fhirFormException.getOperationOutcomeArgs());
+                        opOutcomeIssue.addExpressions(new StringTypeImpl().setValue((issueLocPath = issueLoc.getContentPath()).getFluentPathExpression()));
+                        opOutcomeIssue.addLocations(new StringTypeImpl().setValue(issueLocPath.getXpathExpression()));
+                    }
+
+                    if (issue.hasSource()) {
+                        opOutcomeIssue.addExtensions(
+                            new ExtensionImpl().setUrl(OP_OUTCOME_ISSUE_SRC_EXT_URL_VALUE).setContent(new StringTypeImpl().setValue(issue.getSource())));
                     }
                 }
-
-                // noinspection ConstantConditions
-                issueDetailConcept =
-                    new CodeableConceptImpl().addCoding(new CodingImpl().setCode(new CodeTypeImpl().setValue(opOutcomeType.getId()))
-                        .setDisplay((opOutcomeDisplayNameAvailable ? new StringTypeImpl().setValue(opOutcomeName) : null))
-                        .setSystem(new UriTypeImpl().setValue(opOutcomeType.getCodeSystemUri().toString()))
-                        .setVersion((opOutcomeType.hasCodeSystemVersion() ? new StringTypeImpl().setValue(opOutcomeType.getCodeSystemVersion()) : null)));
             }
-        }
 
-        OperationOutcomeIssue opOutcomeIssue =
-            new OperationOutcomeIssueImpl().setCode(new IssueTypeComponentImpl().setValue(issueType)).setDetails(issueDetailConcept)
-                .setSeverity(new IssueSeverityComponentImpl().setValue(IssueSeverity.ERROR));
-        OperationOutcome opOutcome = new OperationOutcomeImpl().addIssue(opOutcomeIssue);
-
-        if (MessageUtils.getContextualBoolean(JAXRSUtils.getCurrentMessage(), WsPropertyNames.ERROR_STACK_TRACE, false)) {
-            // noinspection ThrowableResultOfMethodCallIgnored
-            opOutcomeIssue.setDiagnostics(new StringTypeImpl().setValue(SdcctExceptionUtils.getRootCause(exception).getMessage()));
-
-            try {
-                opOutcome.setText(new NarrativeImpl().setDiv(
-                    new DivImpl().addContent(new String(this.xmlCodec.encode(new PreImpl().addContent(SdcctExceptionUtils.buildRootCauseStackTrace(exception)),
-                        null), StandardCharsets.UTF_8))).setStatus(new NarrativeStatusComponentImpl().setValue(NarrativeStatus.GENERATED)));
-            } catch (Exception e) {
-                LOGGER.error("Unable to encode FHIR operation outcome narrative.", e);
+            if (MessageUtils.getContextualBoolean(JAXRSUtils.getCurrentMessage(), WsPropertyNames.ERROR_STACK_TRACE, false)) {
+                opOutcome.setText(new NarrativeImpl()
+                    .setDiv(new DivImpl().addContent(((Serializable) new PreImpl().addContent(SdcctExceptionUtils.buildRootCauseStackTrace(exception)))))
+                    .setStatus(new NarrativeStatusComponentImpl().setValue(NarrativeStatus.GENERATED)));
             }
         }
 

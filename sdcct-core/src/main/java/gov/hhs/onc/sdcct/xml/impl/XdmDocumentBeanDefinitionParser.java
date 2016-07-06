@@ -1,6 +1,7 @@
 package gov.hhs.onc.sdcct.xml.impl;
 
 import gov.hhs.onc.sdcct.beans.factory.xml.impl.AbstractSdcctBeanDefinitionParser;
+import gov.hhs.onc.sdcct.beans.factory.xml.impl.SdcctNamespaceHandler;
 import java.util.Collections;
 import javax.xml.transform.Source;
 import org.springframework.beans.MutablePropertyValues;
@@ -11,7 +12,7 @@ import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 public class XdmDocumentBeanDefinitionParser extends AbstractSdcctBeanDefinitionParser {
-    private final static String DOC_ELEM_LOCAL_NAME = "document";
+    public final static String DOC_ELEM_LOCAL_NAME = "document";
 
     private final static String DOC_URI_NODE_NAME = DOC_ELEM_LOCAL_NAME + "-uri";
     private final static String PUBLIC_ID_ATTR_NAME = "public-" + ID_ATTRIBUTE;
@@ -21,8 +22,8 @@ public class XdmDocumentBeanDefinitionParser extends AbstractSdcctBeanDefinition
     private final static String PUBLIC_ID_PROP_NAME = "publicId";
     private final static String SYS_ID_PROP_NAME = "systemId";
 
-    public XdmDocumentBeanDefinitionParser() {
-        super(Collections.singletonMap(DOC_ELEM_LOCAL_NAME, XdmDocument.class));
+    public XdmDocumentBeanDefinitionParser(SdcctNamespaceHandler nsHandler) {
+        super(nsHandler, Collections.singletonMap(DOC_ELEM_LOCAL_NAME, XdmDocument.class));
     }
 
     @Override

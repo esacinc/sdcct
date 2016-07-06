@@ -19,6 +19,7 @@
         p:recoveryPolicy="#{ T(net.sf.saxon.Configuration).DO_NOT_RECOVER }"
         p:stripsAllWhiteSpace="false"
         p:stripsWhiteSpace="#{ T(net.sf.saxon.value.Whitespace).NONE }"
+        p:treeModel="#{ T(net.sf.saxon.event.Builder).LINKED_TREE }"
         p:URIResolver-ref="xmlResolver"
         p:xsltVersion="2.0">
         <beans:property name="configurationProperties">
@@ -40,4 +41,9 @@
     =====================================================================================================-->
     <beans:bean id="processor" class="gov.hhs.onc.sdcct.transform.impl.SdcctProcessor"
         c:config-ref="config"/>
+    
+    <!--====================================================================================================
+    = CONTENT PATH BUILDERS
+    =====================================================================================================-->
+    <beans:bean id="contentPathBuilder" class="gov.hhs.onc.sdcct.transform.content.path.impl.ContentPathBuilderImpl"/>
 </beans:beans>

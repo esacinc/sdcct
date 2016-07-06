@@ -9,5 +9,7 @@ public interface ResourceMetadataService<T, U extends ResourceMetadata<?>> exten
 
     public void setBaseParamMetadatas(ResourceParamMetadata ... baseParamMetadatas);
 
+    public Map<Class<? extends T>, U> getBeanMetadatas();
+
     public Map<String, U> getMetadatas();
 }

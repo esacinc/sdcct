@@ -4,6 +4,7 @@ import com.github.sebhoss.warnings.CompilerWarnings;
 import gov.hhs.onc.sdcct.beans.TypeBean;
 import gov.hhs.onc.sdcct.data.SdcctResource;
 import gov.hhs.onc.sdcct.data.db.DbPropertyNames;
+import gov.hhs.onc.sdcct.data.db.DbQueryNames;
 import gov.hhs.onc.sdcct.data.db.SdcctRepository;
 import gov.hhs.onc.sdcct.data.db.SdcctResourceRegistry;
 import gov.hhs.onc.sdcct.data.db.criteria.SdcctCriteria;
@@ -13,6 +14,7 @@ import gov.hhs.onc.sdcct.data.metadata.ResourceMetadata;
 import gov.hhs.onc.sdcct.data.metadata.ResourceParamMetadata;
 import gov.hhs.onc.sdcct.data.parameter.ResourceParamProcessor;
 import gov.hhs.onc.sdcct.transform.impl.ByteArraySource;
+import gov.hhs.onc.sdcct.xml.XmlEncodeOptions;
 import gov.hhs.onc.sdcct.xml.impl.SdcctDocumentBuilder;
 import gov.hhs.onc.sdcct.xml.impl.XdmDocument;
 import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
@@ -33,12 +35,15 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.xml.transform.Source;
+import net.sf.saxon.dom.NodeOverNodeInfo;
+import net.sf.saxon.om.MutableNodeInfo;
 import net.sf.saxon.s9api.XdmNode;
-import net.sf.saxon.tree.util.Navigator;
+import net.sf.saxon.value.Whitespace;
+import org.apache.xml.security.Init;
+import org.apache.xml.security.c14n.Canonicalizer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Node;
 
 public abstract class AbstractSdcctResourceRegistry<T, U extends ResourceMetadata<T>, V extends SdcctResource> extends AbstractSdcctResourceAccessor<T, U, V>
     implements SdcctResourceRegistry<T, U, V> {
@@ -63,6 +68,10 @@ public abstract class AbstractSdcctResourceRegistry<T, U extends ResourceMetadat
     protected Supplier<V> entityInstantiator;
     protected CriteriaBuilder criteriaBuilder;
     protected Map<String, ResourceParamMetadata> resourceParamMetadatas;
+
+    static {
+        Init.init();
+    }
 
     protected AbstractSdcctResourceRegistry(U resourceMetadata, Class<V> entityClass, Class<? extends V> entityImplClass, Supplier<V> entityInstantiator) {
         super(resourceMetadata.getSpecificationType(), resourceMetadata.getBeanClass(), resourceMetadata.getBeanImplClass(), entityClass, entityImplClass);
@@ -114,7 +123,7 @@ public abstract class AbstractSdcctResourceRegistry<T, U extends ResourceMetadat
 
     @Override
     @SuppressWarnings({ CompilerWarnings.UNCHECKED })
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public V save(V entity) throws Exception {
         ByteArraySource contentSrc = new ByteArraySource(entity.getContent().getBytes(StandardCharsets.UTF_8));
         XdmDocument contentDoc = this.buildContentDocument(contentSrc);
@@ -138,9 +147,7 @@ public abstract class AbstractSdcctResourceRegistry<T, U extends ResourceMetadat
         Root<V> criteriaRoot;
 
         if (id == null) {
-            // TODO: replace w/ NamedNativeQuery or enhance SdcctCriteria
-            id = this.entityManager.createQuery("select (coalesce(max(id), 0) + 1) from resource where instanceId = -1", Long.class).getSingleResult();
-
+            id = this.entityManager.createNamedQuery(DbQueryNames.RESOURCE_SELECT_ID_NEW, Long.class).getSingleResult();
             instanceId = -1L;
             version = 1L;
         } else if (instanceId == null) {
@@ -149,7 +156,7 @@ public abstract class AbstractSdcctResourceRegistry<T, U extends ResourceMetadat
             criteriaQuery.distinct(true);
 
             instanceId = (Optional.ofNullable(
-                this.buildCriteria(SdcctCriterionUtils.matchId(id), SdcctCriterionUtils.matchInstances(), SdcctCriterionUtils.<V>matchHistory().not())
+                this.buildCriteria(SdcctCriterionUtils.matchId(id), SdcctCriterionUtils.matchInstances(), SdcctCriterionUtils.<V> matchHistory().not())
                     .first(this.entityManager, criteriaQuery, criteriaRoot))
                 .orElse(0L) + 1);
             version = 1L;
@@ -262,24 +269,25 @@ public abstract class AbstractSdcctResourceRegistry<T, U extends ResourceMetadat
     }
 
     protected String buildContent(XdmDocument contentDoc, boolean canonical) throws Exception {
-        if (canonical) {
-            XdmNode contentDocElem = new XdmNode(Navigator.getOutermostElement(contentDoc.getUnderlyingNode().getTreeInfo()));
-            Node canonicalRemoveNode;
-            Attr canonicalRemoveAttr;
+        Source contentSrc;
+        XmlEncodeOptions contentEncodeOpts = this.xmlCodec.getDefaultEncodeOptions().clone();
 
+        if (canonical) {
             for (SdcctXpathExecutable canonicalRemoveXpathExec : this.resourceMetadata.getCanonicalRemoveXpathExecutables()) {
-                for (XdmNode canonicalRemoveNodeWrapper : canonicalRemoveXpathExec.load(new DynamicXpathOptionsImpl().setContextNode(contentDocElem))
-                    .evaluateNodes()) {
-                    if ((canonicalRemoveNode = ((Node) canonicalRemoveNodeWrapper.getExternalNode())) instanceof Attr) {
-                        (canonicalRemoveAttr = ((Attr) canonicalRemoveNode)).getOwnerElement().removeAttributeNode(canonicalRemoveAttr);
-                    } else {
-                        canonicalRemoveNode.getParentNode().removeChild(canonicalRemoveNode);
-                    }
+                for (XdmNode canonicalRemoveNode : canonicalRemoveXpathExec.load(new DynamicXpathOptionsImpl().setContextNode(contentDoc)).evaluateNodes()) {
+                    ((MutableNodeInfo) canonicalRemoveNode.getUnderlyingNode()).delete();
                 }
             }
+
+            contentEncodeOpts.getParseOptions().setStripSpace(Whitespace.ALL);
+
+            contentSrc = new ByteArraySource(Canonicalizer.getInstance(Canonicalizer.ALGO_ID_C14N11_OMIT_COMMENTS)
+                .canonicalizeSubtree(NodeOverNodeInfo.wrap(contentDoc.getUnderlyingNode())), contentDoc.getPublicId(), contentDoc.getSystemId());
+        } else {
+            contentSrc = contentDoc.getUnderlyingNode();
         }
 
-        return new String(this.xmlCodec.encode(contentDoc.getUnderlyingNode(), null), StandardCharsets.UTF_8);
+        return new String(this.xmlCodec.encode(contentSrc, contentEncodeOpts), StandardCharsets.UTF_8);
     }
 
     protected XdmDocument buildContentDocument(Source contentSrc) throws Exception {

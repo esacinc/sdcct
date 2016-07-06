@@ -1,2 +1,3 @@
+urn\:sdcct\:core=gov.hhs.onc.sdcct.beans.factory.xml.impl.SdcctNamespaceHandler
 urn\:sdcct\:spring=gov.hhs.onc.sdcct.beans.factory.xml.impl.SdcctNamespaceHandler
 urn\:sdcct\:spring\:xml=gov.hhs.onc.sdcct.beans.factory.xml.impl.SdcctNamespaceHandler

@@ -1,7 +1,7 @@
 package gov.hhs.onc.sdcct.data.parameter.impl;
 
 import com.github.sebhoss.warnings.CompilerWarnings;
-import gov.hhs.onc.sdcct.beans.SpecificationType;
+import gov.hhs.onc.sdcct.api.SpecificationType;
 import gov.hhs.onc.sdcct.data.SdcctResource;
 import gov.hhs.onc.sdcct.data.db.impl.AbstractSdcctResourceAccessor;
 import gov.hhs.onc.sdcct.data.metadata.ResourceMetadata;
@@ -17,6 +17,7 @@ import gov.hhs.onc.sdcct.data.parameter.StringResourceParam;
 import gov.hhs.onc.sdcct.data.parameter.TermResourceParam;
 import gov.hhs.onc.sdcct.data.parameter.TokenResourceParam;
 import gov.hhs.onc.sdcct.data.parameter.UriResourceParam;
+import gov.hhs.onc.sdcct.transform.content.path.ContentPathBuilder;
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
 import gov.hhs.onc.sdcct.xml.impl.SdcctDocumentBuilder;
 import gov.hhs.onc.sdcct.xml.impl.XdmDocument;
@@ -58,6 +59,7 @@ public abstract class AbstractResourceParamProcessor<T, U extends ResourceMetada
     @Autowired
     protected SdcctDocumentBuilder docBuilder;
 
+    protected ContentPathBuilder contentPathBuilder;
     protected Map<String, U> resourceMetadatas;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(AbstractResourceParamProcessor.class);
@@ -132,7 +134,6 @@ public abstract class AbstractResourceParamProcessor<T, U extends ResourceMetada
     }
 
     protected void processResourceParams(String type, U resourceMetadata, XdmDocument contentDoc, V entity) throws Exception {
-        XdmNode contentDocElem = new XdmNode(Navigator.getOutermostElement(contentDoc.getUnderlyingNode().getTreeInfo()));
         Map<String, ResourceParamMetadata> resourceParamMetadatas = resourceMetadata.getParamMetadatas();
         Map<MultiKey<Serializable>, ResourceParam<?>> existingResourceParams = mapExistingResourceParams(entity), resourceParams = new LinkedHashMap<>();
         ResourceParamMetadata resourceParamMetadata;
@@ -140,9 +141,10 @@ public abstract class AbstractResourceParamProcessor<T, U extends ResourceMetada
 
         for (String resourceParamName : resourceParamMetadatas.keySet()) {
             // noinspection ConstantConditions
-            if ((resourceParamMetadata = resourceParamMetadatas.get(resourceParamName)).isInline() || !resourceParamMetadata.hasXpathExecutable()
-                || (resourceParamItems =
-                    resourceParamMetadata.getXpathExecutable().load(new DynamicXpathOptionsImpl().setContextNode(contentDocElem)).evaluateItems()).isEmpty()) {
+            if ((resourceParamMetadata = resourceParamMetadatas.get(resourceParamName)).isInline() || !resourceParamMetadata.hasXpathExecutable() ||
+                (resourceParamItems = resourceParamMetadata.getXpathExecutable()
+                    .load(new DynamicXpathOptionsImpl().setContextNode(new XdmNode(Navigator.getOutermostElement(contentDoc.getUnderlyingNode()))))
+                    .evaluateItems()).isEmpty()) {
                 continue;
             }
 
@@ -232,23 +234,19 @@ public abstract class AbstractResourceParamProcessor<T, U extends ResourceMetada
         }
 
         LOGGER
-            .trace(
-                String.format(
-                    "Processed resource (type=%s) entity (class=%s, entityId=%s, id=%s, instanceId=%s, version=%s) parameter(s): removedKeys=[%s], addedKeys=[%s], resultKeys=[%s]",
-                    type, entity.getClass(), entity.getEntityId(), entity.getId(), entity.getInstanceId(), entity.getVersion(),
-                    removeResourceParamKeys.stream()
-                        .map(removeResourceParamKey -> (SdcctStringUtils.L_BRACE + StringUtils.join(removeResourceParamKey.getKeys(), ", ")
-                            + SdcctStringUtils.R_BRACE))
-                        .collect(Collectors.joining("; ")),
-                    addResourceParamKeys.stream()
-                        .map(addResourceParamKey -> (SdcctStringUtils.L_BRACE + StringUtils.join(addResourceParamKey.getKeys(), ", ")
-                            + SdcctStringUtils.R_BRACE))
-                        .collect(
-                            Collectors
-                                .joining(
-                                    "; ")),
-                    mapExistingResourceParams(entity).keySet().stream().map(resultResourceParamKey -> (SdcctStringUtils.L_BRACE
-                        + StringUtils.join(resultResourceParamKey.getKeys(), ", ") + SdcctStringUtils.R_BRACE)).collect(Collectors.joining("; "))));
+            .trace(String.format(
+                "Processed resource (type=%s) entity (class=%s, entityId=%s, id=%s, instanceId=%s, version=%s) parameter(s): removedKeys=[%s], addedKeys=[%s], resultKeys=[%s]",
+                type, entity.getClass(), entity.getEntityId(), entity.getId(), entity.getInstanceId(), entity.getVersion(),
+                removeResourceParamKeys.stream()
+                    .map(removeResourceParamKey -> (SdcctStringUtils.L_BRACE + StringUtils.join(removeResourceParamKey.getKeys(), ", ") +
+                        SdcctStringUtils.R_BRACE))
+                    .collect(Collectors.joining("; ")),
+                addResourceParamKeys.stream()
+                    .map(addResourceParamKey -> (SdcctStringUtils.L_BRACE + StringUtils.join(addResourceParamKey.getKeys(), ", ") + SdcctStringUtils.R_BRACE))
+                    .collect(Collectors.joining("; ")),
+                mapExistingResourceParams(entity).keySet().stream().map(
+                    resultResourceParamKey -> (SdcctStringUtils.L_BRACE + StringUtils.join(resultResourceParamKey.getKeys(), ", ") + SdcctStringUtils.R_BRACE))
+                    .collect(Collectors.joining("; "))));
     }
 
     protected void buildCompositeResourceParam(String type, Map<MultiKey<Serializable>, ResourceParam<?>> resourceParams, String name,
@@ -325,12 +323,31 @@ public abstract class AbstractResourceParamProcessor<T, U extends ResourceMetada
             entity.getClass(), entity.getEntityId(), entity.getId(), entity.getInstanceId(), entity.getVersion(), name, item));
     }
 
-    protected <X> X decodeNode(XdmNode node, Class<? extends X> resultClass) throws HibernateException {
+    protected Object decodeNode(XdmNode node) throws Exception {
+        Class<?> resultClass;
+
         try {
-            return resultClass.cast(this.xmlCodec.decode(this.xmlCodec.encode(node.getUnderlyingNode(), null), resultClass, null));
+            resultClass = this.contentPathBuilder.build(true, node.getUnderlyingNode()).getSegments().getLast().getBeanClass();
         } catch (Exception e) {
-            throw new HibernateException(String.format("Unable to decode (resultClass=%s) node (qname=%s, lineNum=%d, columnNum=%d) from document (uri=%s).",
-                resultClass.getName(), node.getNodeName().getClarkName(), node.getLineNumber(), node.getColumnNumber(), node.getDocumentURI()), e);
+            throw new HibernateException(String.format("Unable to build document (uri=%s) node (qname=%s, lineNum=%d, columnNum=%d) result class.",
+                node.getDocumentURI(), node.getNodeName().getClarkName(), node.getLineNumber(), node.getColumnNumber()), e);
         }
+
+        try {
+            return this.xmlCodec.decode(node.getUnderlyingNode(), resultClass, null);
+        } catch (Exception e) {
+            throw new HibernateException(String.format("Unable to decode (resultClass=%s) document (uri=%s) node (qname=%s, lineNum=%d, columnNum=%d).",
+                resultClass.getName(), node.getDocumentURI(), node.getNodeName().getClarkName(), node.getLineNumber(), node.getColumnNumber()), e);
+        }
+    }
+
+    @Override
+    public ContentPathBuilder getContentPathBuilder() {
+        return this.contentPathBuilder;
+    }
+
+    @Override
+    public void setContentPathBuilder(ContentPathBuilder contentPathBuilder) {
+        this.contentPathBuilder = contentPathBuilder;
     }
 }

@@ -1,7 +1,7 @@
 package gov.hhs.onc.sdcct.rfd.impl;
 
-import gov.hhs.onc.sdcct.beans.SpecificationNames;
-import gov.hhs.onc.sdcct.beans.SpecificationType;
+import gov.hhs.onc.sdcct.api.SpecificationNames;
+import gov.hhs.onc.sdcct.api.SpecificationType;
 import gov.hhs.onc.sdcct.data.db.DbTableNames;
 import gov.hhs.onc.sdcct.data.impl.SdcctResourceImpl;
 import gov.hhs.onc.sdcct.rfd.RfdResource;

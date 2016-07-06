@@ -60,8 +60,6 @@ class PackageCodegenPlugin extends AbstractCodegenPlugin {
             xmlSchemaAnnoModel.param(SdcctCodegenUtils.NS_ANNO_PARAM_NAME, this.xmlNsUriStaticRefModels[it.key])
                 .paramArray(SdcctCodegenUtils.XMLNS_ANNO_PARAM_NAME).annotate(XmlNs).param(SdcctCodegenUtils.PREFIX_ANNO_PARAM_NAME,
                 this.xmlNsPrefixStaticRefModels[it.key]).param(SdcctCodegenUtils.NS_URI_ANNO_PARAM_NAME, xmlNsUriStaticRefModels[it.key])
-            
-            SdcctCodegenUtils.copyAnnotations(implPkg, SdcctCodegenUtils.findPackage(codeModel, this.pkgNames[it.key]))
         }
         
         this.schemaContext.namespacePrefixStaticRefModels = this.xmlNsPrefixStaticRefModels

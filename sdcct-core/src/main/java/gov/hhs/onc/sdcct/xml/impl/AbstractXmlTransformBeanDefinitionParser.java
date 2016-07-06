@@ -1,6 +1,7 @@
 package gov.hhs.onc.sdcct.xml.impl;
 
 import gov.hhs.onc.sdcct.beans.factory.xml.impl.AbstractSdcctBeanDefinitionParser;
+import gov.hhs.onc.sdcct.beans.factory.xml.impl.SdcctNamespaceHandler;
 import gov.hhs.onc.sdcct.xml.utils.SdcctXmlUtils;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import net.sf.saxon.s9api.XdmValue;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
@@ -20,15 +22,18 @@ public abstract class AbstractXmlTransformBeanDefinitionParser extends AbstractS
     protected final static String STATIC_OPTS_ELEM_LOCAL_NAME_SUFFIX = STATIC_ELEM_LOCAL_NAME_PREFIX + "options";
 
     protected final static String STATIC_NS_ELEM_LOCAL_NAME = STATIC_ELEM_LOCAL_NAME_PREFIX + "namespace";
+    protected final static String STATIC_POOLED_DOC_ELEM_LOCAL_NAME =
+        STATIC_ELEM_LOCAL_NAME_PREFIX + "pooled-" + XdmDocumentBeanDefinitionParser.DOC_ELEM_LOCAL_NAME;
     protected final static String STATIC_VAR_ELEM_LOCAL_NAME = STATIC_ELEM_LOCAL_NAME_PREFIX + "variable";
 
     protected final static String PREFIX_ATTR_NAME = "prefix";
 
     protected final static String NAMESPACES_PROP_NAME = "namespaces";
+    protected final static String POOLED_DOCS_PROP_NAME = "pooledDocuments";
     protected final static String VARS_PROP_NAME = "variables";
 
-    protected AbstractXmlTransformBeanDefinitionParser(Map<String, Class<?>> elemBeanClasses) {
-        super(elemBeanClasses);
+    protected AbstractXmlTransformBeanDefinitionParser(SdcctNamespaceHandler nsHandler, Map<String, Class<?>> elemBeanClasses) {
+        super(nsHandler, elemBeanClasses);
     }
 
     protected AbstractBeanDefinition parseStaticOptions(ParserContext parserContext, BeanDefinitionRegistry beanDefRegistry, Element elem, String elemNsPrefix,
@@ -61,6 +66,24 @@ public abstract class AbstractXmlTransformBeanDefinitionParser extends AbstractS
             }
 
             staticOptsPropValues.addPropertyValue(VARS_PROP_NAME, staticVars);
+        }
+
+        List<Element> staticPooledDocElems = SdcctXmlUtils.findChildElements(elem, elemNsUri, STATIC_POOLED_DOC_ELEM_LOCAL_NAME);
+
+        if (!staticPooledDocElems.isEmpty()) {
+            XdmDocumentBeanDefinitionParser docBeanDefParser =
+                ((XdmDocumentBeanDefinitionParser) this.nsHandler.getBeanDefinitionParsers().get(XdmDocumentBeanDefinitionParser.DOC_ELEM_LOCAL_NAME));
+
+            ManagedList<Object> staticPooledDocs = new ManagedList<>(staticPooledDocElems.size());
+            staticPooledDocs.setMergeEnabled(true);
+            staticPooledDocs.setElementTypeName(XdmDocument.class.getName());
+
+            for (Element staticPooledDocElem : staticPooledDocElems) {
+                staticPooledDocs.add(
+                    docBeanDefParser.parse(staticPooledDocElem, new ParserContext(parserContext.getReaderContext(), parserContext.getDelegate(), beanDef)));
+            }
+
+            staticOptsPropValues.addPropertyValue(POOLED_DOCS_PROP_NAME, staticPooledDocs);
         }
 
         return beanDef;

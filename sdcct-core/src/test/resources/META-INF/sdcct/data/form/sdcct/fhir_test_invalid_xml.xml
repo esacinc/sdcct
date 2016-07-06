@@ -4,17 +4,25 @@
     
     <language value="en-US"/>
     
+    <url value="fhir_test_invalid_xml"/>
+    
     <identifier>
-        <value value="sdcct-test1-fhir"/>
+        <value value="fhir_test_invalid_xml"/>
     </identifier>
     
     <version value="1"/>
     
     <status value="published"/>
     
+    <date value="2016-07-06"/>
+    
+    <title value="fhir_test_invalid_xml"/>
+    
+    <badElement value="badElementValue"/>
+    
     <item>
         <linkId value="section1"/>
-        <text value="Section 1"/>
+        <text value="Section 1" badAttribute="badAttributeValue"/>
         <type value="group"/>
         <required value="true"/>
         <item>
@@ -29,6 +37,9 @@
             <type value="choice"/>
             <required value="true"/>
             <option id="question1.2-listItem1">
+                <badNestedElement>
+                    <badNestedChildElement value="badNestedChildElementValue"/>
+                </badNestedElement>
                 <valueString value="Question 1.2 ListItem 1"/>
             </option>
             <option id="question1.2-listItem2">

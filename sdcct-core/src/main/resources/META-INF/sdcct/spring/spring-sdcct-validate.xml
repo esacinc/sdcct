@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
+        urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
+    
+    <!--====================================================================================================
+    = SCHEMATRONS
+    =====================================================================================================-->
+    <beans:bean id="schematron" class="gov.hhs.onc.sdcct.validate.schematron.impl.SdcctSchematronImpl" abstract="true"
+        p:queryBinding="xslt2"
+        p:schemaVersion="2010-04-14">
+        <beans:property name="xsltExecutables">
+            <beans:array>
+                <sdcct-xml:xslt-executable>
+                    <sdcct-xml:xslt-document>classpath*:${sdcct.style.schematron.dir.path}/iso_dsdl_include.xsl</sdcct-xml:xslt-document>
+                    <sdcct-xml:xslt-static-options>
+                        <sdcct-xml:static-variable name="allow-foreign">true</sdcct-xml:static-variable>
+                        <sdcct-xml:static-variable name="diagnose">#{ T(gov.hhs.onc.sdcct.config.utils.SdcctOptionUtils).YES_VALUE }</sdcct-xml:static-variable>
+                        <sdcct-xml:static-variable name="full-path-notation">2</sdcct-xml:static-variable>
+                        <sdcct-xml:static-variable name="generate-path">true</sdcct-xml:static-variable>
+                        <sdcct-xml:static-variable name="langCode">#{ T(java.util.Locale).ENGLISH.language }</sdcct-xml:static-variable>
+                    </sdcct-xml:xslt-static-options>
+                </sdcct-xml:xslt-executable>
+                <sdcct-xml:xslt-executable>
+                    <sdcct-xml:xslt-document>classpath*:${sdcct.style.schematron.dir.path}/iso_abstract_expand.xsl</sdcct-xml:xslt-document>
+                    <sdcct-xml:xslt-static-options/>
+                </sdcct-xml:xslt-executable>
+                <sdcct-xml:xslt-executable>
+                    <sdcct-xml:xslt-document>classpath*:${sdcct.style.schematron.dir.path}/iso_svrl_for_xslt2.xsl</sdcct-xml:xslt-document>
+                    <sdcct-xml:xslt-static-options>
+                        <sdcct-xml:static-pooled-document document-uri="iso_schematron_skeleton_for_saxon.xsl">
+                            classpath*:${sdcct.style.schematron.dir.path}/iso_schematron_skeleton_for_saxon.xsl
+                        </sdcct-xml:static-pooled-document>
+                    </sdcct-xml:xslt-static-options>
+                </sdcct-xml:xslt-executable>
+            </beans:array>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = VALIDATOR SERVICES
+    =====================================================================================================-->
+    <beans:bean id="validatorService" class="gov.hhs.onc.sdcct.validate.impl.SdcctValidatorServiceImpl" abstract="true"/>
+</beans:beans>

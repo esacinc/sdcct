@@ -15,9 +15,11 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 public abstract class AbstractSdcctBeanDefinitionParser extends AbstractBeanDefinitionParser implements SdcctBeanDefinitionParser {
+    protected SdcctNamespaceHandler nsHandler;
     protected Map<String, Class<?>> elemBeanClasses = new TreeMap<>();
 
-    protected AbstractSdcctBeanDefinitionParser(Map<String, Class<?>> elemBeanClasses) {
+    protected AbstractSdcctBeanDefinitionParser(SdcctNamespaceHandler nsHandler, Map<String, Class<?>> elemBeanClasses) {
+        this.nsHandler = nsHandler;
         this.elemBeanClasses.putAll(elemBeanClasses);
     }
 

@@ -1,5 +1,6 @@
 package gov.hhs.onc.sdcct.xml.xpath.impl;
 
+import gov.hhs.onc.sdcct.beans.factory.xml.impl.SdcctNamespaceHandler;
 import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
 import gov.hhs.onc.sdcct.xml.impl.AbstractXmlTransformBeanDefinitionParser;
 import gov.hhs.onc.sdcct.xml.utils.SdcctXmlUtils;
@@ -16,13 +17,13 @@ import org.w3c.dom.Element;
 
 public class XpathBeanDefinitionParser extends AbstractXmlTransformBeanDefinitionParser {
     private final static String XPATH_ELEM_LOCAL_NAME_PREFIX = "xpath-";
-
+    
     private final static String XPATH_EXEC_ELEM_LOCAL_NAME = XPATH_ELEM_LOCAL_NAME_PREFIX + "executable";
     private final static String XPATH_EXPR_ELEM_LOCAL_NAME = XPATH_ELEM_LOCAL_NAME_PREFIX + "expression";
     private final static String XPATH_STATIC_OPTS_ELEM_LOCAL_NAME = XPATH_ELEM_LOCAL_NAME_PREFIX + STATIC_OPTS_ELEM_LOCAL_NAME_SUFFIX;
 
-    public XpathBeanDefinitionParser() {
-        super(Stream.of(new ImmutablePair<>(XPATH_EXEC_ELEM_LOCAL_NAME, SdcctXpathExecutable.class),
+    public XpathBeanDefinitionParser(SdcctNamespaceHandler nsHandler) {
+        super(nsHandler, Stream.of(new ImmutablePair<>(XPATH_EXEC_ELEM_LOCAL_NAME, SdcctXpathExecutable.class),
             new ImmutablePair<>(XPATH_STATIC_OPTS_ELEM_LOCAL_NAME, StaticXpathOptionsImpl.class)).collect(SdcctStreamUtils.toMap()));
     }
 

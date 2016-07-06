@@ -90,6 +90,14 @@
             <artifactId>woodstox-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.github.fge</groupId>
+            <artifactId>json-schema-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.fge</groupId>
+            <artifactId>json-schema-validator</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.github.sebhoss</groupId>
             <artifactId>suppress-warnings</artifactId>
         </dependency>

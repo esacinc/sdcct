@@ -17,4 +17,9 @@
     <beans:bean id="xsltOptsStatic" class="gov.hhs.onc.sdcct.xml.xslt.impl.StaticXsltOptionsImpl" abstract="true"/>
     
     <beans:bean id="xsltOptsDynamic" class="gov.hhs.onc.sdcct.xml.xslt.impl.DynamicXsltOptionsImpl" abstract="true"/>
+    
+    <!--====================================================================================================
+    = XSLT COMPILERS
+    =====================================================================================================-->
+    <beans:bean id="xsltCompiler" factory-bean="processor" factory-method="newXsltCompiler"/>
 </beans:beans>

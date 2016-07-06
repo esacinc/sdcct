@@ -1,12 +1,19 @@
 package gov.hhs.onc.sdcct.transform.impl;
 
+import gov.hhs.onc.sdcct.transform.content.path.ContentPath;
 import javax.annotation.Nullable;
 import javax.xml.stream.Location;
 import javax.xml.transform.SourceLocator;
 import net.sf.saxon.expr.parser.ExplicitLocation;
 import net.sf.saxon.om.NodeInfo;
+import net.sf.saxon.om.StructuredQName;
+import net.sf.saxon.s9api.QName;
+import net.sf.saxon.tree.AttributeLocation;
+import net.sf.saxon.type.Type;
 import org.codehaus.stax2.XMLStreamLocation2;
+import org.w3c.dom.Attr;
 import org.w3c.dom.DOMLocator;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXParseException;
@@ -18,8 +25,9 @@ public class SdcctLocation extends ExplicitLocation implements Location, XMLStre
     private int colNum;
     private int charOffset;
     private XMLStreamLocation2 context;
-    private Node node;
-    private NodeInfo nodeInfo;
+    private QName attrQname;
+    private QName elemQname;
+    private ContentPath contentPath;
 
     public SdcctLocation() {
         this(null, -1, -1);
@@ -28,27 +36,31 @@ public class SdcctLocation extends ExplicitLocation implements Location, XMLStre
     public SdcctLocation(NodeInfo nodeInfo) {
         this(nodeInfo.getSystemId(), nodeInfo.getLineNumber(), nodeInfo.getColumnNumber());
 
-        this.nodeInfo = nodeInfo;
+        this.initializeNodeInfo(nodeInfo);
     }
 
     public SdcctLocation(net.sf.saxon.expr.parser.Location loc) {
         this(loc.getPublicId(), loc.getSystemId(), loc.getLineNumber(), loc.getColumnNumber());
+
+        this.initializeAttributeLocation(loc);
     }
 
     public SdcctLocation(javax.xml.transform.dom.DOMLocator domLoc) {
         this(domLoc.getPublicId(), domLoc.getSystemId(), domLoc.getLineNumber(), domLoc.getColumnNumber());
 
-        this.node = domLoc.getOriginatingNode();
+        this.initializeNode(domLoc.getOriginatingNode());
     }
 
-    public SdcctLocation(SourceLocator srcLoc) {
-        this(srcLoc.getPublicId(), srcLoc.getSystemId(), srcLoc.getLineNumber(), srcLoc.getColumnNumber());
+    public SdcctLocation(SourceLocator locator) {
+        this(locator.getPublicId(), locator.getSystemId(), locator.getLineNumber(), locator.getColumnNumber());
+
+        this.initializeAttributeLocation(locator);
     }
 
-    public SdcctLocation(DOMLocator domLoc) {
-        this(null, domLoc.getUri(), domLoc.getLineNumber(), domLoc.getColumnNumber(), domLoc.getByteOffset());
+    public SdcctLocation(DOMLocator locator) {
+        this(null, locator.getUri(), locator.getLineNumber(), locator.getColumnNumber(), locator.getByteOffset());
 
-        this.node = domLoc.getRelatedNode();
+        this.initializeNode(locator.getRelatedNode());
     }
 
     public SdcctLocation(XMLStreamLocation2 loc) {
@@ -61,8 +73,10 @@ public class SdcctLocation extends ExplicitLocation implements Location, XMLStre
         this(cause.getPublicId(), cause.getSystemId(), cause.getLineNumber(), cause.getColumnNumber());
     }
 
-    public SdcctLocation(Locator srcLoc) {
-        this(srcLoc.getPublicId(), srcLoc.getSystemId(), srcLoc.getLineNumber(), srcLoc.getColumnNumber());
+    public SdcctLocation(Locator locator) {
+        this(locator.getPublicId(), locator.getSystemId(), locator.getLineNumber(), locator.getColumnNumber());
+
+        this.initializeAttributeLocation(locator);
     }
 
     public SdcctLocation(Location loc) {
@@ -92,6 +106,83 @@ public class SdcctLocation extends ExplicitLocation implements Location, XMLStre
         return this;
     }
 
+    private void initializeAttributeLocation(@Nullable Object loc) {
+        if ((loc == null) || !(loc instanceof AttributeLocation)) {
+            return;
+        }
+
+        AttributeLocation attrLoc = ((AttributeLocation) loc);
+        StructuredQName nodeQname = attrLoc.getAttributeName();
+
+        if (nodeQname != null) {
+            this.attrQname = new QName(nodeQname);
+        }
+
+        if ((nodeQname = attrLoc.getElementName()) != null) {
+            this.elemQname = new QName(nodeQname);
+        }
+    }
+
+    private void initializeNodeInfo(@Nullable NodeInfo nodeInfo) {
+        if (nodeInfo == null) {
+            return;
+        }
+
+        int nodeKind = nodeInfo.getNodeKind();
+        NodeInfo elemInfo = null;
+
+        if (nodeKind == Type.ATTRIBUTE) {
+            this.attrQname = new QName(nodeInfo.getPrefix(), nodeInfo.getURI(), nodeInfo.getLocalPart());
+
+            elemInfo = nodeInfo.getParent();
+        } else if (nodeKind == Type.ELEMENT) {
+            elemInfo = nodeInfo;
+        }
+
+        if (elemInfo == null) {
+            return;
+        }
+
+        this.elemQname = new QName(elemInfo.getPrefix(), elemInfo.getURI(), elemInfo.getLocalPart());
+    }
+
+    private void initializeNode(@Nullable Node node) {
+        if (node == null) {
+            return;
+        }
+
+        Element elem = null;
+
+        if (node instanceof Attr) {
+            Attr attr = ((Attr) node);
+
+            this.attrQname = new QName(attr.getPrefix(), null, attr.getLocalName());
+
+            elem = attr.getOwnerElement();
+        } else if (node instanceof Element) {
+            elem = ((Element) node);
+        }
+
+        if (elem == null) {
+            return;
+        }
+
+        this.elemQname = new QName(elem.getPrefix(), null, elem.getLocalName());
+    }
+
+    public boolean hasAttributeQname() {
+        return (this.attrQname != null);
+    }
+
+    @Nullable
+    public QName getAttributeQname() {
+        return this.attrQname;
+    }
+
+    public void setAttributeQname(@Nullable QName attrQname) {
+        this.attrQname = attrQname;
+    }
+
     public boolean hasCharacterOffset() {
         return (this.charOffset >= 0);
     }
@@ -118,6 +209,19 @@ public class SdcctLocation extends ExplicitLocation implements Location, XMLStre
         this.colNum = colNum;
     }
 
+    public boolean hasContentPath() {
+        return (this.contentPath != null);
+    }
+
+    @Nullable
+    public ContentPath getContentPath() {
+        return this.contentPath;
+    }
+
+    public void setContentPath(@Nullable ContentPath contentPath) {
+        this.contentPath = contentPath;
+    }
+
     public boolean hasContext() {
         return (this.context != null);
     }
@@ -132,6 +236,19 @@ public class SdcctLocation extends ExplicitLocation implements Location, XMLStre
         this.context = context;
     }
 
+    public boolean hasElementQname() {
+        return (this.elemQname != null);
+    }
+
+    @Nullable
+    public QName getElementQname() {
+        return this.elemQname;
+    }
+
+    public void setElementQname(@Nullable QName elemQname) {
+        this.elemQname = elemQname;
+    }
+
     public boolean hasLineNumber() {
         return (this.lineNum >= 0);
     }
@@ -143,32 +260,6 @@ public class SdcctLocation extends ExplicitLocation implements Location, XMLStre
 
     public void setLineNumber(int lineNum) {
         this.lineNum = lineNum;
-    }
-
-    public boolean hasNode() {
-        return (this.node != null);
-    }
-
-    @Nullable
-    public Node getNode() {
-        return this.node;
-    }
-
-    public void setNode(@Nullable Node node) {
-        this.node = node;
-    }
-
-    public boolean hasNodeInfo() {
-        return (this.nodeInfo != null);
-    }
-
-    @Nullable
-    public NodeInfo getNodeInfo() {
-        return this.nodeInfo;
-    }
-
-    public void setNodeInfo(@Nullable NodeInfo nodeInfo) {
-        this.nodeInfo = nodeInfo;
     }
 
     public boolean hasPublicId() {

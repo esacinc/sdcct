@@ -4,7 +4,8 @@
     elementFormDefault="qualified"
     targetNamespace="urn:sdcct:spring"
     xmlns:beans="http://www.springframework.org/schema/beans"
-    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct="urn:sdcct:core"
+    xmlns:sdcct-spring="urn:sdcct:spring"
     xmlns:tool="http://www.springframework.org/schema/tool"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     
@@ -14,6 +15,8 @@
     <xsd:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"/>
     
     <xsd:import namespace="http://www.springframework.org/schema/tool" schemaLocation="http://www.springframework.org/schema/tool/spring-tool.xsd"/>
+    
+    <xsd:import namespace="urn:sdcct:core" schemaLocation="urn:sdcct:core:sdcct.xsd"/>
     
     <!--====================================================================================================
     = ATTRIBUTE GROUPS
@@ -25,19 +28,4 @@
     <xsd:attributeGroup name="ParentAttributes">
         <xsd:attribute name="parent" type="sdcct:NotBlankString"/>
     </xsd:attributeGroup>
-    
-    <!--====================================================================================================
-    = SIMPLE TYPES
-    =====================================================================================================-->
-    <xsd:simpleType name="NormalizedString">
-        <xsd:restriction base="xsd:string">
-            <xsd:whiteSpace value="collapse"/>
-        </xsd:restriction>
-    </xsd:simpleType>
-    
-    <xsd:simpleType name="NotBlankString">
-        <xsd:restriction base="sdcct:NormalizedString">
-            <xsd:pattern value=".*[^\s]+.*"/>
-        </xsd:restriction>
-    </xsd:simpleType>
 </xsd:schema>

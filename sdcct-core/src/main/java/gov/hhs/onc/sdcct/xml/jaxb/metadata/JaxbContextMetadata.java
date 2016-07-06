@@ -1,14 +1,19 @@
 package gov.hhs.onc.sdcct.xml.jaxb.metadata;
 
-import com.ctc.wstx.msv.W3CSchema;
 import com.sun.msv.grammar.xmlschema.XMLSchemaGrammar;
+import com.sun.xml.bind.api.JAXBRIContext;
+import gov.hhs.onc.sdcct.transform.content.path.ContentPathBuilder;
 import gov.hhs.onc.sdcct.transform.impl.ResourceSource;
+import gov.hhs.onc.sdcct.validate.schema.impl.MsvValidationSchema;
 import java.util.Map;
-import javax.xml.bind.JAXBContext;
 import org.springframework.beans.factory.InitializingBean;
 
 public interface JaxbContextMetadata extends InitializingBean, JaxbMetadataComponent {
-    public JAXBContext getContext();
+    public ContentPathBuilder getContentPathBuilder();
+
+    public void setContentPathBuilder(ContentPathBuilder contentPathBuilder);
+
+    public JAXBRIContext getContext();
 
     public Map<String, Object> getContextProperties();
 
@@ -34,5 +39,5 @@ public interface JaxbContextMetadata extends InitializingBean, JaxbMetadataCompo
 
     public void setSchemaSources(ResourceSource ... schemaSrcs);
 
-    public W3CSchema getValidationSchema();
+    public MsvValidationSchema getValidationSchema();
 }

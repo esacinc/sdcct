@@ -1,12 +1,12 @@
 package gov.hhs.onc.sdcct.xml.jaxb.metadata.impl;
 
+import com.sun.msv.grammar.ReferenceExp;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbContextMetadata;
-import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbSchemaMetadataComponent;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbSchemaMetadata;
-import java.io.Serializable;
+import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbSchemaMetadataComponent;
 import javax.xml.namespace.QName;
 
-public abstract class AbstractJaxbSchemaMetadataComponent<T extends Serializable> extends AbstractJaxbContextMetadataComponent<T>
+public abstract class AbstractJaxbSchemaMetadataComponent<T extends ReferenceExp> extends AbstractJaxbContextMetadataComponent<T>
     implements JaxbSchemaMetadataComponent<T> {
     protected JaxbSchemaMetadata schema;
     protected QName qname;

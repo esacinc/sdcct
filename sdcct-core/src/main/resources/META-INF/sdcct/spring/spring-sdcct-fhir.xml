@@ -24,6 +24,22 @@
     </sdcct-xml:xpath-static-options>
     
     <!--====================================================================================================
+    = CONTENT PATH BUILDERS
+    =====================================================================================================-->
+    <beans:bean id="contentPathBuilderFhir" parent="contentPathBuilder">
+        <beans:property name="namespaces">
+            <beans:bean class="org.apache.commons.collections4.bidimap.DualTreeBidiMap"
+                c:map="#{ xpathOptsStaticFhir.namespaces }"/>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = RESOURCE PARAM PROCESSORS
+    =====================================================================================================-->
+    <beans:bean id="resourceParamProcFhir" class="gov.hhs.onc.sdcct.fhir.parameter.impl.FhirResourceParamProcessorImpl"
+        p:contentPathBuilder-ref="contentPathBuilderFhir"/>
+    
+    <!--====================================================================================================
     = RESOURCE PARAM METADATAS
     =====================================================================================================-->
     <beans:bean id="metadataResourceParamFhir" parent="metadataResourceParam" abstract="true">
@@ -50,35 +66,75 @@
                 </sdcct-xml:xpath-executable>
             </beans:array>
         </beans:property>
+        <beans:property name="schematrons">
+            <beans:array>
+                <beans:bean parent="schematron"
+                    c:id="fhir-invariants"
+                    c:name="FHIR Invariants">
+                    <beans:property name="document">
+                        <sdcct-xml:document>classpath*:${sdcct.schematron.fhir.dir.path}/fhir-invariants.sch</sdcct-xml:document>
+                    </beans:property>
+                </beans:bean>
+            </beans:array>
+        </beans:property>
     </beans:bean>
-    
-    <beans:bean id="metadataResourceFhirBinary" parent="metadataResourceFhir"
-        c:id="#{ T(gov.hhs.onc.sdcct.fhir.ResourceType).BINARY.id }"
-        c:name="#{ T(gov.hhs.onc.sdcct.fhir.ResourceType).BINARY.name }"
-        c:path="#{ T(gov.hhs.onc.sdcct.fhir.ResourceType).BINARY.id }"
-        c:beanClass="#{ T(gov.hhs.onc.sdcct.fhir.Binary) }"
-        c:beanImplClass="#{ T(gov.hhs.onc.sdcct.fhir.impl.BinaryImpl) }"/>
     
     <beans:bean id="metadataResourceFhirQuestionnaire" parent="metadataResourceFhir"
         c:id="sdc-questionnaire"
         c:name="SDC-Questionnaire"
         c:path="#{ T(gov.hhs.onc.sdcct.fhir.ResourceType).QUESTIONNAIRE.id }"
         c:beanClass="#{ T(gov.hhs.onc.sdcct.fhir.Questionnaire) }"
-        c:beanImplClass="#{ T(gov.hhs.onc.sdcct.fhir.impl.QuestionnaireImpl) }"/>
+        c:beanImplClass="#{ T(gov.hhs.onc.sdcct.fhir.impl.QuestionnaireImpl) }">
+        <beans:property name="schematrons">
+            <beans:array merge="true">
+                <beans:bean parent="schematron"
+                    c:id="sdc-questionnaire"
+                    c:name="SDC Questionnaire">
+                    <beans:property name="document">
+                        <sdcct-xml:document>classpath*:${sdcct.schematron.fhir.dir.path}/sdc-questionnaire.sch</sdcct-xml:document>
+                    </beans:property>
+                </beans:bean>
+            </beans:array>
+        </beans:property>
+    </beans:bean>
     
     <beans:bean id="metadataResourceFhirQuestionnaireResp" parent="metadataResourceFhir"
         c:id="sdc-response"
         c:name="SDC-Response"
         c:path="#{ T(gov.hhs.onc.sdcct.fhir.ResourceType).QUESTIONNAIRE_RESPONSE.id }"
         c:beanClass="#{ T(gov.hhs.onc.sdcct.fhir.QuestionnaireResponse) }"
-        c:beanImplClass="#{ T(gov.hhs.onc.sdcct.fhir.impl.QuestionnaireResponseImpl) }"/>
+        c:beanImplClass="#{ T(gov.hhs.onc.sdcct.fhir.impl.QuestionnaireResponseImpl) }">
+        <beans:property name="schematrons">
+            <beans:array merge="true">
+                <beans:bean parent="schematron"
+                    c:id="sdc-response"
+                    c:name="SDC Response">
+                    <beans:property name="document">
+                        <sdcct-xml:document>classpath*:${sdcct.schematron.fhir.dir.path}/sdc-response.sch</sdcct-xml:document>
+                    </beans:property>
+                </beans:bean>
+            </beans:array>
+        </beans:property>
+    </beans:bean>
     
     <beans:bean id="metadataResourceFhirValueSet" parent="metadataResourceFhir"
         c:id="sdc-valueset"
         c:name="SDC-ValueSet"
         c:path="#{ T(gov.hhs.onc.sdcct.fhir.ResourceType).VALUE_SET.id }"
         c:beanClass="#{ T(gov.hhs.onc.sdcct.fhir.ValueSet) }"
-        c:beanImplClass="#{ T(gov.hhs.onc.sdcct.fhir.impl.ValueSetImpl) }"/>
+        c:beanImplClass="#{ T(gov.hhs.onc.sdcct.fhir.impl.ValueSetImpl) }">
+        <beans:property name="schematrons">
+            <beans:array merge="true">
+                <beans:bean parent="schematron"
+                    c:id="sdc-valueset"
+                    c:name="SDC ValueSet">
+                    <beans:property name="document">
+                        <sdcct-xml:document>classpath*:${sdcct.schematron.fhir.dir.path}/sdc-valueset.sch</sdcct-xml:document>
+                    </beans:property>
+                </beans:bean>
+            </beans:array>
+        </beans:property>
+    </beans:bean>
     
     <!--====================================================================================================
     = RESOURCE METADATA SERVICES
@@ -90,45 +146,80 @@
                     c:id="Resource-content"
                     c:name="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamNames).CONTENT }"
                     c:type="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamType).STRING }"
-                    p:inline="true"
-                    p:valueType="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).STRING.id }"/>
+                    p:inline="true">
+                    <beans:property name="valueTypes">
+                        <beans:set>
+                            <beans:value>#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).STRING.id }</beans:value>
+                        </beans:set>
+                    </beans:property>
+                </beans:bean>
                 <beans:bean parent="metadataResourceParamFhir"
                     c:id="Resource-id"
                     c:name="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamNames).ID }"
                     c:type="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamType).STRING }"
-                    p:inline="true"
-                    p:valueType="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).ID.id }"/>
+                    p:inline="true">
+                    <beans:property name="valueTypes">
+                        <beans:set>
+                            <beans:value>#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).ID.id }</beans:value>
+                        </beans:set>
+                    </beans:property>
+                </beans:bean>
                 <beans:bean parent="metadataResourceParamFhir"
                     c:id="Resource-lastUpdated"
                     c:name="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamNames).LAST_UPDATED }"
                     c:type="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamType).DATE }"
                     p:inline="true"
-                    p:meta="true"
-                    p:valueType="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).INSTANT.id }"/>
+                    p:meta="true">
+                    <beans:property name="valueTypes">
+                        <beans:set>
+                            <beans:value>#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).INSTANT.id }</beans:value>
+                        </beans:set>
+                    </beans:property>
+                </beans:bean>
                 <beans:bean parent="metadataResourceParamFhir"
                     c:id="Resource-profile"
                     c:name="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamNames).PROFILE }"
                     c:type="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamType).URI }"
-                    p:meta="true"
-                    p:valueType="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).URI.id }"/>
+                    p:meta="true">
+                    <beans:property name="valueTypes">
+                        <beans:set>
+                            <beans:value>#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).URI.id }</beans:value>
+                        </beans:set>
+                    </beans:property>
+                </beans:bean>
                 <beans:bean parent="metadataResourceParamFhir"
                     c:id="Resource-security"
                     c:name="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamNames).SECURITY }"
                     c:type="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamType).TOKEN }"
-                    p:meta="true"
-                    p:valueType="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).CODING.id }"/>
+                    p:meta="true">
+                    <beans:property name="valueTypes">
+                        <beans:set>
+                            <beans:value>#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).CODING.id }</beans:value>
+                        </beans:set>
+                    </beans:property>
+                </beans:bean>
                 <beans:bean parent="metadataResourceParamFhir"
                     c:id="Resource-tag"
                     c:name="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamNames).TAG }"
                     c:type="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamType).TOKEN }"
-                    p:meta="true"
-                    p:valueType="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).CODING.id }"/>
+                    p:meta="true">
+                    <beans:property name="valueTypes">
+                        <beans:set>
+                            <beans:value>#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).CODING.id }</beans:value>
+                        </beans:set>
+                    </beans:property>
+                </beans:bean>
                 <beans:bean parent="metadataResourceParamFhir"
                     c:id="Resource-text"
                     c:name="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamNames).TEXT }"
                     c:type="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamType).STRING }"
-                    p:inline="true"
-                    p:valueType="#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).STRING.id }"/>
+                    p:inline="true">
+                    <beans:property name="valueTypes">
+                        <beans:set>
+                            <beans:value>#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).STRING.id }</beans:value>
+                        </beans:set>
+                    </beans:property>
+                </beans:bean>
             </beans:array>
         </beans:property>
         <beans:property name="elementDefXpathExecutable">
@@ -143,6 +234,10 @@
                 <sdcct-xml:document>classpath*:${sdcct.data.fhir.src.dir.path}/sdc-questionnaire.profile.xml</sdcct-xml:document>
                 <sdcct-xml:document>classpath*:${sdcct.data.fhir.src.dir.path}/sdc-response.profile.xml</sdcct-xml:document>
                 <sdcct-xml:document>classpath*:${sdcct.data.fhir.src.dir.path}/sdc-valueset.profile.xml</sdcct-xml:document>
+                <sdcct-xml:document>classpath*:${sdcct.data.fhir.src.dir.path}/extension-definitions.xml</sdcct-xml:document>
+                <sdcct-xml:document>classpath*:${sdcct.data.fhir.src.dir.path}/extension-sdc-questionnaire-endpoint.xml</sdcct-xml:document>
+                <sdcct-xml:document>classpath*:${sdcct.data.fhir.src.dir.path}/extension-sdc-questionnaire-optionaldisplay.xml</sdcct-xml:document>
+                <sdcct-xml:document>classpath*:${sdcct.data.fhir.src.dir.path}/extension-sdc-questionnaire-provenancesignaturerequred.xml</sdcct-xml:document>
             </beans:array>
         </beans:property>
         <beans:property name="searchParamDefsXpathExecutable">
@@ -173,12 +268,16 @@
     </beans:bean>
     
     <!--====================================================================================================
+    = VALIDATOR SERVICES
+    =====================================================================================================-->
+    <beans:bean id="validatorServiceFhir" parent="validatorService"
+        c:contentPathBuilder-ref="contentPathBuilderFhir"
+        c:resourceMetadataService-ref="resourceMetadataServiceFhir"/>
+    
+    <!--====================================================================================================
     = RESOURCE REGISTRIES
     =====================================================================================================-->
     <beans:bean id="resourceRegistryFhir" class="gov.hhs.onc.sdcct.fhir.impl.FhirResourceRegistryImpl" abstract="true"/>
-    
-    <beans:bean id="resourceRegistryFhirBinary" parent="resourceRegistryFhir"
-        c:resourceMetadata-ref="metadataResourceFhirBinary"/>
     
     <beans:bean id="resourceRegistryFhirQuestionnaire" parent="resourceRegistryFhir"
         c:resourceMetadata-ref="metadataResourceFhirQuestionnaire"/>
@@ -194,10 +293,6 @@
     =====================================================================================================-->
     <beans:bean id="searchServiceFhir" class="gov.hhs.onc.sdcct.fhir.search.impl.FhirSearchServiceImpl" abstract="true"/>
     
-    <beans:bean id="searchServiceFhirBinary" parent="searchServiceFhir"
-        c:resourceMetadata-ref="metadataResourceFhirBinary"
-        c:resourceRegistry-ref="resourceRegistryFhirBinary"/>
-    
     <beans:bean id="searchServiceFhirQuestionnaire" parent="searchServiceFhir"
         c:resourceMetadata-ref="metadataResourceFhirQuestionnaire"
         c:resourceRegistry-ref="resourceRegistryFhirQuestionnaire"/>
@@ -209,9 +304,4 @@
     <beans:bean id="searchServiceFhirValueSet" parent="searchServiceFhir"
         c:resourceMetadata-ref="metadataResourceFhirValueSet"
         c:resourceRegistry-ref="resourceRegistryFhirValueSet"/>
-    
-    <!--====================================================================================================
-    = FORMS
-    =====================================================================================================-->
-    <beans:bean id="formFhir" class="gov.hhs.onc.sdcct.fhir.impl.FhirFormImpl" abstract="true"/>
 </beans:beans>

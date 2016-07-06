@@ -1,11 +1,12 @@
 package gov.hhs.onc.sdcct.data.metadata.impl;
 
-import gov.hhs.onc.sdcct.beans.SpecificationType;
+import gov.hhs.onc.sdcct.api.SpecificationType;
 import gov.hhs.onc.sdcct.data.metadata.ResourceParamBinding;
 import gov.hhs.onc.sdcct.data.metadata.ResourceParamCardinality;
 import gov.hhs.onc.sdcct.data.metadata.ResourceParamMetadata;
 import gov.hhs.onc.sdcct.data.parameter.ResourceParamType;
 import gov.hhs.onc.sdcct.xml.xpath.impl.SdcctXpathExecutable;
+import java.util.Set;
 import javax.annotation.Nullable;
 
 public class ResourceParamMetadataImpl extends AbstractResourceMetadataComponent implements ResourceParamMetadata {
@@ -16,7 +17,7 @@ public class ResourceParamMetadataImpl extends AbstractResourceMetadataComponent
     private SdcctXpathExecutable xpathExec;
     private ResourceParamBinding binding;
     private ResourceParamCardinality cardinality;
-    private String valueType;
+    private Set<String> valueTypes;
 
     public ResourceParamMetadataImpl(SpecificationType specType, ResourceParamType type, String id, String name) {
         super(specType, id, name);
@@ -90,13 +91,13 @@ public class ResourceParamMetadataImpl extends AbstractResourceMetadataComponent
     }
 
     @Override
-    public String getValueType() {
-        return this.valueType;
+    public Set<String> getValueTypes() {
+        return this.valueTypes;
     }
 
     @Override
-    public void setValueType(String valueType) {
-        this.valueType = valueType;
+    public void setValueTypes(Set<String> valueTypes) {
+        this.valueTypes = valueTypes;
     }
 
     @Override

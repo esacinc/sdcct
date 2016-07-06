@@ -4,6 +4,8 @@ public final class SdcctXmlPrefixes {
     public final static String FHIR = "fhir";
     public final static String FHIR_XPATH = "f";
     public final static String IHE = "ihe";
+    public final static String SCHEMATRON = "sch";
+    public final static String SCHEMATRON_SVRL = "svrl";
     public final static String SDC = "sdc";
     public final static String SDCCT = "sdcct";
     public final static String SDCCT_JAXB = SDCCT + "-jaxb";

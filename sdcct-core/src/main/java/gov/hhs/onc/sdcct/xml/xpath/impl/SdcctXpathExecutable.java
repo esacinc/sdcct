@@ -52,10 +52,6 @@ public class SdcctXpathExecutable extends XPathExecutable {
         }
 
         try {
-            if (staticOptsAvailable && this.staticOpts.hasPooledDocuments()) {
-                controller.registerDocuments(this.staticOpts.getPooledDocuments());
-            }
-
             // noinspection ConstantConditions
             XPathDynamicContext dynamicContext =
                 expr.createDynamicContext(controller, ((dynamicOptsAvailable && dynamicOpts.hasContextNode()) ? dynamicOpts.getContextNode()

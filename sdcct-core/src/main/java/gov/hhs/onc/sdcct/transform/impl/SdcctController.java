@@ -1,12 +1,9 @@
 package gov.hhs.onc.sdcct.transform.impl;
 
-import gov.hhs.onc.sdcct.xml.impl.XdmDocument;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import net.sf.saxon.Controller;
 import net.sf.saxon.expr.instruct.Executable;
-import net.sf.saxon.trans.XPathException;
 
 public class SdcctController extends Controller {
     private Map<Object, Object> contextData = new HashMap<>();
@@ -17,14 +14,6 @@ public class SdcctController extends Controller {
 
     public SdcctController(SdcctConfiguration config, Executable exec) {
         super(config, exec);
-    }
-
-    public void registerDocuments(List<XdmDocument> pooledDocs) throws XPathException {
-        for (XdmDocument pooledDoc : pooledDocs) {
-            if (pooledDoc.hasDocumentUri()) {
-                this.registerDocument(pooledDoc.getUnderlyingNode().getTreeInfo(), pooledDoc.getDocumentUri());
-            }
-        }
     }
 
     @Override

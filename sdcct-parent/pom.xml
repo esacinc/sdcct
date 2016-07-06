@@ -115,11 +115,15 @@
         <project.build.fhirTypeDataFile>${project.build.fhirDataDirectory}/profiles-types.xml</project.build.fhirTypeDataFile>
         <project.build.fhirV2TermDataFile>${project.build.fhirDataDirectory}/v2-tables.xml</project.build.fhirV2TermDataFile>
         <project.build.fhirV3TermDataFile>${project.build.fhirDataDirectory}/v3-codesystems.xml</project.build.fhirV3TermDataFile>
-        <project.build.fhirSiteUrlPrefix>http://hl7.org/fhir/2016May</project.build.fhirSiteUrlPrefix>
-        <project.build.fhirVersion>1.4.0</project.build.fhirVersion>
+        <project.build.fhirSiteUrlPrefix>http://hl7-fhir.github.io</project.build.fhirSiteUrlPrefix>
+        <project.build.fhirVersion>1.4.0-SNAPSHOT</project.build.fhirVersion>
+        <!-- Project build Schematron properties -->
+        <project.build.schematronUrlPrefix>http://www.schematron.com/tmp</project.build.schematronUrlPrefix>
+        <project.build.schematronVersion>2010-04-14</project.build.schematronVersion>
         <!-- Project build SDC properties -->
         <project.build.sdcSchemaPackageRepositoryArchiveUrlPrefix>http://github.com/esacinc/sdc-schema-package/archive</project.build.sdcSchemaPackageRepositoryArchiveUrlPrefix>
-        <project.build.sdcSchemaPackageVersion>2.0-M1</project.build.sdcSchemaPackageVersion>
+        <!-- TEMP: dev -->
+        <project.build.sdcSchemaPackageVersion>master</project.build.sdcSchemaPackageVersion>
         <!-- Project build SoapUI properties -->
         <project.build.soapuiVersion>5.2.1</project.build.soapuiVersion>
         <project.build.soapuiRepoUrlPrefix>https://github.com/SmartBear/soapui/raw/${project.build.soapuiVersion}</project.build.soapuiRepoUrlPrefix>
@@ -167,32 +171,72 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>2.7.4</version>
+                <version>2.7.5</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
-                <version>2.7.4</version>
+                <version>2.7.5</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.7.4</version>
+                <version>2.7.5</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.datatype</groupId>
                 <artifactId>jackson-datatype-jdk8</artifactId>
-                <version>2.7.4</version>
+                <version>2.7.5</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.module</groupId>
                 <artifactId>jackson-module-jaxb-annotations</artifactId>
-                <version>2.7.4</version>
+                <version>2.7.5</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.module</groupId>
+                <artifactId>jackson-module-jsonSchema</artifactId>
+                <version>2.7.5</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.staxmate</groupId>
+                <artifactId>staxmate</artifactId>
+                <version>2.3.0</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.woodstox</groupId>
                 <artifactId>woodstox-core</artifactId>
                 <version>5.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.fge</groupId>
+                <artifactId>json-schema-core</artifactId>
+                <version>1.2.5</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.mozilla</groupId>
+                        <artifactId>rhino</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.github.fge</groupId>
+                <artifactId>json-schema-validator</artifactId>
+                <version>2.2.6</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.googlecode.libphonenumber</groupId>
+                        <artifactId>libphonenumber</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>javax.mail</groupId>
+                        <artifactId>mailapi</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>net.sf.jopt-simple</groupId>
+                        <artifactId>jopt-simple</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>com.github.sebhoss</groupId>
@@ -368,27 +412,27 @@
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-buffer</artifactId>
-                <version>4.1.0.Final</version>
+                <version>4.1.1.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-codec-http</artifactId>
-                <version>4.1.0.Final</version>
+                <version>4.1.1.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-common</artifactId>
-                <version>4.1.0.Final</version>
+                <version>4.1.1.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-handler</artifactId>
-                <version>4.1.0.Final</version>
+                <version>4.1.1.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-transport</artifactId>
-                <version>4.1.0.Final</version>
+                <version>4.1.1.Final</version>
             </dependency>
             <dependency>
                 <groupId>javax.el</groupId>
@@ -438,7 +482,7 @@
             <dependency>
                 <groupId>net.sf.saxon</groupId>
                 <artifactId>Saxon-HE</artifactId>
-                <version>9.7.0-5</version>
+                <version>9.7.0-6</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.ant</groupId>
@@ -572,7 +616,7 @@
             <dependency>
                 <groupId>org.apache.santuario</groupId>
                 <artifactId>xmlsec</artifactId>
-                <version>2.0.6</version>
+                <version>2.0.7</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.codehaus.woodstox</groupId>
@@ -608,7 +652,7 @@
             <dependency>
                 <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy-all</artifactId>
-                <version>2.4.6</version>
+                <version>2.4.7</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.janino</groupId>
@@ -633,7 +677,7 @@
             <dependency>
                 <groupId>org.fusesource.jansi</groupId>
                 <artifactId>jansi</artifactId>
-                <version>1.12</version>
+                <version>1.13</version>
             </dependency>
             <dependency>
                 <groupId>org.glassfish</groupId>
@@ -767,7 +811,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
-                <version>4.2.6.RELEASE</version>
+                <version>4.3.0.RELEASE</version>
                 <exclusions>
                     <exclusion>
                         <groupId>commons-logging</groupId>
@@ -782,7 +826,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>4.2.6.RELEASE</version>
+                <version>4.3.0.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -796,12 +840,12 @@
             <dependency>
                 <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-commons</artifactId>
-                <version>1.12.1.RELEASE</version>
+                <version>1.12.2.RELEASE</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-jpa</artifactId>
-                <version>1.10.1.RELEASE</version>
+                <version>1.10.2.RELEASE</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.data</groupId>
@@ -928,7 +972,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>2.6</version>
+                    <version>3.0.2</version>
                     <inherited>true</inherited>
                     <executions>
                         <execution>
@@ -950,7 +994,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>2.7</version>
+                    <version>3.0.1</version>
                     <inherited>true</inherited>
                     <configuration>
                         <delimiters>
@@ -1055,7 +1099,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.0.1</version>
                     <inherited>true</inherited>
                     <executions>
                         <execution>

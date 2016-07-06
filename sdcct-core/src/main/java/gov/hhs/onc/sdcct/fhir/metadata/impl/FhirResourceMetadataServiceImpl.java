@@ -1,6 +1,6 @@
 package gov.hhs.onc.sdcct.fhir.metadata.impl;
 
-import gov.hhs.onc.sdcct.beans.SpecificationType;
+import gov.hhs.onc.sdcct.api.SpecificationType;
 import gov.hhs.onc.sdcct.data.metadata.ResourceParamMetadata;
 import gov.hhs.onc.sdcct.data.metadata.impl.AbstractResourceMetadataService;
 import gov.hhs.onc.sdcct.data.metadata.impl.ResourceParamBindingImpl;
@@ -27,6 +27,7 @@ import gov.hhs.onc.sdcct.xml.xpath.StaticXpathOptions;
 import gov.hhs.onc.sdcct.xml.xpath.impl.DynamicXpathOptionsImpl;
 import gov.hhs.onc.sdcct.xml.xpath.impl.SdcctXpathExecutable;
 import java.net.URI;
+import java.util.stream.Collectors;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmAtomicValue;
 import net.sf.saxon.s9api.XdmNode;
@@ -69,8 +70,7 @@ public class FhirResourceMetadataServiceImpl extends AbstractResourceMetadataSer
     protected FhirResourceMetadata<?> buildMetadata(String id, String path, FhirResourceMetadata<?> metadata) throws Exception {
         XdmNode structDefNode = this.buildStructDefNode(id);
 
-        metadata.setUri(URI.create(
-            this.xmlCodec.decode(this.xmlCodec.encode(structDefNode.getUnderlyingNode(), null), StructureDefinitionImpl.class, null).getUrl().getValue()));
+        metadata.setUri(URI.create(this.xmlCodec.decode(structDefNode.getUnderlyingNode(), StructureDefinitionImpl.class, null).getUrl().getValue()));
 
         SearchParameter searchParamDef;
 
@@ -108,11 +108,9 @@ public class FhirResourceMetadataServiceImpl extends AbstractResourceMetadataSer
             return paramMetadata;
         }
 
-        ElementDefinition elemDef = this.xmlCodec.decode(this.xmlCodec.encode(elemDefNode.getUnderlyingNode(), null), ElementDefinitionImpl.class, null);
+        ElementDefinition elemDef = this.xmlCodec.decode(elemDefNode.getUnderlyingNode(), ElementDefinitionImpl.class, null);
 
-        // TODO: support multiple resource parameter types
-        paramMetadata.setValueType(elemDef.getType().get(0).getCode().getValue());
-
+        paramMetadata.setValueTypes(elemDef.getTypes().stream().map(elemTypeDef -> elemTypeDef.getCode().getValue()).collect(Collectors.toSet()));
         paramMetadata.setCardinality(new ResourceParamCardinalityImpl(elemDef.getMin().getValue(), elemDef.getMax().getValue()));
 
         if (!elemDef.hasBinding()) {
@@ -131,7 +129,7 @@ public class FhirResourceMetadataServiceImpl extends AbstractResourceMetadataSer
     }
 
     private SearchParameter buildSearchParamDef(XdmNode searchParamDefNode) throws Exception {
-        return this.xmlCodec.decode(this.xmlCodec.encode(searchParamDefNode.getUnderlyingNode(), null), SearchParameterImpl.class, null);
+        return this.xmlCodec.decode(searchParamDefNode.getUnderlyingNode(), SearchParameterImpl.class, null);
     }
 
     private XdmNode buildStructDefNode(String structDefId) throws Exception {

@@ -86,27 +86,14 @@
     <beans:bean id="contentCodecXml" class="gov.hhs.onc.sdcct.xml.impl.XmlCodec">
         <beans:constructor-arg name="defaultDecodeOpts">
             <beans:bean class="gov.hhs.onc.sdcct.xml.impl.XmlDecodeOptionsImpl"
-                c:parseOpts="#{ config.parseOptions }">
-                <beans:property name="options">
-                    <beans:map>
-                        <beans:entry key="#{ T(gov.hhs.onc.sdcct.transform.content.ContentCodecOptions).CANONICALIZE }" value="false"
-                            value-type="java.lang.Boolean"/>
-                        <beans:entry key="#{ T(gov.hhs.onc.sdcct.transform.content.ContentCodecOptions).VALIDATE }" value="false"
-                            value-type="java.lang.Boolean"/>
-                    </beans:map>
-                </beans:property>
-            </beans:bean>
+                c:parseOpts="#{ config.parseOptions }"/>
         </beans:constructor-arg>
         <beans:constructor-arg name="defaultEncodeOpts">
             <beans:bean class="gov.hhs.onc.sdcct.xml.impl.XmlEncodeOptionsImpl"
                 c:parseOpts="#{ config.parseOptions }">
                 <beans:property name="options">
                     <beans:map>
-                        <beans:entry key="#{ T(gov.hhs.onc.sdcct.transform.content.ContentCodecOptions).CANONICALIZE }" value="false"
-                            value-type="java.lang.Boolean"/>
                         <beans:entry key="#{ T(gov.hhs.onc.sdcct.transform.content.ContentCodecOptions).PRETTY }" value="false"
-                            value-type="java.lang.Boolean"/>
-                        <beans:entry key="#{ T(gov.hhs.onc.sdcct.transform.content.ContentCodecOptions).VALIDATE }" value="false"
                             value-type="java.lang.Boolean"/>
                     </beans:map>
                 </beans:property>

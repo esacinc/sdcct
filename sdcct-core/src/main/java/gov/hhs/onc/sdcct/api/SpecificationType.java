@@ -1,4 +1,7 @@
-package gov.hhs.onc.sdcct.beans;
+package gov.hhs.onc.sdcct.api;
+
+import gov.hhs.onc.sdcct.api.SpecificationNames;
+import gov.hhs.onc.sdcct.beans.IdentifiedBean;
 
 public enum SpecificationType implements IdentifiedBean {
     FHIR(SpecificationNames.FHIR), RFD(SpecificationNames.RFD);

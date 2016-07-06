@@ -1,9 +1,9 @@
 package gov.hhs.onc.sdcct.xml.jaxb.metadata;
 
-import java.io.Serializable;
+import com.sun.msv.grammar.ReferenceExp;
 import javax.xml.namespace.QName;
 
-public interface JaxbSchemaMetadataComponent<T extends Serializable> extends JaxbContextMetadataComponent<T> {
+public interface JaxbSchemaMetadataComponent<T extends ReferenceExp> extends JaxbContextMetadataComponent<T> {
     public boolean isAbstract();
 
     public QName getQname();

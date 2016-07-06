@@ -12,7 +12,7 @@ import com.sun.codemodel.JMod
 import com.sun.tools.xjc.Options
 import com.sun.tools.xjc.model.Model
 import com.sun.tools.xjc.outline.Outline
-import gov.hhs.onc.sdcct.beans.SpecificationType
+import gov.hhs.onc.sdcct.api.SpecificationType
 import gov.hhs.onc.sdcct.beans.StaticValueSetBean
 import gov.hhs.onc.sdcct.build.xml.jaxb.impl.AbstractCodegenPlugin
 import gov.hhs.onc.sdcct.build.xml.jaxb.impl.CodegenSchemaContext

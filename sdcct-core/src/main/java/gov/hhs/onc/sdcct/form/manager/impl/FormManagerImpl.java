@@ -81,14 +81,14 @@ public class FormManagerImpl extends AbstractFormService implements FormManager 
     @SuppressWarnings({ CompilerWarnings.UNCHECKED })
     public void afterPropertiesSet() throws Exception {
         for (FhirForm fhirForm : this.fhirForms) {
-            if (!this.questionnaireRegistry.exists(this.questionnaireRegistry
+            if (fhirForm.isInternal() && !this.questionnaireRegistry.exists(this.questionnaireRegistry
                 .buildCriteria(SdcctCriterionUtils.matchParam(DbPropertyNames.TOKEN_PARAMS, ResourceParamNames.IDENTIFIER, fhirForm.getIdentifier())))) {
                 this.questionnaireRegistry.saveBean(fhirForm.getBean());
             }
         }
 
         for (RfdForm rfdForm : this.rfdForms) {
-            if (!this.formDesignRegistry.exists(this.formDesignRegistry.buildCriteria(
+            if (rfdForm.isInternal() && !this.formDesignRegistry.exists(this.formDesignRegistry.buildCriteria(
                 SdcctCriterionUtils.matchParam(DbPropertyNames.URI_PARAMS, ResourceParamNames.IDENTIFIER, URI.create(rfdForm.getIdentifier()))))) {
                 this.formDesignRegistry.saveBean(rfdForm.getBean());
             }

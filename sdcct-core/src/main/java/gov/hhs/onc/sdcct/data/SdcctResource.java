@@ -1,6 +1,6 @@
 package gov.hhs.onc.sdcct.data;
 
-import gov.hhs.onc.sdcct.beans.SpecificationType;
+import gov.hhs.onc.sdcct.api.SpecificationType;
 import gov.hhs.onc.sdcct.beans.SpecifiedBean;
 import gov.hhs.onc.sdcct.data.parameter.DateResourceParam;
 import gov.hhs.onc.sdcct.data.parameter.NumberResourceParam;

@@ -21,6 +21,22 @@
     </sdcct-xml:xpath-static-options>
     
     <!--====================================================================================================
+    = CONTENT PATH BUILDERS
+    =====================================================================================================-->
+    <beans:bean id="contentPathBuilderRfd" parent="contentPathBuilder">
+        <beans:property name="namespaces">
+            <beans:bean class="org.apache.commons.collections4.bidimap.DualTreeBidiMap"
+                c:map="#{ xpathOptsStaticRfd.namespaces }"/>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = RESOURCE PARAM PROCESSORS
+    =====================================================================================================-->
+    <beans:bean id="resourceParamProcRfd" class="gov.hhs.onc.sdcct.rfd.parameter.impl.RfdResourceParamProcessorImpl"
+        p:contentPathBuilder-ref="contentPathBuilderRfd"/>
+    
+    <!--====================================================================================================
     = RESOURCE PARAM METADATAS
     =====================================================================================================-->
     <beans:bean id="metadataResourceParamRfd" parent="metadataResourceParam" abstract="true">
@@ -131,6 +147,13 @@
     </beans:bean>
     
     <!--====================================================================================================
+    = VALIDATOR SERVICES
+    =====================================================================================================-->
+    <beans:bean id="validatorServiceRfd" parent="validatorService"
+        c:contentPathBuilder-ref="contentPathBuilderRfd"
+        c:resourceMetadataService-ref="resourceMetadataServiceRfd"/>
+    
+    <!--====================================================================================================
     = RESOURCE REGISTRIES
     =====================================================================================================-->
     <beans:bean id="resourceRegistryRfd" class="gov.hhs.onc.sdcct.rfd.impl.RfdResourceRegistryImpl" abstract="true"/>
@@ -146,9 +169,4 @@
     <beans:bean id="searchServiceRfdFormDesign" parent="searchServiceRfd"
         c:resourceMetadata-ref="metadataResourceRfdFormDesign"
         c:resourceRegistry-ref="resourceRegistryRfdFormDesign"/>
-    
-    <!--====================================================================================================
-    = FORMS
-    =====================================================================================================-->
-    <beans:bean id="formRfd" class="gov.hhs.onc.sdcct.rfd.impl.RfdFormImpl" abstract="true"/>
 </beans:beans>

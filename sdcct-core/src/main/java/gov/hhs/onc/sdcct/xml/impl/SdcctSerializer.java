@@ -15,39 +15,36 @@ import java.util.Properties;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
+import javax.xml.transform.stax.StAXResult;
 import javax.xml.transform.stax.StAXSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import net.sf.saxon.Configuration;
 import net.sf.saxon.event.FilterFactory;
 import net.sf.saxon.event.PipelineConfiguration;
+import net.sf.saxon.event.ProxyReceiver;
 import net.sf.saxon.event.Receiver;
 import net.sf.saxon.event.Sender;
+import net.sf.saxon.expr.parser.ExplicitLocation;
+import net.sf.saxon.expr.parser.Location;
 import net.sf.saxon.lib.ParseOptions;
+import net.sf.saxon.om.NodeName;
 import net.sf.saxon.om.StructuredQName;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.Serializer;
-import net.sf.saxon.stax.ReceiverToXMLStreamWriter;
 import net.sf.saxon.trans.XPathException;
+import net.sf.saxon.type.SchemaType;
 import org.apache.commons.collections4.CollectionUtils;
-import org.codehaus.stax2.ri.Stax2WriterAdapter;
-import org.codehaus.stax2.util.StreamWriter2Delegate;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class SdcctSerializer extends Serializer {
-    private static class PrettyXmlStreamWriter extends StreamWriter2Delegate {
+    private static class PrettyXmlReceiver extends ProxyReceiver {
         private static class PrettyXmlElement {
-            private String nsPrefix;
-            private String nsUri;
             private boolean childElems;
-
-            public PrettyXmlElement(@Nullable String nsPrefix, @Nullable String nsUri) {
-                this.nsPrefix = nsPrefix;
-                this.nsUri = nsUri;
-            }
 
             public boolean getChildElements() {
                 return this.childElems;
@@ -56,136 +53,92 @@ public class SdcctSerializer extends Serializer {
             public void setChildElements(boolean childElems) {
                 this.childElems = childElems;
             }
-
-            public boolean hasNamespacePrefix() {
-                return (this.nsPrefix != null);
-            }
-
-            @Nullable
-            public String getNamespacePrefix() {
-                return this.nsPrefix;
-            }
-
-            public boolean hasNamespaceUri() {
-                return (this.nsUri != null);
-            }
-
-            @Nullable
-            public String getNamespaceUri() {
-                return this.nsUri;
-            }
         }
 
-        private final static char[] NEWLINE_CHARS = new char[] { SdcctStringUtils.LF_CHAR };
-
-        private int numIndentSpaces;
-        private char[] indentSpaces;
-        private int indentLvl;
+        private boolean omitDecl;
+        private int indentLen;
+        private String indentStr;
+        private int depth;
         private Deque<PrettyXmlElement> elems = new LinkedList<>();
         private boolean decl;
 
-        public PrettyXmlStreamWriter(XMLStreamWriter delegate, @Nonnegative int numIndentSpaces) {
-            super(Stax2WriterAdapter.wrapIfNecessary(delegate));
+        public PrettyXmlReceiver(Receiver nextReceiver, boolean omitDecl, @Nonnegative int indentLen) {
+            super(nextReceiver);
 
-            this.setParent(this.getParent());
+            this.omitDecl = omitDecl;
 
-            Arrays.fill((this.indentSpaces = new char[(this.numIndentSpaces = numIndentSpaces)]), SdcctStringUtils.SPACE_CHAR);
+            char[] indentChars = new char[(this.indentLen = indentLen)];
+            Arrays.fill(indentChars, SdcctStringUtils.SPACE_CHAR);
+
+            this.indentStr = new String(indentChars, 0, this.indentLen);
         }
 
         @Override
-        public void writeEndElement() throws XMLStreamException {
+        public void endElement() throws XPathException {
             PrettyXmlElement elem = this.elems.pop();
 
-            this.indentLvl--;
+            this.depth--;
 
             if (elem.getChildElements()) {
                 this.writeNewline();
                 this.writeIndent();
             }
 
-            this.mDelegate2.writeEndElement();
+            super.endElement();
         }
 
         @Override
-        public void writeStartElement(String elemLocalName) throws XMLStreamException {
-            this.writeStartElement(null, elemLocalName);
-        }
+        public void startElement(NodeName elemName, SchemaType schemaType, Location loc, int props) throws XPathException {
+            boolean elemAvailable = !this.elems.isEmpty();
 
-        @Override
-        public void writeStartElement(String elemNsUri, String elemLocalName) throws XMLStreamException {
-            this.writeStartElement(null, elemNsUri, elemLocalName);
-        }
+            if (elemAvailable) {
+                this.elems.peek().setChildElements(true);
+            }
 
-        @Override
-        public void writeStartElement(String elemNsPrefix, String elemNsUri, String elemLocalName) throws XMLStreamException {
-            boolean elemsAvailable = !this.elems.isEmpty();
-
-            if (this.decl || elemsAvailable) {
+            if (elemAvailable || this.decl) {
                 this.writeNewline();
             }
 
             this.writeIndent();
 
-            this.indentLvl++;
+            this.depth++;
 
-            if (elemsAvailable) {
-                this.elems.peek().setChildElements(true);
-            }
+            super.startElement(elemName, schemaType, loc, props);
 
-            if (elemNsPrefix == null) {
-                if (elemNsUri != null) {
-                    this.mDelegate2.writeStartElement(elemNsUri, elemLocalName);
-                } else {
-                    this.mDelegate2.writeStartElement(elemLocalName);
-                }
-            } else {
-                this.mDelegate2.writeStartElement(elemNsPrefix, elemNsUri, elemLocalName);
-            }
-
-            this.elems.push(new PrettyXmlElement(elemNsPrefix, elemNsUri));
+            this.elems.push(new PrettyXmlElement());
         }
 
         @Override
-        public void writeStartDocument(String declVersion, String declEnc, boolean declStandalone) throws XMLStreamException {
-            this.decl = true;
+        public void processingInstruction(String name, CharSequence value, Location loc, int props) throws XPathException {
+            super.processingInstruction(name, value, loc, props);
 
-            super.writeStartDocument(declVersion, declEnc, declStandalone);
+            this.writeNewline();
         }
 
         @Override
-        public void writeStartDocument(String declEnc, String declVersion) throws XMLStreamException {
-            this.decl = true;
+        public void startDocument(int props) throws XPathException {
+            super.startDocument(props);
 
-            super.writeStartDocument(declEnc, declVersion);
+            this.decl = !this.omitDecl;
         }
 
-        @Override
-        public void writeStartDocument(String declVersion) throws XMLStreamException {
-            this.decl = true;
-
-            super.writeStartDocument(declVersion);
+        private void writeNewline() throws XPathException {
+            this.characters(StringUtils.LF, ExplicitLocation.UNKNOWN_LOCATION, 0);
         }
 
-        @Override
-        public void writeStartDocument() throws XMLStreamException {
-            this.decl = true;
-
-            super.writeStartDocument();
-        }
-
-        private void writeNewline() throws XMLStreamException {
-            this.mDelegate2.writeCharacters(NEWLINE_CHARS, 0, 1);
-        }
-
-        private void writeIndent() throws XMLStreamException {
-            for (int a = 0; a < this.indentLvl; a++) {
-                this.mDelegate2.writeCharacters(this.indentSpaces, 0, this.numIndentSpaces);
+        private void writeIndent() throws XPathException {
+            for (int a = 0; a < this.depth; a++) {
+                this.characters(this.indentStr, ExplicitLocation.UNKNOWN_LOCATION, 0);
             }
         }
     }
 
     private final static String INDENT_OUT_PROP_KEY = Property.INDENT.getQName().getClarkName();
     private final static String INDENT_SPACES_OUT_PROP_KEY = Property.SAXON_INDENT_SPACES.getQName().getClarkName();
+    private final static String OMIT_XML_DECL_OUT_PROP_KEY = Property.OMIT_XML_DECLARATION.getQName().getClarkName();
+
+    @Autowired
+    private SdcctXmlOutputFactory xmlOutFactory;
 
     @Autowired
     private SdcctXmlInputFactory xmlInFactory;
@@ -249,10 +202,18 @@ public class SdcctSerializer extends Serializer {
 
     public Receiver getReceiver(SdcctConfiguration config, SdcctPipelineConfiguration pipelineConfig, Result result, @Nullable ParseOptions parseOpts,
         @Nullable Properties outProps) throws SaxonApiException {
-        boolean indent = SdcctOptionUtils.getBooleanValue((outProps = this.mergeOutputProperties(outProps)), INDENT_OUT_PROP_KEY, false);
-        int indentSpaces = SdcctOptionUtils.getIntegerValue(outProps, INDENT_SPACES_OUT_PROP_KEY, -1);
+        boolean pretty = SdcctOptionUtils.getBooleanValue((outProps = this.mergeOutputProperties(outProps)), INDENT_OUT_PROP_KEY, false);
+        int indentLen = SdcctOptionUtils.getIntegerValue(outProps, INDENT_SPACES_OUT_PROP_KEY, -1);
 
         outProps.setProperty(INDENT_OUT_PROP_KEY, SdcctOptionUtils.NO_VALUE);
+
+        if (result instanceof StreamResult) {
+            try {
+                result = new StAXResult(this.xmlOutFactory.createXMLStreamWriter(result));
+            } catch (XMLStreamException e) {
+                throw new SaxonApiException(e);
+            }
+        }
 
         Receiver receiver;
 
@@ -268,8 +229,8 @@ public class SdcctSerializer extends Serializer {
             receiver.setSystemId(result.getSystemId());
         }
 
-        if (indent) {
-            (receiver = new ReceiverToXMLStreamWriter(new PrettyXmlStreamWriter(new ReceiverXmlStreamWriter(receiver), indentSpaces)))
+        if (pretty) {
+            (receiver = new PrettyXmlReceiver(receiver, SdcctOptionUtils.getBooleanValue(outProps, OMIT_XML_DECL_OUT_PROP_KEY, false), indentLen))
                 .setPipelineConfiguration(pipelineConfig);
         }
 

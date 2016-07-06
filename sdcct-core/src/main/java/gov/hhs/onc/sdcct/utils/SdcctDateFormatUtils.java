@@ -12,10 +12,10 @@ import org.apache.commons.lang3.time.FastDateFormat;
 
 public final class SdcctDateFormatUtils {
     public static enum DateTimePrecisionType implements IdentifiedBean {
-        YEAR(YEAR_FORMAT_PATTERN, false), YEAR_TZ(YEAR_TZ_FORMAT_PATTERN, true), MONTH(YEAR_MONTH_FORMAT_PATTERN, false), MONTH_TZ(
-            YEAR_MONTH_TZ_FORMAT_PATTERN, true), DAY(YEAR_MONTH_DAY_FORMAT_PATTERN, false), DAY_TZ(YEAR_MONTH_DAY_TZ_FORMAT_PATTERN, true), MIN(
-            HOUR_MIN_FORMAT_PATTERN, false), MIN_TZ(HOUR_MIN_TZ_FORMAT_PATTERN, true), SEC(HOUR_MIN_SEC_FORMAT_PATTERN, false), SEC_TZ(
-            HOUR_MIN_SEC_TZ_FORMAT_PATTERN, true), MS(HOUR_MIN_SEC_MS_FORMAT_PATTERN, false), MS_TZ(HOUR_MIN_SEC_MS_TZ_FORMAT_PATTERN, true);
+        YEAR(YEAR_FORMAT_PATTERN, false), YEAR_TZ(YEAR_TZ_FORMAT_PATTERN, true), MONTH(YEAR_MONTH_FORMAT_PATTERN, false),
+        MONTH_TZ(YEAR_MONTH_TZ_FORMAT_PATTERN, true), DAY(YEAR_MONTH_DAY_FORMAT_PATTERN, false), DAY_TZ(YEAR_MONTH_DAY_TZ_FORMAT_PATTERN, true),
+        MIN(HOUR_MIN_FORMAT_PATTERN, false), MIN_TZ(HOUR_MIN_TZ_FORMAT_PATTERN, true), SEC(HOUR_MIN_SEC_FORMAT_PATTERN, false),
+        SEC_TZ(HOUR_MIN_SEC_TZ_FORMAT_PATTERN, true), MS(HOUR_MIN_SEC_MS_FORMAT_PATTERN, false), MS_TZ(HOUR_MIN_SEC_MS_TZ_FORMAT_PATTERN, true);
 
         private final String id;
         private final String formatPattern;
@@ -54,10 +54,10 @@ public final class SdcctDateFormatUtils {
 
     public final static String TZ_FORMAT_PATTERN_SUFFIX = "XXX";
 
-    public final static String DATE_TIME_PATTERN_STR = "(?<" + YEAR_PATTERN_GROUP_NAME + ">\\d{4})(?:\\-(?<" + MONTH_PATTERN_GROUP_NAME
-        + ">0?\\d|1[0-2])(?:\\-(?<" + DAY_PATTERN_GROUP_NAME + ">[0-2]?\\d|3[0-1])(?:T(?<" + HOUR_PATTERN_GROUP_NAME + ">[0-1]\\d|2[0-3]):(?<"
-        + MIN_PATTERN_GROUP_NAME + ">[0-5]\\d)(?::(?<" + SEC_PATTERN_GROUP_NAME + ">[0-5]\\d)(?::(?<" + MS_PATTERN_GROUP_NAME + ">\\d{3}))?)?)?)?)?" + "(?<"
-        + TZ_PATTERN_GROUP_NAME + ">" + SdcctDateUtils.UTC_ZULU_TZ_ID + "|[\\-\\+](?:[0-1]\\d|2[0-3]):[0-5]\\d)?";
+    public final static String DATE_TIME_PATTERN_STR = "(?<" + YEAR_PATTERN_GROUP_NAME + ">\\d{4})(?:\\-(?<" + MONTH_PATTERN_GROUP_NAME +
+        ">0?\\d|1[0-2])(?:\\-(?<" + DAY_PATTERN_GROUP_NAME + ">[0-2]?\\d|3[0-1])(?:T(?<" + HOUR_PATTERN_GROUP_NAME + ">[0-1]\\d|2[0-3]):(?<" +
+        MIN_PATTERN_GROUP_NAME + ">[0-5]\\d)(?::(?<" + SEC_PATTERN_GROUP_NAME + ">[0-5]\\d)(?::(?<" + MS_PATTERN_GROUP_NAME + ">\\d{3}))?)?)?)?)?" + "(?<" +
+        TZ_PATTERN_GROUP_NAME + ">" + SdcctDateUtils.UTC_ZULU_TZ_ID + "|[\\-\\+](?:[0-1]\\d|2[0-3]):[0-5]\\d|)";
     public final static Pattern DATE_TIME_PATTERN = Pattern.compile(SdcctStringUtils.CARET + DATE_TIME_PATTERN_STR + SdcctStringUtils.DOLLAR_SIGN);
 
     public final static String YEAR_FORMAT_PATTERN = "yyyy";
@@ -93,20 +93,20 @@ public final class SdcctDateFormatUtils {
     public static FastDateFormat buildFormat(String str, @Nullable TimeZone tz, @Nullable Locale locale) {
         Matcher matcher = DATE_TIME_PATTERN.matcher(str);
         String group = matcher.group(TZ_PATTERN_GROUP_NAME);
-        boolean withTz = (group != null);
+        boolean withTz = !group.isEmpty();
 
         if (tz == null) {
             tz = (withTz ? TimeZone.getTimeZone(group) : SdcctDateUtils.DEFAULT_TZ);
         }
 
-        return FastDateFormat.getInstance(findPrecisionType(matcher, withTz).getFormatPattern(), tz, ((locale != null)
-            ? locale : SdcctLocaleUtils.DEFAULT_LOCALE));
+        return FastDateFormat.getInstance(findPrecisionType(matcher, withTz).getFormatPattern(), tz,
+            ((locale != null) ? locale : SdcctLocaleUtils.DEFAULT_LOCALE));
     }
 
     public static DateTimePrecisionType findPrecisionType(String str) {
         Matcher matcher = DATE_TIME_PATTERN.matcher(str);
 
-        return findPrecisionType(matcher, (matcher.group(TZ_PATTERN_GROUP_NAME) != null));
+        return findPrecisionType(matcher, !matcher.group(TZ_PATTERN_GROUP_NAME).isEmpty());
     }
 
     public static boolean isValid(String str) {

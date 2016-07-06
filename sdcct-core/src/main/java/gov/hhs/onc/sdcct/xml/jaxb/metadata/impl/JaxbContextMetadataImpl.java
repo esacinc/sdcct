@@ -1,7 +1,6 @@
 package gov.hhs.onc.sdcct.xml.jaxb.metadata.impl;
 
 import com.ctc.wstx.msv.BaseSchemaFactory;
-import com.ctc.wstx.msv.W3CSchema;
 import com.github.sebhoss.warnings.CompilerWarnings;
 import com.sun.msv.grammar.ExpressionPool;
 import com.sun.msv.grammar.xmlschema.ComplexTypeExp;
@@ -9,17 +8,21 @@ import com.sun.msv.grammar.xmlschema.ElementDeclExp;
 import com.sun.msv.grammar.xmlschema.SimpleTypeExp;
 import com.sun.msv.grammar.xmlschema.XMLSchemaGrammar;
 import com.sun.msv.grammar.xmlschema.XMLSchemaSchema;
+import com.sun.msv.grammar.xmlschema.XMLSchemaTypeExp;
 import com.sun.msv.reader.GrammarReaderController2;
 import com.sun.msv.reader.State;
 import com.sun.msv.reader.xmlschema.MultiSchemaReader;
 import com.sun.msv.reader.xmlschema.SchemaState;
 import com.sun.msv.reader.xmlschema.XMLSchemaReader;
 import com.sun.msv.reader.xmlschema.XMLSchemaReader.StateFactory;
+import com.sun.xml.bind.api.JAXBRIContext;
+import gov.hhs.onc.sdcct.transform.content.path.ContentPathBuilder;
 import gov.hhs.onc.sdcct.transform.impl.ByteArraySource;
 import gov.hhs.onc.sdcct.transform.impl.ResourceSource;
 import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
 import gov.hhs.onc.sdcct.xml.SdcctXmlResolver;
 import gov.hhs.onc.sdcct.xml.impl.SdcctSaxParserFactory;
+import gov.hhs.onc.sdcct.validate.schema.impl.MsvValidationSchema;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbComplexTypeMetadata;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbContextMetadata;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbSchemaMetadata;
@@ -38,7 +41,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
@@ -225,13 +227,14 @@ public class JaxbContextMetadataImpl extends AbstractJaxbMetadataComponent imple
     @Autowired
     private SdcctXmlResolver xmlResolver;
 
+    private ContentPathBuilder contentPathBuilder;
     private Map<String, Object> contextProps = new HashMap<>();
     private Map<String, Package> schemaImplPkgs = new TreeMap<>();
     private Map<String, Package> schemaPkgs = new TreeMap<>();
     private Map<String, ResourceSource> schemaSrcs;
-    private JAXBContext context;
+    private JAXBRIContext context;
     private XMLSchemaGrammar schemaGrammar;
-    private W3CSchema validationSchema;
+    private MsvValidationSchema validationSchema;
     private Map<String, JaxbSchemaMetadata> schemas = new TreeMap<>();
     private Map<String, Object> schemaObjFactories = new TreeMap<>();
 
@@ -245,10 +248,10 @@ public class JaxbContextMetadataImpl extends AbstractJaxbMetadataComponent imple
         Map<Object, Class<?>> schemaObjFactoryClasses =
             this.schemaObjFactories.values().stream().collect(SdcctStreamUtils.toMap(Function.identity(), Object::getClass, LinkedHashMap::new));
 
-        this.context =
-            JAXBContextCache.getCachedContextAndSchemas(new LinkedHashSet<>(schemaObjFactoryClasses.values()), null, contextProps, null, true).getContext();
+        this.context = ((JAXBRIContext) JAXBContextCache
+            .getCachedContextAndSchemas(new LinkedHashSet<>(schemaObjFactoryClasses.values()), null, contextProps, null, true).getContext());
 
-        this.validationSchema = new W3CSchema((this.schemaGrammar = new JaxbMultiSchemaFactory().loadSchemas()));
+        this.validationSchema = new MsvValidationSchema(this.contentPathBuilder, (this.schemaGrammar = new JaxbMultiSchemaFactory().loadSchemas()));
 
         Package schemaPkg, schemaImplPkg;
         JaxbSchemaMetadata schema;
@@ -260,7 +263,8 @@ public class JaxbContextMetadataImpl extends AbstractJaxbMetadataComponent imple
         XmlElementDecl elemDeclAnno;
         Map<String, JaxbTypeMetadata<?, ?>> schemaTypeNames;
         boolean schemaTypeBeanClassAvailable, schemaElemTypeBeanClassAvailable;
-        ComplexTypeExp schemaElemTypeExpr;
+        XMLSchemaTypeExp schemaElemTypeExpr;
+        ComplexTypeExp schemaElemComplexTypeExpr;
         JaxbComplexTypeMetadataImpl<?> schemaElemType;
 
         for (XMLSchemaSchema schemaExpr : IteratorUtils.asIterable(((Iterator<XMLSchemaSchema>) this.schemaGrammar.iterateSchemas()))) {
@@ -329,7 +333,11 @@ public class JaxbContextMetadataImpl extends AbstractJaxbMetadataComponent imple
                 schemaElemName = schemaElemExpr.getElementExp().elementName.localName;
                 schemaElemType = null;
 
-                if ((schemaElemTypeName = (schemaElemTypeExpr = ((ComplexTypeExp) schemaElemExpr.getTypeDefinition())).name) == null) {
+                if ((schemaElemTypeExpr = schemaElemExpr.getTypeDefinition()) instanceof SimpleTypeExp) {
+                    continue;
+                }
+
+                if ((schemaElemTypeName = (schemaElemComplexTypeExpr = ((ComplexTypeExp) schemaElemTypeExpr)).name) == null) {
                     schemaElemTypeName = schemaElemName;
                 }
 
@@ -337,7 +345,7 @@ public class JaxbContextMetadataImpl extends AbstractJaxbMetadataComponent imple
                     schemaTypeBeanClassAvailable = schemaTypeBeanClasses.containsKey(schemaElemTypeName);
                     schemaElemTypeBeanClassAvailable = schemaTypeBeanClasses.containsKey(schemaElemName);
 
-                    schema.addType((schemaElemType = new JaxbComplexTypeMetadataImpl<>(this, schema, schemaElemTypeExpr, schemaElemTypeName,
+                    schema.addType((schemaElemType = new JaxbComplexTypeMetadataImpl<>(this, schema, schemaElemComplexTypeExpr, schemaElemTypeName,
                         new QName(schemaExpr.targetNamespace, schemaElemTypeName), false,
                         ((schemaTypeBeanClassAvailable || schemaElemTypeBeanClassAvailable)
                             ? ((Class<Object>) schemaTypeBeanClasses.get((schemaTypeBeanClassAvailable ? schemaElemTypeName : schemaElemName))) : null),
@@ -369,7 +377,17 @@ public class JaxbContextMetadataImpl extends AbstractJaxbMetadataComponent imple
     }
 
     @Override
-    public JAXBContext getContext() {
+    public ContentPathBuilder getContentPathBuilder() {
+        return this.contentPathBuilder;
+    }
+
+    @Override
+    public void setContentPathBuilder(ContentPathBuilder contentPathBuilder) {
+        this.contentPathBuilder = contentPathBuilder;
+    }
+
+    @Override
+    public JAXBRIContext getContext() {
         return this.context;
     }
 
@@ -438,7 +456,7 @@ public class JaxbContextMetadataImpl extends AbstractJaxbMetadataComponent imple
     }
 
     @Override
-    public W3CSchema getValidationSchema() {
+    public MsvValidationSchema getValidationSchema() {
         return this.validationSchema;
     }
 }

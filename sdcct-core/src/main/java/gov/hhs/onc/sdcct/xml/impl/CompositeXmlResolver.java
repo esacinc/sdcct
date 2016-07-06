@@ -1,7 +1,7 @@
 package gov.hhs.onc.sdcct.xml.impl;
 
-import gov.hhs.onc.sdcct.transform.ResourceSourceResolver;
 import gov.hhs.onc.sdcct.io.SdcctFileNameExtensions;
+import gov.hhs.onc.sdcct.transform.ResourceSourceResolver;
 import gov.hhs.onc.sdcct.transform.impl.ByteArraySource;
 import gov.hhs.onc.sdcct.utils.SdcctResourceUtils;
 import gov.hhs.onc.sdcct.xml.SdcctXmlResolver;

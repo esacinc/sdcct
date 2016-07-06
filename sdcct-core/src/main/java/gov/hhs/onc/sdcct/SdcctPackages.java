@@ -27,6 +27,16 @@ public final class SdcctPackages {
     public final static String RFD_IMPL_NAME = RFD_NAME + ClassUtils.PACKAGE_SEPARATOR + SdcctClassUtils.IMPL_PKG_NAME;
     public final static Package RFD_IMPL = Package.getPackage(RFD_IMPL_NAME);
 
+    public final static String SCHEMATRON_NAME = ROOT_NAME + ".schematron";
+    public final static Package SCHEMATRON = Package.getPackage(SCHEMATRON_NAME);
+    public final static String SCHEMATRON_IMPL_NAME = SCHEMATRON_NAME + ClassUtils.PACKAGE_SEPARATOR + SdcctClassUtils.IMPL_PKG_NAME;
+    public final static Package SCHEMATRON_IMPL = Package.getPackage(SCHEMATRON_IMPL_NAME);
+
+    public final static String SCHEMATRON_SVRL_NAME = SCHEMATRON_NAME + ".svrl";
+    public final static Package SCHEMATRON_SVRL = Package.getPackage(SCHEMATRON_SVRL_NAME);
+    public final static String SCHEMATRON_SVRL_IMPL_NAME = SCHEMATRON_SVRL_NAME + ClassUtils.PACKAGE_SEPARATOR + SdcctClassUtils.IMPL_PKG_NAME;
+    public final static Package SCHEMATRON_SVRL_IMPL = Package.getPackage(SCHEMATRON_SVRL_IMPL_NAME);
+
     public final static String SDC_NAME = ROOT_NAME + ".sdc";
     public final static Package SDC = Package.getPackage(SDC_NAME);
     public final static String SDC_IMPL_NAME = SDC_NAME + ClassUtils.PACKAGE_SEPARATOR + SdcctClassUtils.IMPL_PKG_NAME;

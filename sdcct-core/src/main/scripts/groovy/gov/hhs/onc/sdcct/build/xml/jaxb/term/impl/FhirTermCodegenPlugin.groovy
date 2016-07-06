@@ -14,7 +14,8 @@ import com.sun.tools.xjc.outline.Outline
 import com.sun.xml.xsom.XSRestrictionSimpleType
 import com.sun.xml.xsom.XSSchemaSet
 import gov.hhs.onc.sdcct.SdcctPackages
-import gov.hhs.onc.sdcct.beans.SpecificationType
+import gov.hhs.onc.sdcct.api.SpecificationType
+import gov.hhs.onc.sdcct.beans.StaticValueSetComponentBean
 import gov.hhs.onc.sdcct.build.xml.jaxb.impl.CodegenSchemaContext
 import gov.hhs.onc.sdcct.build.xml.jaxb.naming.impl.CompositeNameConverter
 import gov.hhs.onc.sdcct.build.xml.jaxb.naming.impl.CompositeNameConverter.DefaultCodegenNameConverter
@@ -92,6 +93,8 @@ class FhirTermCodegenPlugin extends AbstractTermCodegenPlugin {
             }
             
             SdcctCodegenUtils.findField(enumComponentImplClassModel, SdcctCodegenUtils.VALUE_MEMBER_NAME).type(enumClassModel)
+            
+            enumComponentClassModel._implements(StaticValueSetComponentBean)
             
             [ SdcctCodegenUtils.findGetterMethod(enumComponentClassModel, SdcctCodegenUtils.VALUE_MEMBER_NAME, false),
                 SdcctCodegenUtils.findGetterMethod(enumComponentImplClassModel, SdcctCodegenUtils.VALUE_MEMBER_NAME, false) ].each{ it.type(enumClassModel) }

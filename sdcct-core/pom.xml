@@ -19,6 +19,9 @@
     <properties>
         <!-- Project properties -->
         <project.basedir.all>${project.basedir}/..</project.basedir.all>
+        <!-- Project build form test properties -->
+        <project.build.testFormDirectory>${project.build.testOutputDirectory}/META-INF/sdcct/data/form</project.build.testFormDirectory>
+        <project.build.sdcTestFormDirectory>${project.build.testFormDirectory}/sdc</project.build.sdcTestFormDirectory>
         <!-- Project build JAXB properties -->
         <project.build.jaxbDirectory>${project.build.outputDirectory}/META-INF/sdcct/jaxb</project.build.jaxbDirectory>
         <project.build.jaxbPluralsPropertyFile>${project.build.jaxbDirectory}/jaxb-sdcct-plurals.properties</project.build.jaxbPluralsPropertyFile>
@@ -26,11 +29,16 @@
         <project.build.jaxbSourceDirectory>${project.basedir}/src/main/jaxb</project.build.jaxbSourceDirectory>
         <project.build.jaxbFhirGeneratedSourceDirectory>${project.build.directory}/generated-sources/jaxb-fhir</project.build.jaxbFhirGeneratedSourceDirectory>
         <project.build.jaxbRfdGeneratedSourceDirectory>${project.build.directory}/generated-sources/jaxb-rfd</project.build.jaxbRfdGeneratedSourceDirectory>
+        <project.build.jaxbSchematronGeneratedSourceDirectory>${project.build.directory}/generated-sources/jaxb-schematron</project.build.jaxbSchematronGeneratedSourceDirectory>
         <project.build.jaxbSdcGeneratedSourceDirectory>${project.build.directory}/generated-sources/jaxb-sdc</project.build.jaxbSdcGeneratedSourceDirectory>
-        <!-- Project build XML schema properties -->
+        <!-- Project build schema properties -->
         <project.build.schemaDirectory>${project.build.outputDirectory}/META-INF/sdcct/schema</project.build.schemaDirectory>
-        <!-- Project build XML schematron properties -->
+        <!-- Project build schema source properties -->
+        <project.build.schemaSourceDirectory>${project.basedir}/src/main/resources/META-INF/sdcct/schema</project.build.schemaSourceDirectory>
+        <!-- Project build Schematron properties -->
         <project.build.schematronDirectory>${project.build.outputDirectory}/META-INF/sdcct/schematron</project.build.schematronDirectory>
+        <!-- Project build XSLT properties -->
+        <project.build.styleDirectory>${project.build.outputDirectory}/META-INF/sdcct/style</project.build.styleDirectory>
         <!-- Project build WSDL properties -->
         <project.build.wsdlDirectory>${project.build.outputDirectory}/META-INF/sdcct/wsdl</project.build.wsdlDirectory>
     </properties>
@@ -66,8 +74,24 @@
             <artifactId>jackson-module-jaxb-annotations</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-jsonSchema</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.staxmate</groupId>
+            <artifactId>staxmate</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.woodstox</groupId>
             <artifactId>woodstox-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.fge</groupId>
+            <artifactId>json-schema-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.fge</groupId>
+            <artifactId>json-schema-validator</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.sebhoss</groupId>
@@ -503,6 +527,24 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>copy-resources-schema</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.schemaDirectory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.schemaSourceDirectory}</directory>
+                                    <includes>
+                                        <include>**/*.xsd</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>copy-resources-jaxb-generated</id>
                         <phase>process-sources</phase>
                         <goals>
@@ -519,6 +561,12 @@
                                 </resource>
                                 <resource>
                                     <directory>${project.build.jaxbRfdGeneratedSourceDirectory}</directory>
+                                    <includes>
+                                        <include>**/*.properties</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>${project.build.jaxbSchematronGeneratedSourceDirectory}</directory>
                                     <includes>
                                         <include>**/*.properties</include>
                                     </includes>
@@ -683,6 +731,7 @@
                                     <name>srcIncludes</name>
                                     <value>
                                         gov/hhs/onc/sdcct/*.java
+                                        gov/hhs/onc/sdcct/api/Specification*.java
                                         gov/hhs/onc/sdcct/beans/*.java
                                         gov/hhs/onc/sdcct/config/utils/*.java
                                         gov/hhs/onc/sdcct/impl/*.java
@@ -709,6 +758,18 @@
                     </execution>
                     <execution>
                         <id>process-project-properties</id>
+                    </execution>
+                    <execution>
+                        <id>process-deps-schematron</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <scripts>
+                                <script>file://${project.build.scriptSourceDirectory}/sdcct-process-deps-schematron.groovy</script>
+                            </scripts>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>process-deps-fhir</id>
@@ -743,6 +804,64 @@
                         <configuration>
                             <scripts>
                                 <script>file://${project.build.scriptSourceDirectory}/sdcct-process-deps-soapui.groovy</script>
+                            </scripts>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-sources-jaxb-schematron</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <properties>
+                                <property>
+                                    <name>bindingIncludes</name>
+                                    <value>
+                                        jaxb-sdcct.xjb
+                                        jaxb-sdcct-schematron.xjb
+                                        jaxb-sdcct-schematron-svrl.xjb
+                                    </value>
+                                </property>
+                                <property>
+                                    <name>outDir</name>
+                                    <value>${project.build.jaxbSchematronGeneratedSourceDirectory}</value>
+                                </property>
+                                <property>
+                                    <name>pkgNames</name>
+                                    <value>
+                                        sch=gov.hhs.onc.sdcct.schematron
+                                        svrl=gov.hhs.onc.sdcct.schematron.svrl
+                                    </value>
+                                </property>
+                                <property>
+                                    <name>schemaIncludes</name>
+                                    <value>
+                                        schematron/iso-schematron.xsd
+                                        schematron/svrl.xsd
+                                    </value>
+                                </property>
+                                <property>
+                                    <name>verbose</name>
+                                    <value>true</value>
+                                </property>
+                                <property>
+                                    <name>xmlNsPrefixes</name>
+                                    <value>
+                                        sch=gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes.SCHEMATRON
+                                        svrl=gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes.SCHEMATRON_SVRL
+                                    </value>
+                                </property>
+                                <property>
+                                    <name>xmlNsUris</name>
+                                    <value>
+                                        sch=gov.hhs.onc.sdcct.net.SdcctUris.SCHEMATRON_URL_VALUE
+                                        svrl=gov.hhs.onc.sdcct.net.SdcctUris.SCHEMATRON_SVRL_URL_VALUE
+                                    </value>
+                                </property>
+                            </properties>
+                            <scripts>
+                                <script>file://${project.build.scriptSourceDirectory}/sdcct-generate-sources-jaxb.groovy</script>
                             </scripts>
                         </configuration>
                     </execution>
@@ -1076,6 +1195,7 @@
                             <sources>
                                 <source>${project.build.jaxbFhirGeneratedSourceDirectory}</source>
                                 <source>${project.build.jaxbRfdGeneratedSourceDirectory}</source>
+                                <source>${project.build.jaxbSchematronGeneratedSourceDirectory}</source>
                                 <source>${project.build.jaxbSdcGeneratedSourceDirectory}</source>
                             </sources>
                         </configuration>

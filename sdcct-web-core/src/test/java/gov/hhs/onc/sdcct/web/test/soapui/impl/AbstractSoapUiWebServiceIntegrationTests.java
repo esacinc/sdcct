@@ -76,7 +76,7 @@ public abstract class AbstractSoapUiWebServiceIntegrationTests extends AbstractS
                 testClass = initialMethodModel.getTestClass();
                 xmlTest = initialMethodModel.getXmlTest();
 
-                (initialInstance = ((AbstractSoapUiWebServiceIntegrationTests) initialMethodInstance.getInstance())).initialize();
+                (initialInstance = ((AbstractSoapUiWebServiceIntegrationTests) initialMethodInstance.getInstance())).initializeTestContext();
 
                 instanceClass = initialInstance.getClass();
 

@@ -29,13 +29,12 @@
                     c:durationUnit="#{ T(java.util.concurrent.TimeUnit).MILLISECONDS }"
                     c:rateUnit="#{ T(java.util.concurrent.TimeUnit).MILLISECONDS }"
                     c:showSamples="true"/>
-                <beans:bean parent="moduleSimple"
-                    c:name="sdcct-logging-metrics">
-                    <beans:constructor-arg name="serializers">
+                <beans:bean parent="module">
+                    <beans:property name="serializerItems">
                         <beans:list>
                             <beans:ref bean="jsonSerializerMetricRegistry"/>
                         </beans:list>
-                    </beans:constructor-arg>
+                    </beans:property>
                 </beans:bean>
             </beans:list>
         </beans:property>

@@ -1,6 +1,6 @@
 package gov.hhs.onc.sdcct.data.metadata.impl;
 
-import gov.hhs.onc.sdcct.beans.SpecificationType;
+import gov.hhs.onc.sdcct.api.SpecificationType;
 import gov.hhs.onc.sdcct.data.metadata.ResourceMetadataComponent;
 import gov.hhs.onc.sdcct.metadata.impl.AbstractMetadataComponent;
 import java.net.URI;

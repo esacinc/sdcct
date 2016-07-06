@@ -11,7 +11,8 @@ Artifact sdcSchemaPkgArchiveArtifact = new DefaultArtifact("gov.hhs.onc.sdc", "s
 File sdcSchemaPkgArchiveFile = SdcctBuildUtils.resolveRemoteArtifact(log, project, ant, sdcSchemaPkgArchiveArtifact,
     new URL("${project.properties.getProperty("project.build.sdcSchemaPackageRepositoryArchiveUrlPrefix")}/${sdcSchemaPkgArchiveArtifact.version}.${sdcSchemaPkgArchiveArtifact.type}"),
     true), schemaDir = new File(project.properties.getProperty("project.build.schemaDirectory")),
-    wsdlDir = new File(project.properties.getProperty("project.build.wsdlDirectory"))
+    wsdlDir = new File(project.properties.getProperty("project.build.wsdlDirectory")),
+    sdcTestFormDir = new File(project.properties.getProperty("project.build.sdcTestFormDirectory"))
 
 ant.mkdir(dir: schemaDir)
 
@@ -31,4 +32,14 @@ ant.unzip(src: sdcSchemaPkgArchiveFile, dest: wsdlDir) {
     }
     
     ant.cutdirsmapper(dirs: 2)
+}
+
+ant.mkdir(dir: sdcTestFormDir)
+
+ant.unzip(src: sdcSchemaPkgArchiveFile, dest: sdcTestFormDir) {
+    ant.patternset() {
+        ant.include(name: "*/example/form/*.${SdcctFileNameExtensions.XML}")
+    }
+    
+    ant.cutdirsmapper(dirs: 3)
 }

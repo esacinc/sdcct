@@ -13,6 +13,9 @@
     <!--====================================================================================================
     = GLOBAL
     =====================================================================================================-->
+    <sdcct-jaxb:static-value-set-enum class="gov.hhs.onc.sdcct.fhir.ConformanceExpectation" uri="http://hl7.org/fhir/ValueSet/conformance-expectation"
+        specType="fhir"/>
+    
     <sdcct-jaxb:static-value-set-enum class="gov.hhs.onc.sdcct.fhir.DatatypeType" uri="http://hl7.org/fhir/ValueSet/data-types" specType="fhir"/>
     
     <sdcct-jaxb:static-value-set-enum class="gov.hhs.onc.sdcct.fhir.OperationOutcomeType" uri="http://hl7.org/fhir/ValueSet/operation-outcome" specType="fhir"/>
@@ -60,6 +63,14 @@
         <jaxb:bindings node="xsd:complexContent/xsd:extension/xsd:sequence">
             <jaxb:bindings node="xsd:choice">
                 <jaxb:property name="valueSet"/>
+            </jaxb:bindings>
+        </jaxb:bindings>
+    </jaxb:bindings>
+    
+    <jaxb:bindings node="xsd:complexType[@name='Extension']">
+        <jaxb:bindings node="xsd:complexContent/xsd:extension/xsd:sequence">
+            <jaxb:bindings node="xsd:choice">
+                <jaxb:property name="content"/>
             </jaxb:bindings>
         </jaxb:bindings>
     </jaxb:bindings>

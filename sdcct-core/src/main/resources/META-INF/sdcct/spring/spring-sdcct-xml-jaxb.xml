@@ -26,6 +26,14 @@
     
     <beans:bean id="objFactoryRfdImpl" class="gov.hhs.onc.sdcct.rfd.impl.ObjectFactory"/>
     
+    <beans:bean id="objFactorySchematron" class="gov.hhs.onc.sdcct.schematron.ObjectFactory"/>
+    
+    <beans:bean id="objFactorySchematronImpl" class="gov.hhs.onc.sdcct.schematron.impl.ObjectFactory"/>
+    
+    <beans:bean id="objFactorySchematronSvrl" class="gov.hhs.onc.sdcct.schematron.svrl.ObjectFactory"/>
+    
+    <beans:bean id="objFactorySchematronSvrlImpl" class="gov.hhs.onc.sdcct.schematron.svrl.impl.ObjectFactory"/>
+    
     <beans:bean id="objFactorySdc" class="gov.hhs.onc.sdcct.sdc.ObjectFactory"/>
     
     <beans:bean id="objFactorySdcImpl" class="gov.hhs.onc.sdcct.sdc.impl.ObjectFactory"/>
@@ -39,10 +47,94 @@
     <!--====================================================================================================
     = JAXB CONTEXT METADATAS
     =====================================================================================================-->
-    <beans:bean id="jaxbContextMetadata" class="gov.hhs.onc.sdcct.xml.jaxb.metadata.impl.JaxbContextMetadataImpl" abstract="true">
+    <beans:bean id="jaxbContextMetadata" class="gov.hhs.onc.sdcct.xml.jaxb.metadata.impl.JaxbContextMetadataImpl" abstract="true"
+        p:contentPathBuilder-ref="contentPathBuilder">
         <beans:property name="contextProperties">
             <beans:map>
                 <beans:entry key="#{ T(com.sun.xml.bind.api.JAXBRIContext).IMPROVED_XSI_TYPE_HANDLING }" value="true" value-type="java.lang.Boolean"/>
+                <beans:entry key="#{ T(com.sun.xml.bind.api.JAXBRIContext).RETAIN_REFERENCE_TO_INFO }" value="true" value-type="java.lang.Boolean"/>
+            </beans:map>
+        </beans:property>
+    </beans:bean>
+    
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="jaxbContextMetadataFhir" parent="jaxbContextMetadata"
+        c:name="#{ T(gov.hhs.onc.sdcct.api.SpecificationType).FHIR.id }"
+        p:contentPathBuilder-ref="contentPathBuilderFhir"
+        p:schemaSources="classpath*:${sdcct.schema.fhir.dir.path}/*.xsd">
+        <beans:property name="schemaImplPackages">
+            <beans:map>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).FHIR_URL_VALUE }"
+                    value="#{ T(gov.hhs.onc.sdcct.SdcctPackages).FHIR_IMPL }"/>
+                <beans:entry key="#{ T(net.sf.saxon.lib.NamespaceConstant).XHTML }"
+                    value="#{ T(gov.hhs.onc.sdcct.SdcctPackages).FHIR_XHTML_IMPL }"/>
+            </beans:map>
+        </beans:property>
+        <beans:property name="schemaObjectFactories">
+            <beans:map>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).FHIR_URL_VALUE }" value-ref="objFactoryFhirImpl"/>
+                <beans:entry key="#{ T(net.sf.saxon.lib.NamespaceConstant).XHTML }" value-ref="objFactoryFhirXhtmlImpl"/>
+            </beans:map>
+        </beans:property>
+        <beans:property name="schemaPackages">
+            <beans:map>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).FHIR_URL_VALUE }" value="#{ T(gov.hhs.onc.sdcct.SdcctPackages).FHIR }"/>
+                <beans:entry key="#{ T(net.sf.saxon.lib.NamespaceConstant).XHTML }" value="#{ T(gov.hhs.onc.sdcct.SdcctPackages).FHIR_XHTML }"/>
+            </beans:map>
+        </beans:property>
+    </beans:bean>
+    
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="jaxbContextMetadataRfd" parent="jaxbContextMetadata"
+        c:name="#{ T(gov.hhs.onc.sdcct.api.SpecificationType).RFD.id }"
+        p:contentPathBuilder-ref="contentPathBuilderRfd"
+        p:schemaSources="classpath*:${sdcct.schema.rfd.dir.path}/*.xsd,classpath*:${sdcct.schema.sdc.dir.path}/*.xsd">
+        <beans:property name="schemaImplPackages">
+            <beans:map>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).IHE_ITI_RFD_URN_VALUE }"
+                    value="#{ T(gov.hhs.onc.sdcct.SdcctPackages).RFD_IMPL }"/>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).SDC_URL_VALUE }" value="#{ T(gov.hhs.onc.sdcct.SdcctPackages).SDC_IMPL }"/>
+            </beans:map>
+        </beans:property>
+        <beans:property name="schemaObjectFactories">
+            <beans:map>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).IHE_ITI_RFD_URN_VALUE }" value-ref="objFactoryRfdImpl"/>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).SDC_URL_VALUE }" value-ref="objFactorySdcImpl"/>
+            </beans:map>
+        </beans:property>
+        <beans:property name="schemaPackages">
+            <beans:map>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).IHE_ITI_RFD_URN_VALUE }"
+                    value="#{ T(gov.hhs.onc.sdcct.SdcctPackages).RFD }"/>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).SDC_URL_VALUE }" value="#{ T(gov.hhs.onc.sdcct.SdcctPackages).SDC }"/>
+            </beans:map>
+        </beans:property>
+    </beans:bean>
+    
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="jaxbContextMetadataSchematron" parent="jaxbContextMetadata"
+        c:name="schematron"
+        p:schemaSources="classpath*:${sdcct.schema.schematron.dir.path}/*.xsd">
+        <beans:property name="schemaImplPackages">
+            <beans:map>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).SCHEMATRON_URL_VALUE }"
+                    value="#{ T(gov.hhs.onc.sdcct.SdcctPackages).SCHEMATRON_IMPL }"/>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).SCHEMATRON_SVRL_URL_VALUE }"
+                    value="#{ T(gov.hhs.onc.sdcct.SdcctPackages).SCHEMATRON_SVRL_IMPL }"/>
+            </beans:map>
+        </beans:property>
+        <beans:property name="schemaObjectFactories">
+            <beans:map>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).SCHEMATRON_URL_VALUE }" value-ref="objFactorySchematronImpl"/>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).SCHEMATRON_SVRL_URL_VALUE }" value-ref="objFactorySchematronSvrlImpl"/>
+            </beans:map>
+        </beans:property>
+        <beans:property name="schemaPackages">
+            <beans:map>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).SCHEMATRON_URL_VALUE }"
+                    value="#{ T(gov.hhs.onc.sdcct.SdcctPackages).SCHEMATRON }"/>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).SCHEMATRON_SVRL_URL_VALUE }"
+                    value="#{ T(gov.hhs.onc.sdcct.SdcctPackages).SCHEMATRON_SVRL }"/>
             </beans:map>
         </beans:property>
     </beans:bean>
@@ -53,56 +145,9 @@
     <beans:bean id="jaxbContextRepo" class="gov.hhs.onc.sdcct.xml.jaxb.impl.JaxbContextRepositoryImpl">
         <beans:property name="contextMetadatas">
             <beans:array>
-                <!--suppress SpringPlaceholdersInspection -->
-                <beans:bean parent="jaxbContextMetadata"
-                    c:name="#{ T(gov.hhs.onc.sdcct.beans.SpecificationType).FHIR.id }"
-                    p:schemaSources="classpath*:${sdcct.schema.fhir.dir.path}/*.xsd">
-                    <beans:property name="schemaImplPackages">
-                        <beans:map>
-                            <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).FHIR_URL_VALUE }"
-                                value="#{ T(gov.hhs.onc.sdcct.SdcctPackages).FHIR_IMPL }"/>
-                            <beans:entry key="#{ T(net.sf.saxon.lib.NamespaceConstant).XHTML }"
-                                value="#{ T(gov.hhs.onc.sdcct.SdcctPackages).FHIR_XHTML_IMPL }"/>
-                        </beans:map>
-                    </beans:property>
-                    <beans:property name="schemaObjectFactories">
-                        <beans:map>
-                            <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).FHIR_URL_VALUE }" value-ref="objFactoryFhirImpl"/>
-                            <beans:entry key="#{ T(net.sf.saxon.lib.NamespaceConstant).XHTML }" value-ref="objFactoryFhirXhtmlImpl"/>
-                        </beans:map>
-                    </beans:property>
-                    <beans:property name="schemaPackages">
-                        <beans:map>
-                            <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).FHIR_URL_VALUE }" value="#{ T(gov.hhs.onc.sdcct.SdcctPackages).FHIR }"/>
-                            <beans:entry key="#{ T(net.sf.saxon.lib.NamespaceConstant).XHTML }" value="#{ T(gov.hhs.onc.sdcct.SdcctPackages).FHIR_XHTML }"/>
-                        </beans:map>
-                    </beans:property>
-                </beans:bean>
-                <!--suppress SpringPlaceholdersInspection -->
-                <beans:bean parent="jaxbContextMetadata"
-                    c:name="#{ T(gov.hhs.onc.sdcct.beans.SpecificationType).RFD.id }"
-                    p:schemaSources="classpath*:${sdcct.schema.rfd.dir.path}/*.xsd,classpath*:${sdcct.schema.sdc.dir.path}/*.xsd">
-                    <beans:property name="schemaImplPackages">
-                        <beans:map>
-                            <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).IHE_ITI_RFD_URN_VALUE }"
-                                value="#{ T(gov.hhs.onc.sdcct.SdcctPackages).RFD_IMPL }"/>
-                            <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).SDC_URL_VALUE }" value="#{ T(gov.hhs.onc.sdcct.SdcctPackages).SDC_IMPL }"/>
-                        </beans:map>
-                    </beans:property>
-                    <beans:property name="schemaObjectFactories">
-                        <beans:map>
-                            <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).IHE_ITI_RFD_URN_VALUE }" value-ref="objFactoryRfdImpl"/>
-                            <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).SDC_URL_VALUE }" value-ref="objFactorySdcImpl"/>
-                        </beans:map>
-                    </beans:property>
-                    <beans:property name="schemaPackages">
-                        <beans:map>
-                            <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).IHE_ITI_RFD_URN_VALUE }"
-                                value="#{ T(gov.hhs.onc.sdcct.SdcctPackages).RFD }"/>
-                            <beans:entry key="#{ T(gov.hhs.onc.sdcct.net.SdcctUris).SDC_URL_VALUE }" value="#{ T(gov.hhs.onc.sdcct.SdcctPackages).SDC }"/>
-                        </beans:map>
-                    </beans:property>
-                </beans:bean>
+                <beans:ref bean="jaxbContextMetadataFhir"/>
+                <beans:ref bean="jaxbContextMetadataRfd"/>
+                <beans:ref bean="jaxbContextMetadataSchematron"/>
             </beans:array>
         </beans:property>
         <beans:property name="defaultMarshallerProperties">

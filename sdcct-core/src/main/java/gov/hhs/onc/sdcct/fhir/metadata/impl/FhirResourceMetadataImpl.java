@@ -1,6 +1,6 @@
 package gov.hhs.onc.sdcct.fhir.metadata.impl;
 
-import gov.hhs.onc.sdcct.beans.SpecificationType;
+import gov.hhs.onc.sdcct.api.SpecificationType;
 import gov.hhs.onc.sdcct.data.metadata.impl.AbstractResourceMetadata;
 import gov.hhs.onc.sdcct.fhir.metadata.FhirResourceMetadata;
 import gov.hhs.onc.sdcct.fhir.Resource;

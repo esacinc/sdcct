@@ -11,8 +11,10 @@ public final class SdcctFileNameExtensions {
     public final static String SCH = "sch";
     public final static String WADL = "wadl";
     public final static String WSDL = "wsdl";
+    public final static String XHTML = "xhtml";
     public final static String XML = "xml";
     public final static String XSD = "xsd";
+    public final static String XSL = "xsl";
     public final static String XSLT = "xslt";
     public final static String ZIP = "zip";
 

@@ -5,7 +5,7 @@ import com.sun.tools.xjc.Options
 import com.sun.tools.xjc.model.Model
 import com.sun.tools.xjc.outline.Outline
 import gov.hhs.onc.sdcct.SdcctPackages
-import gov.hhs.onc.sdcct.beans.SpecificationType
+import gov.hhs.onc.sdcct.api.SpecificationType
 import gov.hhs.onc.sdcct.build.xml.jaxb.impl.CodegenSchemaContext
 import gov.hhs.onc.sdcct.build.xml.jaxb.utils.SdcctCodegenUtils
 import gov.hhs.onc.sdcct.rfd.RfdResourceType

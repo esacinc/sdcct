@@ -1,6 +1,7 @@
 package gov.hhs.onc.sdcct.xml.jaxb;
 
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbContextMetadata;
+import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbElementMetadata;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbTypeMetadata;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -15,7 +16,12 @@ public interface JaxbContextRepository {
 
     public <T> Unmarshaller buildUnmarshaller(Class<T> resultClass, @Nullable Map<String, Object> unmarshallerProps) throws JAXBException;
 
+    @Nullable
+    public <T> JaxbElementMetadata<T> findElementMetadata(JaxbTypeMetadata<?, ?> typeMetadata);
+
     public JaxbTypeMetadata<?, ?> findTypeMetadata(Class<?> beanImplClass) throws JAXBException;
+
+    public JaxbContextMetadata findContextMetadata(String schemaNsUri) throws JAXBException;
 
     public Map<String, JaxbContextMetadata> getContextMetadatas();
 

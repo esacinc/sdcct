@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jaxb:bindings
+    jaxb:extensionBindingPrefixes="annox wildcard xjc"
+    jaxb:version="2.0"
+    node="/xsd:schema"
+    schemaLocation="../schema/schematron/iso-schematron.xsd"
+    xmlns:annox="http://annox.dev.java.net"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:wildcard="http://jaxb2-commons.dev.java.net/basic/wildcard"
+    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    
+    <!--====================================================================================================
+    = SCHEMA
+    =====================================================================================================-->
+    <jaxb:schemaBindings>
+        <jaxb:package name="gov.hhs.onc.sdcct.schematron"/>
+    </jaxb:schemaBindings>
+    
+    <!--====================================================================================================
+    = ELEMENTS
+    =====================================================================================================-->
+    <jaxb:bindings node="xsd:element[@name='assert']">
+        <jaxb:class name="Assertion"/>
+    </jaxb:bindings>
+    
+    <jaxb:bindings node="xsd:element[@name='diagnostics']">
+        <jaxb:bindings node="xsd:complexType">
+            <jaxb:bindings node="xsd:choice">
+                <jaxb:property name="content"/>
+            </jaxb:bindings>
+        </jaxb:bindings>
+    </jaxb:bindings>
+    
+    <jaxb:bindings node="xsd:element[@name='dir']">
+        <jaxb:class name="Direction"/>
+    </jaxb:bindings>
+    
+    <jaxb:bindings node="xsd:element[@name='emph']">
+        <jaxb:class name="Emphasis"/>
+    </jaxb:bindings>
+    
+    <jaxb:bindings node="xsd:element[@name='extends']">
+        <jaxb:class name="Extension"/>
+    </jaxb:bindings>
+    
+    <jaxb:bindings node="xsd:element[@name='ns']">
+        <jaxb:class name="Namespace"/>
+    </jaxb:bindings>
+    
+    <jaxb:bindings node="xsd:element[@name='p']">
+        <jaxb:class name="Paragraph"/>
+    </jaxb:bindings>
+    
+    <jaxb:bindings node="xsd:element[@name='param']">
+        <jaxb:class name="Parameter"/>
+    </jaxb:bindings>
+    
+    <jaxb:bindings node="xsd:element[@name='pattern']">
+        <jaxb:bindings node="xsd:complexType">
+            <jaxb:bindings node="xsd:choice">
+                <jaxb:property name="content"/>
+            </jaxb:bindings>
+        </jaxb:bindings>
+    </jaxb:bindings>
+    
+    <jaxb:bindings node="xsd:element[@name='phase']">
+        <jaxb:bindings node="xsd:complexType">
+            <jaxb:bindings node="xsd:choice">
+                <jaxb:property name="content"/>
+            </jaxb:bindings>
+        </jaxb:bindings>
+    </jaxb:bindings>
+    
+    <jaxb:bindings node="xsd:element[@name='rule']">
+        <jaxb:bindings node="xsd:complexType">
+            <jaxb:bindings node="xsd:choice">
+                <jaxb:property name="content"/>
+            </jaxb:bindings>
+        </jaxb:bindings>
+    </jaxb:bindings>
+    
+    <jaxb:bindings node="xsd:element[@name='schema']">
+        <jaxb:bindings node="xsd:complexType">
+            <jaxb:bindings node="xsd:choice">
+                <jaxb:property name="content"/>
+            </jaxb:bindings>
+        </jaxb:bindings>
+    </jaxb:bindings>
+ </jaxb:bindings>

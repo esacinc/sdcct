@@ -1,10 +1,12 @@
 package gov.hhs.onc.sdcct.data.impl;
 
-import gov.hhs.onc.sdcct.beans.SpecificationType;
+import gov.hhs.onc.sdcct.api.SpecificationType;
 import gov.hhs.onc.sdcct.data.SdcctResource;
 import gov.hhs.onc.sdcct.data.db.DbAnalyzerNames;
 import gov.hhs.onc.sdcct.data.db.DbColumnNames;
 import gov.hhs.onc.sdcct.data.db.DbFieldNames;
+import gov.hhs.onc.sdcct.data.db.DbPropertyNames;
+import gov.hhs.onc.sdcct.data.db.DbQueryNames;
 import gov.hhs.onc.sdcct.data.db.DbSequenceNames;
 import gov.hhs.onc.sdcct.data.db.DbTableNames;
 import gov.hhs.onc.sdcct.data.parameter.DateResourceParam;
@@ -42,8 +44,11 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
+import org.hibernate.annotations.CacheModeType;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.NamedQueries;
+import org.hibernate.annotations.NamedQuery;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Boost;
 import org.hibernate.search.annotations.DocumentId;
@@ -53,6 +58,8 @@ import org.hibernate.search.annotations.SortableField;
 
 @DiscriminatorColumn(name = DbColumnNames.SPEC_TYPE)
 @Entity(name = "resource")
+@NamedQueries({ @NamedQuery(cacheMode = CacheModeType.IGNORE, name = DbQueryNames.RESOURCE_SELECT_ID_NEW,
+    query = ("select (coalesce(max(" + DbPropertyNames.ID + "), 0) + 1) from " + DbTableNames.RESOURCE + " where " + DbPropertyNames.INSTANCE_ID + " = -1")) })
 @Table(name = DbTableNames.RESOURCE)
 public class SdcctResourceImpl extends AbstractSdcctEntity implements SdcctResource {
     protected SpecificationType specType;

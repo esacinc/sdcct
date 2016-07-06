@@ -1,4 +1,4 @@
-package gov.hhs.onc.sdcct.beans;
+package gov.hhs.onc.sdcct.api;
 
 public final class SpecificationNames {
     public final static String FHIR = "fhir";

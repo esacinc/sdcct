@@ -2,11 +2,11 @@ package gov.hhs.onc.sdcct.xml.impl;
 
 import gov.hhs.onc.sdcct.transform.impl.SdcctConfiguration;
 import net.sf.saxon.Configuration;
-import net.sf.saxon.dom.DOMNodeWrapper;
 import net.sf.saxon.event.ProxyReceiver;
 import net.sf.saxon.event.Receiver;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmDestination;
+import net.sf.saxon.tree.linked.DocumentImpl;
 
 public class XdmDocumentDestination extends XdmDestination {
     public static class XdmDocumentReceiver extends ProxyReceiver {
@@ -31,7 +31,7 @@ public class XdmDocumentDestination extends XdmDestination {
 
     @Override
     public XdmDocument getXdmNode() {
-        DOMNodeWrapper docInfo = ((DOMNodeWrapper) super.getXdmNode().getUnderlyingNode());
+        DocumentImpl docInfo = ((DocumentImpl) super.getXdmNode().getUnderlyingNode());
 
         return new XdmDocument(docInfo, docInfo);
     }

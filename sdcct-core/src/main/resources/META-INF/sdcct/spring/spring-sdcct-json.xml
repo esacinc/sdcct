@@ -14,9 +14,7 @@
     <!--====================================================================================================
     = MODULES
     =====================================================================================================-->
-    <beans:bean id="moduleSimple" class="com.fasterxml.jackson.databind.module.SimpleModule" abstract="true">
-        <beans:constructor-arg name="version" value="#{ T(com.fasterxml.jackson.core.Version).unknownVersion() }"/>
-    </beans:bean>
+    <beans:bean id="module" class="gov.hhs.onc.sdcct.json.impl.SdcctModule" abstract="true"/>
     
     <!--====================================================================================================
     = OBJECT MAPPERS
@@ -35,9 +33,7 @@
         </beans:property>
         <beans:property name="modules">
             <beans:list>
-                <beans:bean id="moduleJaxbAnno" class="com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule"
-                    p:nonNillableInclusion="NON_DEFAULT"
-                    p:priority="SECONDARY"/>
+                <beans:bean id="moduleJaxb" class="gov.hhs.onc.sdcct.json.impl.SdcctJaxbModule"/>
                 <beans:bean id="moduleJdk8" class="com.fasterxml.jackson.datatype.jdk8.Jdk8Module"/>
             </beans:list>
         </beans:property>
@@ -52,17 +48,24 @@
     =====================================================================================================-->
     <beans:bean id="contentCodecJson" class="gov.hhs.onc.sdcct.json.impl.JsonCodec">
         <beans:constructor-arg name="defaultDecodeOpts">
-            <beans:bean class="gov.hhs.onc.sdcct.json.impl.JsonDecodeOptionsImpl"/>
+            <beans:bean class="gov.hhs.onc.sdcct.json.impl.JsonDecodeOptionsImpl">
+                <beans:property name="beanDeserializerModifiers">
+                    <beans:list>
+                        <beans:ref bean="beanDeserializerModifierFhir"/>
+                    </beans:list>
+                </beans:property>
+            </beans:bean>
         </beans:constructor-arg>
         <beans:constructor-arg name="defaultEncodeOpts">
             <beans:bean class="gov.hhs.onc.sdcct.json.impl.JsonEncodeOptionsImpl">
+                <beans:property name="beanSerializerModifiers">
+                    <beans:list>
+                        <beans:ref bean="beanSerializerModifierFhir"/>
+                    </beans:list>
+                </beans:property>
                 <beans:property name="options">
                     <beans:map>
-                        <beans:entry key="#{ T(gov.hhs.onc.sdcct.transform.content.ContentCodecOptions).CANONICALIZE }" value="false"
-                            value-type="java.lang.Boolean"/>
                         <beans:entry key="#{ T(gov.hhs.onc.sdcct.transform.content.ContentCodecOptions).PRETTY }" value="false"
-                            value-type="java.lang.Boolean"/>
-                        <beans:entry key="#{ T(gov.hhs.onc.sdcct.transform.content.ContentCodecOptions).VALIDATE }" value="true"
                             value-type="java.lang.Boolean"/>
                     </beans:map>
                 </beans:property>

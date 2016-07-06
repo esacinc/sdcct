@@ -1,11 +1,13 @@
 package gov.hhs.onc.sdcct.fhir.ws.impl;
 
 import com.github.sebhoss.warnings.CompilerWarnings;
+import gov.hhs.onc.sdcct.api.IssueLevel;
 import gov.hhs.onc.sdcct.config.utils.SdcctOptionUtils;
-import gov.hhs.onc.sdcct.fhir.FhirFormException;
+import gov.hhs.onc.sdcct.fhir.FhirException;
 import gov.hhs.onc.sdcct.fhir.FhirFormatType;
 import gov.hhs.onc.sdcct.fhir.IssueType;
 import gov.hhs.onc.sdcct.fhir.OperationOutcomeType;
+import gov.hhs.onc.sdcct.fhir.impl.FhirIssueImpl;
 import gov.hhs.onc.sdcct.fhir.ws.FhirWsQueryParamNames;
 import gov.hhs.onc.sdcct.io.utils.SdcctMediaTypeUtils;
 import gov.hhs.onc.sdcct.transform.content.ContentCodec;
@@ -67,9 +69,11 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
             String formatQueryParamValue = mergedQueryParams.get(FhirWsQueryParamNames.FORMAT);
 
             if (!this.formatQueryParamValues.containsKey(formatQueryParamValue)) {
-                throw new FhirFormException(String.format("Invalid format query parameter (name=%s) value: %s", FhirWsQueryParamNames.FORMAT,
-                    formatQueryParamValue)).setIssueType(IssueType.PROCESSING).setOperationOutcomeArgs(FhirWsQueryParamNames.FORMAT)
-                    .setOperationOutcomeType(OperationOutcomeType.MSG_PARAM_INVALID).setResponseStatus(Status.BAD_REQUEST);
+                throw new FhirException(
+                    String.format("Invalid format query parameter (name=%s) value: %s", FhirWsQueryParamNames.FORMAT, formatQueryParamValue))
+                        .addIssues(
+                            new FhirIssueImpl(IssueLevel.ERROR, IssueType.PROCESSING, OperationOutcomeType.MSG_PARAM_INVALID, FhirWsQueryParamNames.FORMAT))
+                        .setResponseStatus(Status.BAD_REQUEST);
             }
 
             format = this.formatQueryParamValues.get(formatQueryParamValue);
@@ -84,7 +88,7 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
         headers.putSingle(HttpHeaders.CONTENT_TYPE, formatEncMediaTypeValue);
 
         msg.put(Message.CONTENT_TYPE, formatEncMediaTypeValue);
-        msg.put(Message.ENCODING, formatEncMediaType.getCharSet().name());
+        msg.put(Message.ENCODING, formatEncMediaType.getCharset().name());
 
         ContentCodec<?, ?> codec = this.formatCodecs.get(format);
         ContentCodecOptions<?> encodeOpts = codec.getDefaultEncodeOptions().clone();
@@ -97,9 +101,11 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
             try {
                 encodeOpts.setOption(ContentCodecOptions.PRETTY, SdcctOptionUtils.getBooleanValue(FhirWsQueryParamNames.PRETTY, prettyQueryParamValue));
             } catch (IllegalArgumentException e) {
-                throw new FhirFormException(String.format("Invalid pretty query parameter (name=%s) value: %s", FhirWsQueryParamNames.PRETTY,
-                    prettyQueryParamValue), e).setIssueType(IssueType.PROCESSING).setOperationOutcomeArgs(FhirWsQueryParamNames.PRETTY)
-                    .setOperationOutcomeType(OperationOutcomeType.MSG_PARAM_INVALID).setResponseStatus(Status.BAD_REQUEST);
+                throw new FhirException(
+                    String.format("Invalid pretty query parameter (name=%s) value: %s", FhirWsQueryParamNames.PRETTY, prettyQueryParamValue), e)
+                        .addIssues(
+                            new FhirIssueImpl(IssueLevel.ERROR, IssueType.PROCESSING, OperationOutcomeType.MSG_PARAM_INVALID, FhirWsQueryParamNames.PRETTY))
+                        .setResponseStatus(Status.BAD_REQUEST);
             }
         }
 
@@ -108,8 +114,9 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
 
             entityStream.close();
         } catch (Exception e) {
-            throw new FhirFormException(String.format("Unable to encode (mediaType=%s) content object (class=%s).", formatEncMediaTypeValue, obj.getClass()
-                .getName()), e).setIssueType(IssueType.STRUCTURE);
+            throw new FhirException(
+                String.format("Unable to encode (mediaType=%s) content object (class=%s).", formatEncMediaTypeValue, obj.getClass().getName()), e)
+                    .addIssues(new FhirIssueImpl(IssueLevel.ERROR, IssueType.STRUCTURE));
         }
     }
 
@@ -127,8 +134,8 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
 
             return (type.equals(byte[].class) ? type.cast(entityBytes) : codec.decode(entityBytes, type, null));
         } catch (Exception e) {
-            throw new FhirFormException(String.format("Unable to decode (mediaType=%s) content object (class=%s).", mediaType, type.getName()), e)
-                .setIssueType(IssueType.STRUCTURE);
+            throw new FhirException(String.format("Unable to decode (mediaType=%s) content object (class=%s).", mediaType, type.getName()), e)
+                .addIssues(new FhirIssueImpl(IssueLevel.ERROR, IssueType.STRUCTURE));
         }
     }
 
@@ -155,20 +162,19 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
     public void init(List<ClassResourceInfo> classResourceInfos) {
         this.setProduceMediaTypes((this.formatCodecs =
             (this.codecs.stream().collect(SdcctStreamUtils.toMap(ContentCodec::getType, Function.identity(), () -> new LinkedHashMap<>(this.codecs.size()))))
-                .entrySet()
-                .stream()
-                .collect(
-                    SdcctStreamUtils.toMap((Entry<SdcctContentType, ContentCodec<?, ?>> contentTypeEntry) -> SdcctEnumUtils.findByPredicate(
-                        FhirFormatType.class, formatTypeItem -> (formatTypeItem.getContentType() == contentTypeEntry.getKey())), Entry::getValue,
-                        () -> new LinkedHashMap<FhirFormatType, ContentCodec<?, ?>>(this.codecs.size())))).keySet().stream()
-            .map(formatType -> formatType.getEncodedMediaType().toString()).collect(Collectors.toList()));
+                .entrySet().stream()
+                .collect(SdcctStreamUtils.toMap(
+                    (Entry<SdcctContentType, ContentCodec<?, ?>> contentTypeEntry) -> SdcctEnumUtils.findByPredicate(FhirFormatType.class,
+                        formatTypeItem -> (formatTypeItem.getContentType() == contentTypeEntry.getKey())),
+                    Entry::getValue, () -> new LinkedHashMap<FhirFormatType, ContentCodec<?, ?>>(this.codecs.size())))).keySet().stream()
+                        .map(formatType -> formatType.getEncodedMediaType().toString()).collect(Collectors.toList()));
 
         FhirFormatType[] formats = FhirFormatType.values();
 
         this.formatQueryParamValues = new LinkedHashMap<>();
 
-        Stream.of(formats).forEach(
-            format -> format.getQueryParamValues().forEach(formatQueryParamValue -> this.formatQueryParamValues.put(formatQueryParamValue, format)));
+        Stream.of(formats)
+            .forEach(format -> format.getQueryParamValues().forEach(formatQueryParamValue -> this.formatQueryParamValues.put(formatQueryParamValue, format)));
     }
 
     public Map<String, String> getDefaultQueryParameters() {

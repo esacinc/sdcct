@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+    attributeFormDefault="unqualified"
+    elementFormDefault="qualified"
+    targetNamespace="urn:sdcct:core"
+    xmlns:sdcct="urn:sdcct:core"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    
+    <!--====================================================================================================
+    = SIMPLE TYPES
+    =====================================================================================================-->
+    <xsd:simpleType name="NormalizedString">
+        <xsd:restriction base="xsd:string">
+            <xsd:whiteSpace value="collapse"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <xsd:simpleType name="NonNegativeInt">
+        <xsd:restriction base="xsd:int">
+            <xsd:minInclusive value="0"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <xsd:simpleType name="NonNegativeLong">
+        <xsd:restriction base="xsd:long">
+            <xsd:minInclusive value="0"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <xsd:simpleType name="NotBlankString">
+        <xsd:restriction base="sdcct:NormalizedString">
+            <xsd:pattern value=".*[^\s]+.*"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>

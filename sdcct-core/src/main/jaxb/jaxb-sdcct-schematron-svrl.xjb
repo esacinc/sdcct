@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jaxb:bindings
+    jaxb:extensionBindingPrefixes="annox wildcard xjc"
+    jaxb:version="2.0"
+    node="/xsd:schema"
+    schemaLocation="../schema/schematron/svrl.xsd"
+    xmlns:annox="http://annox.dev.java.net"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:wildcard="http://jaxb2-commons.dev.java.net/basic/wildcard"
+    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    
+    <!--====================================================================================================
+    = SCHEMA
+    =====================================================================================================-->
+    <jaxb:schemaBindings>
+        <jaxb:package name="gov.hhs.onc.sdcct.schematron.svrl"/>
+    </jaxb:schemaBindings>
+    
+    <!--====================================================================================================
+    = ELEMENTS
+    =====================================================================================================-->
+    <jaxb:bindings node="xsd:element[@name='failed-assert']">
+        <jaxb:class name="FailedAssertion"/>
+    </jaxb:bindings>
+    
+    <jaxb:bindings node="xsd:element[@name='ns-prefix-in-attribute-values']">
+        <jaxb:class name="AttributeValueNamespace"/>
+    </jaxb:bindings>
+    
+    <jaxb:bindings node="xsd:element[@name='schematron-output']">
+        <jaxb:class name="Output"/>
+        <jaxb:bindings node="xsd:complexType">
+            <jaxb:bindings node="xsd:sequence">
+                <jaxb:property name="content"/>
+            </jaxb:bindings>
+        </jaxb:bindings>
+    </jaxb:bindings>
+ </jaxb:bindings>

@@ -1,2 +1,3 @@
+urn\:sdcct\:core\:sdcct.xsd=META-INF/sdcct/schema/sdcct/sdcct.xsd
 urn\:sdcct\:spring\:sdcct-spring.xsd=META-INF/sdcct/schema/sdcct/sdcct-spring.xsd
 urn\:sdcct\:spring\:xml\:sdcct-spring-xml.xsd=META-INF/sdcct/schema/sdcct/sdcct-spring-xml.xsd

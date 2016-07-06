@@ -3,35 +3,36 @@ package gov.hhs.onc.sdcct.xml.impl;
 import gov.hhs.onc.sdcct.transform.utils.SdcctTransformUtils;
 import javax.annotation.Nullable;
 import javax.xml.transform.Source;
-import net.sf.saxon.dom.DOMNodeWrapper;
+import net.sf.saxon.dom.DocumentOverNodeInfo;
+import net.sf.saxon.dom.NodeOverNodeInfo;
 import net.sf.saxon.expr.parser.Location;
 import net.sf.saxon.s9api.XdmNode;
-import org.w3c.dom.Document;
+import net.sf.saxon.tree.linked.DocumentImpl;
 
 public class XdmDocument extends XdmNode {
-    private Document doc;
+    private DocumentOverNodeInfo doc;
     private Source src;
     private String publicId;
     private String sysId;
     private SdcctDocumentUri docUri;
 
-    public XdmDocument(Source src, DOMNodeWrapper docInfo) {
+    public XdmDocument(Source src, DocumentImpl docInfo) {
         this(src, src.getSystemId(), docInfo);
     }
 
-    public XdmDocument(Source src, @Nullable String sysId, DOMNodeWrapper docInfo) {
+    public XdmDocument(Source src, @Nullable String sysId, DocumentImpl docInfo) {
         this(src, SdcctTransformUtils.getPublicId(src), sysId, null, docInfo);
     }
 
-    public XdmDocument(Source src, @Nullable String sysId, @Nullable SdcctDocumentUri docUri, DOMNodeWrapper docInfo) {
+    public XdmDocument(Source src, @Nullable String sysId, @Nullable SdcctDocumentUri docUri, DocumentImpl docInfo) {
         this(src, SdcctTransformUtils.getPublicId(src), sysId, docUri, docInfo);
     }
 
-    public XdmDocument(Source src, @Nullable String publicId, @Nullable String sysId, @Nullable SdcctDocumentUri docUri, DOMNodeWrapper docInfo) {
+    public XdmDocument(Source src, @Nullable String publicId, @Nullable String sysId, @Nullable SdcctDocumentUri docUri, DocumentImpl docInfo) {
         super(docInfo);
 
         this.src = src;
-        this.doc = ((Document) docInfo.getRealNode());
+        this.doc = ((DocumentOverNodeInfo) NodeOverNodeInfo.wrap(docInfo));
 
         Location docLoc = docInfo.getRoot().saveLocation();
 
@@ -40,7 +41,7 @@ public class XdmDocument extends XdmNode {
         this.docUri = ((docUri != null) ? docUri : ((this.sysId != null) ? new SdcctDocumentUri(this.sysId) : null));
     }
 
-    public Document getDocument() {
+    public DocumentOverNodeInfo getDocument() {
         return this.doc;
     }
 
@@ -53,7 +54,7 @@ public class XdmDocument extends XdmNode {
         return this.docUri;
     }
 
-    public void setDocUri(@Nullable SdcctDocumentUri docUri) {
+    public void setDocumentUri(@Nullable SdcctDocumentUri docUri) {
         this.docUri = docUri;
     }
 
@@ -88,7 +89,7 @@ public class XdmDocument extends XdmNode {
     }
 
     @Override
-    public DOMNodeWrapper getUnderlyingNode() {
-        return ((DOMNodeWrapper) super.getUnderlyingNode());
+    public DocumentImpl getUnderlyingNode() {
+        return ((DocumentImpl) super.getUnderlyingNode());
     }
 }

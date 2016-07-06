@@ -1,13 +1,13 @@
 package gov.hhs.onc.sdcct.xml.jaxb.metadata.impl;
 
+import com.sun.msv.grammar.xmlschema.XMLSchemaTypeExp;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbContextMetadata;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbSchemaMetadata;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbTypeMetadata;
-import java.io.Serializable;
 import javax.annotation.Nullable;
 import javax.xml.namespace.QName;
 
-public abstract class AbstractJaxbTypeMetadata<T extends Serializable, U> extends AbstractJaxbSchemaMetadataComponent<T> implements JaxbTypeMetadata<T, U> {
+public abstract class AbstractJaxbTypeMetadata<T extends XMLSchemaTypeExp, U> extends AbstractJaxbSchemaMetadataComponent<T> implements JaxbTypeMetadata<T, U> {
     protected Class<U> beanClass;
     protected Class<? extends U> beanImplClass;
 

@@ -2,6 +2,7 @@ package gov.hhs.onc.sdcct.data.metadata;
 
 import gov.hhs.onc.sdcct.data.parameter.ResourceParamType;
 import gov.hhs.onc.sdcct.xml.xpath.impl.SdcctXpathExecutable;
+import java.util.Set;
 import javax.annotation.Nullable;
 
 public interface ResourceParamMetadata extends ResourceMetadataComponent {
@@ -33,9 +34,9 @@ public interface ResourceParamMetadata extends ResourceMetadataComponent {
 
     public ResourceParamType getType();
 
-    public String getValueType();
+    public Set<String> getValueTypes();
 
-    public void setValueType(String valueType);
+    public void setValueTypes(Set<String> valueTypes);
 
     public boolean hasXpathExecutable();
 

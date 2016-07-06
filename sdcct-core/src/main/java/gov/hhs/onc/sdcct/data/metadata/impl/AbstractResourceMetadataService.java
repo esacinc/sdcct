@@ -1,14 +1,15 @@
 package gov.hhs.onc.sdcct.data.metadata.impl;
 
+import com.github.sebhoss.warnings.CompilerWarnings;
+import gov.hhs.onc.sdcct.api.SpecificationType;
 import gov.hhs.onc.sdcct.beans.NamedBean;
-import gov.hhs.onc.sdcct.beans.SpecificationType;
 import gov.hhs.onc.sdcct.data.metadata.ResourceMetadata;
 import gov.hhs.onc.sdcct.data.metadata.ResourceMetadataService;
 import gov.hhs.onc.sdcct.data.metadata.ResourceParamMetadata;
 import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
 import gov.hhs.onc.sdcct.xml.jaxb.JaxbContextRepository;
-import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbComplexTypeMetadata;
 import gov.hhs.onc.sdcct.xml.xpath.impl.SdcctXpathCompiler;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -35,6 +36,7 @@ public abstract class AbstractResourceMetadataService<T, U extends ResourceMetad
     protected SpecificationType specType;
     protected ResourceParamMetadata[] baseParamMetadatas;
     protected Map<String, U> metadatas = new TreeMap<>();
+    protected Map<Class<? extends T>, U> beanMetadatas = new TreeMap<>(Comparator.comparing(Class::getName));
 
     private final static Logger LOGGER = LoggerFactory.getLogger(AbstractResourceMetadataService.class);
 
@@ -43,6 +45,7 @@ public abstract class AbstractResourceMetadataService<T, U extends ResourceMetad
     }
 
     @Override
+    @SuppressWarnings({ CompilerWarnings.UNCHECKED })
     public void afterPropertiesSet() throws Exception {
         String id, name, path;
 
@@ -53,6 +56,7 @@ public abstract class AbstractResourceMetadataService<T, U extends ResourceMetad
 
             try {
                 this.metadatas.put(path, this.buildMetadata(id, path, metadata));
+                this.beanMetadatas.put(((Class<? extends T>) metadata.getBeanImplClass()), metadata);
 
                 LOGGER.debug(String.format("Built %s resource type (id=%s, name=%s, path=%s) metadata (params=[%s]).", this.specType, id, name, path,
                     metadata.getParamMetadatas().values().stream().map(NamedBean::getName).collect(Collectors.joining(", "))));
@@ -64,8 +68,6 @@ public abstract class AbstractResourceMetadataService<T, U extends ResourceMetad
     }
 
     protected U buildMetadata(String id, String path, U metadata) throws Exception {
-        metadata.setJaxbTypeMetadata(((JaxbComplexTypeMetadata<?>) this.jaxbContextRepo.findTypeMetadata(metadata.getBeanImplClass())));
-
         metadata.addParamMetadatas(this.baseParamMetadatas);
 
         return metadata;
@@ -79,6 +81,11 @@ public abstract class AbstractResourceMetadataService<T, U extends ResourceMetad
     @Override
     public void setBaseParamMetadatas(ResourceParamMetadata ... baseParamMetadatas) {
         this.baseParamMetadatas = baseParamMetadatas;
+    }
+
+    @Override
+    public Map<Class<? extends T>, U> getBeanMetadatas() {
+        return this.beanMetadatas;
     }
 
     @Override

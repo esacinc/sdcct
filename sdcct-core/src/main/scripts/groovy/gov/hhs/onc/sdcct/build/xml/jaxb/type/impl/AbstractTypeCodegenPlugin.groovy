@@ -5,7 +5,7 @@ import com.sun.codemodel.JCodeModel
 import com.sun.codemodel.JDefinedClass
 import com.sun.codemodel.JMod
 import com.sun.tools.xjc.Options
-import gov.hhs.onc.sdcct.beans.SpecificationType
+import gov.hhs.onc.sdcct.api.SpecificationType
 import gov.hhs.onc.sdcct.beans.TypeBean
 import gov.hhs.onc.sdcct.build.xml.jaxb.impl.AbstractCodegenPlugin
 import gov.hhs.onc.sdcct.build.xml.jaxb.impl.CodegenSchemaContext

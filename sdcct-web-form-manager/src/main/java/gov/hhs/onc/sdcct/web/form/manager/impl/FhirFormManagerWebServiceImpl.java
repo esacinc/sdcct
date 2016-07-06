@@ -1,10 +1,12 @@
 package gov.hhs.onc.sdcct.web.form.manager.impl;
 
+import gov.hhs.onc.sdcct.api.IssueLevel;
 import gov.hhs.onc.sdcct.fhir.Bundle;
-import gov.hhs.onc.sdcct.fhir.FhirFormException;
+import gov.hhs.onc.sdcct.fhir.FhirException;
 import gov.hhs.onc.sdcct.fhir.IssueType;
 import gov.hhs.onc.sdcct.fhir.OperationOutcomeType;
 import gov.hhs.onc.sdcct.fhir.Questionnaire;
+import gov.hhs.onc.sdcct.fhir.impl.FhirIssueImpl;
 import gov.hhs.onc.sdcct.fhir.ws.impl.AbstractFhirFormWebService;
 import gov.hhs.onc.sdcct.form.manager.FormManager;
 import gov.hhs.onc.sdcct.web.form.manager.FhirFormManagerWebService;
@@ -30,15 +32,18 @@ public class FhirFormManagerWebServiceImpl extends AbstractFhirFormWebService<Fo
             Questionnaire questionnaire = this.service.findQuestionnaire(questionnaireId);
 
             if (questionnaire == null) {
-                throw new FhirFormException(String.format("Questionnaire (id=%s) is unavailable.", questionnaireId)).setIssueType(IssueType.NOT_FOUND)
-                    .setOperationOutcomeArgs(questionnaireId).setOperationOutcomeType(OperationOutcomeType.MSG_NO_EXIST).setResponseStatus(Status.NOT_FOUND);
+                throw new FhirException(String.format("Questionnaire (id=%s) is unavailable.", questionnaireId))
+                    .addIssues(new FhirIssueImpl(IssueLevel.ERROR, IssueType.NOT_FOUND, OperationOutcomeType.MSG_NO_EXIST, questionnaireId))
+                    .setResponseStatus(Status.NOT_FOUND);
             }
 
             return questionnaire;
-        } catch (FhirFormException e) {
+        } catch (FhirException e) {
             throw e;
         } catch (Exception e) {
-            throw new FhirFormException(String.format("Unable to retrieve questionnaire (id=%s)", questionnaireId)).setIssueType(IssueType.NOT_FOUND);
+            throw new FhirException(String.format("Unable to retrieve questionnaire (id=%s)", questionnaireId))
+                .addIssues(new FhirIssueImpl(IssueLevel.ERROR, IssueType.NOT_FOUND, OperationOutcomeType.MSG_NO_EXIST, questionnaireId))
+                .setResponseStatus(Status.NOT_FOUND);
         }
     }
 }

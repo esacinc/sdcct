@@ -67,7 +67,7 @@ abstract class AbstractCodegenNameConverter implements CodegenNameConverter {
     String toConstantName(String token) {
         String constName = smart.toConstantName(token)
         
-        return (Character.isDigit(constName.toCharArray()[0]) ? (SdcctStringUtils.UNDERSCORE + constName) : constName)
+        return ((!constName.isEmpty() && Character.isDigit(constName.toCharArray()[0])) ? (SdcctStringUtils.UNDERSCORE + constName) : constName)
     }
     
     @Override

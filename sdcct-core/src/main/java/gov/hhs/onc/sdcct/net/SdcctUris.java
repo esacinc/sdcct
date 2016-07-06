@@ -12,6 +12,7 @@ public final class SdcctUris {
     public final static String UUID_URN_NID = "uuid";
 
     public final static String HTTP_URL_PREFIX = SdcctSchemes.HTTP + SdcctUriUtils.HIERARCHICAL_DELIM;
+    public final static String SCHEMATRON_URL_PREFIX = HTTP_URL_PREFIX + "purl.oclc.org/dsdl/";
 
     public final static String URN_PREFIX = SdcctSchemes.URN + SdcctStringUtils.COLON;
     public final static String IETF_URN_PREFIX = URN_PREFIX + IETF_URN_NID + SdcctStringUtils.COLON;
@@ -37,6 +38,16 @@ public final class SdcctUris {
     public final static String IHE_ITI_RFD_URN_NSS = "iti:rfd:2007";
     public final static String IHE_ITI_RFD_URN_VALUE = IHE_URN_PREFIX + IHE_ITI_RFD_URN_NSS;
     public final static URI IHE_ITI_RFD_URN = URI.create(IHE_ITI_RFD_URN_VALUE);
+
+    public final static String SCHEMATRON_URL_VALUE = SCHEMATRON_URL_PREFIX + "schematron";
+    public final static URI SCHEMATRON_URL = URI.create(SCHEMATRON_URL_VALUE);
+
+    public final static String SCHEMATRON_SVRL_URL_VALUE = SCHEMATRON_URL_PREFIX + "svrl";
+    public final static URI SCHEMATRON_SVRL_URL = URI.create(SCHEMATRON_SVRL_URL_VALUE);
+
+    public final static String SDCCT_CORE_URN_NSS = "core";
+    public final static String SDCCT_CORE_URN_VALUE = SDCCT_URN_PREFIX + SDCCT_CORE_URN_NSS;
+    public final static URI SDCCT_CORE_URN = URI.create(SDCCT_CORE_URN_VALUE);
 
     public final static String SDCCT_JAXB_URN_NSS = "jaxb";
     public final static String SDCCT_JAXB_URN_VALUE = SDCCT_URN_PREFIX + SDCCT_JAXB_URN_NSS;

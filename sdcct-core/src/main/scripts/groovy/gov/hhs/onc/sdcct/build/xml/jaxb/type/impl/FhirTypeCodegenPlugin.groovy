@@ -7,7 +7,7 @@ import com.sun.tools.xjc.model.Model
 import com.sun.tools.xjc.outline.Outline
 import com.sun.xml.xsom.XSSchemaSet
 import gov.hhs.onc.sdcct.SdcctPackages
-import gov.hhs.onc.sdcct.beans.SpecificationType
+import gov.hhs.onc.sdcct.api.SpecificationType
 import gov.hhs.onc.sdcct.build.xml.jaxb.impl.CodegenSchemaContext
 import gov.hhs.onc.sdcct.build.xml.jaxb.naming.impl.CompositeNameConverter
 import gov.hhs.onc.sdcct.build.xml.jaxb.naming.impl.CompositeNameConverter.DefaultCodegenNameConverter
@@ -96,7 +96,7 @@ class FhirTypeCodegenPlugin extends AbstractTypeCodegenPlugin {
             
             typeId = SdcctFhirCodegenUtils.buildId(typeElem)
             
-            this.types[typeId] = type = new TypeCodegenModel(typeElem, (((typeKind == CodegenTypeKind.DATATYPE) &&
+            this.types[typeId] = type = new TypeCodegenModel(typeElem, (((typeKind == CodegenTypeKind.COMPLEX) &&
                 Character.isLowerCase(typeId.toCharArray()[0])) ? CodegenTypeKind.PRIMITIVE : typeKind), typeId)
             
             this.normalizedTypes[SdcctCodegenUtils.buildNormalizedId(typeId)] = type

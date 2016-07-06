@@ -29,7 +29,7 @@ public class JaxbContextRepositoryImpl implements JaxbContextRepository {
     @Override
     @SuppressWarnings({ CompilerWarnings.UNCHECKED })
     public <T> Object buildSource(JaxbTypeMetadata<?, ?> srcTypeMetadata, T src) throws JAXBException {
-        JaxbElementMetadata<?> srcElemMetadata = findElementMetadata(srcTypeMetadata.getContext(), srcTypeMetadata.getName());
+        JaxbElementMetadata<?> srcElemMetadata = this.findElementMetadata(srcTypeMetadata);
 
         // noinspection ConstantConditions
         return ((srcElemMetadata != null)
@@ -86,6 +86,22 @@ public class JaxbContextRepositoryImpl implements JaxbContextRepository {
         return unmarshaller;
     }
 
+    @Nullable
+    @Override
+    @SuppressWarnings({ CompilerWarnings.UNCHECKED })
+    public <T> JaxbElementMetadata<T> findElementMetadata(JaxbTypeMetadata<?, ?> typeMetadata) {
+        String typeName = typeMetadata.getName();
+        Map<String, String> schemaElemTypeNames;
+
+        for (JaxbSchemaMetadata schemaMetadata : typeMetadata.getContext().getSchemas().values()) {
+            if ((schemaElemTypeNames = schemaMetadata.getElementTypeNames()).containsKey(typeName)) {
+                return ((JaxbElementMetadata<T>) schemaMetadata.getElementNames().get(schemaElemTypeNames.get(typeName)));
+            }
+        }
+
+        return null;
+    }
+
     @Override
     public JaxbTypeMetadata<?, ?> findTypeMetadata(Class<?> beanImplClass) throws JAXBException {
         Map<Class<?>, JaxbTypeMetadata<?, ?>> schemaTypeBeanClassMetadatas;
@@ -98,21 +114,13 @@ public class JaxbContextRepositoryImpl implements JaxbContextRepository {
             }
         }
 
-        throw new JAXBException(String.format("Unable to find JAXB context for bean implementation class (name=%s).", beanImplClass.getName()));
+        throw new JAXBException(String.format("Unable to find JAXB type (beanImplClass=%s) metadata.", beanImplClass.getName()));
     }
 
-    @Nullable
-    @SuppressWarnings({ CompilerWarnings.UNCHECKED })
-    private static <T> JaxbElementMetadata<T> findElementMetadata(JaxbContextMetadata contextMetadata, String typeName) {
-        Map<String, String> schemaElemTypeNames;
-
-        for (JaxbSchemaMetadata schemaMetadata : contextMetadata.getSchemas().values()) {
-            if ((schemaElemTypeNames = schemaMetadata.getElementTypeNames()).containsKey(typeName)) {
-                return ((JaxbElementMetadata<T>) schemaMetadata.getElementNames().get(schemaElemTypeNames.get(typeName)));
-            }
-        }
-
-        return null;
+    @Override
+    public JaxbContextMetadata findContextMetadata(String schemaNsUri) throws JAXBException {
+        return this.contextMetadatas.values().stream().filter(contextMetadata -> contextMetadata.getSchemas().containsKey(schemaNsUri)).findFirst()
+            .orElseThrow(() -> new JAXBException(String.format("Unable to find JAXB schema (nsUri=%s) context metadata.", schemaNsUri)));
     }
 
     @Override

@@ -17,11 +17,12 @@ import javax.annotation.Resource;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-@Test(dependsOnGroups = { "sdcct.test.unit.utils.all", "sdcct.test.unit.xml.all" }, groups = { "sdcct.test.unit.data.all", "sdcct.test.unit.data.db" })
+@Test(dependsOnGroups = { "sdcct.test.unit.utils.all", "sdcct.test.unit.transform.all", "sdcct.test.unit.validate.all" },
+    groups = { "sdcct.test.unit.data.all", "sdcct.test.unit.data.db" })
 public class DbUnitTests extends AbstractSdcctUnitTests {
-    private final static String NEW_TEST_FORM_IDENTIFIER = "sdcct-test-form-new";
+    private final static String NEW_TEST_FORM_IDENTIFIER = "fhir_test_new";
 
-    @Resource(name = "formFhirTest1")
+    @Resource(name = "formFhir1a")
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
     private FhirForm testForm;
 
@@ -39,7 +40,7 @@ public class DbUnitTests extends AbstractSdcctUnitTests {
             this.registry.buildCriteria(SdcctCriterionUtils.matchParam(DbPropertyNames.TOKEN_PARAMS, ResourceParamNames.IDENTIFIER, NEW_TEST_FORM_IDENTIFIER)));
 
         Assert.assertFalse(
-            this.registry.exists(this.registry.buildCriteria(SdcctCriterionUtils.<FhirResource>matchDeleted().not(),
+            this.registry.exists(this.registry.buildCriteria(SdcctCriterionUtils.<FhirResource> matchDeleted().not(),
                 SdcctCriterionUtils.matchParam(DbPropertyNames.TOKEN_PARAMS, ResourceParamNames.IDENTIFIER, NEW_TEST_FORM_IDENTIFIER))),
             String.format("New test form (identifier=%s) still exists.", NEW_TEST_FORM_IDENTIFIER));
     }

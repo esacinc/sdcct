@@ -8,7 +8,7 @@ import com.sun.tools.xjc.Plugin
 import com.sun.tools.xjc.model.Model
 import com.sun.tools.xjc.outline.Outline
 import com.sun.xml.xsom.XSSchemaSet
-import gov.hhs.onc.sdcct.beans.SpecificationType
+import gov.hhs.onc.sdcct.api.SpecificationType
 import gov.hhs.onc.sdcct.beans.NamedBean
 import gov.hhs.onc.sdcct.build.xml.jaxb.CodegenException
 import gov.hhs.onc.sdcct.build.xml.jaxb.utils.SdcctCodegenUtils

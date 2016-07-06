@@ -6,19 +6,43 @@ import gov.hhs.onc.sdcct.transform.content.impl.AbstractContentCodec;
 import gov.hhs.onc.sdcct.transform.impl.ByteArrayResult;
 import gov.hhs.onc.sdcct.transform.impl.ByteArraySource;
 import gov.hhs.onc.sdcct.transform.impl.SdcctConfiguration;
+import gov.hhs.onc.sdcct.transform.impl.SdcctPipelineConfiguration;
 import gov.hhs.onc.sdcct.xml.XmlDecodeOptions;
 import gov.hhs.onc.sdcct.xml.XmlEncodeOptions;
 import gov.hhs.onc.sdcct.xml.jaxb.JaxbContextRepository;
-import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbTypeMetadata;
+import java.util.NoSuchElementException;
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
-import org.codehaus.stax2.XMLStreamWriter2;
-import org.codehaus.stax2.ri.Stax2WriterAdapter;
+import net.sf.saxon.evpull.Decomposer;
+import net.sf.saxon.evpull.EventToStaxBridge;
+import net.sf.saxon.om.NodeInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class XmlCodec extends AbstractContentCodec<XmlDecodeOptions, XmlEncodeOptions> {
+    /**
+     * Workaround for the fact that the {@link com.sun.xml.bind.v2.runtime.unmarshaller.StAXStreamConnector#bridge JAXB Unmarshaller StAX bridging} calls
+     * {@link XMLStreamReader#next()} an extra time.
+     */
+    private static class UnmarshallingXmlStreamReader extends EventToStaxBridge {
+        public UnmarshallingXmlStreamReader(NodeInfo srcNodeInfo, SdcctPipelineConfiguration pipelineConfig) {
+            super(new Decomposer(srcNodeInfo, pipelineConfig), pipelineConfig);
+        }
+
+        @Override
+        public int next() throws XMLStreamException {
+            try {
+                return super.next();
+            } catch (NoSuchElementException ignored) {
+                return -1;
+            }
+        }
+    }
+
     @Autowired
     private JaxbContextRepository jaxbContextRepo;
 
@@ -45,18 +69,14 @@ public class XmlCodec extends AbstractContentCodec<XmlDecodeOptions, XmlEncodeOp
 
     public <T extends Result> T encode(Object src, T result, @Nullable XmlEncodeOptions opts) throws Exception {
         // noinspection ConstantConditions
-        XMLStreamWriter2 resultWriter = Stax2WriterAdapter.wrapIfNecessary(
+        XMLStreamWriter resultWriter =
             ((opts = this.defaultEncodeOpts.clone().merge(opts)).getOption(ContentCodecOptions.PRETTY) ? this.prettySerializer : this.serializer)
-                .getXMLStreamWriter(this.config, this.config.makePipelineConfiguration(), result, opts.getParseOptions(), opts.getOutputProperties()));
-        JaxbTypeMetadata<?, ?> srcTypeMetadata = this.jaxbContextRepo.findTypeMetadata(src.getClass());
+                .getXMLStreamWriter(this.config, this.config.makePipelineConfiguration(), result, opts.getParseOptions(), opts.getOutputProperties());
 
-        // noinspection ConstantConditions
-        if (opts.getOption(ContentCodecOptions.VALIDATE)) {
-            // TODO: validate
-        }
+        this.jaxbContextRepo.buildMarshaller(src, null).marshal(this.jaxbContextRepo.buildSource(this.jaxbContextRepo.findTypeMetadata(src.getClass()), src),
+            resultWriter);
 
-        this.jaxbContextRepo.buildMarshaller(src, null).marshal(this.jaxbContextRepo.buildSource(srcTypeMetadata, src), resultWriter);
-
+        resultWriter.flush();
         resultWriter.close();
 
         return result;
@@ -78,11 +98,10 @@ public class XmlCodec extends AbstractContentCodec<XmlDecodeOptions, XmlEncodeOp
     }
 
     public <T> T decode(Source src, Class<T> resultClass, @Nullable XmlDecodeOptions opts) throws Exception {
-        // noinspection ConstantConditions
-        if ((opts = this.defaultDecodeOpts.clone().merge(opts)).getOption(ContentCodecOptions.VALIDATE)) {
-            // TODO: validate
-        }
-
-        return this.jaxbContextRepo.buildUnmarshaller(resultClass, null).unmarshal(this.xmlInFactory.createXMLStreamReader(src), resultClass).getValue();
+        return this.jaxbContextRepo.buildUnmarshaller(resultClass, null)
+            .unmarshal(((src instanceof NodeInfo)
+                ? new UnmarshallingXmlStreamReader(((NodeInfo) src), this.config.makePipelineConfiguration()) : this.xmlInFactory.createXMLStreamReader(src)),
+                resultClass)
+            .getValue();
     }
 }
