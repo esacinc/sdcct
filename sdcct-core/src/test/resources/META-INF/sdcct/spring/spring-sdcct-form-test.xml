@@ -15,47 +15,49 @@
     = FORMS
     =====================================================================================================-->
     <!--suppress SpringPlaceholdersInspection -->
-    <beans:bean id="formFhirTestInvalidXml" parent="formFhir"
+    <beans:bean id="formFhirTestBadCharsXml" parent="formFhir" autowire-candidate="false"
+        c:name="fhir_test_bad_chars_xml"
+        c:src="classpath*:${sdcct.data.form.src.dir.path}/sdcct/fhir_test_bad_chars_xml.xml"/>
+    
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="formFhirTestInvalidXml" parent="formFhir" autowire-candidate="false"
         c:name="fhir_test_invalid_xml"
         c:src="classpath*:${sdcct.data.form.src.dir.path}/sdcct/fhir_test_invalid_xml.xml"/>
     
-    <!--
-    <beans:bean id="formFhirTestMalformedXml" parent="formFhir"
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="formFhirTestMalformedXml" parent="formFhir" autowire-candidate="false"
         c:name="fhir_test_malformed_xml"
         c:src="classpath*:${sdcct.data.form.src.dir.path}/sdcct/fhir_test_malformed_xml.xml"/>
-    -->
     
     <!--suppress SpringPlaceholdersInspection -->
-    <beans:bean id="formRfdTestInvalidXml" parent="formRfd"
+    <beans:bean id="formRfdTestInvalidXml" parent="formRfd" autowire-candidate="false"
         c:name="rfd_test_invalid_xml"
         c:src="classpath*:${sdcct.data.form.src.dir.path}/sdcct/rfd_test_invalid_xml.xml"/>
     
-    <!-- TODO: Re-enable once SDC CAP example forms are fixed. -->
-    <!--
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="formRfdTestSchematron" parent="formRfd" autowire-candidate="false"
+        c:name="rfd_test_schematron"
+        c:src="classpath*:${sdcct.data.form.src.dir.path}/sdcct/rfd_test_schematron.xml"/>
+    
+    <!--suppress SpringPlaceholdersInspection -->
     <beans:bean id="formRfdTestSdcCapAdrenal" parent="formRfd"
         c:name="rfd_test_sdc_cap_adrenal"
         c:src="classpath*:${sdcct.data.form.src.dir.path}/sdc/CAP_Adrenal.xml"
         p:identifier="129.1000043"
         p:internal="true"/>
     
+    <!--suppress SpringPlaceholdersInspection -->
     <beans:bean id="formRfdTestSdcCapBreastBmk" parent="formRfd"
         c:name="rfd_test_sdc_cap_breast_bmk"
-        c:src="classpath*:${sdcct.data.form.src.dir.path}/sdc/CAP_Breast BMK.xml"
+        c:src="classpath*:${sdcct.data.form.src.dir.path}/sdc/CAP_Breast_BMK.xml"
         p:identifier="169.1000043"
         p:internal="true"/>
     
+    <!--suppress SpringPlaceholdersInspection -->
     <beans:bean id="formRfdTestSdcCapBreastRes" parent="formRfd"
         c:name="rfd_test_sdc_cap_breast_res"
-        c:src="classpath*:${sdcct.data.form.src.dir.path}/sdc/CAP_Breast Res.xml"
+        c:src="classpath*:${sdcct.data.form.src.dir.path}/sdc/CAP_Breast_Res.xml"
         p:identifier="189.1000043"
-        p:internal="true"/>
-    -->
-    
-    <!--suppress SpringPlaceholdersInspection -->
-    <beans:bean id="formRfdTestSdcAdrenal" parent="formRfd"
-        c:name="rfd_test_sdc_adrenal"
-        c:src="classpath*:${sdcct.data.form.src.dir.path}/sdc/SDC_Adrenal.xml"
-        p:identifier="129.1000043"
         p:internal="true"/>
     
     <!--suppress SpringPlaceholdersInspection -->

@@ -41,9 +41,8 @@ public class SdcctXpathExecutable extends XPathExecutable {
     public SdcctXpathSelector load(@Nullable DynamicXpathOptions dynamicOpts) {
         XPathExpression expr = this.getUnderlyingExpression();
         IndependentContext staticContext = this.getUnderlyingStaticContext();
-        Map<StructuredQName, XPathVariable> declaredVars =
-            SdcctIteratorUtils.stream(staticContext.iterateExternalVariables()).collect(
-                SdcctStreamUtils.toMap(XPathVariable::getVariableQName, Function.identity(), LinkedHashMap::new));
+        Map<StructuredQName, XPathVariable> declaredVars = SdcctIteratorUtils.stream(staticContext.iterateExternalVariables())
+            .collect(SdcctStreamUtils.toMap(XPathVariable::getVariableQName, Function.identity(), LinkedHashMap::new));
         boolean staticOptsAvailable = (this.staticOpts != null), dynamicOptsAvailable = (dynamicOpts != null);
         SdcctController controller = new SdcctController(this.proc.getUnderlyingConfiguration());
 
@@ -54,8 +53,7 @@ public class SdcctXpathExecutable extends XPathExecutable {
         try {
             // noinspection ConstantConditions
             XPathDynamicContext dynamicContext =
-                expr.createDynamicContext(controller, ((dynamicOptsAvailable && dynamicOpts.hasContextNode()) ? dynamicOpts.getContextNode()
-                    .getUnderlyingNode() : null));
+                expr.createDynamicContext(controller, ((dynamicOptsAvailable && dynamicOpts.hasContextItem()) ? dynamicOpts.getContextItem() : null));
             SdcctXpathSelector selector = new SdcctXpathSelector(expr, this.staticOpts, dynamicOpts, dynamicContext, declaredVars);
 
             Map<QName, XdmValue> vars = new LinkedHashMap<>();

@@ -6,11 +6,11 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import net.sf.saxon.functions.FunctionLibraryList;
 import net.sf.saxon.functions.IntegratedFunctionLibrary;
+import net.sf.saxon.om.Item;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XPathCompiler;
 import net.sf.saxon.s9api.XdmItem;
-import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
 import net.sf.saxon.sxpath.IndependentContext;
 import net.sf.saxon.sxpath.XPathEvaluator;
@@ -27,13 +27,15 @@ public class SdcctXpathCompiler extends XPathCompiler {
 
     @Override
     public XdmValue evaluate(String exprStr, @Nullable XdmItem contextItem) throws SaxonApiException {
-        return this.compile(exprStr).load(new DynamicXpathOptionsImpl().setContextNode(((XdmNode) contextItem))).evaluate();
+        // noinspection ConstantConditions
+        return this.compile(exprStr).load(new DynamicXpathOptionsImpl().setContextItem(((Item) contextItem.getUnderlyingValue()))).evaluate();
     }
 
     @Nullable
     @Override
     public XdmItem evaluateSingle(String exprStr, @Nullable XdmItem contextItem) throws SaxonApiException {
-        return this.compile(exprStr).load(new DynamicXpathOptionsImpl().setContextNode(((XdmNode) contextItem))).evaluateSingle();
+        // noinspection ConstantConditions
+        return this.compile(exprStr).load(new DynamicXpathOptionsImpl().setContextItem(((Item) contextItem.getUnderlyingValue()))).evaluateSingle();
     }
 
     @Override

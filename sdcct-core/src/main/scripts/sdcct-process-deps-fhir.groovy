@@ -54,7 +54,8 @@ final String[] FHIR_SDC_SCHEMATRON_FILE_NAMES = [
 ]
 
 String fhirVersion = project.properties.getProperty("project.build.fhirVersion"),
-    fhirSiteUrlPrefix = project.properties.getProperty("project.build.fhirSiteUrlPrefix"), fhirSiteSdcUrlPrefix = "${fhirSiteUrlPrefix}/sdc"
+    fhirImplGuideSiteUrlPrefix = project.properties.getProperty("project.build.fhirImplGuideSiteUrlPrefix"),
+    fhirSiteUrlPrefix = project.properties.getProperty("project.build.fhirSiteUrlPrefix"), fhirSdcSiteUrlPrefix = "${fhirImplGuideSiteUrlPrefix}/sdc"
 Artifact fhirXmlDefsArchiveFileArtifact = new DefaultArtifact(FHIR_GROUP_ID, "definitions-xml", fhirVersion, Artifact.SCOPE_COMPILE,
     SdcctFileNameExtensions.ZIP, StringUtils.EMPTY, new DefaultArtifactHandler()), fhirXsdArchiveFileArtifact = new DefaultArtifact(FHIR_GROUP_ID, "xsd",
     fhirVersion, Artifact.SCOPE_COMPILE, SdcctFileNameExtensions.ZIP, StringUtils.EMPTY, new DefaultArtifactHandler()),
@@ -119,11 +120,11 @@ ant.unzip(src: fhirXsdArchiveFile, dest: fhirSchematronDir) {
 
 if (!fhirSdcArchiveLocalRepoFile.exists()) {
     ant.get(dest: fhirDataDir) {
-        FHIR_SDC_DATA_FILE_NAMES.collect{ ant.url(url: "${fhirSiteSdcUrlPrefix}/${it}") }
+        FHIR_SDC_DATA_FILE_NAMES.collect{ ant.url(url: "${fhirSdcSiteUrlPrefix}/${it}") }
     }
     
     ant.get(dest: fhirSchematronDir) {
-        FHIR_SDC_SCHEMATRON_FILE_NAMES.collect{ ant.url(url: "${fhirSiteSdcUrlPrefix}/${it}") }
+        FHIR_SDC_SCHEMATRON_FILE_NAMES.collect{ ant.url(url: "${fhirSdcSiteUrlPrefix}/${it}") }
     }
     
     ant.zip(destfile: fhirSdcArchiveDepsFile) {

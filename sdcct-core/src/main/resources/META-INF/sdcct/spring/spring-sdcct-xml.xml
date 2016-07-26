@@ -14,19 +14,43 @@
     <!--====================================================================================================
     = XML RESOLVERS
     =====================================================================================================-->
-    <beans:bean id="xmlResolver" class="gov.hhs.onc.sdcct.xml.impl.CompositeXmlResolver"
+    <beans:bean id="xmlResolver" class="gov.hhs.onc.sdcct.xml.impl.SdcctXmlResolverImpl"
+        c:resolve="false"
         c:resourceSrcResolver-ref="resourceSrcResolver"/>
     
     <!--====================================================================================================
     = XML INPUT FACTORIES
     =====================================================================================================-->
-    <beans:bean id="xmlInFactory" class="gov.hhs.onc.sdcct.xml.impl.SdcctXmlInputFactory"
-        p:XMLResolver-ref="xmlResolver">
+    <beans:bean id="xmlInFactory" class="gov.hhs.onc.sdcct.xml.impl.SdcctXmlInputFactory">
         <beans:property name="properties">
             <beans:map>
                 <beans:entry key="#{ T(javax.xml.stream.XMLInputFactory).IS_REPLACING_ENTITY_REFERENCES }" value="false" value-type="java.lang.Boolean"/>
                 <beans:entry key="#{ T(javax.xml.stream.XMLInputFactory).IS_SUPPORTING_EXTERNAL_ENTITIES }" value="false" value-type="java.lang.Boolean"/>
                 <beans:entry key="#{ T(com.ctc.wstx.api.WstxInputProperties).P_CACHE_DTDS }" value="false" value-type="java.lang.Boolean"/>
+                <!--suppress SpringPlaceholdersInspection -->
+                <beans:entry key="#{ T(com.ctc.wstx.api.WstxInputProperties).P_INPUT_BUFFER_LENGTH }" value="${sdcct.xml.input.buffer.size}"
+                    value-type="java.lang.Integer"/>
+                <!--suppress SpringPlaceholdersInspection -->
+                <beans:entry key="#{ T(com.ctc.wstx.api.WstxInputProperties).P_MAX_ATTRIBUTES_PER_ELEMENT }" value="${sdcct.xml.input.elem.attr.max}"
+                    value-type="java.lang.Integer"/>
+                <!--suppress SpringPlaceholdersInspection -->
+                <beans:entry key="#{ T(com.ctc.wstx.api.WstxInputProperties).P_MAX_ATTRIBUTE_SIZE }" value="${sdcct.xml.input.attr.size.max}"
+                    value-type="java.lang.Integer"/>
+                <!--suppress SpringPlaceholdersInspection -->
+                <beans:entry key="#{ T(com.ctc.wstx.api.WstxInputProperties).P_MAX_CHARACTERS }" value="${sdcct.xml.input.char.max}"
+                    value-type="java.lang.Long"/>
+                <!--suppress SpringPlaceholdersInspection -->
+                <beans:entry key="#{ T(com.ctc.wstx.api.WstxInputProperties).P_MAX_CHILDREN_PER_ELEMENT }" value="${sdcct.xml.input.elem.child.max}"
+                    value-type="java.lang.Integer"/>
+                <!--suppress SpringPlaceholdersInspection -->
+                <beans:entry key="#{ T(com.ctc.wstx.api.WstxInputProperties).P_MAX_ELEMENT_COUNT }" value="${sdcct.xml.input.elem.max}"
+                    value-type="java.lang.Long"/>
+                <!--suppress SpringPlaceholdersInspection -->
+                <beans:entry key="#{ T(com.ctc.wstx.api.WstxInputProperties).P_MAX_ELEMENT_DEPTH }" value="${sdcct.xml.input.elem.depth.max}"
+                    value-type="java.lang.Integer"/>
+                <!--suppress SpringPlaceholdersInspection -->
+                <beans:entry key="#{ T(com.ctc.wstx.api.WstxInputProperties).P_MAX_TEXT_LENGTH }" value="${sdcct.xml.input.text.size.max}"
+                    value-type="java.lang.Integer"/>
                 <beans:entry key="#{ T(javax.xml.stream.XMLInputFactory).SUPPORT_DTD }" value="false" value-type="java.lang.Boolean"/>
                 <beans:entry key="#{ T(org.codehaus.stax2.XMLStreamProperties).XSP_SUPPORT_XMLID }"
                     value="#{ T(org.codehaus.stax2.XMLStreamProperties).XSP_V_XMLID_FULL }"/>
@@ -49,6 +73,8 @@
                 <beans:entry key="#{ T(com.ctc.wstx.api.WstxOutputProperties).P_USE_DOUBLE_QUOTES_IN_XML_DECL }" value="true" value-type="java.lang.Boolean"/>
                 <beans:entry key="#{ T(org.codehaus.stax2.XMLStreamProperties).XSP_SUPPORT_XMLID }"
                     value="#{ T(org.codehaus.stax2.XMLStreamProperties).XSP_V_XMLID_FULL }"/>
+                <beans:entry key="#{ T(com.ctc.wstx.api.WstxOutputProperties).P_OUTPUT_VALIDATE_ATTR }" value="true" value-type="java.lang.Boolean"/>
+                <beans:entry key="#{ T(com.ctc.wstx.api.WstxOutputProperties).P_OUTPUT_VALIDATE_NAMES }" value="true" value-type="java.lang.Boolean"/>
             </beans:map>
         </beans:property>
     </beans:bean>
@@ -79,6 +105,16 @@
             </beans:map>
         </beans:property>
     </beans:bean>
+    
+    <!--====================================================================================================
+    = XPATH COMPILERS
+    =====================================================================================================-->
+    <beans:bean id="xpathCompiler" factory-bean="processor" factory-method="newXPathCompiler"/>
+    
+    <!--====================================================================================================
+    = XSLT COMPILERS
+    =====================================================================================================-->
+    <beans:bean id="xsltCompiler" factory-bean="processor" factory-method="newXsltCompiler"/>
     
     <!--====================================================================================================
     = CONTENT CODECS

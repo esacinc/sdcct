@@ -37,7 +37,7 @@ import java.util.stream.Stream.Builder;
 import net.sf.saxon.s9api.XdmAtomicValue;
 import net.sf.saxon.s9api.XdmItem;
 import net.sf.saxon.s9api.XdmNode;
-import net.sf.saxon.tree.util.Navigator;
+import net.sf.saxon.tree.linked.ElementImpl;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.collections4.keyvalue.MultiKey;
@@ -134,6 +134,7 @@ public abstract class AbstractResourceParamProcessor<T, U extends ResourceMetada
     }
 
     protected void processResourceParams(String type, U resourceMetadata, XdmDocument contentDoc, V entity) throws Exception {
+        ElementImpl contentDocElem = contentDoc.getDocumentElement();
         Map<String, ResourceParamMetadata> resourceParamMetadatas = resourceMetadata.getParamMetadatas();
         Map<MultiKey<Serializable>, ResourceParam<?>> existingResourceParams = mapExistingResourceParams(entity), resourceParams = new LinkedHashMap<>();
         ResourceParamMetadata resourceParamMetadata;
@@ -142,9 +143,8 @@ public abstract class AbstractResourceParamProcessor<T, U extends ResourceMetada
         for (String resourceParamName : resourceParamMetadatas.keySet()) {
             // noinspection ConstantConditions
             if ((resourceParamMetadata = resourceParamMetadatas.get(resourceParamName)).isInline() || !resourceParamMetadata.hasXpathExecutable() ||
-                (resourceParamItems = resourceParamMetadata.getXpathExecutable()
-                    .load(new DynamicXpathOptionsImpl().setContextNode(new XdmNode(Navigator.getOutermostElement(contentDoc.getUnderlyingNode()))))
-                    .evaluateItems()).isEmpty()) {
+                (resourceParamItems =
+                    resourceParamMetadata.getXpathExecutable().load(new DynamicXpathOptionsImpl().setContextItem(contentDocElem)).evaluateItems()).isEmpty()) {
                 continue;
             }
 

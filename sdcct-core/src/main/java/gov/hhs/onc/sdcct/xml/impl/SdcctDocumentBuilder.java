@@ -1,10 +1,11 @@
 package gov.hhs.onc.sdcct.xml.impl;
 
 import gov.hhs.onc.sdcct.transform.impl.SdcctConfiguration;
+import gov.hhs.onc.sdcct.transform.impl.SdcctPullSource;
+import gov.hhs.onc.sdcct.transform.utils.SdcctTransformUtils;
 import java.io.File;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
-import javax.xml.transform.stax.StAXSource;
 import javax.xml.transform.stream.StreamSource;
 import net.sf.saxon.s9api.DocumentBuilder;
 import net.sf.saxon.s9api.SaxonApiException;
@@ -40,7 +41,7 @@ public class SdcctDocumentBuilder extends DocumentBuilder {
 
         if (src instanceof StreamSource) {
             try {
-                buildSrc = new StAXSource(this.xmlInFactory.createXMLStreamReader(src));
+                buildSrc = new SdcctPullSource(SdcctTransformUtils.getPublicId(src), new SdcctStaxBridge(this.xmlInFactory.createXMLStreamReader(src)));
             } catch (XMLStreamException e) {
                 throw new SaxonApiException(e);
             }

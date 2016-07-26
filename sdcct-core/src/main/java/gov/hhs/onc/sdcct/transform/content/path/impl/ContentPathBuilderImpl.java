@@ -21,6 +21,8 @@ import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbSimpleTypeMetadata;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbTypeMetadata;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 import javax.annotation.Nullable;
 import javax.xml.bind.JAXBException;
 import net.sf.saxon.om.AxisInfo;
@@ -28,8 +30,6 @@ import net.sf.saxon.om.NodeInfo;
 import net.sf.saxon.pattern.SameNameTest;
 import net.sf.saxon.tree.iter.AxisIterator;
 import net.sf.saxon.type.Type;
-import org.apache.commons.collections4.BidiMap;
-import org.apache.commons.collections4.bidimap.DualTreeBidiMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ public class ContentPathBuilderImpl implements ContentPathBuilder {
     private JaxbContextRepository jaxbContextRepo;
 
     private ClassLoader beanClassLoader;
-    private BidiMap<String, String> namespaces = new DualTreeBidiMap<>();
+    private Map<String, String> namespaces = new TreeMap<>();
 
     @Override
     public ContentPath build(boolean typed, NodeInfo nodeInfo) throws Exception {
@@ -177,7 +177,7 @@ public class ContentPathBuilderImpl implements ContentPathBuilder {
             } catch (ClassNotFoundException e) {
                 throw new IllegalStateException(
                     String.format("Unable to build content path (xpath=%s) segment (qname=%s) JAXB property type (class=%s) implementation class.",
-                        buildXpathExpression(segments), segment.getQname(), jaxbPropTypeClass.getName()),
+                        this.buildXpathExpression(segments), segment.getQname(), jaxbPropTypeClass.getName()),
                     e);
             }
         }
@@ -186,7 +186,7 @@ public class ContentPathBuilderImpl implements ContentPathBuilder {
 
         if (jaxbPropTypeInfo == null) {
             throw new IllegalStateException(String.format("Unable to build content path (xpath=%s) segment (qname=%s) JAXB property type (class=%s) info.",
-                buildXpathExpression(segments), segment.getQname(), jaxbPropTypeClass.getName()));
+                this.buildXpathExpression(segments), segment.getQname(), jaxbPropTypeClass.getName()));
         }
 
         if (jaxbLeafProp) {
@@ -205,7 +205,7 @@ public class ContentPathBuilderImpl implements ContentPathBuilder {
             } catch (JAXBException e) {
                 throw new IllegalStateException(
                     String.format("Unable to find content path (xpath=%s) segment (qname=%s) JAXB property type (class=%s) metadata.",
-                        buildXpathExpression(segments), segment.getQname(), jaxbPropTypeClass.getName()),
+                        this.buildXpathExpression(segments), segment.getQname(), jaxbPropTypeClass.getName()),
                     e);
             }
         }
@@ -215,7 +215,7 @@ public class ContentPathBuilderImpl implements ContentPathBuilder {
 
     private String buildXpathExpression(LinkedList<ContentPathSegment<?, ?>> segments) {
         StrBuilder builder = new StrBuilder();
-        String nsPrefix, nsUri;
+        String nsPrefix;
         boolean attrSegmentItem;
         ElementPathSegment elemSegment;
 
@@ -226,8 +226,10 @@ public class ContentPathBuilderImpl implements ContentPathBuilder {
                 builder.append(SdcctStringUtils.AT_CHAR);
             }
 
-            if (!(nsPrefix = (namespaces.containsValue((nsUri = segment.getNamespaceUri())) ? namespaces.getKey(nsUri) : segment.getNamespacePrefix()))
-                .isEmpty()) {
+            final String nsUri = segment.getNamespaceUri();
+
+            if (!(nsPrefix = this.namespaces.entrySet().stream().filter(nsEntry -> nsEntry.getValue().equals(nsUri)).findFirst().map(Entry::getKey)
+                .orElseGet(segment::getNamespacePrefix)).isEmpty()) {
                 builder.append(nsPrefix);
                 builder.append(SdcctStringUtils.COLON_CHAR);
             }
@@ -251,7 +253,7 @@ public class ContentPathBuilderImpl implements ContentPathBuilder {
     }
 
     @Override
-    public BidiMap<String, String> getNamespaces() {
+    public Map<String, String> getNamespaces() {
         return this.namespaces;
     }
 

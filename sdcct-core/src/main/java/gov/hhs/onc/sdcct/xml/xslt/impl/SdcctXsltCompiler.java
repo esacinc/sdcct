@@ -1,7 +1,12 @@
 package gov.hhs.onc.sdcct.xml.xslt.impl;
 
+import gov.hhs.onc.sdcct.transform.impl.ByteArraySource;
 import gov.hhs.onc.sdcct.transform.impl.SdcctConfiguration;
 import gov.hhs.onc.sdcct.transform.impl.SdcctProcessor;
+import gov.hhs.onc.sdcct.transform.impl.SdcctPullSource;
+import gov.hhs.onc.sdcct.transform.utils.SdcctTransformUtils;
+import gov.hhs.onc.sdcct.xml.SdcctXmlResolver;
+import gov.hhs.onc.sdcct.xml.impl.SdcctStaxBridge;
 import gov.hhs.onc.sdcct.xml.impl.SdcctXmlInputFactory;
 import gov.hhs.onc.sdcct.xml.impl.XdmDocument;
 import gov.hhs.onc.sdcct.xml.xslt.StaticXsltOptions;
@@ -9,12 +14,9 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
-import javax.xml.transform.stax.StAXSource;
 import javax.xml.transform.stream.StreamSource;
 import net.sf.saxon.functions.FunctionLibraryList;
 import net.sf.saxon.functions.IntegratedFunctionLibrary;
-import net.sf.saxon.lib.AugmentedSource;
-import net.sf.saxon.lib.ParseOptions;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XdmValue;
@@ -53,7 +55,6 @@ public class SdcctXsltCompiler extends XsltCompiler {
         SdcctProcessor proc = this.getProcessor();
         SdcctConfiguration config = proc.getUnderlyingConfiguration();
         CompilerInfo compilerInfo = this.getUnderlyingCompilerInfo();
-        ParseOptions parseOpts = new ParseOptions(config.getParseOptions());
 
         if (staticOpts != null) {
             if (staticOpts.hasFunctions()) {
@@ -72,17 +73,20 @@ public class SdcctXsltCompiler extends XsltCompiler {
                 }
             }
 
-            // TODO: Build/use document pool instead.
             if (staticOpts.hasPooledDocuments()) {
-                compilerInfo.setURIResolver(
-                    (href, base) -> staticOpts.getPooledDocuments().stream().filter(pooledDoc -> pooledDoc.getDocumentUri().toString().equals(href)).findFirst()
-                        .map(pooledDoc -> new AugmentedSource(pooledDoc.getSource(), parseOpts)).orElse(null));
+                SdcctXmlResolver xmlResolver = ((SdcctXmlResolver) compilerInfo.getURIResolver()).clone();
+
+                // noinspection ConstantConditions
+                staticOpts.getPooledDocuments().forEach(
+                    pooledDoc -> xmlResolver.addStaticSource(null, null, pooledDoc.getDocumentUri().getUri(), ((ByteArraySource) pooledDoc.getSource())));
+
+                compilerInfo.setURIResolver(xmlResolver);
             }
         }
 
         if (src instanceof StreamSource) {
             try {
-                src = new StAXSource(this.xmlInFactory.createXMLStreamReader(src));
+                src = new SdcctPullSource(SdcctTransformUtils.getPublicId(src), new SdcctStaxBridge(this.xmlInFactory.createXMLStreamReader(src)));
             } catch (XMLStreamException e) {
                 throw new SaxonApiException(e);
             }

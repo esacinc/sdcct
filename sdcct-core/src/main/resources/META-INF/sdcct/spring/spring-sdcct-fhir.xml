@@ -12,9 +12,22 @@
         urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
     
     <!--====================================================================================================
+    = TEMPLATE ENGINES
+    =====================================================================================================-->
+    <beans:bean id="templateEngineFhir" parent="templateEngine">
+        <beans:property name="templateResolvers">
+            <beans:set>
+                <!--suppress SpringPlaceholdersInspection -->
+                <beans:bean parent="templateResolver"
+                    p:prefix="${sdcct.template.fhir.dir.path}/"/>
+            </beans:set>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
     = XPATH OPTIONS
     =====================================================================================================-->
-    <sdcct-xml:xpath-static-options id="xpathOptsStaticFhir" parent="xpathOptsStatic" abstract="true">
+    <sdcct-xml:xpath-static-options id="xpathOptsStaticFhir" abstract="true">
         <sdcct-xml:static-namespace prefix="#{ T(gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes).FHIR_XPATH }">
             #{ T(gov.hhs.onc.sdcct.net.SdcctUris).FHIR_URL_VALUE }
         </sdcct-xml:static-namespace>
@@ -26,12 +39,8 @@
     <!--====================================================================================================
     = CONTENT PATH BUILDERS
     =====================================================================================================-->
-    <beans:bean id="contentPathBuilderFhir" parent="contentPathBuilder">
-        <beans:property name="namespaces">
-            <beans:bean class="org.apache.commons.collections4.bidimap.DualTreeBidiMap"
-                c:map="#{ xpathOptsStaticFhir.namespaces }"/>
-        </beans:property>
-    </beans:bean>
+    <beans:bean id="contentPathBuilderFhir" parent="contentPathBuilder"
+        p:namespaces="#{ xpathOptsStaticFhir.namespaces }"/>
     
     <!--====================================================================================================
     = RESOURCE PARAM PROCESSORS
@@ -44,6 +53,17 @@
     =====================================================================================================-->
     <beans:bean id="metadataResourceParamFhir" parent="metadataResourceParam" abstract="true">
         <beans:constructor-arg name="specType" value="FHIR"/>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = SCHEMATRONS
+    =====================================================================================================-->
+    <beans:bean id="schematronFhirInvariants" parent="schematron"
+        c:id="fhir-invariants"
+        c:name="FHIR Invariants">
+        <beans:property name="document">
+            <sdcct-xml:document>classpath*:${sdcct.schematron.fhir.dir.path}/fhir-invariants.sch</sdcct-xml:document>
+        </beans:property>
     </beans:bean>
     
     <!--====================================================================================================
@@ -68,13 +88,7 @@
         </beans:property>
         <beans:property name="schematrons">
             <beans:array>
-                <beans:bean parent="schematron"
-                    c:id="fhir-invariants"
-                    c:name="FHIR Invariants">
-                    <beans:property name="document">
-                        <sdcct-xml:document>classpath*:${sdcct.schematron.fhir.dir.path}/fhir-invariants.sch</sdcct-xml:document>
-                    </beans:property>
-                </beans:bean>
+                <beans:ref bean="schematronFhirInvariants"/>
             </beans:array>
         </beans:property>
     </beans:bean>
@@ -206,17 +220,6 @@
                     <beans:property name="valueTypes">
                         <beans:set>
                             <beans:value>#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).CODING.id }</beans:value>
-                        </beans:set>
-                    </beans:property>
-                </beans:bean>
-                <beans:bean parent="metadataResourceParamFhir"
-                    c:id="Resource-text"
-                    c:name="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamNames).TEXT }"
-                    c:type="#{ T(gov.hhs.onc.sdcct.data.parameter.ResourceParamType).STRING }"
-                    p:inline="true">
-                    <beans:property name="valueTypes">
-                        <beans:set>
-                            <beans:value>#{ T(gov.hhs.onc.sdcct.fhir.DatatypeType).STRING.id }</beans:value>
                         </beans:set>
                     </beans:property>
                 </beans:bean>

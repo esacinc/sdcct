@@ -6,19 +6,30 @@ import org.apache.maven.artifact.DefaultArtifact
 import org.apache.maven.artifact.handler.DefaultArtifactHandler
 
 Artifact sdcSchemaPkgArchiveArtifact = new DefaultArtifact("gov.hhs.onc.sdc", "sdc-schema-package",
-    project.properties.getProperty("project.build.sdcSchemaPackageVersion"), Artifact.SCOPE_COMPILE, SdcctFileNameExtensions.ZIP, StringUtils.EMPTY,
+    project.properties.getProperty("project.build.sdcVersion"), Artifact.SCOPE_COMPILE, SdcctFileNameExtensions.ZIP, StringUtils.EMPTY,
     new DefaultArtifactHandler());
 File sdcSchemaPkgArchiveFile = SdcctBuildUtils.resolveRemoteArtifact(log, project, ant, sdcSchemaPkgArchiveArtifact,
-    new URL("${project.properties.getProperty("project.build.sdcSchemaPackageRepositoryArchiveUrlPrefix")}/${sdcSchemaPkgArchiveArtifact.version}.${sdcSchemaPkgArchiveArtifact.type}"),
+    new URL("${project.properties.getProperty("project.build.sdcSchemaPackageRepoArchiveUrlPrefix")}/${project.properties.getProperty("project.build.sdcSchemaPackageVersion")}.${sdcSchemaPkgArchiveArtifact.type}"),
     true), schemaDir = new File(project.properties.getProperty("project.build.schemaDirectory")),
+    schematronDir = new File(project.properties.getProperty("project.build.schematronDirectory")),
     wsdlDir = new File(project.properties.getProperty("project.build.wsdlDirectory")),
-    sdcTestFormDir = new File(project.properties.getProperty("project.build.sdcTestFormDirectory"))
+    sdcTestFormDir = new File("${project.properties.getProperty("project.build.testFormDirectory")}/sdc")
 
 ant.mkdir(dir: schemaDir)
 
 ant.unzip(src: sdcSchemaPkgArchiveFile, dest: schemaDir) {
     ant.patternset() {
         ant.include(name: "*/schema/**/*.${SdcctFileNameExtensions.XSD}")
+    }
+    
+    ant.cutdirsmapper(dirs: 2)
+}
+
+ant.mkdir(dir: schematronDir)
+
+ant.unzip(src: sdcSchemaPkgArchiveFile, dest: schematronDir) {
+    ant.patternset() {
+        ant.include(name: "*/schematron/**/*.${SdcctFileNameExtensions.SCH}")
     }
     
     ant.cutdirsmapper(dirs: 2)

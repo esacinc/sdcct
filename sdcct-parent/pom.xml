@@ -109,6 +109,7 @@
         <project.build.dependenciesDirectory>${project.build.directory}/deps</project.build.dependenciesDirectory>
         <!-- Project build FHIR properties -->
         <project.build.fhirDataDirectory>${project.build.outputDirectory}/META-INF/sdcct/data/fhir</project.build.fhirDataDirectory>
+        <project.build.fhirImplGuideSiteUrlPrefix>http://hl7.org/fhir/2016May</project.build.fhirImplGuideSiteUrlPrefix>
         <project.build.fhirOtherTypeDataFile>${project.build.fhirDataDirectory}/profiles-others.xml</project.build.fhirOtherTypeDataFile>
         <project.build.fhirResourceTypeDataFile>${project.build.fhirDataDirectory}/profiles-resources.xml</project.build.fhirResourceTypeDataFile>
         <project.build.fhirTermDataFile>${project.build.fhirDataDirectory}/valuesets.xml</project.build.fhirTermDataFile>
@@ -121,12 +122,16 @@
         <project.build.schematronUrlPrefix>http://www.schematron.com/tmp</project.build.schematronUrlPrefix>
         <project.build.schematronVersion>2010-04-14</project.build.schematronVersion>
         <!-- Project build SDC properties -->
-        <project.build.sdcSchemaPackageRepositoryArchiveUrlPrefix>http://github.com/esacinc/sdc-schema-package/archive</project.build.sdcSchemaPackageRepositoryArchiveUrlPrefix>
-        <!-- TEMP: dev -->
+        <!--
+        TODO: Switch back to main Git(Hub) repository once changes have been pulled.
+        -->
+        <project.build.sdcSchemaPackageRepoArchiveUrlPrefix>http://github.com/mkotelba/sdc-schema-package/archive</project.build.sdcSchemaPackageRepoArchiveUrlPrefix>
+        <!--<project.build.sdcSchemaPackageRepoArchiveUrlPrefix>http://github.com/esacinc/sdc-schema-package/archive</project.build.sdcSchemaPackageRepoArchiveUrlPrefix>-->
         <project.build.sdcSchemaPackageVersion>master</project.build.sdcSchemaPackageVersion>
+        <project.build.sdcVersion>2.0-SNAPSHOT</project.build.sdcVersion>
         <!-- Project build SoapUI properties -->
         <project.build.soapuiVersion>5.2.1</project.build.soapuiVersion>
-        <project.build.soapuiRepoUrlPrefix>https://github.com/SmartBear/soapui/raw/${project.build.soapuiVersion}</project.build.soapuiRepoUrlPrefix>
+        <project.build.soapuiRepoUrlPrefix>http://github.com/SmartBear/soapui/raw/${project.build.soapuiVersion}</project.build.soapuiRepoUrlPrefix>
         <!-- Project build source properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Project Java properties -->
@@ -171,72 +176,32 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>2.7.5</version>
+                <version>2.8.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
-                <version>2.7.5</version>
+                <version>2.8.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.7.5</version>
+                <version>2.8.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.datatype</groupId>
                 <artifactId>jackson-datatype-jdk8</artifactId>
-                <version>2.7.5</version>
+                <version>2.8.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.module</groupId>
                 <artifactId>jackson-module-jaxb-annotations</artifactId>
-                <version>2.7.5</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.module</groupId>
-                <artifactId>jackson-module-jsonSchema</artifactId>
-                <version>2.7.5</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.staxmate</groupId>
-                <artifactId>staxmate</artifactId>
-                <version>2.3.0</version>
+                <version>2.8.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.woodstox</groupId>
                 <artifactId>woodstox-core</artifactId>
                 <version>5.0.2</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.fge</groupId>
-                <artifactId>json-schema-core</artifactId>
-                <version>1.2.5</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.mozilla</groupId>
-                        <artifactId>rhino</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.github.fge</groupId>
-                <artifactId>json-schema-validator</artifactId>
-                <version>2.2.6</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.googlecode.libphonenumber</groupId>
-                        <artifactId>libphonenumber</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>javax.mail</groupId>
-                        <artifactId>mailapi</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>net.sf.jopt-simple</groupId>
-                        <artifactId>jopt-simple</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>com.github.sebhoss</groupId>
@@ -377,7 +342,7 @@
             <dependency>
                 <groupId>com.zaxxer</groupId>
                 <artifactId>HikariCP</artifactId>
-                <version>2.4.6</version>
+                <version>2.4.7</version>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
@@ -412,27 +377,27 @@
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-buffer</artifactId>
-                <version>4.1.1.Final</version>
+                <version>4.1.3.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-codec-http</artifactId>
-                <version>4.1.1.Final</version>
+                <version>4.1.3.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-common</artifactId>
-                <version>4.1.1.Final</version>
+                <version>4.1.3.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-handler</artifactId>
-                <version>4.1.1.Final</version>
+                <version>4.1.3.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-transport</artifactId>
-                <version>4.1.1.Final</version>
+                <version>4.1.3.Final</version>
             </dependency>
             <dependency>
                 <groupId>javax.el</groupId>
@@ -482,7 +447,7 @@
             <dependency>
                 <groupId>net.sf.saxon</groupId>
                 <artifactId>Saxon-HE</artifactId>
-                <version>9.7.0-6</version>
+                <version>9.7.0-7</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.ant</groupId>
@@ -657,7 +622,7 @@
             <dependency>
                 <groupId>org.codehaus.janino</groupId>
                 <artifactId>janino</artifactId>
-                <version>2.7.8</version>
+                <version>3.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.woodstox</groupId>
@@ -811,7 +776,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
-                <version>4.3.0.RELEASE</version>
+                <version>4.3.1.RELEASE</version>
                 <exclusions>
                     <exclusion>
                         <groupId>commons-logging</groupId>
@@ -826,14 +791,14 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>4.3.0.RELEASE</version>
+                <version>4.3.1.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>1.3.5.RELEASE</version>
+                <version>1.3.6.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -857,19 +822,39 @@
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-bom</artifactId>
-                <version>4.1.0.RELEASE</version>
+                <version>4.1.1.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-config</artifactId>
-                <version>4.1.0.RELEASE</version>
+                <version>4.1.1.RELEASE</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-core</artifactId>
-                <version>4.1.0.RELEASE</version>
+                <version>4.1.1.RELEASE</version>
+            </dependency>
+            <dependency>
+                <groupId>org.thymeleaf</groupId>
+                <artifactId>thymeleaf</artifactId>
+                <version>3.0.1.RELEASE</version>
+            </dependency>
+            <dependency>
+                <groupId>org.thymeleaf</groupId>
+                <artifactId>thymeleaf-spring4</artifactId>
+                <version>3.0.1.RELEASE</version>
+            </dependency>
+            <dependency>
+                <groupId>org.thymeleaf.extras</groupId>
+                <artifactId>thymeleaf-extras-java8time</artifactId>
+                <version>3.0.0.RELEASE</version>
+            </dependency>
+            <dependency>
+                <groupId>org.thymeleaf.extras</groupId>
+                <artifactId>thymeleaf-extras-springsecurity4</artifactId>
+                <version>3.0.0.RELEASE</version>
             </dependency>
             <dependency>
                 <groupId>tanukisoft</groupId>
@@ -908,7 +893,6 @@
                             <arg>-J-XX:+UseG1GC</arg>
                             <arg>-J-XX:MaxGCPauseMillis=50</arg>
                             <arg>-parameters</arg>
-                            <arg>-proc:none</arg>
                             <arg>-Werror</arg>
                             <arg>-Xlint</arg>
                             <arg>-Xlint:-path</arg>
@@ -917,10 +901,12 @@
                         <maxmem>256m</maxmem>
                         <meminitial>128m</meminitial>
                         <optimize>true</optimize>
+                        <proc>none</proc>
                         <showDeprecation>true</showDeprecation>
                         <showWarnings>true</showWarnings>
                         <source>${java.version}</source>
                         <target>${java.version}</target>
+                        <useIncrementalCompilation>false</useIncrementalCompilation>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -1351,7 +1337,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>1.10</version>
+                    <version>1.11</version>
                     <inherited>true</inherited>
                 </plugin>
                 <plugin>

@@ -75,4 +75,18 @@
     =====================================================================================================-->
     <beans:bean id="taskSchedulerThreadPool" class="org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler" parent="threadFactory" abstract="true"
         p:removeOnCancelPolicy="true"/>
+    
+    <!--====================================================================================================
+    = TEMPLATE RESOLVERS
+    =====================================================================================================-->
+    <beans:bean id="templateResolver" class="org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver" abstract="true"
+        p:characterEncoding="#{ T(java.nio.charset.StandardCharsets).UTF_8.name() }"
+        p:suffix=".#{ T(gov.hhs.onc.sdcct.io.SdcctFileNameExtensions).HTML }"
+        p:templateMode="#{ T(org.thymeleaf.templatemode.TemplateMode).HTML }"/>
+    
+    <!--====================================================================================================
+    = TEMPLATE ENGINES
+    =====================================================================================================-->
+    <beans:bean id="templateEngine" class="org.thymeleaf.spring4.SpringTemplateEngine" abstract="true"
+        p:enableSpringELCompiler="true"/>
 </beans:beans>

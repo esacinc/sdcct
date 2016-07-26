@@ -1,5 +1,6 @@
 package gov.hhs.onc.sdcct.transform.impl;
 
+import gov.hhs.onc.sdcct.beans.LocationBean;
 import gov.hhs.onc.sdcct.transform.content.path.ContentPath;
 import javax.annotation.Nullable;
 import javax.xml.stream.Location;
@@ -18,7 +19,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXParseException;
 
-public class SdcctLocation extends ExplicitLocation implements Location, XMLStreamLocation2 {
+public class SdcctLocation extends ExplicitLocation implements Location, LocationBean, XMLStreamLocation2 {
     private String publicId;
     private String sysId;
     private int lineNum;
@@ -184,7 +185,7 @@ public class SdcctLocation extends ExplicitLocation implements Location, XMLStre
     }
 
     public boolean hasCharacterOffset() {
-        return (this.charOffset >= 0);
+        return (this.charOffset > 0);
     }
 
     @Override
@@ -197,7 +198,7 @@ public class SdcctLocation extends ExplicitLocation implements Location, XMLStre
     }
 
     public boolean hasColumnNumber() {
-        return (this.colNum >= 0);
+        return (this.colNum > 0);
     }
 
     @Override
@@ -250,7 +251,7 @@ public class SdcctLocation extends ExplicitLocation implements Location, XMLStre
     }
 
     public boolean hasLineNumber() {
-        return (this.lineNum >= 0);
+        return (this.lineNum > 0);
     }
 
     @Override

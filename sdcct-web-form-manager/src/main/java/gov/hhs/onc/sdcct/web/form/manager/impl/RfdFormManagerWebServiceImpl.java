@@ -13,11 +13,8 @@ import gov.hhs.onc.sdcct.rfd.impl.RetrieveFormResponseTypeImpl;
 import gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlNames;
 import gov.hhs.onc.sdcct.rfd.ws.impl.AbstractRfdFormWebService;
 import gov.hhs.onc.sdcct.sdc.FormDesignType;
-import gov.hhs.onc.sdcct.sdc.impl.FormDesignPkgTypeImpl;
-import gov.hhs.onc.sdcct.sdc.impl.FormPackageModulesImpl;
-import gov.hhs.onc.sdcct.sdc.impl.FormPackageTypeImpl;
-import gov.hhs.onc.sdcct.sdc.impl.PackageModulesTypeImpl;
-import gov.hhs.onc.sdcct.sdc.impl.PackageTypeImpl;
+import gov.hhs.onc.sdcct.sdc.impl.SimpleSdcRetrieveFormPackageTypeImpl;
+import gov.hhs.onc.sdcct.sdc.impl.XmlPackageImpl;
 import gov.hhs.onc.sdcct.web.form.manager.RfdFormManagerWebService;
 import gov.hhs.onc.sdcct.xml.impl.XdmDocumentDestination;
 import javax.jws.WebService;
@@ -41,10 +38,8 @@ public class RfdFormManagerWebServiceImpl extends AbstractRfdFormWebService<Form
             }
 
             return new RetrieveFormResponseTypeImpl()
-                .setForm(
-                    new FormDataTypeImpl().setContent(new AnyXmlContentTypeImpl().addAny(this.xmlCodec.encode(
-                        new PackageTypeImpl().setPackageModules(new PackageModulesTypeImpl().setMainFormPackage(new FormPackageTypeImpl()
-                            .setFormPackageModules(new FormPackageModulesImpl().setFormDesignPkg(new FormDesignPkgTypeImpl().setFormDesign(formDesign))))),
+                .setForm(new FormDataTypeImpl().setContent(new AnyXmlContentTypeImpl()
+                    .addAny(this.xmlCodec.encode(new SimpleSdcRetrieveFormPackageTypeImpl().setContent(new XmlPackageImpl().setFormDesign(formDesign)),
                         new XdmDocumentDestination(this.config).getReceiver(), null).getXdmNode().getDocument().getDocumentElement())))
                 .setContentType(MimeTypeUtils.APPLICATION_XML_VALUE).setResponseCode(Integer.toString(HttpStatus.OK.value()));
         } catch (RfdException e) {

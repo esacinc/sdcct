@@ -10,10 +10,10 @@ import org.codehaus.stax2.validation.XMLValidator;
 import org.relaxng.datatype.Datatype;
 
 public class MsvValidator extends XMLValidator {
-    private MsvValidationContext context;
+    private MsvContext context;
     private GenericMsvValidator delegate;
 
-    public MsvValidator(MsvValidationSchema schema, MsvValidationContext context) {
+    public MsvValidator(MsvSchema schema, MsvContext context) {
         this.context = context;
         this.delegate = new GenericMsvValidator(schema, context, new XSREDocDecl(schema.getGrammar()));
     }
@@ -97,7 +97,7 @@ public class MsvValidator extends XMLValidator {
         return this.delegate.getBaseUri();
     }
 
-    public MsvValidationContext getContext() {
+    public MsvContext getContext() {
         return this.context;
     }
 
@@ -112,8 +112,8 @@ public class MsvValidator extends XMLValidator {
     }
 
     @Override
-    public MsvValidationSchema getSchema() {
-        return ((MsvValidationSchema) this.delegate.getSchema());
+    public MsvSchema getSchema() {
+        return ((MsvSchema) this.delegate.getSchema());
     }
 
     @Override

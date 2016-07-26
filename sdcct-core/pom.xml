@@ -21,7 +21,6 @@
         <project.basedir.all>${project.basedir}/..</project.basedir.all>
         <!-- Project build form test properties -->
         <project.build.testFormDirectory>${project.build.testOutputDirectory}/META-INF/sdcct/data/form</project.build.testFormDirectory>
-        <project.build.sdcTestFormDirectory>${project.build.testFormDirectory}/sdc</project.build.sdcTestFormDirectory>
         <!-- Project build JAXB properties -->
         <project.build.jaxbDirectory>${project.build.outputDirectory}/META-INF/sdcct/jaxb</project.build.jaxbDirectory>
         <project.build.jaxbPluralsPropertyFile>${project.build.jaxbDirectory}/jaxb-sdcct-plurals.properties</project.build.jaxbPluralsPropertyFile>
@@ -74,24 +73,8 @@
             <artifactId>jackson-module-jaxb-annotations</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-jsonSchema</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.staxmate</groupId>
-            <artifactId>staxmate</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.fasterxml.woodstox</groupId>
             <artifactId>woodstox-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.fge</groupId>
-            <artifactId>json-schema-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.fge</groupId>
-            <artifactId>json-schema-validator</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.sebhoss</groupId>
@@ -449,6 +432,22 @@
             <artifactId>spring-security-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.thymeleaf</groupId>
+            <artifactId>thymeleaf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.thymeleaf</groupId>
+            <artifactId>thymeleaf-spring4</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.thymeleaf.extras</groupId>
+            <artifactId>thymeleaf-extras-java8time</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.thymeleaf.extras</groupId>
+            <artifactId>thymeleaf-extras-springsecurity4</artifactId>
+        </dependency>
+        <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
         </dependency>
@@ -747,8 +746,7 @@
                                         gov/hhs/onc/sdcct/utils/*.java
                                         gov/hhs/onc/sdcct/xml/SdcctXmlPrefixes.java
                                         gov/hhs/onc/sdcct/xml/SdcctXmlResolver.java
-                                        gov/hhs/onc/sdcct/xml/impl/AbstractSdcctXmlResolver.java
-                                        gov/hhs/onc/sdcct/xml/impl/CompositeXmlResolver.java
+                                        gov/hhs/onc/sdcct/xml/impl/SdcctXmlResolverImpl.java
                                         gov/hhs/onc/sdcct/xml/utils/*.java
                                         **/*.groovy
                                     </value>
@@ -824,6 +822,10 @@
                                     </value>
                                 </property>
                                 <property>
+                                    <name>defaultBaseUri</name>
+                                    <value>file:${project.build.schemaDirectory}/schematron/</value>
+                                </property>
+                                <property>
                                     <name>outDir</name>
                                     <value>${project.build.jaxbSchematronGeneratedSourceDirectory}</value>
                                 </property>
@@ -880,6 +882,10 @@
                                         jaxb-sdcct-rfd.xjb
                                         jaxws-sdcct-rfd-form-archiver.xjb
                                     </value>
+                                </property>
+                                <property>
+                                    <name>defaultBaseUri</name>
+                                    <value>file:${project.build.schemaDirectory}/rfd/</value>
                                 </property>
                                 <property>
                                     <name>outDir</name>
@@ -946,6 +952,10 @@
                                     </value>
                                 </property>
                                 <property>
+                                    <name>defaultBaseUri</name>
+                                    <value>file:${project.build.schemaDirectory}/rfd/</value>
+                                </property>
+                                <property>
                                     <name>outDir</name>
                                     <value>${project.build.jaxbRfdGeneratedSourceDirectory}</value>
                                 </property>
@@ -1008,6 +1018,10 @@
                                         jaxb-sdcct-rfd.xjb
                                         jaxws-sdcct-rfd-form-receiver.xjb
                                     </value>
+                                </property>
+                                <property>
+                                    <name>defaultBaseUri</name>
+                                    <value>file:${project.build.schemaDirectory}/rfd/</value>
                                 </property>
                                 <property>
                                     <name>outDir</name>
@@ -1079,6 +1093,10 @@
                                     </value>
                                 </property>
                                 <property>
+                                    <name>defaultBaseUri</name>
+                                    <value>file:${project.build.schemaDirectory}/sdc/</value>
+                                </property>
+                                <property>
                                     <name>outDir</name>
                                     <value>${project.build.jaxbSdcGeneratedSourceDirectory}</value>
                                 </property>
@@ -1137,6 +1155,10 @@
                                         jaxb-sdcct.xjb
                                         jaxb-sdcct-fhir*.xjb
                                     </value>
+                                </property>
+                                <property>
+                                    <name>defaultBaseUri</name>
+                                    <value>file:${project.build.schemaDirectory}/fhir/</value>
                                 </property>
                                 <property>
                                     <name>outDir</name>

@@ -3,16 +3,16 @@ package gov.hhs.onc.sdcct.transform.content.path.impl;
 import gov.hhs.onc.sdcct.transform.content.path.ContentPath;
 import gov.hhs.onc.sdcct.transform.content.path.ContentPathSegment;
 import java.util.LinkedList;
-import org.apache.commons.collections4.BidiMap;
+import java.util.Map;
 
 public class ContentPathImpl implements ContentPath {
-    private BidiMap<String, String> namespaces;
+    private Map<String, String> namespaces;
     private LinkedList<ContentPathSegment<?, ?>> segments;
     private String fluentPathExpr;
     private String jsonPointerExpr;
     private String xpathExpr;
 
-    public ContentPathImpl(BidiMap<String, String> namespaces, LinkedList<ContentPathSegment<?, ?>> segments, String fluentPathExpr, String jsonPointerExpr,
+    public ContentPathImpl(Map<String, String> namespaces, LinkedList<ContentPathSegment<?, ?>> segments, String fluentPathExpr, String jsonPointerExpr,
         String xpathExpr) {
         this.namespaces = namespaces;
         this.segments = segments;
@@ -32,7 +32,7 @@ public class ContentPathImpl implements ContentPath {
     }
 
     @Override
-    public BidiMap<String, String> getNamespaces() {
+    public Map<String, String> getNamespaces() {
         return this.namespaces;
     }
 

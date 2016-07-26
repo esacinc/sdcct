@@ -33,7 +33,7 @@ import gov.hhs.onc.sdcct.build.xml.jaxb.type.impl.FhirTypeCodegenPlugin
 import gov.hhs.onc.sdcct.build.xml.jaxb.type.impl.RfdTypeCodegenPlugin
 import gov.hhs.onc.sdcct.transform.impl.ResourceSourceResolverImpl
 import gov.hhs.onc.sdcct.utils.SdcctClassUtils
-import gov.hhs.onc.sdcct.xml.impl.CompositeXmlResolver
+import gov.hhs.onc.sdcct.xml.impl.SdcctXmlResolverImpl
 import org.apache.commons.collections4.BidiMap
 import org.apache.commons.collections4.CollectionUtils
 import org.apache.commons.collections4.bidimap.DualLinkedHashBidiMap
@@ -137,11 +137,12 @@ opts.compatibilityMode = Options.EXTENSION
 opts.contentForWildcard = true
 opts.debugMode = debug
 opts.encoding = enc
-opts.entityResolver = new CompositeXmlResolver(new ResourceSourceResolverImpl())
 opts.noFileHeader = true
 opts.schemaLanguage = Language.XMLSCHEMA
 opts.targetDir = outDir
 opts.verbose = verbose
+
+opts.entityResolver = new SdcctXmlResolverImpl(new ResourceSourceResolverImpl(), URI.create(((String) bindingVars["defaultBaseUri"])), true)
 
 opts.setNameConverter(new CompositeNameConverter(schemaContext), null)
 

@@ -38,6 +38,7 @@ import javax.xml.transform.Source;
 import net.sf.saxon.dom.NodeOverNodeInfo;
 import net.sf.saxon.om.MutableNodeInfo;
 import net.sf.saxon.s9api.XdmNode;
+import net.sf.saxon.tree.linked.DocumentImpl;
 import net.sf.saxon.value.Whitespace;
 import org.apache.xml.security.Init;
 import org.apache.xml.security.c14n.Canonicalizer;
@@ -269,12 +270,14 @@ public abstract class AbstractSdcctResourceRegistry<T, U extends ResourceMetadat
     }
 
     protected String buildContent(XdmDocument contentDoc, boolean canonical) throws Exception {
+        DocumentImpl contentDocInfo = contentDoc.getUnderlyingNode();
         Source contentSrc;
         XmlEncodeOptions contentEncodeOpts = this.xmlCodec.getDefaultEncodeOptions().clone();
 
         if (canonical) {
             for (SdcctXpathExecutable canonicalRemoveXpathExec : this.resourceMetadata.getCanonicalRemoveXpathExecutables()) {
-                for (XdmNode canonicalRemoveNode : canonicalRemoveXpathExec.load(new DynamicXpathOptionsImpl().setContextNode(contentDoc)).evaluateNodes()) {
+                for (XdmNode canonicalRemoveNode : canonicalRemoveXpathExec.load(new DynamicXpathOptionsImpl().setContextItem(contentDocInfo))
+                    .evaluateNodes()) {
                     ((MutableNodeInfo) canonicalRemoveNode.getUnderlyingNode()).delete();
                 }
             }

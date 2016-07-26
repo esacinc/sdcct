@@ -11,8 +11,8 @@ import net.sf.saxon.lib.ExtensionFunctionDefinition;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 
-public abstract class AbstractStaticXmlTransformOptions<T extends StaticXmlTransformOptions<T>> extends AbstractXmlTransformOptions<T> implements
-    StaticXmlTransformOptions<T> {
+public abstract class AbstractStaticXmlTransformOptions<T extends StaticXmlTransformOptions<T>> extends AbstractXmlTransformOptions<T>
+    implements StaticXmlTransformOptions<T> {
     protected List<ExtensionFunctionDefinition> funcs = new ArrayList<>();
     protected Map<String, String> namespaces = new TreeMap<>();
     protected List<XdmDocument> pooledDocs = new ArrayList<>();

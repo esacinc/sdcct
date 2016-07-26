@@ -23,8 +23,9 @@ import java.util.List;
 import java.util.Map;
 import javax.xml.transform.stream.StreamResult;
 import net.sf.saxon.event.Sender;
-import net.sf.saxon.om.NodeInfo;
 import net.sf.saxon.stax.ReceiverToXMLStreamWriter;
+import net.sf.saxon.tree.linked.DocumentImpl;
+import net.sf.saxon.tree.linked.ElementImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.stax2.XMLStreamWriter2;
 import org.springframework.core.Ordered;
@@ -56,15 +57,16 @@ public class SchemaValidatorImpl extends AbstractSdcctValidator implements Schem
     }
 
     @Override
-    protected List<ValidationIssue> validateInternal(NodeInfo nodeInfo, JaxbComplexTypeMetadata<?> jaxbTypeMetadata, Class<?> beanClass,
-        ResourceMetadata<?> resourceMetadata, List<ValidationIssue> issues) throws ValidationException {
+    protected List<ValidationIssue> validateInternal(DocumentImpl docInfo, ElementImpl docElemInfo, JaxbComplexTypeMetadata<?> jaxbTypeMetadata,
+        Class<?> beanClass, ResourceMetadata<?> resourceMetadata, List<ValidationIssue> issues) throws ValidationException {
         JaxbContextMetadata jaxbContextMetadata = jaxbTypeMetadata.getContext();
+        MsvSchema schema = jaxbContextMetadata.getValidationSchema();
+        String schemaId = schema.getId(), schemaName = schema.getName();
         Map<String, JaxbSchemaMetadata> jaxbSchemaMetadatas = jaxbContextMetadata.getSchemas();
         Map<String, ValidationSource> schemaSrcs = new LinkedHashMap<>(jaxbSchemaMetadatas.size());
 
         for (String schemaNsUri : jaxbSchemaMetadatas.keySet()) {
-            // TODO: Build XML schema IDs + names.
-            schemaSrcs.put(schemaNsUri, new ValidationSourceImpl(null, null, URI.create(schemaNsUri)));
+            schemaSrcs.put(schemaNsUri, new ValidationSourceImpl(schemaId, schemaName, URI.create(schemaNsUri)));
         }
 
         try {
@@ -72,18 +74,18 @@ public class SchemaValidatorImpl extends AbstractSdcctValidator implements Schem
 
             ValidatorXmlReporter reporter = new ValidatorXmlReporter(schemaSrcs, issues);
             resultWriter.setValidationProblemHandler(reporter);
-            resultWriter.validateAgainst(jaxbContextMetadata.getValidationSchema());
+            resultWriter.validateAgainst(schema);
 
             ReceiverToXMLStreamWriter receiver = new ReceiverToXMLStreamWriter(resultWriter);
             receiver.setPipelineConfiguration(this.config.makePipelineConfiguration());
 
-            Sender.send(nodeInfo, receiver, null);
+            Sender.send(docElemInfo, receiver, null);
         } catch (Exception e) {
             issues.clear();
 
-            throw new ValidationException(String.format("Unable to validate XML node (nsPrefix=%s, nsUri=%s, localName=%s) using XML schemas (nsUris=[%s]).",
-                nodeInfo.getPrefix(), nodeInfo.getURI(), nodeInfo.getLocalPart(), StringUtils.join(jaxbContextMetadata.getSchemas().keySet(), ", ")), e,
-                issues);
+            throw new ValidationException(String.format(
+                "Unable to validate XML document element (nsPrefix=%s, nsUri=%s, localName=%s) using XML schemas (nsUris=[%s]).", docElemInfo.getPrefix(),
+                docElemInfo.getURI(), docElemInfo.getLocalPart(), StringUtils.join(jaxbContextMetadata.getSchemas().keySet(), ", ")), e, issues);
         }
 
         return issues;

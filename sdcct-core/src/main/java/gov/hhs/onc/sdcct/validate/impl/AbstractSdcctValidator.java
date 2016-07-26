@@ -13,7 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import net.sf.saxon.om.NodeInfo;
+import net.sf.saxon.tree.linked.DocumentImpl;
+import net.sf.saxon.tree.linked.ElementImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractSdcctValidator implements SdcctValidator {
@@ -30,9 +31,9 @@ public abstract class AbstractSdcctValidator implements SdcctValidator {
     }
 
     @Override
-    public List<ValidationIssue> validate(NodeInfo nodeInfo, JaxbComplexTypeMetadata<?> jaxbTypeMetadata, Class<?> beanClass,
+    public List<ValidationIssue> validate(DocumentImpl docInfo, ElementImpl docElemInfo, JaxbComplexTypeMetadata<?> jaxbTypeMetadata, Class<?> beanClass,
         ResourceMetadata<?> resourceMetadata) throws ValidationException {
-        List<ValidationIssue> issues = this.validateInternal(nodeInfo, jaxbTypeMetadata, beanClass, resourceMetadata, new ArrayList<>());
+        List<ValidationIssue> issues = this.validateInternal(docInfo, docElemInfo, jaxbTypeMetadata, beanClass, resourceMetadata, new ArrayList<>());
 
         Map<IssueLevel, Integer> issueLevelCounts =
             issues.stream().collect(Collectors.groupingBy(ValidationIssue::getLevel, Collectors.reducing(0, issue -> 1, Integer::sum)));
@@ -40,16 +41,17 @@ public abstract class AbstractSdcctValidator implements SdcctValidator {
 
         if ((numErrorIssues > 0) || (numFatalIssues > 0)) {
             throw new ValidationException(String.format(
-                "XML node (nsPrefix=%s, nsUri=%s, localName=%s) validation (type=%s) failed (numInfoIssues=%d, numWarnIssues=%d, numErrorIssues=%d, numFatalIssues=%d).",
-                nodeInfo.getPrefix(), nodeInfo.getURI(), nodeInfo.getLocalPart(), this.type.getId(), issueLevelCounts.getOrDefault(IssueLevel.INFORMATION, 0),
-                issueLevelCounts.getOrDefault(IssueLevel.WARNING, 0), numErrorIssues, numFatalIssues), issues);
+                "XML document element (nsPrefix=%s, nsUri=%s, localName=%s) validation (type=%s) failed (numInfoIssues=%d, numWarnIssues=%d, numErrorIssues=%d, numFatalIssues=%d).",
+                docElemInfo.getPrefix(), docElemInfo.getURI(), docElemInfo.getLocalPart(), this.type.getId(),
+                issueLevelCounts.getOrDefault(IssueLevel.INFORMATION, 0), issueLevelCounts.getOrDefault(IssueLevel.WARNING, 0), numErrorIssues, numFatalIssues),
+                issues);
         }
 
         return issues;
     }
 
-    protected abstract List<ValidationIssue> validateInternal(NodeInfo nodeInfo, JaxbComplexTypeMetadata<?> jaxbTypeMetadata, Class<?> beanClass,
-        ResourceMetadata<?> resourceMetadata, List<ValidationIssue> issues) throws ValidationException;
+    protected abstract List<ValidationIssue> validateInternal(DocumentImpl docInfo, ElementImpl docElemInfo, JaxbComplexTypeMetadata<?> jaxbTypeMetadata,
+        Class<?> beanClass, ResourceMetadata<?> resourceMetadata, List<ValidationIssue> issues) throws ValidationException;
 
     @Override
     public ValidationType getType() {

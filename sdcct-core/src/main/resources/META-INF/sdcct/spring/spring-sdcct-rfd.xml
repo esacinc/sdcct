@@ -14,7 +14,7 @@
     <!--====================================================================================================
     = XPATH OPTIONS
     =====================================================================================================-->
-    <sdcct-xml:xpath-static-options id="xpathOptsStaticRfd" parent="xpathOptsStatic" abstract="true">
+    <sdcct-xml:xpath-static-options id="xpathOptsStaticRfd" abstract="true">
         <sdcct-xml:static-namespace prefix="#{ T(gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes).SDC }">
             #{ T(gov.hhs.onc.sdcct.net.SdcctUris).SDC_URL_VALUE }
         </sdcct-xml:static-namespace>
@@ -23,12 +23,8 @@
     <!--====================================================================================================
     = CONTENT PATH BUILDERS
     =====================================================================================================-->
-    <beans:bean id="contentPathBuilderRfd" parent="contentPathBuilder">
-        <beans:property name="namespaces">
-            <beans:bean class="org.apache.commons.collections4.bidimap.DualTreeBidiMap"
-                c:map="#{ xpathOptsStaticRfd.namespaces }"/>
-        </beans:property>
-    </beans:bean>
+    <beans:bean id="contentPathBuilderRfd" parent="contentPathBuilder"
+        p:namespaces="#{ xpathOptsStaticRfd.namespaces }"/>
     
     <!--====================================================================================================
     = RESOURCE PARAM PROCESSORS
@@ -44,6 +40,17 @@
     </beans:bean>
     
     <!--====================================================================================================
+    = SCHEMATRONS
+    =====================================================================================================-->
+    <beans:bean id="schematronSdc" parent="schematron"
+        c:id="sdc"
+        c:name="SDC">
+        <beans:property name="document">
+            <sdcct-xml:document>classpath*:${sdcct.schematron.sdc.dir.path}/SDC.sch</sdcct-xml:document>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
     = RESOURCE METADATAS
     =====================================================================================================-->
     <beans:bean id="metadataResourceRfd" class="gov.hhs.onc.sdcct.rfd.metadata.impl.RfdResourceMetadataImpl" abstract="true">
@@ -53,6 +60,11 @@
                     <sdcct-xml:xpath-expression>//sdc:HTML</sdcct-xml:xpath-expression>
                     <sdcct-xml:xpath-static-options parent="xpathOptsStaticRfd"/>
                 </sdcct-xml:xpath-executable>
+            </beans:array>
+        </beans:property>
+        <beans:property name="schematrons">
+            <beans:array>
+                <beans:ref bean="schematronSdc"/>
             </beans:array>
         </beans:property>
     </beans:bean>

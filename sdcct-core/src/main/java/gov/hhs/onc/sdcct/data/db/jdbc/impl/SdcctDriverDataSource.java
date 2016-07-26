@@ -6,10 +6,10 @@ import gov.hhs.onc.sdcct.data.db.DbStatementType;
 import gov.hhs.onc.sdcct.data.db.logging.DbStatementEvent;
 import gov.hhs.onc.sdcct.data.db.logging.impl.DbStatementEventImpl;
 import gov.hhs.onc.sdcct.data.db.logging.impl.DbParamImpl;
-import gov.hhs.onc.sdcct.utils.SdcctAopUtils;
 import gov.hhs.onc.sdcct.utils.SdcctAopUtils.SdcctMethodInterceptor;
 import gov.hhs.onc.sdcct.utils.SdcctAopUtils.SdcctProxyBuilder;
 import gov.hhs.onc.sdcct.utils.SdcctEnumUtils;
+import gov.hhs.onc.sdcct.utils.SdcctMethodUtils;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -55,7 +55,7 @@ public class SdcctDriverDataSource implements SmartDataSource {
         @Nullable
         @Override
         public Object invoke(MethodInvocation invocation, Method method, String methodName, Object[] args, Statement target) throws Throwable {
-            if (StringUtils.startsWith(methodName, SET_STATEMENT_METHOD_NAME_PREFIX)) {
+            if (StringUtils.startsWith(methodName, SET_METHOD_NAME_PREFIX)) {
                 ParameterMetaData paramMetadata = ((PreparedStatement) target).getParameterMetaData();
                 int paramIndex = ((int) args[0]), paramPrecision = paramMetadata.getPrecision(paramIndex);
                 Object paramValue = null;
@@ -77,9 +77,8 @@ public class SdcctDriverDataSource implements SmartDataSource {
                         paramValue = paramValueStr = new String(paramValueBytes, StandardCharsets.UTF_8);
                     }
                 } else if (args[1] instanceof Reader) {
-                    args[1] =
-                        new InputStreamReader(new ByteArrayInputStream((paramValueBytes = IOUtils.toByteArray(((Reader) args[1]), StandardCharsets.UTF_8))),
-                            StandardCharsets.UTF_8);
+                    args[1] = new InputStreamReader(
+                        new ByteArrayInputStream((paramValueBytes = IOUtils.toByteArray(((Reader) args[1]), StandardCharsets.UTF_8))), StandardCharsets.UTF_8);
 
                     if (SET_BINARY_STATEMENT_METHOD_NAMES.contains(methodName)) {
                         paramValue = paramValueBytes;
@@ -92,10 +91,11 @@ public class SdcctDriverDataSource implements SmartDataSource {
                     paramValueStr = (paramValue = args[1]).toString();
                 }
 
-                this.event.addParameter(new DbParamImpl((((int) args[0]) - 1), paramMetadata.getParameterType(paramIndex), paramMetadata.getParameterTypeName(
-                    paramIndex).toLowerCase(), SdcctEnumUtils.findByOrdinalId(DbParamModeType.class, paramMetadata.getParameterMode(paramIndex)),
-                    SdcctEnumUtils.findByOrdinalId(DbParamNullabilityType.class, paramMetadata.isNullable(paramIndex)), paramPrecision, paramMetadata
-                        .getScale(paramIndex), paramValue, paramValueStr));
+                this.event.addParameter(new DbParamImpl((((int) args[0]) - 1), paramMetadata.getParameterType(paramIndex),
+                    paramMetadata.getParameterTypeName(paramIndex).toLowerCase(),
+                    SdcctEnumUtils.findByOrdinalId(DbParamModeType.class, paramMetadata.getParameterMode(paramIndex)),
+                    SdcctEnumUtils.findByOrdinalId(DbParamNullabilityType.class, paramMetadata.isNullable(paramIndex)), paramPrecision,
+                    paramMetadata.getScale(paramIndex), paramValue, paramValueStr));
             } else {
                 if ((args.length > 0) && (args[0] instanceof String)) {
                     this.event.setSql(((String) args[0]));
@@ -105,43 +105,43 @@ public class SdcctDriverDataSource implements SmartDataSource {
             try {
                 return method.invoke(target, args);
             } finally {
-                if (StringUtils.startsWith(methodName, EXEC_STATEMENT_METHOD_NAME_PREFIX)) {
+                if (StringUtils.startsWith(methodName, EXEC_METHOD_NAME_PREFIX)) {
                     LOGGER.trace(this.event.buildMarker(), StringUtils.EMPTY);
                 }
             }
         }
     }
 
-    private final static String EXEC_STATEMENT_METHOD_NAME_PREFIX = "execute";
-    private final static String SET_STATEMENT_METHOD_NAME_PREFIX = "set";
+    private final static String EXEC_METHOD_NAME_PREFIX = "execute";
+    private final static String SET_METHOD_NAME_PREFIX = "set";
 
     private final static String ADD_BATCH_STATEMENT_METHOD_NAME = "addBatch";
-    private final static String SET_NULL_STATEMENT_METHOD_NAME = SET_STATEMENT_METHOD_NAME_PREFIX + "Null";
+    private final static String SET_NULL_STATEMENT_METHOD_NAME = SET_METHOD_NAME_PREFIX + "Null";
 
-    private final static Set<String> SET_BINARY_STATEMENT_METHOD_NAMES = Stream.of((SET_STATEMENT_METHOD_NAME_PREFIX + "BinaryStream"),
-        (SET_STATEMENT_METHOD_NAME_PREFIX + "Blob")).collect(Collectors.toSet());
+    private final static Set<String> SET_BINARY_STATEMENT_METHOD_NAMES =
+        Stream.of((SET_METHOD_NAME_PREFIX + "BinaryStream"), (SET_METHOD_NAME_PREFIX + "Blob")).collect(Collectors.toSet());
 
-    private final static MethodMatcher PROCESS_STATEMENT_METHOD_MATCHER = SdcctAopUtils.matchMethodName(statementMethodName -> StringUtils.startsWithAny(
-        statementMethodName, ADD_BATCH_STATEMENT_METHOD_NAME, EXEC_STATEMENT_METHOD_NAME_PREFIX));
-    private final static MethodMatcher PROCESS_PARAMS_STATEMENT_METHOD_MATCHER = MethodMatchers.union(PROCESS_STATEMENT_METHOD_MATCHER, SdcctAopUtils
-        .matchMethod(statementMethod -> (StringUtils.startsWith(statementMethod.getName(), SET_STATEMENT_METHOD_NAME_PREFIX) && (statementMethod
-            .getParameterCount() >= 2))));
+    private final static MethodMatcher PROCESS_STATEMENT_METHOD_MATCHER = SdcctMethodUtils
+        .matchName(statementMethodName -> StringUtils.startsWithAny(statementMethodName, ADD_BATCH_STATEMENT_METHOD_NAME, EXEC_METHOD_NAME_PREFIX));
+    private final static MethodMatcher PROCESS_PARAMS_STATEMENT_METHOD_MATCHER = MethodMatchers.union(PROCESS_STATEMENT_METHOD_MATCHER, SdcctMethodUtils
+        .match(statementMethod -> (StringUtils.startsWith(statementMethod.getName(), SET_METHOD_NAME_PREFIX) && (statementMethod.getParameterCount() >= 2))));
 
     private final static SdcctMethodInterceptor<Connection> CREATE_STATEMENT_CONN_METHOD_INTERCEPTOR =
-        (invocation, method, methodName, args, target) -> new SdcctProxyBuilder<>(Statement.class, invocation.proceed()).addMethodAdvice(
-            PROCESS_STATEMENT_METHOD_MATCHER, new StatementMethodInterceptor(new DbStatementEventImpl(DbStatementType.STATEMENT, null))).build();
+        (invocation, method, methodName, args, target) -> new SdcctProxyBuilder<>(Statement.class, invocation.proceed())
+            .addMethodAdvice(PROCESS_STATEMENT_METHOD_MATCHER, new StatementMethodInterceptor(new DbStatementEventImpl(DbStatementType.STATEMENT, null)))
+            .build();
 
     private final static SdcctMethodInterceptor<Connection> PREPARE_STATEMENT_CONN_METHOD_INTERCEPTOR =
-        (invocation, method, methodName, args, target) -> new SdcctProxyBuilder<>(PreparedStatement.class, invocation.proceed()).addMethodAdvice(
-            PROCESS_PARAMS_STATEMENT_METHOD_MATCHER,
-            new StatementMethodInterceptor(new DbStatementEventImpl(DbStatementType.PREPARED_STATEMENT, (((args.length > 0) && (args[0] instanceof String))
-                ? ((String) args[0]) : null)))).build();
+        (invocation, method, methodName, args, target) -> new SdcctProxyBuilder<>(PreparedStatement.class, invocation.proceed())
+            .addMethodAdvice(PROCESS_PARAMS_STATEMENT_METHOD_MATCHER, new StatementMethodInterceptor(
+                new DbStatementEventImpl(DbStatementType.PREPARED_STATEMENT, (((args.length > 0) && (args[0] instanceof String)) ? ((String) args[0]) : null))))
+            .build();
 
     private final static SdcctMethodInterceptor<Connection> PREPARE_CALL_CONN_METHOD_INTERCEPTOR =
-        (invocation, method, methodName, args, target) -> new SdcctProxyBuilder<>(CallableStatement.class, invocation.proceed()).addMethodAdvice(
-            PROCESS_PARAMS_STATEMENT_METHOD_MATCHER,
-            new StatementMethodInterceptor(new DbStatementEventImpl(DbStatementType.CALLABLE_STATEMENT, (((args.length > 0) && (args[0] instanceof String))
-                ? ((String) args[0]) : null)))).build();
+        (invocation, method, methodName, args, target) -> new SdcctProxyBuilder<>(CallableStatement.class, invocation.proceed())
+            .addMethodAdvice(PROCESS_PARAMS_STATEMENT_METHOD_MATCHER, new StatementMethodInterceptor(
+                new DbStatementEventImpl(DbStatementType.CALLABLE_STATEMENT, (((args.length > 0) && (args[0] instanceof String)) ? ((String) args[0]) : null))))
+            .build();
 
     private final static String NULL_STATEMENT_PARAM_VALUE = "<null>";
 
@@ -200,9 +200,9 @@ public class SdcctDriverDataSource implements SmartDataSource {
 
     private Connection buildConnection() throws SQLException {
         return new SdcctProxyBuilder<>(Connection.class, this.driver.connect(this.url, this.props))
-            .addMethodAdvice(SdcctAopUtils.matchMethodReturnType(Statement.class, false), CREATE_STATEMENT_CONN_METHOD_INTERCEPTOR)
-            .addMethodAdvice(SdcctAopUtils.matchMethodReturnType(PreparedStatement.class, false), PREPARE_STATEMENT_CONN_METHOD_INTERCEPTOR)
-            .addMethodAdvice(SdcctAopUtils.matchMethodReturnType(CallableStatement.class, false), PREPARE_CALL_CONN_METHOD_INTERCEPTOR).build();
+            .addMethodAdvice(SdcctMethodUtils.matchReturnType(Statement.class, false), CREATE_STATEMENT_CONN_METHOD_INTERCEPTOR)
+            .addMethodAdvice(SdcctMethodUtils.matchReturnType(PreparedStatement.class, false), PREPARE_STATEMENT_CONN_METHOD_INTERCEPTOR)
+            .addMethodAdvice(SdcctMethodUtils.matchReturnType(CallableStatement.class, false), PREPARE_CALL_CONN_METHOD_INTERCEPTOR).build();
     }
 
     @Nonnegative

@@ -5,8 +5,11 @@ import gov.hhs.onc.sdcct.api.SpecificationType;
 import gov.hhs.onc.sdcct.beans.StaticValueSetBean;
 import gov.hhs.onc.sdcct.beans.StaticValueSetComponentBean;
 import gov.hhs.onc.sdcct.data.metadata.ResourceParamMetadata;
+import gov.hhs.onc.sdcct.data.parameter.DatePeriod;
 import gov.hhs.onc.sdcct.data.parameter.ResourceParam;
 import gov.hhs.onc.sdcct.data.parameter.impl.AbstractResourceParamProcessor;
+import gov.hhs.onc.sdcct.data.parameter.impl.DatePeriodImpl;
+import gov.hhs.onc.sdcct.data.parameter.impl.DateResourceParamImpl;
 import gov.hhs.onc.sdcct.data.parameter.impl.NumberResourceParamImpl;
 import gov.hhs.onc.sdcct.data.parameter.impl.QuantityResourceParamImpl;
 import gov.hhs.onc.sdcct.data.parameter.impl.RefResourceParamImpl;
@@ -21,31 +24,42 @@ import gov.hhs.onc.sdcct.fhir.Coding;
 import gov.hhs.onc.sdcct.fhir.ContactPoint;
 import gov.hhs.onc.sdcct.fhir.ContactPointSystem;
 import gov.hhs.onc.sdcct.fhir.Count;
+import gov.hhs.onc.sdcct.fhir.DateTimeType;
+import gov.hhs.onc.sdcct.fhir.DateType;
 import gov.hhs.onc.sdcct.fhir.DecimalType;
 import gov.hhs.onc.sdcct.fhir.Distance;
 import gov.hhs.onc.sdcct.fhir.Duration;
+import gov.hhs.onc.sdcct.fhir.Element;
 import gov.hhs.onc.sdcct.fhir.FhirResource;
 import gov.hhs.onc.sdcct.fhir.IdType;
 import gov.hhs.onc.sdcct.fhir.Identifier;
+import gov.hhs.onc.sdcct.fhir.InstantType;
 import gov.hhs.onc.sdcct.fhir.IntegerType;
 import gov.hhs.onc.sdcct.fhir.Money;
+import gov.hhs.onc.sdcct.fhir.Period;
 import gov.hhs.onc.sdcct.fhir.PositiveIntType;
 import gov.hhs.onc.sdcct.fhir.Quantity;
 import gov.hhs.onc.sdcct.fhir.Reference;
 import gov.hhs.onc.sdcct.fhir.Resource;
 import gov.hhs.onc.sdcct.fhir.SpecialValueType;
 import gov.hhs.onc.sdcct.fhir.StringType;
+import gov.hhs.onc.sdcct.fhir.Timing;
+import gov.hhs.onc.sdcct.fhir.TimingRepeat;
 import gov.hhs.onc.sdcct.fhir.UnsignedIntType;
 import gov.hhs.onc.sdcct.fhir.UriType;
 import gov.hhs.onc.sdcct.fhir.impl.FhirResourceImpl;
 import gov.hhs.onc.sdcct.fhir.impl.ResourceImpl;
 import gov.hhs.onc.sdcct.fhir.metadata.FhirResourceMetadata;
 import gov.hhs.onc.sdcct.fhir.parameter.FhirResourceParamProcessor;
+import gov.hhs.onc.sdcct.utils.SdcctDateFormatUtils;
+import gov.hhs.onc.sdcct.utils.SdcctDateFormatUtils.ParsedDate;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import net.sf.saxon.s9api.XdmItem;
 import net.sf.saxon.s9api.XdmNode;
@@ -68,17 +82,17 @@ public class FhirResourceParamProcessorImpl extends AbstractResourceParamProcess
     @Override
     protected void buildDateResourceParam(String type, Map<MultiKey<Serializable>, ResourceParam<?>> resourceParams, String name,
         ResourceParamMetadata resourceParamMetadata, XdmItem item, FhirResource entity) throws Exception {
-        // TODO: Re-enable once date/time XML processing has been fixed.
-        // @formatter:off
-        /*
         Object itemValue = this.decodeNode(((XdmNode) item));
+        ParsedDate parsedValue;
         Date startValue = null, endValue = null;
         Period period = null;
 
         if (itemValue instanceof DateType) {
-            startValue = endValue = SdcctDateFormatUtils.parse(((DateType) itemValue).getValue(), null, Locale.ROOT);
+            startValue = (parsedValue = SdcctDateFormatUtils.parse(((DateType) itemValue).getValue(), null, Locale.ROOT)).getStartValue();
+            endValue = parsedValue.getEndValue();
         } else if (itemValue instanceof DateTimeType) {
-            startValue = endValue = SdcctDateFormatUtils.parse(((DateTimeType) itemValue).getValue(), null, Locale.ROOT);
+            startValue = (parsedValue = SdcctDateFormatUtils.parse(((DateTimeType) itemValue).getValue(), null, Locale.ROOT)).getStartValue();
+            endValue = parsedValue.getEndValue();
         } else if (itemValue instanceof InstantType) {
             startValue = endValue = ((InstantType) itemValue).getValue().toGregorianCalendar().getTime();
         } else if (itemValue instanceof Period) {
@@ -100,8 +114,8 @@ public class FhirResourceParamProcessorImpl extends AbstractResourceParamProcess
         }
 
         if (period != null) {
-            startValue = (period.hasStart() ? SdcctDateFormatUtils.parse(period.getStart().getValue(), null, Locale.ROOT) : null);
-            endValue = (period.hasEnd() ? SdcctDateFormatUtils.parse(period.getEnd().getValue(), null, Locale.ROOT) : null);
+            startValue = (period.hasStart() ? SdcctDateFormatUtils.parse(period.getStart().getValue(), null, Locale.ROOT).getValue() : null);
+            endValue = (period.hasEnd() ? SdcctDateFormatUtils.parse(period.getEnd().getValue(), null, Locale.ROOT).getValue() : null);
         }
 
         if ((startValue == null) && (endValue == null)) {
@@ -111,8 +125,6 @@ public class FhirResourceParamProcessorImpl extends AbstractResourceParamProcess
         DatePeriod value = new DatePeriodImpl(startValue, endValue);
 
         resourceParams.put(new MultiKey<>(name, value), new DateResourceParamImpl(entity, name, value));
-        */
-        // @formatter:on
     }
 
     @Override

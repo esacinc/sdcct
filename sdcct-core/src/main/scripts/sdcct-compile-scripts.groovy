@@ -44,6 +44,7 @@ ant.groovyc(destdir: outDir, encoding: project.properties.getProperty("project.b
             ant.compilerarg(value: "-Fparameters")
             ant.compilerarg(value: "-Fproc:none")
             ant.compilerarg(value: "-FWerror")
+            ant.compilerarg(value: "-FXlint")
             ant.compilerarg(value: "-FXlint:-path")
         }
     }

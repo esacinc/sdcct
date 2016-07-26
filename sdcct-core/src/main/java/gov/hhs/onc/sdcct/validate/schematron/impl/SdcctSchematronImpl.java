@@ -18,9 +18,13 @@ import java.util.TreeMap;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import net.sf.saxon.stax.XMLStreamWriterDestination;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class SdcctSchematronImpl implements SdcctSchematron {
+    private final static Logger LOGGER = LoggerFactory.getLogger(SdcctSchematronImpl.class);
+
     @Autowired
     private SdcctXsltCompiler xsltCompiler;
 
@@ -46,10 +50,10 @@ public class SdcctSchematronImpl implements SdcctSchematron {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        this.initializeSchema();
+        this.buildSchema();
     }
 
-    private void initializeSchema() throws Exception {
+    private void buildSchema() throws Exception {
         Schema schema = this.xmlCodec.decode(this.doc.getSource(), SchemaImpl.class, null);
         schema.setId(this.id);
         schema.setQueryBinding(this.queryBinding);
@@ -58,15 +62,15 @@ public class SdcctSchematronImpl implements SdcctSchematron {
         this.schemaNamespaces = SdcctStreamUtils.asInstances(schema.getContent().stream(), Namespace.class)
             .collect(SdcctStreamUtils.toMap(Namespace::getPrefix, Namespace::getUri, TreeMap::new));
 
-        String sysId = this.doc.getSystemId();
+        String publicId = this.doc.getPublicId(), sysId = this.doc.getSystemId();
 
         SdcctXsltTransformer[] xsltTransformers = Stream.of(this.xsltExecs).map(SdcctXsltExecutable::load).toArray(SdcctXsltTransformer[]::new);
-        xsltTransformers[0].setSource(new ByteArraySource(this.xmlCodec.encode(schema, null), sysId));
+        xsltTransformers[0].setSource(new ByteArraySource(this.xmlCodec.encode(schema, null), publicId, sysId));
 
         IntStream.range(0, (xsltTransformers.length - 1))
             .forEach(xsltTransformerIndex -> xsltTransformers[xsltTransformerIndex].setDestination(xsltTransformers[(xsltTransformerIndex + 1)]));
 
-        ByteArrayResult schemaResult = new ByteArrayResult(sysId);
+        ByteArrayResult schemaResult = new ByteArrayResult(publicId, sysId);
 
         XMLStreamWriterDestination schemaDest = new XMLStreamWriterDestination(this.xmlOutFactory.createXMLStreamWriter(schemaResult));
         xsltTransformers[(xsltTransformers.length - 1)].setDestination(schemaDest);
@@ -74,6 +78,10 @@ public class SdcctSchematronImpl implements SdcctSchematron {
         xsltTransformers[0].transform();
 
         this.schemaXsltExec = this.xsltCompiler.compile(new ByteArraySource(schemaResult.getBytes(), sysId));
+
+        // noinspection ConstantConditions
+        LOGGER.debug(String.format("Built Schematron schema (id=%s, name=%s) from document (publicId=%s, sysId=%s, uri=%s).", this.id, this.name, publicId,
+            sysId, this.doc.getDocumentUri().getUri()));
     }
 
     @Override

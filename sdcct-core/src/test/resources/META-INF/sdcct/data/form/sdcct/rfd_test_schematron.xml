@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FormDesign
+    ID="rfd_test_schematron"
+    xmlns="http://healthIT.gov/sdc">
+    
+    <Body ID="body">
+        <ChildItems>
+            <Section ID="section1" title="Section 1" instanceGUID="a4bccd14-a1e7-4e2d-9e2b-015f626ccb3e">
+                <ChildItems>
+                    <Question ID="question1.1" title="Question 1.1" instanceGUID="b9e3d15b-d28f-4ca0-a214-73ca7b491e39"
+                        parentGUID="a4bccd14-a1e7-4e2d-9e2b-015f626ccb3e">
+                        <ResponseField>
+                            <Response>
+                                <string/>
+                            </Response>
+                        </ResponseField>
+                    </Question>
+                    <Question ID="question1.2" title="Question 1.2" instanceGUID="942b342b-f31b-4fc2-8a94-d221e0000835"
+                        parentGUID="a4bccd14-a1e7-4e2d-9e2b-015f626ccb3f">
+                        <ListField>
+                            <List>
+                                <ListItem ID="question1.2-listItem1" title="Question 1.2 List Item 1"/>
+                                <ListItem ID="question1.2-listItem2" title="Question 1.2 List Item 2"/>
+                            </List>
+                        </ListField>
+                    </Question>
+                </ChildItems>
+            </Section>
+        </ChildItems>
+    </Body>
+</FormDesign>

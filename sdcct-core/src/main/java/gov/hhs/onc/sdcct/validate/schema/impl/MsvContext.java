@@ -16,7 +16,7 @@ import org.codehaus.stax2.validation.XMLValidationProblem;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-public class MsvValidationContext implements ValidationContext {
+public class MsvContext implements ValidationContext {
     private static abstract class AbstractMsvNode {
         protected net.sf.saxon.s9api.QName qname;
 
@@ -52,7 +52,7 @@ public class MsvValidationContext implements ValidationContext {
     private LinkedList<MsvElement> elems = new LinkedList<>();
     private MsvAttribute attr;
 
-    public MsvValidationContext(ContentPathBuilder contentPathBuilder, ValidationContext delegate) {
+    public MsvContext(ContentPathBuilder contentPathBuilder, ValidationContext delegate) {
         this.contentPathBuilder = contentPathBuilder;
         this.delegate = delegate;
     }

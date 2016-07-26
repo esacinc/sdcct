@@ -12,11 +12,11 @@ import com.sun.tools.xjc.api.SpecVersion
 import com.sun.tools.xjc.model.Model
 import com.sun.tools.xjc.outline.Outline
 import com.sun.tools.xjc.reader.internalizer.DOMForest
-import com.sun.tools.xjc.reader.xmlschema.parser.LSInputSAXWrapper
 import com.sun.tools.xjc.reader.xmlschema.parser.XMLSchemaInternalizationLogic
 import com.sun.xml.bind.unmarshaller.DOMScanner
 import com.sun.xml.bind.v2.util.XmlFactory
 import gov.hhs.onc.sdcct.build.xml.jaxb.CodegenException
+import gov.hhs.onc.sdcct.xml.SdcctXmlResolver
 import java.lang.reflect.Constructor
 import javax.annotation.Nullable
 import javax.xml.XMLConstants
@@ -24,8 +24,6 @@ import javax.xml.stream.XMLStreamException
 import javax.xml.stream.XMLStreamReader
 import javax.xml.validation.SchemaFactory
 import org.w3c.dom.Element
-import org.w3c.dom.ls.LSInput
-import org.w3c.dom.ls.LSResourceResolver
 import org.xml.sax.ContentHandler
 import org.xml.sax.EntityResolver
 import org.xml.sax.InputSource
@@ -33,23 +31,6 @@ import org.xml.sax.SAXException
 import org.xml.sax.helpers.LocatorImpl
 
 class CodegenSchemaCompiler implements SchemaCompiler {
-    private class SdcctLsResourceResolver implements LSResourceResolver {
-        @Nullable
-        @Override
-        LSInput resolveResource(String type, String nsUri, String publicId, String sysId, String baseUri) {
-            try {
-                InputSource src = CodegenSchemaCompiler.this.opts.entityResolver.resolveEntity(nsUri, sysId)
-                
-                if (src != null) {
-                    return new LSInputSAXWrapper(src)
-                }
-            } catch (IOException | SAXException ignored) {
-            }
-            
-            return null
-        }
-    }
-    
     private final static Constructor<? extends S2JJAXBModel> JAXB_MODEL_CONSTRUCTOR = buildJaxbModelConstructor("com.sun.tools.xjc.api.impl.s2j.JAXBModelImpl")
     
     private Options opts
@@ -76,10 +57,7 @@ class CodegenSchemaCompiler implements SchemaCompiler {
         
         SchemaFactory schemaFactory = XmlFactory.createSchemaFactory(XMLConstants.W3C_XML_SCHEMA_NS_URI, this.opts.disableXmlSecurity)
         schemaFactory.errorHandler = this.errorReceiver
-        
-        if (opts.entityResolver != null) {
-            schemaFactory.resourceResolver = new SdcctLsResourceResolver()
-        }
+        schemaFactory.resourceResolver = ((SdcctXmlResolver) this.opts.entityResolver)
         
         this.domForest.weakSchemaCorrectnessCheck(schemaFactory)
         

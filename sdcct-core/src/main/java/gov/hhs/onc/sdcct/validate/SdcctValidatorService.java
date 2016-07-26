@@ -1,7 +1,7 @@
 package gov.hhs.onc.sdcct.validate;
 
-import net.sf.saxon.om.NodeInfo;
+import gov.hhs.onc.sdcct.xml.impl.XdmDocument;
 
 public interface SdcctValidatorService {
-    public void validate(NodeInfo nodeInfo) throws ValidationException;
+    public void validate(XdmDocument doc) throws ValidationException;
 }

@@ -5,6 +5,7 @@ import gov.hhs.onc.sdcct.transform.impl.ByteArrayResult;
 import gov.hhs.onc.sdcct.transform.impl.SdcctConfiguration;
 import gov.hhs.onc.sdcct.transform.impl.SdcctPipelineConfiguration;
 import gov.hhs.onc.sdcct.transform.impl.SdcctProcessor;
+import gov.hhs.onc.sdcct.transform.impl.SdcctPullSource;
 import gov.hhs.onc.sdcct.transform.utils.SdcctTransformUtils;
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
 import java.util.Arrays;
@@ -18,7 +19,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.stax.StAXResult;
-import javax.xml.transform.stax.StAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import net.sf.saxon.Configuration;
@@ -156,7 +156,7 @@ public class SdcctSerializer extends Serializer {
     public <T extends Result> T serialize(Source src, T result, @Nullable ParseOptions parseOpts, @Nullable Properties outProps) throws SaxonApiException {
         if (src instanceof StreamSource) {
             try {
-                src = new StAXSource(this.xmlInFactory.createXMLStreamReader(src));
+                src = new SdcctPullSource(SdcctTransformUtils.getPublicId(src), new SdcctStaxBridge((this.xmlInFactory.createXMLStreamReader(src))));
             } catch (XMLStreamException e) {
                 throw new SaxonApiException(e);
             }

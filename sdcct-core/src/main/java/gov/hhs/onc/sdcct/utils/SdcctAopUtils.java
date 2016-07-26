@@ -2,10 +2,6 @@ package gov.hhs.onc.sdcct.utils;
 
 import com.github.sebhoss.warnings.CompilerWarnings;
 import java.lang.reflect.Method;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -52,19 +48,6 @@ public final class SdcctAopUtils {
         public Object invoke(MethodInvocation invocation, Method method, String methodName, Object[] args, @Nullable T target) throws Throwable;
     }
 
-    @FunctionalInterface
-    public static interface SdcctStaticMethodMatcher extends MethodMatcher {
-        @Override
-        default boolean matches(Method method, Class<?> targetClass, Object ... args) {
-            return false;
-        }
-
-        @Override
-        default boolean isRuntime() {
-            return false;
-        }
-    }
-
     public static class SdcctProxyBuilder<T> implements Builder<T> {
         private AspectJProxyFactory factory = new AspectJProxyFactory();
 
@@ -107,31 +90,5 @@ public final class SdcctAopUtils {
     }
 
     private SdcctAopUtils() {
-    }
-
-    public static SdcctStaticMethodMatcher matchMethodName(String ... methodNames) {
-        final Set<String> methodNameSet = Stream.of(methodNames).collect(Collectors.toSet());
-
-        return matchMethodName(methodNameSet::contains);
-    }
-
-    public static SdcctStaticMethodMatcher matchMethodName(Predicate<String> predicate) {
-        return (method, targetClass) -> predicate.test(method.getName());
-    }
-
-    public static SdcctStaticMethodMatcher matchMethodReturnType(Class<?> returnClass, boolean assignable) {
-        final Predicate<Class<?>> predicate = (assignable ? returnClass::isAssignableFrom : returnClass::equals);
-
-        return (method, targetClass) -> predicate.test(method.getReturnType());
-    }
-
-    public static SdcctStaticMethodMatcher matchMethod(Method ... methods) {
-        final Set<Method> methodSet = Stream.of(methods).collect(Collectors.toSet());
-
-        return matchMethod(methodSet::contains);
-    }
-
-    public static SdcctStaticMethodMatcher matchMethod(Predicate<Method> predicate) {
-        return (method, targetClass) -> predicate.test(method);
     }
 }

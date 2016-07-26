@@ -1,5 +1,7 @@
 package gov.hhs.onc.sdcct.xml.impl;
 
+import gov.hhs.onc.sdcct.beans.PublicIdentifiedBean;
+import gov.hhs.onc.sdcct.beans.SystemIdentifiedBean;
 import gov.hhs.onc.sdcct.transform.utils.SdcctTransformUtils;
 import javax.annotation.Nullable;
 import javax.xml.transform.Source;
@@ -8,8 +10,10 @@ import net.sf.saxon.dom.NodeOverNodeInfo;
 import net.sf.saxon.expr.parser.Location;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.tree.linked.DocumentImpl;
+import net.sf.saxon.tree.linked.ElementImpl;
+import net.sf.saxon.tree.util.Navigator;
 
-public class XdmDocument extends XdmNode {
+public class XdmDocument extends XdmNode implements PublicIdentifiedBean, SystemIdentifiedBean {
     private DocumentOverNodeInfo doc;
     private Source src;
     private String publicId;
@@ -45,6 +49,10 @@ public class XdmDocument extends XdmNode {
         return this.doc;
     }
 
+    public ElementImpl getDocumentElement() {
+        return ((ElementImpl) Navigator.getOutermostElement(this.getUnderlyingNode()));
+    }
+
     public boolean hasDocumentUri() {
         return (this.docUri != null);
     }
@@ -63,6 +71,7 @@ public class XdmDocument extends XdmNode {
     }
 
     @Nullable
+    @Override
     public String getPublicId() {
         return this.publicId;
     }
@@ -80,6 +89,7 @@ public class XdmDocument extends XdmNode {
     }
 
     @Nullable
+    @Override
     public String getSystemId() {
         return this.sysId;
     }

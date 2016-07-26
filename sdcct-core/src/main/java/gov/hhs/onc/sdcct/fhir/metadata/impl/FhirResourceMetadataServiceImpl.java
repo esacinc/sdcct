@@ -10,16 +10,16 @@ import gov.hhs.onc.sdcct.data.parameter.ResourceParamType;
 import gov.hhs.onc.sdcct.fhir.Element;
 import gov.hhs.onc.sdcct.fhir.ElementDefinition;
 import gov.hhs.onc.sdcct.fhir.ElementDefinitionBinding;
+import gov.hhs.onc.sdcct.fhir.Reference;
 import gov.hhs.onc.sdcct.fhir.Resource;
+import gov.hhs.onc.sdcct.fhir.ResourceType;
+import gov.hhs.onc.sdcct.fhir.SearchParameter;
+import gov.hhs.onc.sdcct.fhir.UriType;
 import gov.hhs.onc.sdcct.fhir.impl.ElementDefinitionImpl;
 import gov.hhs.onc.sdcct.fhir.impl.SearchParameterImpl;
 import gov.hhs.onc.sdcct.fhir.impl.StructureDefinitionImpl;
 import gov.hhs.onc.sdcct.fhir.metadata.FhirResourceMetadata;
 import gov.hhs.onc.sdcct.fhir.metadata.FhirResourceMetadataService;
-import gov.hhs.onc.sdcct.fhir.Reference;
-import gov.hhs.onc.sdcct.fhir.ResourceType;
-import gov.hhs.onc.sdcct.fhir.SearchParameter;
-import gov.hhs.onc.sdcct.fhir.UriType;
 import gov.hhs.onc.sdcct.utils.SdcctEnumUtils;
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
 import gov.hhs.onc.sdcct.xml.impl.XdmDocument;
@@ -28,9 +28,11 @@ import gov.hhs.onc.sdcct.xml.xpath.impl.DynamicXpathOptionsImpl;
 import gov.hhs.onc.sdcct.xml.xpath.impl.SdcctXpathExecutable;
 import java.net.URI;
 import java.util.stream.Collectors;
+import net.sf.saxon.om.NodeInfo;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmAtomicValue;
 import net.sf.saxon.s9api.XdmNode;
+import net.sf.saxon.tree.linked.DocumentImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.FatalBeanException;
 
@@ -47,6 +49,7 @@ public class FhirResourceMetadataServiceImpl extends AbstractResourceMetadataSer
     private SdcctXpathExecutable searchParamDefsXpathExec;
     private SdcctXpathExecutable searchParamDefXpathExec;
     private XdmDocument searchParamDoc;
+    private DocumentImpl searchParamDocInfo;
     private SdcctXpathExecutable structDefXpathExec;
 
     public FhirResourceMetadataServiceImpl() {
@@ -55,11 +58,14 @@ public class FhirResourceMetadataServiceImpl extends AbstractResourceMetadataSer
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        XdmNode structDefNode = this.buildStructDefNode(ResourceType.RESOURCE.getId());
+        this.searchParamDocInfo = this.searchParamDoc.getUnderlyingNode();
+
+        NodeInfo structDefNodeInfo = this.buildStructDefNodeInfo(ResourceType.RESOURCE.getId());
 
         for (ResourceParamMetadata baseParamMetadata : this.baseParamMetadatas) {
-            this.buildParamMetadata(structDefNode, this.buildSearchParamDef(this.searchParamDefXpathExec.load(new DynamicXpathOptionsImpl()
-                .setContextNode(this.searchParamDoc).addVariable(ID_XPATH_VAR_QNAME, new XdmAtomicValue(baseParamMetadata.getId()))).evaluateNode()),
+            this.buildParamMetadata(
+                structDefNodeInfo, this.buildSearchParamDef(this.searchParamDefXpathExec.load(new DynamicXpathOptionsImpl()
+                    .setContextItem(this.searchParamDocInfo).addVariable(ID_XPATH_VAR_QNAME, new XdmAtomicValue(baseParamMetadata.getId()))).evaluateNode()),
                 baseParamMetadata);
         }
 
@@ -68,16 +74,16 @@ public class FhirResourceMetadataServiceImpl extends AbstractResourceMetadataSer
 
     @Override
     protected FhirResourceMetadata<?> buildMetadata(String id, String path, FhirResourceMetadata<?> metadata) throws Exception {
-        XdmNode structDefNode = this.buildStructDefNode(id);
+        NodeInfo structDefNodeInfo = this.buildStructDefNodeInfo(id);
 
-        metadata.setUri(URI.create(this.xmlCodec.decode(structDefNode.getUnderlyingNode(), StructureDefinitionImpl.class, null).getUrl().getValue()));
+        metadata.setUri(URI.create(this.xmlCodec.decode(structDefNodeInfo, StructureDefinitionImpl.class, null).getUrl().getValue()));
 
         SearchParameter searchParamDef;
 
         for (XdmNode searchParamNode : this.searchParamDefsXpathExec
-            .load(new DynamicXpathOptionsImpl().setContextNode(this.searchParamDoc).addVariable(BASE_XPATH_VAR_QNAME, new XdmAtomicValue(path)))
+            .load(new DynamicXpathOptionsImpl().setContextItem(this.searchParamDocInfo).addVariable(BASE_XPATH_VAR_QNAME, new XdmAtomicValue(path)))
             .evaluateNodes()) {
-            metadata.addParamMetadatas(this.buildParamMetadata(structDefNode, (searchParamDef = this.buildSearchParamDef(searchParamNode)),
+            metadata.addParamMetadatas(this.buildParamMetadata(structDefNodeInfo, (searchParamDef = this.buildSearchParamDef(searchParamNode)),
                 new ResourceParamMetadataImpl(this.specType, SdcctEnumUtils.findById(ResourceParamType.class, searchParamDef.getType().getValue().getId()),
                     searchParamDef.getId().getValue(), searchParamDef.getName().getValue())));
         }
@@ -85,7 +91,7 @@ public class FhirResourceMetadataServiceImpl extends AbstractResourceMetadataSer
         return super.buildMetadata(id, path, metadata);
     }
 
-    private ResourceParamMetadata buildParamMetadata(XdmNode structDefNode, SearchParameter searchParamDef, ResourceParamMetadata paramMetadata)
+    private ResourceParamMetadata buildParamMetadata(NodeInfo structDefNodeInfo, SearchParameter searchParamDef, ResourceParamMetadata paramMetadata)
         throws Exception {
         paramMetadata.setUri(URI.create(searchParamDef.getUrl().getValue()));
 
@@ -100,7 +106,8 @@ public class FhirResourceMetadataServiceImpl extends AbstractResourceMetadataSer
             this.xpathCompiler.compile(StringUtils.split(searchParamDef.getXpath().getValue(), SdcctStringUtils.SLASH, 2)[1], this.staticXpathOpts.clone()));
 
         XdmNode elemDefNode = this.elemDefXpathExec
-            .load(new DynamicXpathOptionsImpl().setContextNode(structDefNode).addVariable(PATH_XPATH_VAR_QNAME, new XdmAtomicValue(paramExpr))).evaluateNode();
+            .load(new DynamicXpathOptionsImpl().setContextItem(structDefNodeInfo).addVariable(PATH_XPATH_VAR_QNAME, new XdmAtomicValue(paramExpr)))
+            .evaluateNode();
 
         if (elemDefNode == null) {
             paramMetadata.setCardinality(new ResourceParamCardinalityImpl(1, 1));
@@ -132,13 +139,14 @@ public class FhirResourceMetadataServiceImpl extends AbstractResourceMetadataSer
         return this.xmlCodec.decode(searchParamDefNode.getUnderlyingNode(), SearchParameterImpl.class, null);
     }
 
-    private XdmNode buildStructDefNode(String structDefId) throws Exception {
+    private NodeInfo buildStructDefNodeInfo(String structDefId) throws Exception {
         XdmAtomicValue structDefIdValue = new XdmAtomicValue(structDefId);
         XdmNode structDefNode = null;
 
         for (XdmDocument profileDoc : this.profileDocs) {
             if ((structDefNode = this.structDefXpathExec
-                .load(new DynamicXpathOptionsImpl().setContextNode(profileDoc).addVariable(ID_XPATH_VAR_QNAME, structDefIdValue)).evaluateNode()) != null) {
+                .load(new DynamicXpathOptionsImpl().setContextItem(profileDoc.getUnderlyingNode()).addVariable(ID_XPATH_VAR_QNAME, structDefIdValue))
+                .evaluateNode()) != null) {
                 break;
             }
         }
@@ -147,7 +155,7 @@ public class FhirResourceMetadataServiceImpl extends AbstractResourceMetadataSer
             throw new FatalBeanException(String.format("Unable to find %s StructureDefinition (id=%s) XML node.", this.specType.name(), structDefId));
         }
 
-        return structDefNode;
+        return structDefNode.getUnderlyingNode();
     }
 
     @Override

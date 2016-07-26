@@ -28,9 +28,10 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import net.sf.saxon.om.NodeInfo;
-import net.sf.saxon.s9api.XdmNode;
+import javax.xml.XMLConstants;
 import net.sf.saxon.stax.XMLStreamWriterDestination;
+import net.sf.saxon.tree.linked.DocumentImpl;
+import net.sf.saxon.tree.linked.ElementImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -50,13 +51,13 @@ public class SchematronValidatorImpl extends AbstractSdcctValidator implements S
     }
 
     @Override
-    protected List<ValidationIssue> validateInternal(NodeInfo nodeInfo, JaxbComplexTypeMetadata<?> jaxbTypeMetadata, Class<?> beanClass,
-        ResourceMetadata<?> resourceMetadata, List<ValidationIssue> issues) throws ValidationException {
+    protected List<ValidationIssue> validateInternal(DocumentImpl docInfo, ElementImpl docElemInfo, JaxbComplexTypeMetadata<?> jaxbTypeMetadata,
+        Class<?> beanClass, ResourceMetadata<?> resourceMetadata, List<ValidationIssue> issues) throws ValidationException {
         if (!resourceMetadata.hasSchematrons()) {
             return issues;
         }
 
-        String id, name, contextXpathExpr = null;
+        String docPublicId = docInfo.getPublicId(), docSysId = docInfo.getSystemId(), nsUri = docElemInfo.getURI(), id, name, contextXpathExpr = null;
         ValidationSource src;
         Map<String, String> namespaces = new TreeMap<>();
         AttributeValueNamespace attrValueNs;
@@ -71,12 +72,13 @@ public class SchematronValidatorImpl extends AbstractSdcctValidator implements S
 
             namespaces.clear();
             namespaces.putAll(schematron.getSchemaNamespaces());
+            namespaces.put(XMLConstants.DEFAULT_NS_PREFIX, nsUri);
 
             try {
                 SdcctXsltTransformer xsltTransformer = schematron.getSchemaXsltExecutable().load();
-                xsltTransformer.setSource(nodeInfo.getTreeInfo());
+                xsltTransformer.setSource(docInfo);
 
-                ByteArrayResult result = new ByteArrayResult(nodeInfo.getSystemId());
+                ByteArrayResult result = new ByteArrayResult(docPublicId, docSysId);
 
                 xsltTransformer.setDestination(new XMLStreamWriterDestination(this.xmlOutFactory.createXMLStreamWriter(result)));
 
@@ -93,7 +95,7 @@ public class SchematronValidatorImpl extends AbstractSdcctValidator implements S
                             (failedAssertion = ((FailedAssertion) outputContentItem)).getText(),
                             new ValidationLocationImpl(new SdcctLocation(
                                 this.xpathCompiler.compile(failedAssertion.getLocation(), new StaticXpathOptionsImpl().setNamespaces(namespaces))
-                                    .load(new DynamicXpathOptionsImpl().setContextNode(new XdmNode(nodeInfo))).evaluateNode().getUnderlyingNode())),
+                                    .load(new DynamicXpathOptionsImpl().setContextItem(docInfo)).evaluateNode().getUnderlyingNode())),
                             src)).setContextXpathExpression(contextXpathExpr);
                         issue.setTestXpathExpression(failedAssertion.getTest());
                         issues.add(issue);
@@ -102,8 +104,10 @@ public class SchematronValidatorImpl extends AbstractSdcctValidator implements S
             } catch (Exception e) {
                 issues.clear();
 
-                throw new ValidationException(String.format("Unable to validate XML node (nsPrefix=%s, nsUri=%s, localName=%s) using Schematron (id=%s, name=%s).",
-                    nodeInfo.getPrefix(), nodeInfo.getURI(), nodeInfo.getLocalPart(), id, name), e, issues);
+                throw new ValidationException(
+                    String.format("Unable to validate XML document element (nsPrefix=%s, nsUri=%s, localName=%s) using Schematron (id=%s, name=%s).",
+                        docElemInfo.getPrefix(), docElemInfo.getURI(), docElemInfo.getLocalPart(), id, name),
+                    e, issues);
             }
         }
 

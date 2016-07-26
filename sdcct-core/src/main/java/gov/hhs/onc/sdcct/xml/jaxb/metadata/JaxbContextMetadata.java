@@ -1,10 +1,9 @@
 package gov.hhs.onc.sdcct.xml.jaxb.metadata;
 
-import com.sun.msv.grammar.xmlschema.XMLSchemaGrammar;
 import com.sun.xml.bind.api.JAXBRIContext;
 import gov.hhs.onc.sdcct.transform.content.path.ContentPathBuilder;
 import gov.hhs.onc.sdcct.transform.impl.ResourceSource;
-import gov.hhs.onc.sdcct.validate.schema.impl.MsvValidationSchema;
+import gov.hhs.onc.sdcct.validate.schema.impl.MsvSchema;
 import java.util.Map;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -18,8 +17,6 @@ public interface JaxbContextMetadata extends InitializingBean, JaxbMetadataCompo
     public Map<String, Object> getContextProperties();
 
     public void setContextProperties(Map<String, Object> contextProps);
-
-    public XMLSchemaGrammar getSchemaGrammar();
 
     public Map<String, Package> getSchemaImplPackages();
 
@@ -39,5 +36,5 @@ public interface JaxbContextMetadata extends InitializingBean, JaxbMetadataCompo
 
     public void setSchemaSources(ResourceSource ... schemaSrcs);
 
-    public MsvValidationSchema getValidationSchema();
+    public MsvSchema getValidationSchema();
 }
