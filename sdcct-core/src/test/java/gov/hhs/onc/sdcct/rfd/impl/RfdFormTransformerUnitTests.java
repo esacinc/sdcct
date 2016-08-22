@@ -5,7 +5,6 @@ import gov.hhs.onc.sdcct.rfd.RfdFormTransformer;
 import gov.hhs.onc.sdcct.test.impl.AbstractSdcctUnitTests;
 import gov.hhs.onc.sdcct.xml.impl.XdmDocument;
 import javax.annotation.Resource;
-import org.apache.commons.jexl2.UnifiedJEXL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;

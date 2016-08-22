@@ -10,11 +10,11 @@ import gov.hhs.onc.sdcct.xml.impl.XdmDocument;
 import gov.hhs.onc.sdcct.xml.impl.XdmDocumentDestination;
 import gov.hhs.onc.sdcct.xml.xslt.impl.SdcctXsltCompiler;
 import gov.hhs.onc.sdcct.xml.xslt.impl.SdcctXsltExecutable;
+import javax.annotation.Nullable;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XsltTransformer;
 import net.sf.saxon.trans.XPathException;
 import org.springframework.beans.factory.annotation.Autowired;
-import javax.annotation.Nullable;
 
 public abstract class AbstractFormTransformer<T> implements FormTransformer<T> {
 
@@ -27,7 +27,6 @@ public abstract class AbstractFormTransformer<T> implements FormTransformer<T> {
     protected ResourceSource src;
     protected boolean internal;
     protected XdmDocument doc;
-    protected T bean;
 
     @Autowired
     private SdcctXsltCompiler xsltCompiler;
@@ -58,6 +57,7 @@ public abstract class AbstractFormTransformer<T> implements FormTransformer<T> {
     public void afterPropertiesSet() throws Exception {
         this.xsltExec = xsltCompiler.compile(this.src);
     }
+
     @Override
     public boolean hasDocument() {
         return (this.doc != null);
