@@ -1,13 +1,12 @@
 package gov.hhs.onc.sdcct.rfd.impl;
 
-import gov.hhs.onc.sdcct.form.transform.FormTransformer;
 import gov.hhs.onc.sdcct.rfd.RfdForm;
 import gov.hhs.onc.sdcct.test.impl.AbstractSdcctUnitTests;
+import gov.hhs.onc.sdcct.xml.impl.XdmDocument;
+import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
-
-import javax.annotation.Resource;
 
 @Test(dependsOnGroups = { "sdcct.test.unit.utils.all", "sdcct.test.unit.transform.all" })
 public class RfdFormTransformerUnitTests extends AbstractSdcctUnitTests {
@@ -17,13 +16,14 @@ public class RfdFormTransformerUnitTests extends AbstractSdcctUnitTests {
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
     private RfdForm testRfdSdcCapAdrenalForm;
 
-    @Resource(name = "RfdTemplateTransformer")
+    @Resource(name = "rfdTemplateTransformer")
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
-    private FormTransformer<RfdForm> rfdTemplateTransformer;
+    private RfdFormTransformerImpl rfdTemplateTransformer;
 
     @Test
     public void testFormTransform() throws Exception {
-        LOGGER.debug(this.rfdTemplateTransformer.transform(testRfdSdcCapAdrenalForm).toString());
+        XdmDocument docOutput = this.rfdTemplateTransformer.transform(testRfdSdcCapAdrenalForm);
+        assert docOutput != null;
+        LOGGER.debug("Transformed form CapAdrenal from XML to HTML:\n" + docOutput.toString());
     }
 }
-

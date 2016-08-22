@@ -14,10 +14,9 @@ import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XsltTransformer;
 import net.sf.saxon.trans.XPathException;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import javax.annotation.Nullable;
 
-public abstract class AbstractFormTransformer<T> implements FormTransformer<T>{
+public abstract class AbstractFormTransformer<T> implements FormTransformer<T> {
 
     @Autowired
     protected SdcctDocumentBuilder docBuilder;
@@ -25,9 +24,7 @@ public abstract class AbstractFormTransformer<T> implements FormTransformer<T>{
     protected SpecificationType specType;
     protected Class<T> beanClass;
     protected Class<? extends T> beanImplClass;
-    protected String name;
     protected ResourceSource src;
-    protected String identifier;
     protected boolean internal;
     protected XdmDocument doc;
     protected T bean;
@@ -40,11 +37,10 @@ public abstract class AbstractFormTransformer<T> implements FormTransformer<T>{
 
     private SdcctXsltExecutable xsltExec;
 
-    protected AbstractFormTransformer(SpecificationType specType, Class<T> beanClass, Class<? extends T> beanImplClass, String name, ResourceSource src) {
+    protected AbstractFormTransformer(SpecificationType specType, Class<T> beanClass, Class<? extends T> beanImplClass, ResourceSource src) {
         this.specType = specType;
         this.beanClass = beanClass;
         this.beanImplClass = beanImplClass;
-        this.name = name;
         this.src = src;
     }
 
@@ -53,16 +49,13 @@ public abstract class AbstractFormTransformer<T> implements FormTransformer<T>{
         XdmDocumentDestination output = new XdmDocumentDestination(this.config);
         XsltTransformer xsltTransformer = xsltExec.load();
         xsltTransformer.setDestination(output);
-        xsltTransformer.setSource(((SdcctForm<?>)form).getSource());
+        xsltTransformer.setSource(((SdcctForm<?>) form).getSource());
         xsltTransformer.transform();
         return output.getXdmNode();
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        if (this.identifier == null) {
-            this.identifier = name;
-        }
         this.xsltExec = xsltCompiler.compile(this.src);
     }
 
@@ -75,11 +68,6 @@ public abstract class AbstractFormTransformer<T> implements FormTransformer<T>{
     @Override
     public T getBean() {
         return this.bean;
-    }
-
-    @Override
-    public void setBean(@Nullable T bean) {
-        this.bean = bean;
     }
 
     @Override
@@ -105,21 +93,6 @@ public abstract class AbstractFormTransformer<T> implements FormTransformer<T>{
     @Override
     public void setDocument(@Nullable XdmDocument doc) {
         this.doc = doc;
-    }
-
-    @Override
-    public String getIdentifier() {
-        return this.identifier;
-    }
-
-    @Override
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
     }
 
     @Override

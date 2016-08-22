@@ -7,7 +7,7 @@ import gov.hhs.onc.sdcct.rfd.RfdFormTransformer;
 import gov.hhs.onc.sdcct.transform.impl.ResourceSource;
 
 public class RfdFormTransformerImpl extends AbstractFormTransformer<RfdForm> implements RfdFormTransformer {
-    protected RfdFormTransformerImpl(String name, ResourceSource src) {
-        super(SpecificationType.RFD, RfdForm.class, RfdFormImpl.class, name, src);
+    protected RfdFormTransformerImpl(ResourceSource src) {
+        super(SpecificationType.RFD, RfdForm.class, RfdFormImpl.class, src);
     }
 }

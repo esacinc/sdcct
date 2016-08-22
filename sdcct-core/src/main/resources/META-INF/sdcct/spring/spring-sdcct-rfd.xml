@@ -185,8 +185,7 @@
     <!--====================================================================================================
     = RFD FORM TRANSFORMER
     =====================================================================================================-->
-    <beans:bean id="RfdTemplateTransformer" class="gov.hhs.onc.sdcct.rfd.impl.RfdFormTransformerImpl"
-                c:name="RfdTransformer"
+    <beans:bean id="rfdTemplateTransformer" class="gov.hhs.onc.sdcct.rfd.impl.RfdFormTransformerImpl"
                 c:src="classpath*:${sdcct.xslt.src.dir.path}/sdcct/rfd-template.xslt"/>
 
 </beans:beans>
