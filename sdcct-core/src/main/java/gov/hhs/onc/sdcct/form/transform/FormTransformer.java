@@ -9,15 +9,6 @@ import net.sf.saxon.trans.XPathException;
 import org.springframework.beans.factory.InitializingBean;
 
 public interface FormTransformer<T> extends InitializingBean, SpecifiedBean {
-    public boolean hasBean();
-
-    @Nullable
-    public T getBean();
-
-    public Class<T> getBeanClass();
-
-    public Class<? extends T> getBeanImplClass();
-
     public boolean hasDocument();
 
     @Nullable

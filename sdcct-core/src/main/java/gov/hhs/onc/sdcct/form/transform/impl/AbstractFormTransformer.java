@@ -58,28 +58,6 @@ public abstract class AbstractFormTransformer<T> implements FormTransformer<T> {
     public void afterPropertiesSet() throws Exception {
         this.xsltExec = xsltCompiler.compile(this.src);
     }
-
-    @Override
-    public boolean hasBean() {
-        return (this.bean != null);
-    }
-
-    @Nullable
-    @Override
-    public T getBean() {
-        return this.bean;
-    }
-
-    @Override
-    public Class<T> getBeanClass() {
-        return this.beanClass;
-    }
-
-    @Override
-    public Class<? extends T> getBeanImplClass() {
-        return this.beanImplClass;
-    }
-
     @Override
     public boolean hasDocument() {
         return (this.doc != null);
