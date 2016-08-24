@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
+        urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
+    
+    <!--====================================================================================================
+    = FORMS
+    =====================================================================================================-->
+    <beans:bean id="formRfd" class="gov.hhs.onc.sdcct.rfd.form.impl.RfdFormImpl" abstract="true"/>
+    
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="formRfd1a" parent="formRfd"
+        c:name="rfd_1a"
+        c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/rfd_1a.xml"
+        p:internal="true"/>
+    
+    <!--====================================================================================================
+    = FORM INITIALIZERS
+    =====================================================================================================-->
+    <beans:bean id="initializerFormRfd" class="gov.hhs.onc.sdcct.rfd.form.impl.RfdFormInitializerImpl"
+        c:registry-ref="resourceRegistryRfdFormDesign"
+        p:phase="1"/>
+    
+    <!--====================================================================================================
+    = XSLT EXECUTABLES
+    =====================================================================================================-->
+    <sdcct-xml:xslt-executable id="xsltExecRfdFormHtml">
+        <sdcct-xml:xslt-document>classpath*:${sdcct.style.sdcct.dir.path}/sdcct-form-html-rfd.xsl</sdcct-xml:xslt-document>
+        <sdcct-xml:xslt-static-options parent="xsltOptsStaticRfd">
+            <sdcct-xml:static-pooled-document document-uri="sdcct.xsl">
+                classpath*:${sdcct.style.sdcct.dir.path}/sdcct.xsl
+            </sdcct-xml:static-pooled-document>
+            <sdcct-xml:static-pooled-document document-uri="sdcct-form-html.xsl">
+                classpath*:${sdcct.style.sdcct.dir.path}/sdcct-form-html.xsl
+            </sdcct-xml:static-pooled-document>
+        </sdcct-xml:xslt-static-options>
+    </sdcct-xml:xslt-executable>
+</beans:beans>

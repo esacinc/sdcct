@@ -46,7 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-public abstract class AbstractSdcctResourceRegistry<T, U extends ResourceMetadata<T>, V extends SdcctResource> extends AbstractSdcctResourceAccessor<T, U, V>
+public abstract class AbstractSdcctResourceRegistry<T, U extends ResourceMetadata<T>, V extends SdcctResource> extends AbstractSdcctResourceAccessor<T, V>
     implements SdcctResourceRegistry<T, U, V> {
     @Autowired
     @SuppressWarnings({ "SpringJavaAutowiringInspection" })
@@ -156,8 +156,8 @@ public abstract class AbstractSdcctResourceRegistry<T, U extends ResourceMetadat
                 .select(this.criteriaBuilder.max((criteriaRoot = ((Root<V>) (criteriaQuery.from(this.entityImplClass)))).get(DbPropertyNames.INSTANCE_ID)));
             criteriaQuery.distinct(true);
 
-            instanceId = (Optional.ofNullable(
-                this.buildCriteria(SdcctCriterionUtils.matchId(id), SdcctCriterionUtils.matchInstances(), SdcctCriterionUtils.<V> matchHistory().not())
+            instanceId = (Optional
+                .ofNullable(this.buildCriteria(SdcctCriterionUtils.matchId(id), SdcctCriterionUtils.matchInstances(), SdcctCriterionUtils.matchLatestVersion())
                     .first(this.entityManager, criteriaQuery, criteriaRoot))
                 .orElse(0L) + 1);
             version = 1L;

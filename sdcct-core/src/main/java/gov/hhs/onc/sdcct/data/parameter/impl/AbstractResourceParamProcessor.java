@@ -47,7 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public abstract class AbstractResourceParamProcessor<T, U extends ResourceMetadata<?>, V extends SdcctResource> extends AbstractSdcctResourceAccessor<T, U, V>
+public abstract class AbstractResourceParamProcessor<T, U extends ResourceMetadata<?>, V extends SdcctResource> extends AbstractSdcctResourceAccessor<T, V>
     implements ResourceParamProcessor<T, U, V> {
     @Autowired
     @SuppressWarnings({ "SpringJavaAutowiringInspection" })

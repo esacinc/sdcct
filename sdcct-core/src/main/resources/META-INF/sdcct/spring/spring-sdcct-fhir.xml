@@ -25,6 +25,22 @@
     </beans:bean>
     
     <!--====================================================================================================
+    = MODULES
+    =====================================================================================================-->
+    <beans:bean id="moduleFhir" parent="module">
+        <beans:property name="beanDeserializerModifiers">
+            <beans:list>
+                <beans:ref bean="beanDeserializerModFhir"/>
+            </beans:list>
+        </beans:property>
+        <beans:property name="beanSerializerModifiers">
+            <beans:list>
+                <beans:ref bean="beanSerializerModFhir"/>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
     = XPATH OPTIONS
     =====================================================================================================-->
     <sdcct-xml:xpath-static-options id="xpathOptsStaticFhir" abstract="true">
@@ -35,6 +51,18 @@
             #{ T(net.sf.saxon.lib.NamespaceConstant).XHTML }
         </sdcct-xml:static-namespace>
     </sdcct-xml:xpath-static-options>
+    
+    <!--====================================================================================================
+    = XSLT OPTIONS
+    =====================================================================================================-->
+    <sdcct-xml:xslt-static-options id="xsltOptsStaticFhir" parent="xsltOptsStatic" abstract="true">
+        <sdcct-xml:static-namespace prefix="#{ T(gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes).FHIR_XPATH }">
+            #{ T(gov.hhs.onc.sdcct.net.SdcctUris).FHIR_URL_VALUE }
+        </sdcct-xml:static-namespace>
+        <sdcct-xml:static-namespace prefix="#{ T(gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes).XHTML_XPATH }">
+            #{ T(net.sf.saxon.lib.NamespaceConstant).XHTML }
+        </sdcct-xml:static-namespace>
+    </sdcct-xml:xslt-static-options>
     
     <!--====================================================================================================
     = CONTENT PATH BUILDERS
@@ -92,6 +120,20 @@
             </beans:array>
         </beans:property>
     </beans:bean>
+    
+    <beans:bean id="metadataResourceFhirBundle" parent="metadataResourceFhir"
+        c:id="#{ T(gov.hhs.onc.sdcct.fhir.ResourceType).BUNDLE.id }"
+        c:name="#{ T(gov.hhs.onc.sdcct.fhir.ResourceType).BUNDLE.name }"
+        c:path="#{ T(gov.hhs.onc.sdcct.fhir.ResourceType).BUNDLE.id }"
+        c:beanClass="#{ T(gov.hhs.onc.sdcct.fhir.Bundle) }"
+        c:beanImplClass="#{ T(gov.hhs.onc.sdcct.fhir.impl.BundleImpl) }"/>
+    
+    <beans:bean id="metadataResourceFhirOpOutcome" parent="metadataResourceFhir"
+        c:id="#{ T(gov.hhs.onc.sdcct.fhir.ResourceType).OPERATION_OUTCOME.id }"
+        c:name="#{ T(gov.hhs.onc.sdcct.fhir.ResourceType).OPERATION_OUTCOME.name }"
+        c:path="#{ T(gov.hhs.onc.sdcct.fhir.ResourceType).OPERATION_OUTCOME.id }"
+        c:beanClass="#{ T(gov.hhs.onc.sdcct.fhir.OperationOutcome) }"
+        c:beanImplClass="#{ T(gov.hhs.onc.sdcct.fhir.impl.OperationOutcomeImpl) }"/>
     
     <beans:bean id="metadataResourceFhirQuestionnaire" parent="metadataResourceFhir"
         c:id="sdc-questionnaire"
@@ -233,14 +275,14 @@
         </beans:property>
         <beans:property name="profileDocuments">
             <beans:array>
-                <sdcct-xml:document>classpath*:${sdcct.data.fhir.src.dir.path}/profiles-resources.xml</sdcct-xml:document>
-                <sdcct-xml:document>classpath*:${sdcct.data.fhir.src.dir.path}/sdc-questionnaire.profile.xml</sdcct-xml:document>
-                <sdcct-xml:document>classpath*:${sdcct.data.fhir.src.dir.path}/sdc-response.profile.xml</sdcct-xml:document>
-                <sdcct-xml:document>classpath*:${sdcct.data.fhir.src.dir.path}/sdc-valueset.profile.xml</sdcct-xml:document>
-                <sdcct-xml:document>classpath*:${sdcct.data.fhir.src.dir.path}/extension-definitions.xml</sdcct-xml:document>
-                <sdcct-xml:document>classpath*:${sdcct.data.fhir.src.dir.path}/extension-sdc-questionnaire-endpoint.xml</sdcct-xml:document>
-                <sdcct-xml:document>classpath*:${sdcct.data.fhir.src.dir.path}/extension-sdc-questionnaire-optionaldisplay.xml</sdcct-xml:document>
-                <sdcct-xml:document>classpath*:${sdcct.data.fhir.src.dir.path}/extension-sdc-questionnaire-provenancesignaturerequred.xml</sdcct-xml:document>
+                <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/profiles-resources.xml</sdcct-xml:document>
+                <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/sdc-questionnaire.profile.xml</sdcct-xml:document>
+                <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/sdc-response.profile.xml</sdcct-xml:document>
+                <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/sdc-valueset.profile.xml</sdcct-xml:document>
+                <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/extension-definitions.xml</sdcct-xml:document>
+                <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/extension-sdc-questionnaire-endpoint.xml</sdcct-xml:document>
+                <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/extension-sdc-questionnaire-optionaldisplay.xml</sdcct-xml:document>
+                <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/extension-sdc-questionnaire-provenancesignaturerequred.xml</sdcct-xml:document>
             </beans:array>
         </beans:property>
         <beans:property name="searchParamDefsXpathExecutable">
@@ -260,7 +302,7 @@
             </sdcct-xml:xpath-executable>
         </beans:property>
         <beans:property name="searchParamDocument">
-            <sdcct-xml:document>classpath*:${sdcct.data.fhir.src.dir.path}/search-parameters.xml</sdcct-xml:document>
+            <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/search-parameters.xml</sdcct-xml:document>
         </beans:property>
         <beans:property name="structDefXpathExecutable">
             <sdcct-xml:xpath-executable>
@@ -275,6 +317,7 @@
     =====================================================================================================-->
     <beans:bean id="validatorServiceFhir" parent="validatorService"
         c:contentPathBuilder-ref="contentPathBuilderFhir"
+        c:jaxbContextMetadata-ref="jaxbContextMetadataFhir"
         c:resourceMetadataService-ref="resourceMetadataServiceFhir"/>
     
     <!--====================================================================================================

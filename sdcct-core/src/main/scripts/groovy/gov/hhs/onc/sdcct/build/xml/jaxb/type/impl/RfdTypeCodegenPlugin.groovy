@@ -5,6 +5,7 @@ import com.sun.tools.xjc.Options
 import com.sun.tools.xjc.model.Model
 import com.sun.tools.xjc.outline.Outline
 import gov.hhs.onc.sdcct.SdcctPackages
+import gov.hhs.onc.sdcct.api.type.DatatypeKindType
 import gov.hhs.onc.sdcct.api.SpecificationType
 import gov.hhs.onc.sdcct.build.xml.jaxb.impl.CodegenSchemaContext
 import gov.hhs.onc.sdcct.build.xml.jaxb.utils.SdcctCodegenUtils
@@ -34,7 +35,7 @@ class RfdTypeCodegenPlugin extends AbstractTypeCodegenPlugin {
         super.onActivatedInternal(opts)
         
         RfdResourceType.values().each{
-            this.types[it.id] = new TypeCodegenModel(null, CodegenTypeKind.RESOURCE, it.id)
+            this.types[it.id] = new TypeCodegenModel(null, DatatypeKindType.RESOURCE, it.id)
         }
     }
 }

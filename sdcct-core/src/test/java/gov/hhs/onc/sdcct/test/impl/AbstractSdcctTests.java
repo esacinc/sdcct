@@ -26,7 +26,15 @@ public abstract class AbstractSdcctTests extends AbstractTestNGSpringContextTest
         }
     }
 
-    protected void writeTestOutputFile(File testOutDir, String testOutFileName, byte ... testOutContent) throws Exception {
+    protected byte[] readTestFile(File testInDir, String testInFileName) throws Exception {
+        File testInFile = new File(testInDir, testInFileName);
+
+        Assert.assertTrue(testInFile.exists(), String.format("Test input file (path=%s) does not exist.", testInFile));
+
+        return FileUtils.readFileToByteArray(testInFile);
+    }
+
+    protected File writeTestFile(File testOutDir, String testOutFileName, byte ... testOutContent) throws Exception {
         File testOutFile = new File(testOutDir, testOutFileName);
 
         if (!testOutDir.exists()) {
@@ -36,5 +44,7 @@ public abstract class AbstractSdcctTests extends AbstractTestNGSpringContextTest
         }
 
         FileUtils.writeByteArrayToFile(testOutFile, testOutContent);
+
+        return testOutFile;
     }
 }

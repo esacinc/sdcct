@@ -8,6 +8,6 @@ import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 
 public interface SearchService<T, U extends ResourceMetadata<T>, V extends SdcctResource, W extends SdcctResourceRegistry<T, U, V>>
-    extends SdcctResourceAccessor<T, U, V> {
+    extends SdcctResourceAccessor<T, V> {
     public List<T> search(MultivaluedMap<String, String> params) throws Exception;
 }

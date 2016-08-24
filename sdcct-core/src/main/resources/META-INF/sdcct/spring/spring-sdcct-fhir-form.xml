@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
+        urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
+    
+    <!--====================================================================================================
+    = FORMS
+    =====================================================================================================-->
+    <beans:bean id="formFhir" class="gov.hhs.onc.sdcct.fhir.form.impl.FhirFormImpl" abstract="true"/>
+    
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="formFhir1a" parent="formFhir"
+        c:name="fhir_1a"
+        c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/fhir_1a.xml"
+        p:internal="true"/>
+    
+    <!--====================================================================================================
+    = FORM INITIALIZERS
+    =====================================================================================================-->
+    <beans:bean id="initializerFormFhir" class="gov.hhs.onc.sdcct.fhir.form.impl.FhirFormInitializerImpl"
+        c:registry-ref="resourceRegistryFhirQuestionnaire"
+        p:phase="1"/>
+</beans:beans>

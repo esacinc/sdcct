@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
+        urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
+    
+    <!--====================================================================================================
+    = JAX-RS SERVERS
+    =====================================================================================================-->
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="serverFormManagerFhir" parent="serverFhir"
+        p:address="${sdcct.ws.form.manager.fhir.url.path}">
+        <beans:property name="serviceBean">
+            <beans:bean class="gov.hhs.onc.sdcct.web.form.manager.fhir.ws.impl.FhirFormManagerWebServiceImpl"
+                p:metadata-ref="metadataWsFhirFormManager">
+                <beans:property name="resourceRegistries">
+                    <beans:array>
+                        <beans:ref bean="resourceRegistryFhirQuestionnaire"/>
+                        <beans:ref bean="resourceRegistryFhirValueSet"/>
+                    </beans:array>
+                </beans:property>
+                <beans:property name="searchServices">
+                    <beans:array>
+                        <beans:ref bean="searchServiceFhirQuestionnaire"/>
+                        <beans:ref bean="searchServiceFhirValueSet"/>
+                    </beans:array>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = JAX-RS CLIENTS
+    =====================================================================================================-->
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="clientFormManagerFhir" parent="clientFhir" lazy-init="true" scope="prototype"
+        p:serviceClass="#{ T(gov.hhs.onc.sdcct.web.form.manager.fhir.ws.FhirFormManagerWebService) }"/>
+</beans:beans>

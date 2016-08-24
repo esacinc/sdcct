@@ -1,15 +1,16 @@
 package gov.hhs.onc.sdcct.fhir.ws.impl;
 
 import com.github.sebhoss.warnings.CompilerWarnings;
-import gov.hhs.onc.sdcct.api.IssueLevel;
 import gov.hhs.onc.sdcct.config.utils.SdcctOptionUtils;
-import gov.hhs.onc.sdcct.fhir.FhirException;
 import gov.hhs.onc.sdcct.fhir.FhirFormatType;
 import gov.hhs.onc.sdcct.fhir.IssueType;
 import gov.hhs.onc.sdcct.fhir.OperationOutcomeType;
-import gov.hhs.onc.sdcct.fhir.impl.FhirIssueImpl;
+import gov.hhs.onc.sdcct.fhir.ws.FhirWsException;
 import gov.hhs.onc.sdcct.fhir.ws.FhirWsQueryParamNames;
+import gov.hhs.onc.sdcct.fhir.ws.utils.SdcctFhirOperationOutcomeUtils.OperationOutcomeBuilder;
+import gov.hhs.onc.sdcct.fhir.ws.utils.SdcctFhirOperationOutcomeUtils.OperationOutcomeIssueBuilder;
 import gov.hhs.onc.sdcct.io.utils.SdcctMediaTypeUtils;
+import gov.hhs.onc.sdcct.net.http.SdcctHttpStatus;
 import gov.hhs.onc.sdcct.transform.content.ContentCodec;
 import gov.hhs.onc.sdcct.transform.content.ContentCodecOptions;
 import gov.hhs.onc.sdcct.transform.content.SdcctContentType;
@@ -31,7 +32,6 @@ import java.util.stream.Stream;
 import javax.annotation.Priority;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import org.apache.commons.io.IOUtils;
@@ -61,7 +61,7 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
         MultivaluedMap<String, String> queryParams = new UriInfoImpl(msg.getExchange().getInMessage()).getQueryParameters();
         Map<String, String> mergedQueryParams = new HashMap<>(this.defaultQueryParams);
 
-        queryParams.keySet().stream().forEach(queryParamName -> mergedQueryParams.put(queryParamName, queryParams.getFirst(queryParamName)));
+        queryParams.keySet().forEach(queryParamName -> mergedQueryParams.put(queryParamName, queryParams.getFirst(queryParamName)));
 
         FhirFormatType format;
 
@@ -69,11 +69,11 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
             String formatQueryParamValue = mergedQueryParams.get(FhirWsQueryParamNames.FORMAT);
 
             if (!this.formatQueryParamValues.containsKey(formatQueryParamValue)) {
-                throw new FhirException(
+                throw new FhirWsException(
                     String.format("Invalid format query parameter (name=%s) value: %s", FhirWsQueryParamNames.FORMAT, formatQueryParamValue))
-                        .addIssues(
-                            new FhirIssueImpl(IssueLevel.ERROR, IssueType.PROCESSING, OperationOutcomeType.MSG_PARAM_INVALID, FhirWsQueryParamNames.FORMAT))
-                        .setResponseStatus(Status.BAD_REQUEST);
+                        .setOperationOutcome(new OperationOutcomeBuilder().addIssues(new OperationOutcomeIssueBuilder().setType(IssueType.PROCESSING)
+                            .setDetails(OperationOutcomeType.MSG_PARAM_INVALID, FhirWsQueryParamNames.FORMAT).build()).build())
+                        .setResponseStatus(SdcctHttpStatus.BAD_REQUEST);
             }
 
             format = this.formatQueryParamValues.get(formatQueryParamValue);
@@ -101,11 +101,11 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
             try {
                 encodeOpts.setOption(ContentCodecOptions.PRETTY, SdcctOptionUtils.getBooleanValue(FhirWsQueryParamNames.PRETTY, prettyQueryParamValue));
             } catch (IllegalArgumentException e) {
-                throw new FhirException(
-                    String.format("Invalid pretty query parameter (name=%s) value: %s", FhirWsQueryParamNames.PRETTY, prettyQueryParamValue), e)
-                        .addIssues(
-                            new FhirIssueImpl(IssueLevel.ERROR, IssueType.PROCESSING, OperationOutcomeType.MSG_PARAM_INVALID, FhirWsQueryParamNames.PRETTY))
-                        .setResponseStatus(Status.BAD_REQUEST);
+                throw new FhirWsException(
+                    String.format("Invalid pretty query parameter (name=%s) value: %s", FhirWsQueryParamNames.PRETTY, prettyQueryParamValue))
+                        .setOperationOutcome(new OperationOutcomeBuilder().addIssues(new OperationOutcomeIssueBuilder().setType(IssueType.PROCESSING)
+                            .setDetails(OperationOutcomeType.MSG_PARAM_INVALID, FhirWsQueryParamNames.PRETTY).build()).build())
+                        .setResponseStatus(SdcctHttpStatus.BAD_REQUEST);
             }
         }
 
@@ -114,9 +114,10 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
 
             entityStream.close();
         } catch (Exception e) {
-            throw new FhirException(
+            throw new FhirWsException(
                 String.format("Unable to encode (mediaType=%s) content object (class=%s).", formatEncMediaTypeValue, obj.getClass().getName()), e)
-                    .addIssues(new FhirIssueImpl(IssueLevel.ERROR, IssueType.STRUCTURE));
+                    .setOperationOutcome(
+                        new OperationOutcomeBuilder().addIssues(new OperationOutcomeIssueBuilder().setType(IssueType.STRUCTURE).build()).build());
         }
     }
 
@@ -134,8 +135,8 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
 
             return (type.equals(byte[].class) ? type.cast(entityBytes) : codec.decode(entityBytes, type, null));
         } catch (Exception e) {
-            throw new FhirException(String.format("Unable to decode (mediaType=%s) content object (class=%s).", mediaType, type.getName()), e)
-                .addIssues(new FhirIssueImpl(IssueLevel.ERROR, IssueType.STRUCTURE));
+            throw new FhirWsException(String.format("Unable to decode (mediaType=%s) content object (class=%s).", mediaType, type.getName()), e)
+                .setOperationOutcome(new OperationOutcomeBuilder().addIssues(new OperationOutcomeIssueBuilder().setType(IssueType.STRUCTURE).build()).build());
         }
     }
 

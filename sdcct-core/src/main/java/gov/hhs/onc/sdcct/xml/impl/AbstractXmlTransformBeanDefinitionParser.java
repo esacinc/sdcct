@@ -5,13 +5,16 @@ import gov.hhs.onc.sdcct.beans.factory.xml.impl.SdcctNamespaceHandler;
 import gov.hhs.onc.sdcct.xml.utils.SdcctXmlUtils;
 import java.util.List;
 import java.util.Map;
+import net.sf.saxon.lib.ExtensionFunctionDefinition;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmValue;
 import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
+import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
@@ -21,6 +24,7 @@ public abstract class AbstractXmlTransformBeanDefinitionParser extends AbstractS
 
     protected final static String STATIC_OPTS_ELEM_LOCAL_NAME_SUFFIX = STATIC_ELEM_LOCAL_NAME_PREFIX + "options";
 
+    protected final static String STATIC_FUNC_ELEM_LOCAL_NAME = STATIC_ELEM_LOCAL_NAME_PREFIX + "function";
     protected final static String STATIC_NS_ELEM_LOCAL_NAME = STATIC_ELEM_LOCAL_NAME_PREFIX + "namespace";
     protected final static String STATIC_POOLED_DOC_ELEM_LOCAL_NAME =
         STATIC_ELEM_LOCAL_NAME_PREFIX + "pooled-" + XdmDocumentBeanDefinitionParser.DOC_ELEM_LOCAL_NAME;
@@ -28,6 +32,7 @@ public abstract class AbstractXmlTransformBeanDefinitionParser extends AbstractS
 
     protected final static String PREFIX_ATTR_NAME = "prefix";
 
+    protected final static String FUNCS_PROP_NAME = "functions";
     protected final static String NAMESPACES_PROP_NAME = "namespaces";
     protected final static String POOLED_DOCS_PROP_NAME = "pooledDocuments";
     protected final static String VARS_PROP_NAME = "variables";
@@ -41,6 +46,19 @@ public abstract class AbstractXmlTransformBeanDefinitionParser extends AbstractS
         super.parseDefinition(parserContext, beanDefRegistry, elem, elemNsPrefix, elemNsUri, elemLocalName, beanDef);
 
         MutablePropertyValues staticOptsPropValues = beanDef.getPropertyValues();
+        List<Element> staticFuncElems = SdcctXmlUtils.findChildElements(elem, elemNsUri, STATIC_FUNC_ELEM_LOCAL_NAME);
+
+        if (!staticFuncElems.isEmpty()) {
+            ManagedList<Object> staticFuncs = new ManagedList<>(staticFuncElems.size());
+            staticFuncs.setMergeEnabled(true);
+            staticFuncs.setElementTypeName(ExtensionFunctionDefinition.class.getName());
+
+            staticFuncElems
+                .forEach(staticFuncElem -> staticFuncs.add(new RuntimeBeanReference(staticFuncElem.getAttribute(BeanDefinitionParserDelegate.REF_ATTRIBUTE))));
+
+            staticOptsPropValues.addPropertyValue(FUNCS_PROP_NAME, staticFuncs);
+        }
+
         List<Element> staticNsElems = SdcctXmlUtils.findChildElements(elem, elemNsUri, STATIC_NS_ELEM_LOCAL_NAME);
 
         if (!staticNsElems.isEmpty()) {

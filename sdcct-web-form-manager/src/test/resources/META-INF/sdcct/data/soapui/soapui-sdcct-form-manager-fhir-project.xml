@@ -9,78 +9,6 @@
     <con:resource name="/" path="/" id="ca9cb35a-82eb-4785-b1f4-b387ab979d25">
       <con:settings/>
       <con:parameters/>
-      <con:resource name="Questionnaire" path="Questionnaire" id="20d77951-3c82-41ff-823c-4086012bba0a">
-        <con:settings/>
-        <con:parameters/>
-        <con:method name="GET" id="44126487-0729-4d13-954e-e87c9f6f5419" method="GET">
-          <con:settings/>
-          <con:parameters>
-            <con:parameter>
-              <con:name>_content</con:name>
-              <con:value/>
-              <con:style>QUERY</con:style>
-              <con:default/>
-            </con:parameter>
-            <con:parameter>
-              <con:name>_id</con:name>
-              <con:value/>
-              <con:style>QUERY</con:style>
-              <con:default/>
-            </con:parameter>
-            <con:parameter>
-              <con:name>_text</con:name>
-              <con:value/>
-              <con:style>QUERY</con:style>
-              <con:default/>
-            </con:parameter>
-          </con:parameters>
-          <con:representation type="RESPONSE" id="">
-            <con:mediaType>application/json+fhir</con:mediaType>
-            <con:params/>
-            <con:element xsi:nil="true"/>
-            <con:description xsi:nil="true"/>
-          </con:representation>
-          <con:representation type="RESPONSE" id="">
-            <con:mediaType>application/xml+fhir</con:mediaType>
-            <con:params/>
-            <con:element xsi:nil="true"/>
-            <con:description xsi:nil="true"/>
-          </con:representation>
-        </con:method>
-      </con:resource>
-      <con:resource name="Questionnaire/_search" path="Questionnaire/_search" id="20d77951-3c82-41ff-823c-4086012bba0b">
-        <con:settings/>
-        <con:parameters/>
-        <con:method name="POST" id="44126487-0729-4d13-954e-e87c9f6f5420" method="POST">
-          <con:settings/>
-          <con:parameters>
-            <con:parameter>
-              <con:name>_id</con:name>
-              <con:value/>
-              <con:style>QUERY</con:style>
-              <con:default/>
-            </con:parameter>
-            <con:parameter>
-              <con:name>_text</con:name>
-              <con:value/>
-              <con:style>PLAIN</con:style>
-              <con:default/>
-            </con:parameter>
-          </con:parameters>
-          <con:representation type="RESPONSE" id="">
-            <con:mediaType>application/json+fhir</con:mediaType>
-            <con:params/>
-            <con:element xsi:nil="true"/>
-            <con:description xsi:nil="true"/>
-          </con:representation>
-          <con:representation type="RESPONSE" id="">
-            <con:mediaType>application/xml+fhir</con:mediaType>
-            <con:params/>
-            <con:element xsi:nil="true"/>
-            <con:description xsi:nil="true"/>
-          </con:representation>
-        </con:method>
-      </con:resource>
       <con:resource name="Questionnaire/{id}" path="Questionnaire/{id}" id="20d77951-3c82-41ff-823c-4086012bba0c">
         <con:settings/>
         <con:parameters>
@@ -108,17 +36,71 @@
           </con:representation>
         </con:method>
       </con:resource>
+      <con:resource name="Questionnaire" path="Questionnaire" id="20d77951-3c82-41ff-823c-4086012bba0a">
+        <con:settings/>
+        <con:parameters/>
+        <con:method name="GET" id="44126487-0729-4d13-954e-e87c9f6f5419" method="GET">
+          <con:settings/>
+          <con:parameters>
+            <con:parameter>
+              <con:name>identifier</con:name>
+              <con:value/>
+              <con:style>QUERY</con:style>
+              <con:default/>
+            </con:parameter>
+          </con:parameters>
+          <con:representation type="RESPONSE" id="">
+            <con:mediaType>application/json+fhir</con:mediaType>
+            <con:params/>
+            <con:element xsi:nil="true"/>
+            <con:description xsi:nil="true"/>
+          </con:representation>
+          <con:representation type="RESPONSE" id="">
+            <con:mediaType>application/xml+fhir</con:mediaType>
+            <con:params/>
+            <con:element xsi:nil="true"/>
+            <con:description xsi:nil="true"/>
+          </con:representation>
+        </con:method>
+      </con:resource>
+      <con:resource name="Questionnaire/_search" path="Questionnaire/_search" id="20d77951-3c82-41ff-823c-4086012bba0b">
+        <con:settings/>
+        <con:parameters/>
+        <con:method name="POST" id="44126487-0729-4d13-954e-e87c9f6f5420" method="POST">
+          <con:settings/>
+          <con:parameters>
+            <con:parameter>
+              <con:name>identifier</con:name>
+              <con:value/>
+              <con:style>PLAIN</con:style>
+              <con:default/>
+            </con:parameter>
+          </con:parameters>
+          <con:representation type="RESPONSE" id="">
+            <con:mediaType>application/json+fhir</con:mediaType>
+            <con:params/>
+            <con:element xsi:nil="true"/>
+            <con:description xsi:nil="true"/>
+          </con:representation>
+          <con:representation type="RESPONSE" id="">
+            <con:mediaType>application/xml+fhir</con:mediaType>
+            <con:params/>
+            <con:element xsi:nil="true"/>
+            <con:description xsi:nil="true"/>
+          </con:representation>
+        </con:method>
+      </con:resource>
     </con:resource>
   </con:interface>
-  <con:testSuite id="95d3ff45-15ca-4378-94c6-73fbcaceabe4" name="FHIR Form Manager Test Suite">
+  <con:testSuite id="95d3ff45-15ca-4378-94c6-73fbcaceabe4" name="FHIR Form Manager">
     <con:settings/>
     <con:runType>SEQUENTIAL</con:runType>
-    <con:testCase id="106aa27b-991a-4703-8df3-9fee6a046e95" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="FHIR Form Manager Find Questionnaire JSON Testcase" searchProperties="true">
+    <con:testCase id="106aa27b-991a-4703-8df3-9fee6a046e95" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="FHIR Form Manager Questionnaire Read JSON" searchProperties="true">
       <con:settings/>
-      <con:testStep type="restrequest" name="FHIR Form Manager Find Questionnaire JSON Request" id="6497e488-d256-4993-982b-45be1a2483ed">
+      <con:testStep type="restrequest" name="FHIR Form Manager Questionnaire Read JSON" id="6497e488-d256-4993-982b-45be1a2483ed">
         <con:settings/>
         <con:config service="FHIR Form Manager" resourcePath="${#Spring#sdcct.ws.base.url.path}${#Spring#sdcct.ws.form.manager.fhir.url.path}/Questionnaire/{id}" methodName="GET" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-          <con:restRequest name="FHIR Form Manager Find Questionnaire JSON Request" id="187c5413-7849-4d33-8654-ddd2ab3fd837" mediaType="*/*" accept="application/json+fhir">
+          <con:restRequest name="FHIR Form Manager Questionnaire Read JSON Request" id="187c5413-7849-4d33-8654-ddd2ab3fd837" mediaType="*/*" accept="application/json+fhir">
             <con:settings/>
             <con:encoding>UTF-8</con:encoding>
             <con:endpoint>${#Spring#sdcct.tomcat.server.context.url}</con:endpoint>
@@ -129,19 +111,24 @@
             <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
             <con:jmsPropertyConfig/>
             <con:parameters>
-              <entry key="id" value="sdcct-test1-fhir" xmlns="http://eviware.com/soapui/config"/>
+              <entry key="id" value="1" xmlns="http://eviware.com/soapui/config"/>
             </con:parameters>
+            <con:assertion type="Valid HTTP Status Codes" name="Valid HTTP Status Codes">
+              <con:configuration>
+                <codes>200</codes>
+              </con:configuration>
+            </con:assertion>
           </con:restRequest>
         </con:config>
       </con:testStep>
       <con:properties/>
     </con:testCase>
-    <con:testCase id="106aa27b-991a-4703-8df3-9fee6a046e96" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="FHIR Form Manager Find Questionnaire XML Testcase" searchProperties="true">
+    <con:testCase id="106aa27b-991a-4703-8df3-9fee6a046e96" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="FHIR Form Manager Questionnaire Read XML" searchProperties="true">
       <con:settings/>
-      <con:testStep type="restrequest" name="FHIR Form Manager Find Questionnaire XML Request" id="6497e488-d256-4993-982b-45be1a2483ee">
+      <con:testStep type="restrequest" name="FHIR Form Manager Questionnaire Read XML" id="6497e488-d256-4993-982b-45be1a2483ee">
         <con:settings/>
         <con:config service="FHIR Form Manager" resourcePath="${#Spring#sdcct.ws.base.url.path}${#Spring#sdcct.ws.form.manager.fhir.url.path}/Questionnaire/{id}" methodName="GET" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-          <con:restRequest name="FHIR Form Manager Find Questionnaire XML Request" id="187c5413-7849-4d33-8654-ddd2ab3fd838" mediaType="*/*" accept="application/xml+fhir">
+          <con:restRequest name="FHIR Form Manager Questionnaire Read XML Request" id="187c5413-7849-4d33-8654-ddd2ab3fd838" mediaType="*/*" accept="application/xml+fhir">
             <con:settings/>
             <con:encoding>UTF-8</con:encoding>
             <con:endpoint>${#Spring#sdcct.tomcat.server.context.url}</con:endpoint>
@@ -152,19 +139,24 @@
             <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
             <con:jmsPropertyConfig/>
             <con:parameters>
-              <entry key="id" value="sdcct-test1-fhir" xmlns="http://eviware.com/soapui/config"/>
+              <entry key="id" value="1" xmlns="http://eviware.com/soapui/config"/>
             </con:parameters>
+            <con:assertion type="Valid HTTP Status Codes" name="Valid HTTP Status Codes">
+              <con:configuration>
+                <codes>200</codes>
+              </con:configuration>
+            </con:assertion>
           </con:restRequest>
         </con:config>
       </con:testStep>
       <con:properties/>
     </con:testCase>
-    <con:testCase id="106aa27b-991a-4703-8df3-9fee6a046e97" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="FHIR Form Manager Find Questionnaires GET Testcase" searchProperties="true">
+    <con:testCase id="106aa27b-991a-4703-8df3-9fee6a046e97" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="FHIR Form Manager Questionnaire Search GET" searchProperties="true">
       <con:settings/>
-      <con:testStep type="restrequest" name="FHIR Form Manager Find Questionnaires GET Request" id="6497e488-d256-4993-982b-45be1a2483ef">
+      <con:testStep type="restrequest" name="FHIR Form Manager Questionnaire Search GET" id="6497e488-d256-4993-982b-45be1a2483ef">
         <con:settings/>
         <con:config service="FHIR Form Manager" resourcePath="${#Spring#sdcct.ws.base.url.path}${#Spring#sdcct.ws.form.manager.fhir.url.path}/Questionnaire" methodName="GET" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-          <con:restRequest name="FHIR Form Manager Find Questionnaires GET Request" id="187c5413-7849-4d33-8654-ddd2ab3fd839" mediaType="*/*" accept="application/json+fhir">
+          <con:restRequest name="FHIR Form Manager Questionnaire Search GET Request" id="187c5413-7849-4d33-8654-ddd2ab3fd839" mediaType="*/*" accept="application/json+fhir">
             <con:settings/>
             <con:encoding>UTF-8</con:encoding>
             <con:endpoint>${#Spring#sdcct.tomcat.server.context.url}</con:endpoint>
@@ -175,31 +167,41 @@
             <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
             <con:jmsPropertyConfig/>
             <con:parameters>
-              <entry key="_id" value="sdcct-test1-fhir" xmlns="http://eviware.com/soapui/config"/>
+              <entry key="identifier" value="fhir_1a" xmlns="http://eviware.com/soapui/config"/>
             </con:parameters>
+            <con:assertion type="Valid HTTP Status Codes" name="Valid HTTP Status Codes">
+              <con:configuration>
+                <codes>200</codes>
+              </con:configuration>
+            </con:assertion>
           </con:restRequest>
         </con:config>
       </con:testStep>
       <con:properties/>
     </con:testCase>
-    <con:testCase id="106aa27b-991a-4703-8df3-9fee6a046e98" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="FHIR Form Manager Find Questionnaires POST Testcase" searchProperties="true">
+    <con:testCase id="106aa27b-991a-4703-8df3-9fee6a046e98" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="FHIR Form Manager Questionnaire Search POST" searchProperties="true">
       <con:settings/>
-      <con:testStep type="restrequest" name="FHIR Form Manager Find Questionnaires POST Request" id="6497e488-d256-4993-982b-45be1a2483f0">
+      <con:testStep type="restrequest" name="FHIR Form Manager Questionnaire Search POST" id="6497e488-d256-4993-982b-45be1a2483f0">
         <con:settings/>
         <con:config service="FHIR Form Manager" resourcePath="${#Spring#sdcct.ws.base.url.path}${#Spring#sdcct.ws.form.manager.fhir.url.path}/Questionnaire/_search" methodName="POST" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-          <con:restRequest name="FHIR Form Manager Find Questionnaires POST Request" id="187c5413-7849-4d33-8654-ddd2ab3fd83a" mediaType="application/x-www-form-urlencoded" accept="application/json+fhir">
+          <con:restRequest name="FHIR Form Manager Questionnaire Search POST Request" id="187c5413-7849-4d33-8654-ddd2ab3fd83a" mediaType="application/x-www-form-urlencoded" accept="application/json+fhir">
             <con:settings/>
             <con:encoding>UTF-8</con:encoding>
             <con:endpoint>${#Spring#sdcct.tomcat.server.context.url}</con:endpoint>
-            <con:request><![CDATA[_content=sdcct-test1-fhir]]></con:request>
+            <con:request><![CDATA[identifier=fhir_1a]]></con:request>
             <con:credentials>
               <con:authType>No Authorization</con:authType>
             </con:credentials>
             <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
             <con:jmsPropertyConfig/>
             <con:parameters>
-              <entry key="_id" value="sdcct-test1-fhir" xmlns="http://eviware.com/soapui/config"/>
+              <entry key="identifier" value="fhir_1a" xmlns="http://eviware.com/soapui/config"/>
             </con:parameters>
+            <con:assertion type="Valid HTTP Status Codes" name="Valid HTTP Status Codes">
+              <con:configuration>
+                <codes>200</codes>
+              </con:configuration>
+            </con:assertion>
           </con:restRequest>
         </con:config>
       </con:testStep>

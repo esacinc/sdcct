@@ -23,22 +23,23 @@
     <beans:bean id="objMapper" class="gov.hhs.onc.sdcct.json.impl.SdcctObjectMapperFactoryBean"
         p:autoDetectFields="false"
         p:autoDetectGettersSetters="false"
+        p:contentInclusion="NON_DEFAULT"
         p:indentSize="${sdcct.transform.content.pretty.indent.size}"
-        p:serializationInclusion="NON_DEFAULT">
+        p:valueInclusion="NON_DEFAULT">
         <beans:property name="features">
             <beans:map>
                 <beans:entry key="#{ T(com.fasterxml.jackson.databind.MapperFeature).AUTO_DETECT_CREATORS }" value="false"/>
                 <beans:entry key="#{ T(com.fasterxml.jackson.databind.MapperFeature).AUTO_DETECT_IS_GETTERS }" value="false"/>
+                <beans:entry key="#{ T(com.fasterxml.jackson.databind.MapperFeature).PROPAGATE_TRANSIENT_MARKER }" value="true"/>
             </beans:map>
         </beans:property>
         <beans:property name="modules">
             <beans:list>
-                <beans:bean id="moduleJaxb" class="gov.hhs.onc.sdcct.json.impl.SdcctJaxbModule"/>
-                <beans:bean id="moduleJdk8" class="com.fasterxml.jackson.datatype.jdk8.Jdk8Module"/>
+                <beans:ref bean="moduleJaxb"/>
+                <beans:bean class="com.fasterxml.jackson.datatype.jdk8.Jdk8Module"/>
             </beans:list>
         </beans:property>
     </beans:bean>
-    
     
     <beans:bean id="objMapperPretty" parent="objMapper"
         p:indentOutput="true"/>
@@ -49,19 +50,19 @@
     <beans:bean id="contentCodecJson" class="gov.hhs.onc.sdcct.json.impl.JsonCodec">
         <beans:constructor-arg name="defaultDecodeOpts">
             <beans:bean class="gov.hhs.onc.sdcct.json.impl.JsonDecodeOptionsImpl">
-                <beans:property name="beanDeserializerModifiers">
-                    <beans:list>
-                        <beans:ref bean="beanDeserializerModifierFhir"/>
-                    </beans:list>
+                <beans:property name="modules">
+                    <beans:array>
+                        <beans:ref bean="moduleFhir"/>
+                    </beans:array>
                 </beans:property>
             </beans:bean>
         </beans:constructor-arg>
         <beans:constructor-arg name="defaultEncodeOpts">
             <beans:bean class="gov.hhs.onc.sdcct.json.impl.JsonEncodeOptionsImpl">
-                <beans:property name="beanSerializerModifiers">
-                    <beans:list>
-                        <beans:ref bean="beanSerializerModifierFhir"/>
-                    </beans:list>
+                <beans:property name="modules">
+                    <beans:array>
+                        <beans:ref bean="moduleFhir"/>
+                    </beans:array>
                 </beans:property>
                 <beans:property name="options">
                     <beans:map>

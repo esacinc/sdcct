@@ -106,10 +106,46 @@
         </beans:property>
     </beans:bean>
     
+    <beans:bean id="serializerHtml" factory-bean="processor" factory-method="newSerializer">
+        <beans:property name="localOutputProperties">
+            <beans:map>
+                <beans:entry key="#{ T(javax.xml.transform.OutputKeys).METHOD }" value="html"/>
+                <beans:entry key="#{ T(javax.xml.transform.OutputKeys).OMIT_XML_DECLARATION }"
+                    value="#{ T(gov.hhs.onc.sdcct.config.utils.SdcctOptionUtils).YES_VALUE }"/>
+            </beans:map>
+        </beans:property>
+    </beans:bean>
+    
+    <!--suppress SpringBeanConstructorArgInspection -->
+    <beans:bean id="serializerHtmlPretty" parent="serializerHtml" factory-bean="processor" factory-method="newSerializer">
+        <beans:property name="localOutputProperties">
+            <beans:map merge="true">
+                <beans:entry key="#{ T(javax.xml.transform.OutputKeys).INDENT }" value="#{ T(gov.hhs.onc.sdcct.config.utils.SdcctOptionUtils).YES_VALUE }"/>
+                <!--suppress SpringPlaceholdersInspection -->
+                <beans:entry key="#{ T(net.sf.saxon.lib.SaxonOutputKeys).INDENT_SPACES }" value="${sdcct.transform.content.pretty.indent.size}"/>
+            </beans:map>
+        </beans:property>
+    </beans:bean>
+    
     <!--====================================================================================================
     = XPATH COMPILERS
     =====================================================================================================-->
     <beans:bean id="xpathCompiler" factory-bean="processor" factory-method="newXPathCompiler"/>
+    
+    <!--====================================================================================================
+    = XSLT OPTIONS
+    =====================================================================================================-->
+    <sdcct-xml:xslt-static-options id="xsltOptsStatic" abstract="true">
+        <sdcct-xml:static-namespace prefix="#{ T(gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes).SDCCT }">
+            #{ T(gov.hhs.onc.sdcct.net.SdcctUris).SDCCT_CORE_URN_VALUE }
+        </sdcct-xml:static-namespace>
+        <sdcct-xml:static-namespace prefix="#{ T(gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes).SDCCT_XML }">
+            #{ T(gov.hhs.onc.sdcct.net.SdcctUris).SDCCT_XML_URN_VALUE }
+        </sdcct-xml:static-namespace>
+        <sdcct-xml:static-function ref="extFuncDefaultIfBlank"/>
+        <sdcct-xml:static-function ref="extFuncIsBlank"/>
+        <sdcct-xml:static-function ref="extFuncResourceContent"/>
+    </sdcct-xml:xslt-static-options>
     
     <!--====================================================================================================
     = XSLT COMPILERS
@@ -127,6 +163,22 @@
         <beans:constructor-arg name="defaultEncodeOpts">
             <beans:bean class="gov.hhs.onc.sdcct.xml.impl.XmlEncodeOptionsImpl"
                 c:parseOpts="#{ config.parseOptions }">
+                <beans:property name="options">
+                    <beans:map>
+                        <beans:entry key="#{ T(gov.hhs.onc.sdcct.transform.content.ContentCodecOptions).PRETTY }" value="false"
+                            value-type="java.lang.Boolean"/>
+                    </beans:map>
+                </beans:property>
+            </beans:bean>
+        </beans:constructor-arg>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = CONTENT TRANSCODERS
+    =====================================================================================================-->
+    <beans:bean id="transcoderHtml" class="gov.hhs.onc.sdcct.xml.html.impl.HtmlTranscoder">
+        <beans:constructor-arg name="defaultTranscodeOpts">
+            <beans:bean class="gov.hhs.onc.sdcct.xml.html.impl.HtmlTranscodeOptionsImpl">
                 <beans:property name="options">
                     <beans:map>
                         <beans:entry key="#{ T(gov.hhs.onc.sdcct.transform.content.ContentCodecOptions).PRETTY }" value="false"

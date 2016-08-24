@@ -11,17 +11,4 @@
         urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
         urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
     
-    <!--====================================================================================================
-    = JAX-RS CLIENTS
-    =====================================================================================================-->
-    <!--suppress SpringPlaceholdersInspection -->
-    <beans:bean id="clientFormManagerFhirLocal" parent="clientFormManagerFhir"
-        c:addr="${sdcct.ws.form.manager.fhir.url}"/>
-    
-    <!--====================================================================================================
-    = JAX-WS CLIENTS
-    =====================================================================================================-->
-    <!--suppress SpringPlaceholdersInspection -->
-    <beans:bean id="clientFormManagerRfdLocal" parent="clientFormManagerRfd"
-        c:addr="${sdcct.ws.form.manager.rfd.url}"/>
 </beans:beans>

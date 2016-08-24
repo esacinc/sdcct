@@ -25,7 +25,7 @@ public abstract class AbstractLifecycleBean implements LifecycleBean {
         this.lock.lock();
 
         try {
-            if (this.isRunning()) {
+            if (this.canStop()) {
                 this.stopInternal();
             }
         } finally {
@@ -38,12 +38,22 @@ public abstract class AbstractLifecycleBean implements LifecycleBean {
         this.lock.lock();
 
         try {
-            if (!this.isRunning()) {
+            if (this.canStart()) {
                 this.startInternal();
             }
         } finally {
             this.lock.unlock();
         }
+    }
+
+    @Override
+    public boolean canStop() {
+        return this.isRunning();
+    }
+
+    @Override
+    public boolean canStart() {
+        return !this.isRunning();
     }
 
     protected abstract void stopInternal();

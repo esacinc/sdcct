@@ -12,8 +12,8 @@
     <!--====================================================================================================
     = COMPLEX TYPES
     =====================================================================================================-->
-    <jaxb:bindings node="xsd:complexType[@name='SimpleSdcRetrieveFormPackageType']">
-        <jaxb:bindings node="xsd:complexContent/xsd:extension/xsd:sequence">
+    <jaxb:bindings node="xsd:complexType[@name='SdcRetrieveFormPackageType']">
+        <jaxb:bindings node="xsd:complexContent/xsd:extension">
             <jaxb:bindings node="xsd:choice">
                 <jaxb:property name="content"/>
             </jaxb:bindings>

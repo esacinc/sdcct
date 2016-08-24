@@ -113,6 +113,11 @@ public class SdcctXmlResolverImpl implements SdcctXmlResolver {
     @Override
     @SuppressWarnings({ "CloneDoesntCallSuperClone" })
     public SdcctXmlResolver clone() {
-        return new SdcctXmlResolverImpl(this.resourceSrcResolver, this.defaultBaseUri, this.resolve);
+        SdcctXmlResolverImpl resolver = new SdcctXmlResolverImpl(this.resourceSrcResolver, this.defaultBaseUri, this.resolve);
+        resolver.nsUriStaticSrcs.putAll(this.nsUriStaticSrcs);
+        resolver.publicIdStaticSrcs.putAll(this.publicIdStaticSrcs);
+        resolver.sysIdStaticSrcs.putAll(this.sysIdStaticSrcs);
+
+        return resolver;
     }
 }

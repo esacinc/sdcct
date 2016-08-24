@@ -57,44 +57,14 @@
                 <version>3.1.0</version>
             </dependency>
             <dependency>
-                <groupId>javax.servlet.jsp</groupId>
-                <artifactId>javax.servlet.jsp-api</artifactId>
-                <version>2.3.1</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.servlet.jsp.jstl</groupId>
-                <artifactId>javax.servlet.jsp.jstl-api</artifactId>
-                <version>1.2.1</version>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-core</artifactId>
-                <version>8.0.36</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.tomcat.embed</groupId>
-                <artifactId>tomcat-embed-logging-log4j</artifactId>
-                <version>8.0.36</version>
-            </dependency>
-            <dependency>
-                <groupId>org.glassfish.web</groupId>
-                <artifactId>javax.servlet.jsp.jstl</artifactId>
-                <version>1.2.4</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>servlet-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>javax.servlet.jsp</groupId>
-                        <artifactId>jsp-api</artifactId>
-                    </exclusion>
-                </exclusions>
+                <version>8.5.4</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-web</artifactId>
-                <version>4.1.1.RELEASE</version>
+                <version>4.1.2.RELEASE</version>
             </dependency>
             <!-- Test dependencies -->
             <dependency>
@@ -217,9 +187,6 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <!--
-            TEMP: Do not upgrade to v4.4.5 due to required annotations.
-            -->
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpcore</artifactId>
@@ -361,9 +328,9 @@
                                                 <extraArgument>-Xss4m</extraArgument>
                                                 <extraArgument>-XX:MetaspaceSize=512m</extraArgument>
                                             </extraArguments>
-                                            <initialMemorySize>1024M</initialMemorySize>
-                                            <maxMemorySize>2048M</maxMemorySize>
-                                            <maxStackSize>768M</maxStackSize>
+                                            <initialMemorySize>1024</initialMemorySize>
+                                            <maxMemorySize>2048</maxMemorySize>
+                                            <maxStackSize>768</maxStackSize>
                                         </jvmSettings>
                                     </daemon>
                                 </daemons>

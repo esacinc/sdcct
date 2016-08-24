@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Comparator;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
@@ -16,8 +14,6 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.util.ResourceUtils;
 
 public final class SdcctResourceUtils {
-    public final static String LOC_DELIMS = ",;\t\n";
-
     public final static String JAR_FILE_PATH_PREFIX = ResourceUtils.JAR_URL_PREFIX + ResourceUtils.FILE_URL_PREFIX;
     public final static String META_INF_PATH_PREFIX = SdcctStringUtils.SLASH + "META-INF" + SdcctStringUtils.SLASH;
     public final static String META_INF_APP_PATH_PREFIX = META_INF_PATH_PREFIX + "sdcct" + SdcctStringUtils.SLASH;
@@ -36,14 +32,14 @@ public final class SdcctResourceUtils {
                     String resourceFileNameExt1 = org.springframework.util.StringUtils.getFilenameExtension(resourceFileName1),
                         resourceFileNameExt2 = org.springframework.util.StringUtils.getFilenameExtension(resourceFileName2);
 
-                    if (resourceFileNameExt1.equals(resourceFileNameExt2)
-                        && !(resourceFileName1 = org.springframework.util.StringUtils.stripFilenameExtension(resourceFileName1))
+                    if (resourceFileNameExt1.equals(resourceFileNameExt2) &&
+                        !(resourceFileName1 = org.springframework.util.StringUtils.stripFilenameExtension(resourceFileName1))
                             .equals((resourceFileName2 = org.springframework.util.StringUtils.stripFilenameExtension(resourceFileName2)))) {
-                        if (StringUtils.endsWith(resourceFileName1, TEST_FILE_NAME_SUFFIX)
-                            && StringUtils.removeEnd(resourceFileName1, TEST_FILE_NAME_SUFFIX).equals(resourceFileName2)) {
+                        if (StringUtils.endsWith(resourceFileName1, TEST_FILE_NAME_SUFFIX) &&
+                            StringUtils.removeEnd(resourceFileName1, TEST_FILE_NAME_SUFFIX).equals(resourceFileName2)) {
                             return 1;
-                        } else if (StringUtils.endsWith(resourceFileName2, TEST_FILE_NAME_SUFFIX)
-                            && StringUtils.removeEnd(resourceFileName2, TEST_FILE_NAME_SUFFIX).equals(resourceFileName1)) {
+                        } else if (StringUtils.endsWith(resourceFileName2, TEST_FILE_NAME_SUFFIX) &&
+                            StringUtils.removeEnd(resourceFileName2, TEST_FILE_NAME_SUFFIX).equals(resourceFileName1)) {
                             return -1;
                         } else {
                             return StringUtils.removeEnd(resourceFileName1, TEST_FILE_NAME_SUFFIX)
@@ -148,13 +144,5 @@ public final class SdcctResourceUtils {
         }
 
         return null;
-    }
-
-    public static String[] tokenizeLocations(@Nullable String ... locs) {
-        return ((locs != null)
-            ? Stream.of(locs)
-                .flatMap(loc -> ((loc != null) ? Stream.of(org.springframework.util.StringUtils.tokenizeToStringArray(loc, LOC_DELIMS)) : Stream.empty()))
-                .toArray(String[]::new)
-            : ArrayUtils.toArray());
     }
 }

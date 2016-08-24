@@ -32,6 +32,19 @@
     </beans:bean>
     
     <!--====================================================================================================
+    = MESSAGE SOURCES
+    =====================================================================================================-->
+    <beans:bean id="messageSource" class="gov.hhs.onc.sdcct.context.impl.PropertySourcesMessageSource" primary="true"
+        p:alwaysUseMessageFormat="true">
+        <beans:property name="propertySources">
+            <beans:array>
+                <!--suppress ELValidationInJSP, SpringElInspection -->
+                <beans:value>#{ app.propertySource }</beans:value>
+            </beans:array>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
     = CONVERSION SERVICES
     =====================================================================================================-->
     <beans:bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean" primary="true">

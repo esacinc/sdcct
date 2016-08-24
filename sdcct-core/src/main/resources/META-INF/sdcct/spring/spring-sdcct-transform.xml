@@ -15,6 +15,8 @@
     = CONFIGURATIONS
     =====================================================================================================-->
     <beans:bean id="config" class="gov.hhs.onc.sdcct.transform.impl.SdcctConfiguration"
+        p:errorHandler-ref="xmlReporterLogging"
+        p:errorListener-ref="xmlReporterLogging"
         p:lineNumbering="true"
         p:recoveryPolicy="#{ T(net.sf.saxon.Configuration).DO_NOT_RECOVER }"
         p:stripsAllWhiteSpace="false"

@@ -2,7 +2,7 @@ package gov.hhs.onc.sdcct.transform.impl;
 
 import gov.hhs.onc.sdcct.convert.SdcctConditionalGenericConverter;
 import gov.hhs.onc.sdcct.transform.ResourceSourceResolver;
-import gov.hhs.onc.sdcct.utils.SdcctResourceUtils;
+import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
 import java.io.IOException;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,7 +34,7 @@ public class ResourceSourceConverter implements SdcctConditionalGenericConverter
 
         boolean srcArr = srcType.isArray(), resolveAll = (srcArr || targetType.isArray());
         String strSrc = (!srcArr ? ((String) src) : null);
-        String[] strSrcs = (srcArr ? SdcctResourceUtils.tokenizeLocations(((String[]) src)) : SdcctResourceUtils.tokenizeLocations(strSrc));
+        String[] strSrcs = (srcArr ? SdcctStringUtils.splitTokens(((String[]) src)) : SdcctStringUtils.splitTokens(strSrc));
 
         if (!resolveAll && (strSrcs.length > 1)) {
             resolveAll = true;

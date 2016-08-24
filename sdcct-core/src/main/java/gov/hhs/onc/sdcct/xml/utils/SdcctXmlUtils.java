@@ -5,18 +5,26 @@ import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import javax.xml.namespace.QName;
+import net.sf.saxon.om.Item;
+import net.sf.saxon.om.Sequence;
+import net.sf.saxon.om.SequenceIterator;
+import net.sf.saxon.s9api.SaxonApiUncheckedException;
 import net.sf.saxon.s9api.XdmAtomicValue;
 import net.sf.saxon.s9api.XdmItem;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmSequenceIterator;
+import net.sf.saxon.trans.XPathException;
+import net.sf.saxon.value.AtomicValue;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.collections4.iterators.NodeListIterator;
+import org.apache.commons.lang3.text.StrBuilder;
 import org.apache.cxf.helpers.DOMUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
@@ -119,5 +127,37 @@ public final class SdcctXmlUtils {
 
     public static Stream<XdmItem> streamItems(XdmSequenceIterator iterator) {
         return SdcctIteratorUtils.stream(iterator);
+    }
+
+    @Nullable
+    public static String getStringValue(@Nullable Sequence seq, @Nullable Sequence defaultSeq) {
+        return Optional.ofNullable(getStringValue(seq)).orElseGet(() -> getStringValue(defaultSeq));
+    }
+
+    @Nullable
+    public static String getStringValue(@Nullable Sequence seq) {
+        if (seq == null) {
+            return null;
+        }
+
+        if (seq instanceof AtomicValue) {
+            return ((AtomicValue) seq).getStringValue();
+        } else if (seq instanceof Item) {
+            return ((Item) seq).getStringValue();
+        } else {
+            try {
+                SequenceIterator seqIterator = seq.iterate();
+                StrBuilder builder = new StrBuilder();
+                Item seqItem;
+
+                while ((seqItem = seqIterator.next()) != null) {
+                    Optional.ofNullable(getStringValue(seqItem)).ifPresent(builder::append);
+                }
+
+                return builder.build();
+            } catch (XPathException e) {
+                throw new SaxonApiUncheckedException(e);
+            }
+        }
     }
 }

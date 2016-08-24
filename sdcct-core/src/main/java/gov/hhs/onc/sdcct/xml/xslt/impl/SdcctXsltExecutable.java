@@ -8,6 +8,8 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import net.sf.saxon.PreparedStylesheet;
 import net.sf.saxon.s9api.QName;
+import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.SaxonApiUncheckedException;
 import net.sf.saxon.s9api.XdmValue;
 import net.sf.saxon.s9api.XsltExecutable;
 import net.sf.saxon.trans.CompilerInfo;
@@ -40,11 +42,25 @@ public class SdcctXsltExecutable extends XsltExecutable {
         SdcctXsltTransformer transformer =
             new SdcctXsltTransformer(this.getProcessor(), this.staticOpts, dynamicOpts, controller, preparedStylesheet.getCompileTimeParams());
 
-        if ((dynamicOpts != null) && (dynamicOpts.hasVariables())) {
-            Map<QName, XdmValue> dynamicVars = dynamicOpts.getVariables();
+        if (dynamicOpts != null) {
+            if (dynamicOpts.hasSource()) {
+                try {
+                    transformer.setSource(dynamicOpts.getSource());
+                } catch (SaxonApiException e) {
+                    throw new SaxonApiUncheckedException(e);
+                }
+            }
 
-            for (QName dynamicVarQname : dynamicVars.keySet()) {
-                transformer.setParameter(dynamicVarQname, dynamicVars.get(dynamicVarQname));
+            if (dynamicOpts.hasDestination()) {
+                transformer.setDestination(dynamicOpts.getDestination());
+            }
+
+            if (dynamicOpts.hasVariables()) {
+                Map<QName, XdmValue> dynamicVars = dynamicOpts.getVariables();
+
+                for (QName dynamicVarQname : dynamicVars.keySet()) {
+                    transformer.setParameter(dynamicVarQname, dynamicVars.get(dynamicVarQname));
+                }
             }
         }
 

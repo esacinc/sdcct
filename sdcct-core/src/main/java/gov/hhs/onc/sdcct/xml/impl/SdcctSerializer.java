@@ -5,7 +5,7 @@ import gov.hhs.onc.sdcct.transform.impl.ByteArrayResult;
 import gov.hhs.onc.sdcct.transform.impl.SdcctConfiguration;
 import gov.hhs.onc.sdcct.transform.impl.SdcctPipelineConfiguration;
 import gov.hhs.onc.sdcct.transform.impl.SdcctProcessor;
-import gov.hhs.onc.sdcct.transform.impl.SdcctPullSource;
+import gov.hhs.onc.sdcct.transform.impl.SdcctPullEventSource;
 import gov.hhs.onc.sdcct.transform.utils.SdcctTransformUtils;
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
 import java.util.Arrays;
@@ -74,6 +74,15 @@ public class SdcctSerializer extends Serializer {
         }
 
         @Override
+        public void characters(CharSequence chars, Location loc, int props) throws XPathException {
+            String str = chars.toString().trim();
+
+            if (!str.isEmpty()) {
+                super.characters(str, loc, props);
+            }
+        }
+
+        @Override
         public void endElement() throws XPathException {
             PrettyXmlElement elem = this.elems.pop();
 
@@ -123,12 +132,12 @@ public class SdcctSerializer extends Serializer {
         }
 
         private void writeNewline() throws XPathException {
-            this.characters(StringUtils.LF, ExplicitLocation.UNKNOWN_LOCATION, 0);
+            super.characters(StringUtils.LF, ExplicitLocation.UNKNOWN_LOCATION, 0);
         }
 
         private void writeIndent() throws XPathException {
             for (int a = 0; a < this.depth; a++) {
-                this.characters(this.indentStr, ExplicitLocation.UNKNOWN_LOCATION, 0);
+                super.characters(this.indentStr, ExplicitLocation.UNKNOWN_LOCATION, 0);
             }
         }
     }
@@ -154,16 +163,19 @@ public class SdcctSerializer extends Serializer {
     }
 
     public <T extends Result> T serialize(Source src, T result, @Nullable ParseOptions parseOpts, @Nullable Properties outProps) throws SaxonApiException {
+        SdcctConfiguration config = this.getProcessor().getUnderlyingConfiguration();
+        SdcctPipelineConfiguration pipelineConfig = config.makePipelineConfiguration();
+
         if (src instanceof StreamSource) {
             try {
-                src = new SdcctPullSource(SdcctTransformUtils.getPublicId(src), new SdcctStaxBridge((this.xmlInFactory.createXMLStreamReader(src))));
+                src = new SdcctPullEventSource(SdcctTransformUtils.getPublicId(src), src.getSystemId(),
+                    new XmlStreamReaderEventIterator(this.xmlInFactory.createXMLStreamReader(src), pipelineConfig));
             } catch (XMLStreamException e) {
                 throw new SaxonApiException(e);
             }
         }
 
-        SdcctConfiguration config = this.getProcessor().getUnderlyingConfiguration();
-        Receiver receiver = this.getReceiver(config, config.makePipelineConfiguration(), result, parseOpts, outProps);
+        Receiver receiver = this.getReceiver(config, pipelineConfig, result, parseOpts, outProps);
 
         try {
             Sender.send(src, receiver, null);

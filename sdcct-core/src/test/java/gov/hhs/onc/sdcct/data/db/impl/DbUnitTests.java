@@ -4,7 +4,7 @@ import com.github.sebhoss.warnings.CompilerWarnings;
 import gov.hhs.onc.sdcct.data.db.DbPropertyNames;
 import gov.hhs.onc.sdcct.data.db.criteria.utils.SdcctCriterionUtils;
 import gov.hhs.onc.sdcct.data.parameter.ResourceParamNames;
-import gov.hhs.onc.sdcct.fhir.FhirForm;
+import gov.hhs.onc.sdcct.fhir.form.FhirForm;
 import gov.hhs.onc.sdcct.fhir.FhirResource;
 import gov.hhs.onc.sdcct.fhir.FhirResourceRegistry;
 import gov.hhs.onc.sdcct.fhir.Questionnaire;

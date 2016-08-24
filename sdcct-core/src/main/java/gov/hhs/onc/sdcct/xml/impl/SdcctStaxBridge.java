@@ -12,6 +12,9 @@ import net.sf.saxon.trans.XPathException;
 import org.codehaus.stax2.ri.Stax2ReaderAdapter;
 import org.xml.sax.Locator;
 
+/**
+ * TODO: Remove exception cause holding once the changes from <a href="https://saxonica.plan.io/issues/2900">Saxon bug #2900</a> are available.
+ */
 public class SdcctStaxBridge extends StaxBridge {
     private class BridgeXmlStreamReader extends Stax2ReaderAdapter {
         public BridgeXmlStreamReader(XMLStreamReader delegate) {

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
+        urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
+    
+    <!--====================================================================================================
+    = INTERACTION WEB SERVICE METADATAS
+    =====================================================================================================-->
+    <beans:bean id="metadataWsInteractionRfd" class="gov.hhs.onc.sdcct.rfd.ws.metadata.impl.RfdInteractionWsMetadataImpl" abstract="true"/>
+    
+    <beans:bean id="metadataWsInteractionRfdUpdate" parent="metadataWsInteractionRfd" abstract="true">
+        <beans:constructor-arg name="type" value="UPDATE"/>
+    </beans:bean>
+    
+    <beans:bean id="metadataWsInteractionRfdHistoryInstance" parent="metadataWsInteractionRfd" abstract="true">
+        <beans:constructor-arg name="type" value="HISTORY_INSTANCE"/>
+    </beans:bean>
+    
+    <beans:bean id="metadataWsInteractionRfdCreate" parent="metadataWsInteractionRfd" abstract="true">
+        <beans:constructor-arg name="type" value="CREATE"/>
+    </beans:bean>
+    
+    <beans:bean id="metadataWsInteractionRfdSearchType" parent="metadataWsInteractionRfd" abstract="true">
+        <beans:constructor-arg name="type" value="SEARCH_TYPE"/>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = RESOURCE WEB SERVICE METADATAS
+    =====================================================================================================-->
+    <beans:bean id="metadataWsResourceRfd" class="gov.hhs.onc.sdcct.rfd.ws.metadata.impl.RfdResourceWsMetadataImpl" abstract="true"/>
+    
+    <!--====================================================================================================
+    = WEB SERVICE METADATAS
+    =====================================================================================================-->
+    <beans:bean id="metadataWsRfd" class="gov.hhs.onc.sdcct.rfd.ws.metadata.impl.RfdWsMetadataImpl" abstract="true"/>
+    
+    <beans:bean id="metadataWsRfdFormManager" parent="metadataWsRfd"
+        c:id="form-manager-rfd"
+        c:name="RFD Form Manager">
+        <beans:property name="resourceMetadatas">
+            <beans:array value-type="gov.hhs.onc.sdcct.rfd.ws.metadata.RfdResourceWsMetadata">
+                <beans:bean parent="metadataWsResourceRfd"
+                    c:resourceMetadata-ref="metadataResourceRfdFormDesign">
+                    <beans:property name="interactionMetadatas">
+                        <beans:array>
+                            <beans:bean parent="metadataWsInteractionRfdSearchType"/>
+                        </beans:array>
+                    </beans:property>
+                </beans:bean>
+            </beans:array>
+        </beans:property>
+    </beans:bean>
+    
+    <beans:bean id="metadataWsRfdFormReceiver" parent="metadataWsRfd"
+        c:id="form-receiver-rfd"
+        c:name="RFD Form Receiver">
+        <beans:property name="resourceMetadatas">
+            <beans:array value-type="gov.hhs.onc.sdcct.rfd.ws.metadata.RfdResourceWsMetadata">
+                <beans:bean parent="metadataWsResourceRfd"
+                    c:resourceMetadata-ref="metadataResourceRfdFormDesign">
+                    <beans:property name="interactionMetadatas">
+                        <beans:array>
+                            <beans:bean parent="metadataWsInteractionRfdUpdate"/>
+                            <beans:bean parent="metadataWsInteractionRfdCreate"/>
+                        </beans:array>
+                    </beans:property>
+                </beans:bean>
+            </beans:array>
+        </beans:property>
+    </beans:bean>
+    
+    <beans:bean id="metadataWsRfdFormArchiver" parent="metadataWsRfd"
+        c:id="form-archiver-rfd"
+        c:name="FHIR Form Archiver">
+        <beans:property name="resourceMetadatas">
+            <beans:array value-type="gov.hhs.onc.sdcct.rfd.ws.metadata.RfdResourceWsMetadata">
+                <beans:bean parent="metadataWsResourceRfd"
+                    c:resourceMetadata-ref="metadataResourceRfdFormDesign">
+                    <beans:property name="interactionMetadatas">
+                        <beans:array>
+                            <beans:bean parent="metadataWsInteractionRfdUpdate"/>
+                            <beans:bean parent="metadataWsInteractionRfdCreate"/>
+                        </beans:array>
+                    </beans:property>
+                </beans:bean>
+            </beans:array>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = DATA BINDINGS
+    =====================================================================================================-->
+    <beans:bean id="dataBindingJaxbRfd" class="gov.hhs.onc.sdcct.rfd.ws.impl.RfdJaxbDataBinding"
+        p:bus-ref="bus"
+        p:validatorService-ref="validatorServiceRfd">
+        <beans:property name="contextMetadatas">
+            <beans:array>
+                <beans:ref bean="jaxbContextMetadataRfd"/>
+            </beans:array>
+        </beans:property>
+        <beans:property name="contextProperties">
+            <beans:map>
+                <beans:entry key="#{ T(com.sun.xml.bind.api.JAXBRIContext).IMPROVED_XSI_TYPE_HANDLING }" value="true" value-type="java.lang.Boolean"/>
+                <beans:entry key="#{ T(com.sun.xml.bind.api.JAXBRIContext).RETAIN_REFERENCE_TO_INFO }" value="true" value-type="java.lang.Boolean"/>
+            </beans:map>
+        </beans:property>
+        <beans:property name="marshallerProperties">
+            <beans:map>
+                <beans:entry key="#{ T(com.sun.xml.bind.marshaller.CharacterEscapeHandler).name }" value-ref="charEscapeHandlerNio"/>
+                <beans:entry key="#{ T(javax.xml.bind.Marshaller).JAXB_ENCODING }" value="#{ T(java.nio.charset.StandardCharsets).UTF_8.name() }"/>
+            </beans:map>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = JAX-WS SERVERS
+    =====================================================================================================-->
+    <beans:bean id="serverRfd" parent="serverJaxWs" abstract="true"
+        p:dataBinding-ref="dataBindingJaxbRfd"/>
+    
+    <!--====================================================================================================
+    = JAX-WS CLIENTS
+    =====================================================================================================-->
+    <beans:bean id="clientRfd" parent="clientJaxWs" abstract="true"
+        p:dataBinding-ref="dataBindingJaxbRfd"/>
+</beans:beans>

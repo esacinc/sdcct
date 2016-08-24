@@ -1,18 +1,27 @@
 package gov.hhs.onc.sdcct.xml.impl;
 
-import gov.hhs.onc.sdcct.api.IssueLevel;
+import com.github.sebhoss.warnings.CompilerWarnings;
+import gov.hhs.onc.sdcct.api.SdcctIssueSeverity;
 import gov.hhs.onc.sdcct.transform.impl.SdcctLocation;
 import gov.hhs.onc.sdcct.xml.SdcctXmlReporter;
 import javax.annotation.Nullable;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.TransformerException;
+import net.sf.saxon.lib.Logger;
+import net.sf.saxon.lib.StandardErrorListener;
 import net.sf.saxon.trans.XPathException;
 import org.codehaus.stax2.validation.XMLValidationException;
 import org.codehaus.stax2.validation.XMLValidationProblem;
 import org.xml.sax.SAXParseException;
 
-public abstract class AbstractSdcctXmlReporter implements SdcctXmlReporter {
+public abstract class AbstractSdcctXmlReporter<T extends AbstractSdcctXmlReporter<T>> extends StandardErrorListener implements SdcctXmlReporter<T> {
+    protected AbstractSdcctXmlReporter(@Nullable Logger logger) {
+        this.setLogger(logger);
+
+        this.setMaximumNumberOfWarnings(Integer.MAX_VALUE);
+    }
+
     @Override
     public void report(String msg, String errorType, @Nullable Object relatedInfo, @Nullable Location loc) throws XMLStreamException {
         if (relatedInfo instanceof XMLValidationProblem) {
@@ -20,7 +29,7 @@ public abstract class AbstractSdcctXmlReporter implements SdcctXmlReporter {
         } else if (relatedInfo instanceof SAXParseException) {
             this.error(((SAXParseException) relatedInfo));
         } else {
-            this.report(IssueLevel.ERROR, msg, ((loc != null) ? new SdcctLocation(loc) : new SdcctLocation()));
+            this.report(SdcctIssueSeverity.ERROR, msg, ((loc != null) ? new SdcctLocation(loc) : new SdcctLocation()), null);
         }
     }
 
@@ -34,66 +43,79 @@ public abstract class AbstractSdcctXmlReporter implements SdcctXmlReporter {
 
     @Override
     public void report(XMLValidationProblem problem) throws XMLStreamException {
-        IssueLevel level = IssueLevel.INFORMATION;
+        SdcctIssueSeverity severity = SdcctIssueSeverity.INFORMATION;
 
         switch (problem.getSeverity()) {
             case XMLValidationProblem.SEVERITY_WARNING:
-                level = IssueLevel.WARNING;
+                severity = SdcctIssueSeverity.WARNING;
                 break;
 
             case XMLValidationProblem.SEVERITY_ERROR:
-                level = IssueLevel.ERROR;
+                severity = SdcctIssueSeverity.ERROR;
                 break;
 
             case XMLValidationProblem.SEVERITY_FATAL:
-                level = IssueLevel.FATAL;
+                severity = SdcctIssueSeverity.FATAL;
                 break;
         }
 
         Location loc = problem.getLocation();
 
-        this.report(level, problem.getMessage(), ((loc instanceof SdcctLocation) ? ((SdcctLocation) loc) : new SdcctLocation(loc)));
+        this.report(severity, problem.getMessage(), ((loc instanceof SdcctLocation) ? ((SdcctLocation) loc) : new SdcctLocation(loc)), null);
     }
 
     @Override
-    public void fatalError(SAXParseException exception) {
-        this.report(exception, IssueLevel.FATAL);
+    public void fatalError(SAXParseException cause) {
+        this.report(SdcctIssueSeverity.FATAL, cause);
     }
 
     @Override
-    public void fatalError(TransformerException exception) {
-        this.report(exception, IssueLevel.FATAL);
+    public void fatalError(TransformerException cause) {
+        this.report(SdcctIssueSeverity.FATAL, cause);
     }
 
     @Override
-    public void error(SAXParseException exception) {
-        this.report(exception, IssueLevel.ERROR);
+    public void error(SAXParseException cause) {
+        this.report(SdcctIssueSeverity.ERROR, cause);
     }
 
     @Override
-    public void error(TransformerException exception) {
-        this.report(exception, IssueLevel.ERROR);
+    public void error(TransformerException cause) {
+        this.report(SdcctIssueSeverity.ERROR, cause);
     }
 
     @Override
-    public void warning(SAXParseException exception) {
-        this.report(exception, IssueLevel.WARNING);
+    public void warning(SAXParseException cause) {
+        this.report(SdcctIssueSeverity.WARNING, cause);
     }
 
     @Override
-    public void warning(TransformerException exception) {
-        this.report(exception, IssueLevel.WARNING);
+    public void warning(TransformerException cause) {
+        this.report(SdcctIssueSeverity.WARNING, cause);
     }
 
-    protected void report(SAXParseException exception, IssueLevel level) {
-        this.report(level, exception.getMessage(), new SdcctLocation(exception));
+    @Override
+    public T makeAnother(int hostLang) {
+        return this.clone();
     }
 
-    protected void report(TransformerException exception, IssueLevel level) {
-        this.report(level, exception.getMessage(), new SdcctLocation(exception.getLocator()));
+    @Override
+    @SuppressWarnings({ "CloneDoesntCallSuperClone", CompilerWarnings.UNCHECKED })
+    public T clone() {
+        return this.cloneInternal();
+    }
 
-        if (exception instanceof XPathException) {
-            ((XPathException) exception).setHasBeenReported(true);
+    protected void report(SdcctIssueSeverity severity, SAXParseException cause) {
+        this.report(severity, cause.getMessage(), new SdcctLocation(cause), cause);
+    }
+
+    protected void report(SdcctIssueSeverity severity, TransformerException cause) {
+        this.report(severity, cause.getMessage(), new SdcctLocation(cause.getLocator()), cause);
+
+        if (cause instanceof XPathException) {
+            ((XPathException) cause).setHasBeenReported(true);
         }
     }
+
+    protected abstract T cloneInternal();
 }

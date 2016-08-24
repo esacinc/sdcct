@@ -1,29 +1,28 @@
 package gov.hhs.onc.sdcct.validate;
 
 import gov.hhs.onc.sdcct.SdcctException;
-import java.util.List;
 import javax.annotation.Nullable;
 
 public class ValidationException extends SdcctException {
     private final static long serialVersionUID = 0L;
 
-    private List<ValidationIssue> issues;
+    private ValidationResult result;
 
-    public ValidationException(@Nullable String msg, List<ValidationIssue> issues) {
-        this(msg, null, issues);
+    public ValidationException(@Nullable String msg, ValidationResult result) {
+        this(msg, null, result);
     }
 
-    public ValidationException(@Nullable Throwable cause, List<ValidationIssue> issues) {
-        this(null, cause, issues);
+    public ValidationException(@Nullable Throwable cause, ValidationResult result) {
+        this(null, cause, result);
     }
 
-    public ValidationException(@Nullable String msg, @Nullable Throwable cause, List<ValidationIssue> issues) {
+    public ValidationException(@Nullable String msg, @Nullable Throwable cause, ValidationResult result) {
         super(msg, cause);
 
-        this.issues = issues;
+        this.result = result;
     }
 
-    public List<ValidationIssue> getIssues() {
-        return this.issues;
+    public ValidationResult getResult() {
+        return this.result;
     }
 }

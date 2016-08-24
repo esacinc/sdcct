@@ -4,8 +4,8 @@ import gov.hhs.onc.sdcct.context.impl.SdcctApplication;
 import gov.hhs.onc.sdcct.context.impl.SdcctApplicationConfiguration;
 import javax.servlet.ServletContext;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.context.web.ServletContextApplicationContextInitializer;
-import org.springframework.boot.context.web.SpringBootServletInitializer;
+import org.springframework.boot.web.support.ServletContextApplicationContextInitializer;
+import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.web.context.WebApplicationContext;
 
 public class WebServletInitializer extends SpringBootServletInitializer {

@@ -80,8 +80,8 @@
    <soap:Body>
       <urn:RetrieveFormRequest>
          <urn:workflowData>
-            <urn:formID>sdcct-test1-rfd</urn:formID>
-            <urn:encodedResponse>true</urn:encodedResponse>
+            <urn:formID>rfd_1a</urn:formID>
+            <urn:encodedResponse responseContentType="application/xml+sdc">true</urn:encodedResponse>
          </urn:workflowData>
       </urn:RetrieveFormRequest>
    </soap:Body>
@@ -89,6 +89,59 @@
             <con:assertion type="Valid HTTP Status Codes" name="Valid HTTP Status Codes">
               <con:configuration>
                 <codes>200</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="SOAP Response" name="SOAP Response">
+              <con:settings/>
+              <con:configuration/>
+            </con:assertion>
+            <!--
+            <con:assertion type="SOAP Fault Assertion" name="Not SOAP Fault">
+              <con:settings/>
+              <con:configuration/>
+            </con:assertion>
+            -->
+            <con:credentials>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:jmsPropertyConfig/>
+            <con:wsaConfig action="urn:ihe:iti:2007:RetrieveForm" mustUnderstand="NONE" version="200508"/>
+            <con:wsrmConfig version="1.2"/>
+          </con:request>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+    </con:testCase>
+    <!--
+    TODO: Re-enable once RfdJaxbDataBinding has validation enabled.
+    -->
+    <con:testCase disabled="true" id="fe73a99f-5d6d-46b6-bd0d-fd8d837e7400" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="RFD Form Manager Retrieve Form Invalid XML Testcase" searchProperties="true">
+      <con:settings/>
+      <con:testStep type="request" id="b2cd1a2b-6e1d-439f-8d61-01300c0e1797" name="RFD Form Manager Retrieve Form Invalid XML Step">
+        <con:settings/>
+        <con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:interface>RFDFormManager_Binding_Soap12</con:interface>
+          <con:operation>RFDFormManager_RetrieveForm</con:operation>
+          <con:request name="RFD Form Manager Retrieve Form Invalid XML Request" id="fc8c48a1-7a7b-468f-8366-a67b1b1db138">
+            <con:settings/>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>${#Spring#sdcct.ws.form.manager.rfd.url}</con:endpoint>
+            <con:request><![CDATA[<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:urn="urn:ihe:iti:rfd:2007">
+   <soap:Header/>
+   <soap:Body>
+      <urn:RetrieveFormRequest>
+         <urn:workflowData badAttribute="badAttributeValue">
+            <urn:formID>rfd_1a</urn:formID>
+            <urn:encodedResponse responseContentType="application/xml+sdc">true</urn:encodedResponse>
+            <badElement value="badElementValue"/>
+         </urn:workflowData>
+      </urn:RetrieveFormRequest>
+   </soap:Body>
+</soap:Envelope>]]></con:request>
+            <con:assertion type="Valid HTTP Status Codes" name="Valid HTTP Status Codes">
+              <con:configuration>
+                <codes>500</codes>
               </con:configuration>
             </con:assertion>
             <con:assertion type="SOAP Response" name="SOAP Response">

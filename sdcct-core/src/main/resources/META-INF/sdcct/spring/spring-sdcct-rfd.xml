@@ -21,6 +21,15 @@
     </sdcct-xml:xpath-static-options>
     
     <!--====================================================================================================
+    = XSLT OPTIONS
+    =====================================================================================================-->
+    <sdcct-xml:xslt-static-options id="xsltOptsStaticRfd" parent="xsltOptsStatic" abstract="true">
+        <sdcct-xml:static-namespace prefix="#{ T(gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes).SDC }">
+            #{ T(gov.hhs.onc.sdcct.net.SdcctUris).SDC_URL_VALUE }
+        </sdcct-xml:static-namespace>
+    </sdcct-xml:xslt-static-options>
+    
+    <!--====================================================================================================
     = CONTENT PATH BUILDERS
     =====================================================================================================-->
     <beans:bean id="contentPathBuilderRfd" parent="contentPathBuilder"
@@ -163,6 +172,7 @@
     =====================================================================================================-->
     <beans:bean id="validatorServiceRfd" parent="validatorService"
         c:contentPathBuilder-ref="contentPathBuilderRfd"
+        c:jaxbContextMetadata-ref="jaxbContextMetadataRfd"
         c:resourceMetadataService-ref="resourceMetadataServiceRfd"/>
     
     <!--====================================================================================================
@@ -181,11 +191,4 @@
     <beans:bean id="searchServiceRfdFormDesign" parent="searchServiceRfd"
         c:resourceMetadata-ref="metadataResourceRfdFormDesign"
         c:resourceRegistry-ref="resourceRegistryRfdFormDesign"/>
-
-    <!--====================================================================================================
-    = RFD FORM TRANSFORMER
-    =====================================================================================================-->
-    <beans:bean id="rfdTemplateTransformer" class="gov.hhs.onc.sdcct.rfd.impl.RfdFormTransformerImpl"
-                c:src="classpath*:${sdcct.xslt.src.dir.path}/sdcct/rfd-template.xslt"/>
-
 </beans:beans>

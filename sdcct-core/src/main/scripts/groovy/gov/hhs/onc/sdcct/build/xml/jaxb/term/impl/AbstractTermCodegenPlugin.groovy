@@ -35,8 +35,8 @@ import org.xml.sax.ErrorHandler
 abstract class AbstractTermCodegenPlugin extends AbstractCodegenPlugin {
     final static String STATIC_VALUE_SET_ENUM_ELEM_NAME = "static-value-set-enum"
     
-    final static QName STATIC_VALUE_SET_ENUM_ELEM_QNAME = new QName(SdcctUris.SDCCT_JAXB_URN_VALUE, STATIC_VALUE_SET_ENUM_ELEM_NAME,
-        SdcctXmlPrefixes.SDCCT_JAXB)
+    final static QName STATIC_VALUE_SET_ENUM_ELEM_QNAME = new QName(SdcctUris.SDCCT_XML_JAXB_URN_VALUE, STATIC_VALUE_SET_ENUM_ELEM_NAME,
+        SdcctXmlPrefixes.SDCCT_XML_JAXB)
     
     protected Map<String, CodeSystemCodegenModel> codeSystems
     protected Map<String, ValueSetCodegenModel> valueSets

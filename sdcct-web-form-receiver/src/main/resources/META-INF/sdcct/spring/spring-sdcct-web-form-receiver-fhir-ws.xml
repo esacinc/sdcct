@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
+        urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
+
+    <!--====================================================================================================
+    = JAX-RS SERVERS
+    =====================================================================================================-->
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="serverFormReceiverFhir" parent="serverFhir"
+        p:address="${sdcct.ws.form.receiver.fhir.url.path}">
+        <beans:property name="serviceBean">
+            <beans:bean class="gov.hhs.onc.sdcct.web.form.receiver.fhir.ws.impl.FhirFormReceiverWebServiceImpl"
+                p:metadata-ref="metadataWsFhirFormReceiver">
+                <beans:property name="resourceRegistries">
+                    <beans:array>
+                        <beans:ref bean="resourceRegistryFhirQuestionnaireResp"/>
+                    </beans:array>
+                </beans:property>
+                <beans:property name="searchServices">
+                    <beans:array>
+                        <beans:ref bean="searchServiceFhirQuestionnaireResp"/>
+                    </beans:array>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = JAX-RS CLIENTS
+    =====================================================================================================-->
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="clientFormReceiverFhir" parent="clientFhir" lazy-init="true" scope="prototype"
+        p:serviceClass="#{ T(gov.hhs.onc.sdcct.web.form.receiver.fhir.ws.FhirFormReceiverWebService) }"/>
+</beans:beans>

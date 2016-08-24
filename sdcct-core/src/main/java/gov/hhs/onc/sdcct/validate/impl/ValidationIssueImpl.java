@@ -1,6 +1,6 @@
 package gov.hhs.onc.sdcct.validate.impl;
 
-import gov.hhs.onc.sdcct.api.IssueLevel;
+import gov.hhs.onc.sdcct.api.SdcctIssueSeverity;
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils.SdcctToStringStyle;
 import gov.hhs.onc.sdcct.validate.ValidationIssue;
 import gov.hhs.onc.sdcct.validate.ValidationLocation;
@@ -11,16 +11,16 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class ValidationIssueImpl implements ValidationIssue {
     protected ValidationType type;
-    protected IssueLevel level;
+    protected SdcctIssueSeverity severity;
     protected String msg;
     protected ValidationLocation loc;
     protected ValidationSource src;
     protected String contextXpathExpr;
     protected String testXpathExpr;
 
-    public ValidationIssueImpl(ValidationType type, IssueLevel level, String msg, ValidationLocation loc, @Nullable ValidationSource src) {
+    public ValidationIssueImpl(ValidationType type, SdcctIssueSeverity severity, String msg, ValidationLocation loc, @Nullable ValidationSource src) {
         this.type = type;
-        this.level = level;
+        this.severity = severity;
         this.msg = msg;
         this.loc = loc;
         this.src = src;
@@ -30,7 +30,7 @@ public class ValidationIssueImpl implements ValidationIssue {
     public String toString() {
         ToStringBuilder builder = new ToStringBuilder(null, SdcctToStringStyle.INSTANCE);
         builder.append("type", this.type.getId());
-        builder.append("level", this.level.getId());
+        builder.append("severity", this.severity.getId());
         builder.append("loc", String.format("{%s}", this.loc));
 
         if (this.hasContextXpathExpression()) {
@@ -66,11 +66,6 @@ public class ValidationIssueImpl implements ValidationIssue {
     }
 
     @Override
-    public IssueLevel getLevel() {
-        return this.level;
-    }
-
-    @Override
     public ValidationLocation getLocation() {
         return this.loc;
     }
@@ -78,6 +73,11 @@ public class ValidationIssueImpl implements ValidationIssue {
     @Override
     public String getMessage() {
         return this.msg;
+    }
+
+    @Override
+    public SdcctIssueSeverity getSeverity() {
+        return this.severity;
     }
 
     @Override

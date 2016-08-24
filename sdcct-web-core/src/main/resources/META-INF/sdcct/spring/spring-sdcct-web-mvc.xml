@@ -14,11 +14,6 @@
         urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
     
     <!--====================================================================================================
-    = CONTEXT
-    =====================================================================================================-->
-    <mvc:annotation-driven conversion-service="conversionService"/>
-    
-    <!--====================================================================================================
     = HANDLERS
     =====================================================================================================-->
     <mvc:default-servlet-handler/>
@@ -40,9 +35,39 @@
     <!--====================================================================================================
     = VIEW RESOLVERS
     =====================================================================================================-->
-    <mvc:view-resolvers>
-        <mvc:jsp prefix="/WEB-INF/views/" suffix=".jsp" view-class="org.springframework.web.servlet.view.JstlView"/>
-    </mvc:view-resolvers>
+    <beans:bean id="viewResolver" class="org.thymeleaf.spring4.view.ThymeleafViewResolver"
+        p:characterEncoding="#{ T(java.nio.charset.StandardCharsets).UTF_8.name() }">
+        <beans:property name="templateEngine">
+            <beans:bean parent="templateEngine">
+                <beans:property name="additionalDialects">
+                    <beans:set>
+                        <beans:bean class="org.thymeleaf.extras.springsecurity4.dialect.SpringSecurityDialect"/>
+                    </beans:set>
+                </beans:property>
+                <beans:property name="templateResolvers">
+                    <beans:set>
+                        <!--suppress SpringPlaceholdersInspection -->
+                        <beans:bean parent="templateResolver"
+                            p:prefix="${sdcct.view.dir.path}/"/>
+                    </beans:set>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = MVC
+    =====================================================================================================-->
+    <mvc:annotation-driven conversion-service="conversionService">
+        <mvc:message-converters register-defaults="false">
+            <beans:bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"
+                p:defaultCharset="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"/>
+            <beans:bean class="org.springframework.http.converter.StringHttpMessageConverter"
+                p:defaultCharset="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"/>
+            <beans:bean class="org.springframework.http.converter.ResourceHttpMessageConverter"
+                p:defaultCharset="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"/>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
     
     <!--====================================================================================================
     = SERVLET REGISTRATION BEANS

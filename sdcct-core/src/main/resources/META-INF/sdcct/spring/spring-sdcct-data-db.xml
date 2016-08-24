@@ -158,7 +158,7 @@
     =====================================================================================================-->
     <!--suppress SpringPlaceholdersInspection -->
     <beans:bean id="dbServer" class="gov.hhs.onc.sdcct.data.db.server.impl.HsqlServerImpl"
-        p:databaseDirectory="${sdcct.data.db.dir}"
+        p:databaseDirectory="${sdcct.data.db.server.dir}"
         p:databaseName="${sdcct.data.db.name}"
         p:hostAddress="${sdcct.data.db.server.host.addr}"
         p:port="${sdcct.data.db.server.port}"
@@ -176,7 +176,7 @@
         <beans:property name="initializationScriptSources">
             <beans:array>
                 <!--suppress SpringPlaceholdersInspection -->
-                <beans:value>classpath*:${sdcct.data.db.src.dir.path}/db-init-sdcct.sql</beans:value>
+                <beans:value>classpath*:${sdcct.data.db.dir.path}/db-init-sdcct.sql</beans:value>
             </beans:array>
         </beans:property>
     </beans:bean>
@@ -206,7 +206,7 @@
                 <beans:entry key="hibernate.search.default.directory_provider" value="filesystem"/>
                 <!--suppress SpringPlaceholdersInspection -->
                 <beans:entry key="hibernate.search.default.#{ T(org.hibernate.search.cfg.Environment).INDEX_BASE_PROP_NAME }"
-                    value="${sdcct.data.db.index.dir}"/>
+                    value="${sdcct.data.db.server.index.dir}"/>
                 <beans:entry key="#{ T(org.hibernate.search.cfg.Environment).GENERATE_STATS }" value="true"/>
                 <beans:entry key="#{ T(org.hibernate.search.cfg.Environment).LUCENE_MATCH_VERSION }"
                     value="#{ T(org.hibernate.search.cfg.Environment).DEFAULT_LUCENE_MATCH_VERSION }"/>

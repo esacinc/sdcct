@@ -7,7 +7,6 @@ import gov.hhs.onc.sdcct.json.JsonEncodeOptions;
 import gov.hhs.onc.sdcct.transform.content.ContentCodecOptions;
 import gov.hhs.onc.sdcct.transform.content.SdcctContentType;
 import gov.hhs.onc.sdcct.transform.content.impl.AbstractContentCodec;
-import java.util.ArrayList;
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
 
@@ -43,11 +42,8 @@ public class JsonCodec extends AbstractContentCodec<JsonDecodeOptions, JsonEncod
         ObjectMapper srcObjMapper =
             ((opts = this.defaultEncodeOpts.clone().merge(opts)).getOption(ContentCodecOptions.PRETTY) ? this.prettyObjMapper : this.objMapper);
 
-        if (opts.hasBeanSerializerModifiers()) {
-            SdcctModule srcModule = new SdcctModule();
-            srcModule.setBeanSerializerModifiers(new ArrayList<>(opts.getBeanSerializerModifiers()));
-
-            (srcObjMapper = srcObjMapper.copy()).registerModules(srcModule);
+        if (opts.hasModules()) {
+            (srcObjMapper = srcObjMapper.copy()).registerModules(opts.getModules());
         }
 
         return srcObjMapper;
@@ -56,11 +52,8 @@ public class JsonCodec extends AbstractContentCodec<JsonDecodeOptions, JsonEncod
     private ObjectMapper buildDecodeObjectMapper(@Nullable JsonDecodeOptions opts) {
         ObjectMapper srcObjMapper = this.objMapper;
 
-        if ((opts = this.defaultDecodeOpts.clone().merge(opts)).hasBeanDeserializerModifiers()) {
-            SdcctModule srcModule = new SdcctModule();
-            srcModule.setBeanDeserializerModifiers(new ArrayList<>(opts.getBeanDeserializerModifiers()));
-
-            (srcObjMapper = srcObjMapper.copy()).registerModule(srcModule);
+        if ((opts = this.defaultDecodeOpts.clone().merge(opts)).hasModules()) {
+            (srcObjMapper = srcObjMapper.copy()).registerModules(opts.getModules());
         }
 
         return srcObjMapper;

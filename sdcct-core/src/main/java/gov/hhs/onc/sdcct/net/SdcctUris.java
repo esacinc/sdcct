@@ -49,9 +49,9 @@ public final class SdcctUris {
     public final static String SDCCT_CORE_URN_VALUE = SDCCT_URN_PREFIX + SDCCT_CORE_URN_NSS;
     public final static URI SDCCT_CORE_URN = URI.create(SDCCT_CORE_URN_VALUE);
 
-    public final static String SDCCT_JAXB_URN_NSS = "jaxb";
-    public final static String SDCCT_JAXB_URN_VALUE = SDCCT_URN_PREFIX + SDCCT_JAXB_URN_NSS;
-    public final static URI SDCCT_JAXB_URN = URI.create(SDCCT_JAXB_URN_VALUE);
+    public final static String SDCCT_FHIR_URN_NSS = "fhir";
+    public final static String SDCCT_FHIR_URN_VALUE = SDCCT_URN_PREFIX + SDCCT_FHIR_URN_NSS;
+    public final static URI SDCCT_FHIR_URN = URI.create(SDCCT_FHIR_URN_VALUE);
 
     public final static String SDCCT_SPRING_URN_NSS = "spring";
     public final static String SDCCT_SPRING_URN_VALUE = SDCCT_URN_PREFIX + SDCCT_SPRING_URN_NSS;
@@ -64,6 +64,14 @@ public final class SdcctUris {
     public final static String SDCCT_WS_URN_NSS = "ws";
     public final static String SDCCT_WS_URN_VALUE = SDCCT_URN_PREFIX + SDCCT_WS_URN_NSS;
     public final static URI SDCCT_WS_URN = URI.create(SDCCT_WS_URN_VALUE);
+
+    public final static String SDCCT_XML_URN_NSS = "xml";
+    public final static String SDCCT_XML_URN_VALUE = SDCCT_URN_PREFIX + SDCCT_XML_URN_NSS;
+    public final static URI SDCCT_XML_URN = URI.create(SDCCT_XML_URN_VALUE);
+
+    public final static String SDCCT_XML_JAXB_URN_NSS = SDCCT_XML_URN_NSS + ":jaxb";
+    public final static String SDCCT_XML_JAXB_URN_VALUE = SDCCT_URN_PREFIX + SDCCT_XML_JAXB_URN_NSS;
+    public final static URI SDCCT_XML_JAXB_URN = URI.create(SDCCT_XML_JAXB_URN_VALUE);
 
     private SdcctUris() {
     }

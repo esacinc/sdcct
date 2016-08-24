@@ -7,7 +7,7 @@ import gov.hhs.onc.sdcct.transform.content.path.ContentPathBuilder;
 import gov.hhs.onc.sdcct.xml.impl.XdmDocument;
 import org.hibernate.HibernateException;
 
-public interface ResourceParamProcessor<T, U extends ResourceMetadata<?>, V extends SdcctResource> extends SdcctResourceAccessor<T, U, V> {
+public interface ResourceParamProcessor<T, U extends ResourceMetadata<?>, V extends SdcctResource> extends SdcctResourceAccessor<T, V> {
     public void process(XdmDocument contentDoc, V entity) throws HibernateException;
 
     public ContentPathBuilder getContentPathBuilder();

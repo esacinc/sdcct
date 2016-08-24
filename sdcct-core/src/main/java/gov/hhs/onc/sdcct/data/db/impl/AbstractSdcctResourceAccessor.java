@@ -3,16 +3,14 @@ package gov.hhs.onc.sdcct.data.db.impl;
 import gov.hhs.onc.sdcct.api.SpecificationType;
 import gov.hhs.onc.sdcct.data.SdcctResource;
 import gov.hhs.onc.sdcct.data.db.SdcctResourceAccessor;
-import gov.hhs.onc.sdcct.data.metadata.ResourceMetadata;
 
-public abstract class AbstractSdcctResourceAccessor<T, U extends ResourceMetadata<?>, V extends SdcctResource> extends AbstractSdcctEntityAccessor<V>
-    implements SdcctResourceAccessor<T, U, V> {
+public abstract class AbstractSdcctResourceAccessor<T, U extends SdcctResource> extends AbstractSdcctEntityAccessor<U> implements SdcctResourceAccessor<T, U> {
     protected SpecificationType specType;
     protected Class<T> beanClass;
     protected Class<? extends T> beanImplClass;
 
-    protected AbstractSdcctResourceAccessor(SpecificationType specType, Class<T> beanClass, Class<? extends T> beanImplClass, Class<V> entityClass,
-        Class<? extends V> entityImplClass) {
+    protected AbstractSdcctResourceAccessor(SpecificationType specType, Class<T> beanClass, Class<? extends T> beanImplClass, Class<U> entityClass,
+        Class<? extends U> entityImplClass) {
         super(entityClass, entityImplClass);
 
         this.specType = specType;
@@ -20,10 +18,12 @@ public abstract class AbstractSdcctResourceAccessor<T, U extends ResourceMetadat
         this.beanImplClass = beanImplClass;
     }
 
+    @Override
     public Class<T> getBeanClass() {
         return this.beanClass;
     }
 
+    @Override
     public Class<? extends T> getBeanImplClass() {
         return this.beanImplClass;
     }

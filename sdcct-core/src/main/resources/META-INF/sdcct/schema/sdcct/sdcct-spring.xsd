@@ -26,6 +26,18 @@
     </xsd:attributeGroup>
     
     <xsd:attributeGroup name="ParentAttributes">
-        <xsd:attribute name="parent" type="sdcct:NotBlankString"/>
+        <xsd:attribute name="parent" type="sdcct:NotBlankString">
+            <xsd:annotation>
+                <xsd:documentation source="java:org.springframework.beans.factory.config.BeanDefinition"/>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+    
+    <xsd:attributeGroup name="RefAttributes">
+        <xsd:attribute name="ref" type="sdcct:NotBlankString">
+            <xsd:annotation>
+                <xsd:documentation source="java:org.springframework.beans.factory.config.BeanDefinition"/>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 </xsd:schema>

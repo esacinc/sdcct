@@ -64,12 +64,9 @@
         <beans:property name="features">
             <beans:list>
                 <beans:ref bean="featureLogging"/>
-                <beans:ref bean="featureSchemaValidation"/>
             </beans:list>
         </beans:property>
     </beans:bean>
-    
-    <beans:bean id="clientFhir" parent="clientJaxRs" abstract="true"/>
     
     <!--====================================================================================================
     = JAX-WS CLIENTS
@@ -81,11 +78,7 @@
         <beans:property name="features">
             <beans:list>
                 <beans:ref bean="featureLogging"/>
-                <beans:ref bean="featureSchemaValidation"/>
             </beans:list>
         </beans:property>
     </beans:bean>
-    
-    <beans:bean id="clientRfd" parent="clientJaxWs" abstract="true"
-        p:dataBinding-ref="dataBindingJaxbRfd"/>
 </beans:beans>

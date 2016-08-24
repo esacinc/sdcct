@@ -1,6 +1,5 @@
 package gov.hhs.onc.sdcct.build.utils
 
-import gov.hhs.onc.sdcct.utils.SdcctResourceUtils
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils
 import javax.annotation.Nullable
 import org.apache.commons.lang3.ObjectUtils
@@ -17,27 +16,32 @@ final class SdcctBuildUtils {
     final static Closure<Boolean> FALSE_PREDICATE = { false }
     final static Closure<Boolean> TRUE_PREDICATE = { true }
     
+    final static String SNAPSHOT_DEP_VERSION_SUFFIX = "-SNAPSHOT"
+    
     final static String DEPS_DIR_PROJECT_PROP_NAME = "project.build.dependenciesDirectory"
     
     private SdcctBuildUtils() {
     }
     
     static File resolveRemoteArtifact(Log log, MavenProject project, AntBuilder ant, Artifact artifact, URL artifactUrl, boolean install) {
+        String artifactDesc = "(groupId=${artifact.groupId}, artifactId=${artifact.artifactId}, version=${artifact.version}, classifier=${artifact.classifier}, scope=${artifact.scope}, type=${artifact.type})"
         File artifactLocalRepoFile = buildArtifactLocalRepositoryFile(project, artifact)
         
         if (artifactLocalRepoFile.exists()) {
-            log.info(
-                "Remote artifact (groupId=${artifact.groupId}, artifactId=${artifact.artifactId}, version=${artifact.version}, scope=${artifact.scope}, type=${artifact.type}) already resolved: ${artifactLocalRepoFile.path}")
-            
-            return artifactLocalRepoFile
+            if (!StringUtils.endsWith(artifact.version, SNAPSHOT_DEP_VERSION_SUFFIX)) {
+                log.info("Remote artifact ${artifactDesc} already resolved: ${artifactLocalRepoFile.path}")
+
+                return artifactLocalRepoFile
+            } else {
+                log.info("Updating remote artifact ${artifactDesc} with snapshot version.")
+            }
         }
         
         File artifactDepsFile = buildDependenciesArtifactFile(project, artifact)
         
         ant.get(src: artifactUrl, dest: artifactDepsFile)
         
-        log.info(
-            "Downloaded remote artifact (groupId=${artifact.groupId}, artifactId=${artifact.artifactId}, version=${artifact.version}, scope=${artifact.scope}, type=${artifact.type}): ${artifactUrl} => ${artifactDepsFile.path}")
+        log.info("Downloaded remote artifact ${artifactDesc}: ${artifactUrl} => ${artifactDepsFile.path}")
         
         return (install ? installArtifact(ant, artifact, artifactDepsFile) : artifactDepsFile)
     }
@@ -49,6 +53,7 @@ final class SdcctBuildUtils {
             ant.arg(value: "-DgroupId=${artifact.groupId}")
             ant.arg(value: "-DartifactId=${artifact.artifactId}")
             ant.arg(value: "-Dversion=${artifact.version}")
+            ant.arg(value: "-Dclassifier=${artifact.classifier}")
             ant.arg(value: "-Dpackaging=${artifact.type}")
             ant.arg(value: "-Dfile=${artifactFile}")
         }
@@ -57,7 +62,8 @@ final class SdcctBuildUtils {
     }
     
     static File buildDependenciesArtifactFile(MavenProject project, Artifact artifact) {
-        return new File(buildDependenciesArtifactDirectory(project, artifact.artifactId), "${artifact.artifactId}-${artifact.version}.${artifact.type}")
+        return new File(buildDependenciesArtifactDirectory(project, artifact.artifactId),
+            "${artifact.artifactId}-${(artifact.hasClassifier() ? "${artifact.classifier}-" : StringUtils.EMPTY)}${artifact.version}.${artifact.type}")
     }
     
     static File buildDependenciesArtifactDirectory(MavenProject project, String artifactDepsDirName) {
@@ -108,6 +114,6 @@ final class SdcctBuildUtils {
     }
 
     static String[] tokenize(@Nullable String str, @Nullable String defaultStr) {
-        return SdcctResourceUtils.tokenizeLocations(ObjectUtils.defaultIfNull(str, defaultStr))
+        return SdcctStringUtils.splitTokens(ObjectUtils.defaultIfNull(str, defaultStr))
     }
 }

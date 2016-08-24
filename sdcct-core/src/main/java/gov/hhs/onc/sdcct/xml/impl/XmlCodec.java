@@ -19,7 +19,6 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import net.sf.saxon.evpull.Decomposer;
-import net.sf.saxon.evpull.EventToStaxBridge;
 import net.sf.saxon.om.NodeInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -28,9 +27,9 @@ public class XmlCodec extends AbstractContentCodec<XmlDecodeOptions, XmlEncodeOp
      * Workaround for the fact that the {@link com.sun.xml.bind.v2.runtime.unmarshaller.StAXStreamConnector#bridge JAXB Unmarshaller StAX bridging} calls
      * {@link XMLStreamReader#next()} an extra time.
      */
-    private static class UnmarshallingXmlStreamReader extends EventToStaxBridge {
+    public static class UnmarshallingXmlStreamReader extends EventXmlStreamReader {
         public UnmarshallingXmlStreamReader(NodeInfo srcNodeInfo, SdcctPipelineConfiguration pipelineConfig) {
-            super(new Decomposer(srcNodeInfo, pipelineConfig), pipelineConfig);
+            super(new Decomposer(srcNodeInfo, pipelineConfig));
         }
 
         @Override

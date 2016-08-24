@@ -34,6 +34,14 @@
         </xsd:complexContent>
     </xsd:complexType>
     
+    <xsd:complexType name="Function">
+        <xsd:complexContent>
+            <xsd:extension base="beans:identifiedType">
+                <xsd:attribute name="ref" type="sdcct:NotBlankString"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
     <xsd:complexType name="Namespace">
         <xsd:simpleContent>
             <xsd:extension base="sdcct:NotBlankString">
@@ -56,6 +64,7 @@
                 <xsd:sequence>
                     <xsd:element name="static-namespace" type="sdcct-spring-xml:Namespace" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element name="static-variable" type="sdcct-spring-xml:Variable" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="static-function" type="sdcct-spring-xml:Function" minOccurs="0" maxOccurs="unbounded"/>
                     <xsd:element name="static-pooled-document" type="sdcct-spring-xml:Document" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="sdcct-spring:AbstractAttributes"/>
@@ -107,6 +116,17 @@
             <xsd:appinfo>
                 <tool:annotation>
                     <tool:exports type="gov.hhs.onc.sdcct.xml.impl.XdmDocument"/>
+                </tool:annotation>
+            </xsd:appinfo>
+        </xsd:annotation>
+    </xsd:element>
+    
+    <xsd:element name="function" type="sdcct-spring-xml:Function">
+        <xsd:annotation>
+            <xsd:documentation source="java:org.springframework.beans.factory.config.BeanDefinition"/>
+            <xsd:appinfo>
+                <tool:annotation>
+                    <tool:exports type="net.sf.saxon.lib.ExtensionFunctionDefinition"/>
                 </tool:annotation>
             </xsd:appinfo>
         </xsd:annotation>

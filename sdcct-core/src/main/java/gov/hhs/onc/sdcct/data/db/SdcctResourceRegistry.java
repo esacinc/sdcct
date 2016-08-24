@@ -7,7 +7,7 @@ import java.util.List;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 
-public interface SdcctResourceRegistry<T, U extends ResourceMetadata<T>, V extends SdcctResource> extends SdcctDao<V>, SdcctResourceAccessor<T, U, V> {
+public interface SdcctResourceRegistry<T, U extends ResourceMetadata<T>, V extends SdcctResource> extends SdcctDao<V>, SdcctResourceAccessor<T, V> {
     public V saveBean(T bean) throws Exception;
 
     public V saveBean(T bean, V entity) throws Exception;

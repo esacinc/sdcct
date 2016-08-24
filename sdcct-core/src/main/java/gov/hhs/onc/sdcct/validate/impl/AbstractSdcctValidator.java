@@ -1,20 +1,17 @@
 package gov.hhs.onc.sdcct.validate.impl;
 
-import gov.hhs.onc.sdcct.api.IssueLevel;
 import gov.hhs.onc.sdcct.data.metadata.ResourceMetadata;
 import gov.hhs.onc.sdcct.transform.impl.SdcctConfiguration;
 import gov.hhs.onc.sdcct.validate.SdcctValidator;
 import gov.hhs.onc.sdcct.validate.ValidationException;
-import gov.hhs.onc.sdcct.validate.ValidationIssue;
+import gov.hhs.onc.sdcct.validate.ValidationResult;
 import gov.hhs.onc.sdcct.validate.ValidationType;
 import gov.hhs.onc.sdcct.xml.impl.SdcctXmlOutputFactory;
-import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbComplexTypeMetadata;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import net.sf.saxon.tree.linked.DocumentImpl;
-import net.sf.saxon.tree.linked.ElementImpl;
+import gov.hhs.onc.sdcct.xml.impl.XdmDocument;
+import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbContextMetadata;
+import javax.annotation.Nullable;
+import org.codehaus.stax2.validation.Validatable;
+import org.codehaus.stax2.validation.XMLValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractSdcctValidator implements SdcctValidator {
@@ -25,36 +22,39 @@ public abstract class AbstractSdcctValidator implements SdcctValidator {
     protected SdcctConfiguration config;
 
     protected ValidationType type;
+    protected boolean validateStream;
+    protected boolean validateDoc;
 
-    protected AbstractSdcctValidator(ValidationType type) {
+    protected AbstractSdcctValidator(ValidationType type, boolean validateStream, boolean validateDoc) {
         this.type = type;
+        this.validateStream = validateStream;
+        this.validateDoc = validateDoc;
     }
 
     @Override
-    public List<ValidationIssue> validate(DocumentImpl docInfo, ElementImpl docElemInfo, JaxbComplexTypeMetadata<?> jaxbTypeMetadata, Class<?> beanClass,
-        ResourceMetadata<?> resourceMetadata) throws ValidationException {
-        List<ValidationIssue> issues = this.validateInternal(docInfo, docElemInfo, jaxbTypeMetadata, beanClass, resourceMetadata, new ArrayList<>());
-
-        Map<IssueLevel, Integer> issueLevelCounts =
-            issues.stream().collect(Collectors.groupingBy(ValidationIssue::getLevel, Collectors.reducing(0, issue -> 1, Integer::sum)));
-        int numErrorIssues = issueLevelCounts.getOrDefault(IssueLevel.ERROR, 0), numFatalIssues = issueLevelCounts.getOrDefault(IssueLevel.FATAL, 0);
-
-        if ((numErrorIssues > 0) || (numFatalIssues > 0)) {
-            throw new ValidationException(String.format(
-                "XML document element (nsPrefix=%s, nsUri=%s, localName=%s) validation (type=%s) failed (numInfoIssues=%d, numWarnIssues=%d, numErrorIssues=%d, numFatalIssues=%d).",
-                docElemInfo.getPrefix(), docElemInfo.getURI(), docElemInfo.getLocalPart(), this.type.getId(),
-                issueLevelCounts.getOrDefault(IssueLevel.INFORMATION, 0), issueLevelCounts.getOrDefault(IssueLevel.WARNING, 0), numErrorIssues, numFatalIssues),
-                issues);
-        }
-
-        return issues;
+    public XdmDocument validateDocument(ValidationResult result, ResourceMetadata<?> resourceMetadata, XdmDocument doc) throws ValidationException {
+        return doc;
     }
 
-    protected abstract List<ValidationIssue> validateInternal(DocumentImpl docInfo, ElementImpl docElemInfo, JaxbComplexTypeMetadata<?> jaxbTypeMetadata,
-        Class<?> beanClass, ResourceMetadata<?> resourceMetadata, List<ValidationIssue> issues) throws ValidationException;
+    @Nullable
+    @Override
+    public <T extends Validatable> XMLValidator validateStream(ValidationResult result, JaxbContextMetadata jaxbContextMetadata, T streamAccessor)
+        throws ValidationException {
+        return null;
+    }
 
     @Override
     public ValidationType getType() {
         return this.type;
+    }
+
+    @Override
+    public boolean getValidateDocument() {
+        return this.validateDoc;
+    }
+
+    @Override
+    public boolean getValidateStream() {
+        return this.validateStream;
     }
 }

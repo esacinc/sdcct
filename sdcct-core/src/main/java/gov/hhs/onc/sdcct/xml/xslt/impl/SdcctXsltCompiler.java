@@ -1,5 +1,6 @@
 package gov.hhs.onc.sdcct.xml.xslt.impl;
 
+import com.github.sebhoss.warnings.CompilerWarnings;
 import gov.hhs.onc.sdcct.transform.impl.ByteArraySource;
 import gov.hhs.onc.sdcct.transform.impl.SdcctConfiguration;
 import gov.hhs.onc.sdcct.transform.impl.SdcctProcessor;
@@ -51,6 +52,10 @@ public class SdcctXsltCompiler extends XsltCompiler {
         return this.compile(srcDoc.getSource(), staticOpts);
     }
 
+    /**
+     * TODO: Switch to the new Saxon pull API stack once the changes from <a href="https://saxonica.plan.io/issues/2901">Saxon bug #2901</a> are available.
+     */
+    @SuppressWarnings({ CompilerWarnings.DEPRECATION })
     public SdcctXsltExecutable compile(Source src, @Nullable StaticXsltOptions staticOpts) throws SaxonApiException {
         SdcctProcessor proc = this.getProcessor();
         SdcctConfiguration config = proc.getUnderlyingConfiguration();
@@ -62,7 +67,13 @@ public class SdcctXsltCompiler extends XsltCompiler {
 
                 staticOpts.getFunctions().forEach(staticFuncLib::registerFunction);
 
-                ((FunctionLibraryList) compilerInfo.getExtensionFunctionLibrary()).addFunctionLibrary(staticFuncLib);
+                FunctionLibraryList funcLibs = ((FunctionLibraryList) compilerInfo.getExtensionFunctionLibrary());
+
+                if (funcLibs == null) {
+                    compilerInfo.setExtensionFunctionLibrary((funcLibs = new FunctionLibraryList()));
+                }
+
+                funcLibs.addFunctionLibrary(staticFuncLib);
             }
 
             if (staticOpts.hasVariables()) {

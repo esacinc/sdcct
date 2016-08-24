@@ -1,5 +1,6 @@
 package gov.hhs.onc.sdcct.transform.impl;
 
+import com.fasterxml.jackson.core.JsonLocation;
 import gov.hhs.onc.sdcct.beans.LocationBean;
 import gov.hhs.onc.sdcct.transform.content.path.ContentPath;
 import javax.annotation.Nullable;
@@ -30,58 +31,54 @@ public class SdcctLocation extends ExplicitLocation implements Location, Locatio
     private QName elemQname;
     private ContentPath contentPath;
 
-    public SdcctLocation() {
-        this(null, -1, -1);
+    public SdcctLocation(@Nullable JsonLocation jsonLoc) {
+        this();
+
+        this.initializeJsonLocation(jsonLoc);
     }
 
-    public SdcctLocation(NodeInfo nodeInfo) {
-        this(nodeInfo.getSystemId(), nodeInfo.getLineNumber(), nodeInfo.getColumnNumber());
+    public SdcctLocation(@Nullable NodeInfo nodeInfo) {
+        this(((SourceLocator) nodeInfo));
 
         this.initializeNodeInfo(nodeInfo);
     }
 
-    public SdcctLocation(net.sf.saxon.expr.parser.Location loc) {
-        this(loc.getPublicId(), loc.getSystemId(), loc.getLineNumber(), loc.getColumnNumber());
+    public SdcctLocation(@Nullable SourceLocator srcLocator) {
+        this();
 
-        this.initializeAttributeLocation(loc);
+        this.initializeSourceLocator(srcLocator);
+        this.initializeAttributeLocation(srcLocator);
     }
 
-    public SdcctLocation(javax.xml.transform.dom.DOMLocator domLoc) {
-        this(domLoc.getPublicId(), domLoc.getSystemId(), domLoc.getLineNumber(), domLoc.getColumnNumber());
+    public SdcctLocation(@Nullable DOMLocator domLocator) {
+        this();
 
-        this.initializeNode(domLoc.getOriginatingNode());
+        if (domLocator != null) {
+            this.initializeNode(domLocator.getRelatedNode());
+        }
     }
 
-    public SdcctLocation(SourceLocator locator) {
-        this(locator.getPublicId(), locator.getSystemId(), locator.getLineNumber(), locator.getColumnNumber());
+    public SdcctLocation(@Nullable SAXParseException cause) {
+        this();
 
+        this.initializeSaxParseException(cause);
+    }
+
+    public SdcctLocation(@Nullable Locator locator) {
+        this();
+
+        this.initializeLocator(locator);
         this.initializeAttributeLocation(locator);
     }
 
-    public SdcctLocation(DOMLocator locator) {
-        this(null, locator.getUri(), locator.getLineNumber(), locator.getColumnNumber(), locator.getByteOffset());
+    public SdcctLocation(@Nullable Location loc) {
+        this();
 
-        this.initializeNode(locator.getRelatedNode());
+        this.initializeLocation(loc);
     }
 
-    public SdcctLocation(XMLStreamLocation2 loc) {
-        this(loc.getPublicId(), loc.getSystemId(), loc.getLineNumber(), loc.getColumnNumber(), loc.getCharacterOffset());
-
-        this.context = loc.getContext();
-    }
-
-    public SdcctLocation(SAXParseException cause) {
-        this(cause.getPublicId(), cause.getSystemId(), cause.getLineNumber(), cause.getColumnNumber());
-    }
-
-    public SdcctLocation(Locator locator) {
-        this(locator.getPublicId(), locator.getSystemId(), locator.getLineNumber(), locator.getColumnNumber());
-
-        this.initializeAttributeLocation(locator);
-    }
-
-    public SdcctLocation(Location loc) {
-        this(loc.getPublicId(), loc.getSystemId(), loc.getLineNumber(), loc.getColumnNumber(), loc.getCharacterOffset());
+    public SdcctLocation() {
+        this(null, -1, -1);
     }
 
     public SdcctLocation(@Nullable String sysId, int lineNum, int colNum) {
@@ -107,21 +104,14 @@ public class SdcctLocation extends ExplicitLocation implements Location, Locatio
         return this;
     }
 
-    private void initializeAttributeLocation(@Nullable Object loc) {
-        if ((loc == null) || !(loc instanceof AttributeLocation)) {
+    private void initializeJsonLocation(@Nullable JsonLocation jsonLoc) {
+        if (jsonLoc == null) {
             return;
         }
 
-        AttributeLocation attrLoc = ((AttributeLocation) loc);
-        StructuredQName nodeQname = attrLoc.getAttributeName();
-
-        if (nodeQname != null) {
-            this.attrQname = new QName(nodeQname);
-        }
-
-        if ((nodeQname = attrLoc.getElementName()) != null) {
-            this.elemQname = new QName(nodeQname);
-        }
+        this.charOffset = ((int) jsonLoc.getCharOffset());
+        this.colNum = jsonLoc.getColumnNr();
+        this.lineNum = jsonLoc.getLineNr();
     }
 
     private void initializeNodeInfo(@Nullable NodeInfo nodeInfo) {
@@ -147,6 +137,21 @@ public class SdcctLocation extends ExplicitLocation implements Location, Locatio
         this.elemQname = new QName(elemInfo.getPrefix(), elemInfo.getURI(), elemInfo.getLocalPart());
     }
 
+    private void initializeSourceLocator(@Nullable SourceLocator srcLocator) {
+        if (srcLocator == null) {
+            return;
+        }
+
+        this.colNum = srcLocator.getColumnNumber();
+        this.lineNum = srcLocator.getLineNumber();
+        this.publicId = srcLocator.getPublicId();
+        this.sysId = srcLocator.getSystemId();
+
+        if (srcLocator instanceof javax.xml.transform.dom.DOMLocator) {
+            this.initializeNode(((javax.xml.transform.dom.DOMLocator) srcLocator).getOriginatingNode());
+        }
+    }
+
     private void initializeNode(@Nullable Node node) {
         if (node == null) {
             return;
@@ -169,6 +174,61 @@ public class SdcctLocation extends ExplicitLocation implements Location, Locatio
         }
 
         this.elemQname = new QName(elem.getPrefix(), null, elem.getLocalName());
+    }
+
+    private void initializeSaxParseException(@Nullable SAXParseException cause) {
+        if (cause == null) {
+            return;
+        }
+
+        this.colNum = cause.getColumnNumber();
+        this.lineNum = cause.getLineNumber();
+        this.publicId = cause.getPublicId();
+        this.sysId = cause.getSystemId();
+    }
+
+    private void initializeLocator(@Nullable Locator locator) {
+        if (locator == null) {
+            return;
+        }
+
+        this.colNum = locator.getColumnNumber();
+        this.lineNum = locator.getLineNumber();
+        this.publicId = locator.getPublicId();
+        this.sysId = locator.getSystemId();
+    }
+
+    private void initializeAttributeLocation(@Nullable Object loc) {
+        if ((loc == null) || !(loc instanceof AttributeLocation)) {
+            return;
+        }
+
+        AttributeLocation attrLoc = ((AttributeLocation) loc);
+        StructuredQName nodeQname = attrLoc.getAttributeName();
+
+        if (nodeQname != null) {
+            this.attrQname = new QName(nodeQname);
+        }
+
+        if ((nodeQname = attrLoc.getElementName()) != null) {
+            this.elemQname = new QName(nodeQname);
+        }
+    }
+
+    private void initializeLocation(@Nullable Location loc) {
+        if (loc == null) {
+            return;
+        }
+
+        this.charOffset = loc.getCharacterOffset();
+        this.colNum = loc.getColumnNumber();
+        this.lineNum = loc.getLineNumber();
+        this.publicId = loc.getPublicId();
+        this.sysId = loc.getSystemId();
+
+        if (loc instanceof XMLStreamLocation2) {
+            this.context = ((XMLStreamLocation2) loc).getContext();
+        }
     }
 
     public boolean hasAttributeQname() {

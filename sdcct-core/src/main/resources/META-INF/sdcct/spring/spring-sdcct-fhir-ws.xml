@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
+        urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
+    
+    <!--====================================================================================================
+    = INTERACTION WEB SERVICE METADATAS
+    =====================================================================================================-->
+    <beans:bean id="metadataWsInteractionFhir" class="gov.hhs.onc.sdcct.fhir.ws.metadata.impl.FhirInteractionWsMetadataImpl" abstract="true"/>
+    
+    <beans:bean id="metadataWsInteractionFhirRead" parent="metadataWsInteractionFhir" abstract="true">
+        <beans:constructor-arg name="type" value="READ"/>
+    </beans:bean>
+    
+    <beans:bean id="metadataWsInteractionFhirVread" parent="metadataWsInteractionFhir" abstract="true">
+        <beans:constructor-arg name="type" value="VREAD"/>
+    </beans:bean>
+    
+    <beans:bean id="metadataWsInteractionFhirUpdate" parent="metadataWsInteractionFhir" abstract="true">
+        <beans:constructor-arg name="type" value="UPDATE"/>
+    </beans:bean>
+    
+    <beans:bean id="metadataWsInteractionFhirDelete" parent="metadataWsInteractionFhir" abstract="true">
+        <beans:constructor-arg name="type" value="DELETE"/>
+    </beans:bean>
+    
+    <beans:bean id="metadataWsInteractionFhirHistoryInstance" parent="metadataWsInteractionFhir" abstract="true">
+        <beans:constructor-arg name="type" value="HISTORY_INSTANCE"/>
+    </beans:bean>
+    
+    <beans:bean id="metadataWsInteractionFhirCreate" parent="metadataWsInteractionFhir" abstract="true">
+        <beans:constructor-arg name="type" value="CREATE"/>
+    </beans:bean>
+    
+    <beans:bean id="metadataWsInteractionFhirSearchType" parent="metadataWsInteractionFhir" abstract="true">
+        <beans:constructor-arg name="type" value="SEARCH_TYPE"/>
+    </beans:bean>
+    
+    <beans:bean id="metadataWsInteractionFhirConformance" parent="metadataWsInteractionFhir" abstract="true">
+        <beans:constructor-arg name="type" value="CONFORMANCE"/>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = RESOURCE WEB SERVICE METADATAS
+    =====================================================================================================-->
+    <beans:bean id="metadataWsResourceFhir" class="gov.hhs.onc.sdcct.fhir.ws.metadata.impl.FhirResourceWsMetadataImpl" abstract="true">
+        <beans:property name="interactionMetadatas">
+            <beans:array value-type="gov.hhs.onc.sdcct.fhir.ws.metadata.FhirInteractionWsMetadata">
+                <beans:bean parent="metadataWsInteractionFhirConformance"/>
+            </beans:array>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = WEB SERVICE METADATAS
+    =====================================================================================================-->
+    <beans:bean id="metadataWsFhir" class="gov.hhs.onc.sdcct.fhir.ws.metadata.impl.FhirWsMetadataImpl" abstract="true"/>
+    
+    <beans:bean id="metadataWsFhirFormManager" parent="metadataWsFhir"
+        c:id="form-manager-fhir"
+        c:name="FHIR Form Manager">
+        <beans:property name="resourceMetadatas">
+            <beans:array value-type="gov.hhs.onc.sdcct.fhir.ws.metadata.FhirResourceWsMetadata">
+                <beans:bean parent="metadataWsResourceFhir"
+                    c:resourceMetadata-ref="metadataResourceFhirQuestionnaire">
+                    <beans:property name="interactionMetadatas">
+                        <beans:array merge="true">
+                            <beans:bean parent="metadataWsInteractionFhirRead"/>
+                            <beans:bean parent="metadataWsInteractionFhirVread"/>
+                            <beans:bean parent="metadataWsInteractionFhirUpdate"
+                                p:restricted="true"/>
+                            <beans:bean parent="metadataWsInteractionFhirDelete"
+                                p:restricted="true"/>
+                            <beans:bean parent="metadataWsInteractionFhirHistoryInstance"/>
+                            <beans:bean parent="metadataWsInteractionFhirCreate"
+                                p:restricted="true"/>
+                            <beans:bean parent="metadataWsInteractionFhirSearchType"/>
+                        </beans:array>
+                    </beans:property>
+                </beans:bean>
+                <beans:bean parent="metadataWsResourceFhir"
+                    c:resourceMetadata-ref="metadataResourceFhirValueSet">
+                    <beans:property name="interactionMetadatas">
+                        <beans:array merge="true">
+                            <beans:bean parent="metadataWsInteractionFhirRead"/>
+                            <beans:bean parent="metadataWsInteractionFhirVread"/>
+                            <beans:bean parent="metadataWsInteractionFhirUpdate"
+                                p:restricted="true"/>
+                            <beans:bean parent="metadataWsInteractionFhirDelete"
+                                p:restricted="true"/>
+                            <beans:bean parent="metadataWsInteractionFhirHistoryInstance"/>
+                            <beans:bean parent="metadataWsInteractionFhirCreate"
+                                p:restricted="true"/>
+                            <beans:bean parent="metadataWsInteractionFhirSearchType"/>
+                        </beans:array>
+                    </beans:property>
+                </beans:bean>
+            </beans:array>
+        </beans:property>
+    </beans:bean>
+    
+    <beans:bean id="metadataWsFhirFormReceiver" parent="metadataWsFhir"
+        c:id="form-receiver-fhir"
+        c:name="FHIR Form Receiver">
+        <beans:property name="resourceMetadatas">
+            <beans:array value-type="gov.hhs.onc.sdcct.fhir.ws.metadata.FhirResourceWsMetadata">
+                <beans:bean parent="metadataWsResourceFhir"
+                    c:resourceMetadata-ref="metadataResourceFhirQuestionnaireResp">
+                    <beans:property name="interactionMetadatas">
+                        <beans:array merge="true">
+                            <beans:bean parent="metadataWsInteractionFhirUpdate"/>
+                            <beans:bean parent="metadataWsInteractionFhirDelete"
+                                p:restricted="true"/>
+                            <beans:bean parent="metadataWsInteractionFhirHistoryInstance"/>
+                            <beans:bean parent="metadataWsInteractionFhirCreate"/>
+                            <beans:bean parent="metadataWsInteractionFhirSearchType"/>
+                        </beans:array>
+                    </beans:property>
+                </beans:bean>
+            </beans:array>
+        </beans:property>
+    </beans:bean>
+    
+    <beans:bean id="metadataWsFhirFormArchiver" parent="metadataWsFhir"
+        c:id="form-archiver-fhir"
+        c:name="FHIR Form Archiver">
+        <beans:property name="resourceMetadatas">
+            <beans:array value-type="gov.hhs.onc.sdcct.fhir.ws.metadata.FhirResourceWsMetadata">
+                <beans:bean parent="metadataWsResourceFhir"
+                    c:resourceMetadata-ref="metadataResourceFhirQuestionnaireResp">
+                    <beans:property name="interactionMetadatas">
+                        <beans:array merge="true">
+                            <beans:bean parent="metadataWsInteractionFhirUpdate"/>
+                            <beans:bean parent="metadataWsInteractionFhirDelete"
+                                p:restricted="true"/>
+                            <beans:bean parent="metadataWsInteractionFhirCreate"/>
+                        </beans:array>
+                    </beans:property>
+                </beans:bean>
+            </beans:array>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = JAX-RS PROVIDERS
+    =====================================================================================================-->
+    <beans:bean id="provWadlGenFhir" class="gov.hhs.onc.sdcct.fhir.ws.impl.FhirWadlGenerator"
+        c:bus-ref="bus"
+        p:linkAnyMediaTypeToXmlSchema="true"/>
+    
+    <beans:bean id="provContentFhir" class="gov.hhs.onc.sdcct.fhir.ws.impl.FhirContentProvider">
+        <beans:property name="defaultQueryParameters">
+            <beans:map>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.fhir.ws.FhirWsQueryParamNames).PRETTY }" value="false" value-type="java.lang.Boolean"/>
+            </beans:map>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = JAX-RS SERVERS
+    =====================================================================================================-->
+    <beans:bean id="serverFhir" parent="serverJaxRs" abstract="true">
+        <beans:property name="providers">
+            <beans:list>
+                <beans:ref bean="provExceptionMapperFhir"/>
+                <beans:ref bean="provWadlGenFhir"/>
+                <beans:ref bean="provContentFhir"/>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = JAX-RS CLIENTS
+    =====================================================================================================-->
+    <beans:bean id="clientFhir" parent="clientJaxRs" abstract="true"/>
+</beans:beans>

@@ -1,5 +1,7 @@
 package gov.hhs.onc.sdcct.json.impl;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonInclude.Value;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.io.SerializedString;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
@@ -32,6 +34,7 @@ public class SdcctObjectMapperFactoryBean extends Jackson2ObjectMapperFactoryBea
     private final static SerializedString FIELD_VALUE_DELIM = new SerializedString(": ");
 
     private int indentSize;
+    private Value propInclusion = Value.empty();
 
     @Override
     public void afterPropertiesSet() {
@@ -45,6 +48,16 @@ public class SdcctObjectMapperFactoryBean extends Jackson2ObjectMapperFactoryBea
         prettyPrinter.indentObjectsWith(indenter);
 
         objMapper.setDefaultPrettyPrinter(prettyPrinter);
+
+        objMapper.setPropertyInclusion(this.propInclusion);
+    }
+
+    public Include getContentInclusion() {
+        return this.propInclusion.getContentInclusion();
+    }
+
+    public void setContentInclusion(Include contentInclusion) {
+        this.propInclusion = this.propInclusion.withContentInclusion(contentInclusion);
     }
 
     public void setFeatures(Map<Object, Boolean> features) {
@@ -65,5 +78,13 @@ public class SdcctObjectMapperFactoryBean extends Jackson2ObjectMapperFactoryBea
 
     public void setIndentSize(int indentSize) {
         this.indentSize = indentSize;
+    }
+
+    public Include getValueInclusion() {
+        return this.propInclusion.getValueInclusion();
+    }
+
+    public void setValueInclusion(Include valueInclusion) {
+        this.propInclusion = this.propInclusion.withValueInclusion(valueInclusion);
     }
 }

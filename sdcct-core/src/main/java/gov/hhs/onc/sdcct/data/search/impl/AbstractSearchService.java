@@ -10,7 +10,7 @@ import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 
 public abstract class AbstractSearchService<T, U extends ResourceMetadata<T>, V extends SdcctResource, W extends SdcctResourceRegistry<T, U, V>>
-    extends AbstractSdcctResourceAccessor<T, U, V> implements SearchService<T, U, V, W> {
+    extends AbstractSdcctResourceAccessor<T, V> implements SearchService<T, U, V, W> {
     protected U resourceMetadata;
     protected W resourceRegistry;
 

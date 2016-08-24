@@ -27,15 +27,6 @@
         </jaxb:bindings>
     </jaxb:bindings>
     
-    <jaxb:bindings node="xsd:attributeGroup[@name='ResponseReportingAttributes']">
-        <jaxb:bindings node="xsd:attribute[@name='instanceGUID']">
-            <jaxb:property name="instanceGuid"/>
-        </jaxb:bindings>
-        <jaxb:bindings node="xsd:attribute[@name='parentGUID']">
-            <jaxb:property name="parentGuid"/>
-        </jaxb:bindings>
-    </jaxb:bindings>
-    
     <!--====================================================================================================
     = COMPLEX TYPES
     =====================================================================================================-->

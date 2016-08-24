@@ -25,17 +25,6 @@
         <beans:property name="features">
             <beans:list>
                 <beans:ref bean="featureLogging"/>
-                <beans:ref bean="featureSchemaValidation"/>
-            </beans:list>
-        </beans:property>
-    </beans:bean>
-    
-    <beans:bean id="serverFhir" parent="serverJaxRs" abstract="true">
-        <beans:property name="providers">
-            <beans:list>
-                <beans:ref bean="provExceptionMapperFhir"/>
-                <beans:ref bean="provWadlGenFhir"/>
-                <beans:ref bean="provContentFhir"/>
             </beans:list>
         </beans:property>
     </beans:bean>
@@ -49,7 +38,6 @@
         <beans:property name="features">
             <beans:list>
                 <beans:ref bean="featureLogging"/>
-                <beans:ref bean="featureSchemaValidation"/>
             </beans:list>
         </beans:property>
         <beans:property name="outFaultInterceptors">
@@ -58,7 +46,4 @@
             </beans:list>
         </beans:property>
     </beans:bean>
-    
-    <beans:bean id="serverRfd" parent="serverJaxWs" abstract="true"
-        p:dataBinding-ref="dataBindingJaxbRfd"/>
 </beans:beans>

@@ -10,25 +10,5 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
         urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
-
-    <!--====================================================================================================
-    = JAX-WS SERVERS
-    =====================================================================================================-->
-    <!--suppress SpringPlaceholdersInspection -->
-    <beans:bean id="serverFormReceiverRfd" parent="serverRfd"
-        p:address="${sdcct.ws.form.receiver.rfd.url.path}"
-        p:endpointName="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).FORM_RECEIVER_PORT }"
-        p:serviceBean-ref="wsFormReceiverRfdImpl"
-        p:serviceName="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).FORM_RECEIVER_SERVICE }"
-        p:wsdlLocation="${sdcct.ws.form.receiver.rfd.wsdl.loc}"/>
-
-    <!--====================================================================================================
-    = JAX-WS CLIENTS
-    =====================================================================================================-->
-    <!--suppress SpringPlaceholdersInspection -->
-    <beans:bean id="clientFormReceiverRfd" parent="clientRfd" lazy-init="true" scope="prototype"
-        p:endpointName="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).FORM_RECEIVER_PORT }"
-        p:serviceClass="gov.hhs.onc.sdcct.rfd.RfdFormReceiverPortType"
-        p:serviceName="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).FORM_RECEIVER_SERVICE }"
-        p:wsdlLocation="${sdcct.ws.form.receiver.rfd.wsdl.loc}"/>
+    
 </beans:beans>

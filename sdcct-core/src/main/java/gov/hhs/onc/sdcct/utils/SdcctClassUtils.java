@@ -4,7 +4,9 @@ import com.github.sebhoss.warnings.CompilerWarnings;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public final class SdcctClassUtils {
     public final static String IMPL_PKG_NAME = "impl";
@@ -46,6 +48,14 @@ public final class SdcctClassUtils {
             : buildClassName(pkgName, (interfaceClassSimpleName + IMPL_CLASS_NAME_SUFFIX)));
     }
 
+    public static boolean isImplClass(Class<?> clazz) {
+        return isImplClassName(clazz.getSimpleName());
+    }
+
+    public static boolean isImplClassName(String simpleName) {
+        return (StringUtils.startsWith(simpleName, ABSTRACT_CLASS_NAME_PREFIX) || StringUtils.endsWith(simpleName, IMPL_CLASS_NAME_SUFFIX));
+    }
+
     public static String buildInterfaceClassName(Package pkg, String simpleName) {
         return buildClassName(pkg.getName(), simpleName);
     }
@@ -54,11 +64,12 @@ public final class SdcctClassUtils {
         return (pkgName + ClassUtils.PACKAGE_SEPARATOR + simpleName);
     }
 
+    @Nullable
     public static Package buildImplPackage(Package pkg) {
         return Package.getPackage(buildImplPackageName(pkg.getName()));
     }
 
     public static String buildImplPackageName(String pkgName) {
-        return (pkgName + ClassUtils.PACKAGE_SEPARATOR + IMPL_PKG_NAME);
+        return StringUtils.appendIfMissing(pkgName, (ClassUtils.PACKAGE_SEPARATOR + IMPL_PKG_NAME));
     }
 }

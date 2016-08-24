@@ -2,11 +2,16 @@ package gov.hhs.onc.sdcct.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
+import javax.annotation.Nullable;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.commons.lang3.text.StrBuilder;
 
 public final class SdcctStringUtils {
+    public final static String TOKEN_DELIMS = ",;\t\n";
+
     public static class SdcctToStringStyle extends ToStringStyle {
         public final static SdcctToStringStyle INSTANCE = new SdcctToStringStyle();
 
@@ -163,8 +168,8 @@ public final class SdcctStringUtils {
             for (int b = 1; b < initialPartChars.length; b++) {
                 partCharType = Character.getType(initialPartChars[b]);
 
-                if (((lastPartCharType == Character.LOWERCASE_LETTER) && (partCharType == Character.UPPERCASE_LETTER))
-                    || ((partStartIndex != -1) && (lastPartCharType == Character.UPPERCASE_LETTER) && (partCharType == Character.LOWERCASE_LETTER))) {
+                if (((lastPartCharType == Character.LOWERCASE_LETTER) && (partCharType == Character.UPPERCASE_LETTER)) ||
+                    ((partStartIndex != -1) && (lastPartCharType == Character.UPPERCASE_LETTER) && (partCharType == Character.LOWERCASE_LETTER))) {
                     parts.add(new String(initialPartChars, (partStartIndex = Math.max(partStartIndex, 0)), (b - partStartIndex)));
 
                     partStartIndex = b;
@@ -181,5 +186,13 @@ public final class SdcctStringUtils {
         }
 
         return parts.toArray(new String[parts.size()]);
+    }
+
+    public static String[] splitTokens(@Nullable String ... strs) {
+        return ((strs != null)
+            ? Stream.of(strs)
+                .flatMap(str -> ((str != null) ? Stream.of(org.springframework.util.StringUtils.tokenizeToStringArray(str, TOKEN_DELIMS)) : Stream.empty()))
+                .toArray(String[]::new)
+            : ArrayUtils.toArray());
     }
 }

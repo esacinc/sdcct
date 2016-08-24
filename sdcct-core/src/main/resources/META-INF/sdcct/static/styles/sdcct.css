@@ -1,0 +1,34 @@
+body {
+    font-family: "Tahoma", sans-serif;
+    font-size: 11px;
+}
+
+h1 {
+    font-size: 18px;
+}
+
+h2 {
+    font-size: 16px;
+}
+
+h3 {
+    font-size: 14px;
+}
+
+h1 i.fa,
+h2 i.fa,
+h3 i.fa {
+    font-size: inherit;
+}
+
+a:focus {
+    outline-style: none;
+}
+
+a.link:hover {
+    cursor: pointer;
+}
+
+*.form-control {
+    font-size: 13px;
+}

@@ -7,6 +7,7 @@ import com.sun.tools.xjc.model.Model
 import com.sun.tools.xjc.outline.Outline
 import com.sun.xml.xsom.XSSchemaSet
 import gov.hhs.onc.sdcct.SdcctPackages
+import gov.hhs.onc.sdcct.api.type.DatatypeKindType
 import gov.hhs.onc.sdcct.api.SpecificationType
 import gov.hhs.onc.sdcct.build.xml.jaxb.impl.CodegenSchemaContext
 import gov.hhs.onc.sdcct.build.xml.jaxb.naming.impl.CompositeNameConverter
@@ -51,7 +52,7 @@ class FhirTypeCodegenPlugin extends AbstractTypeCodegenPlugin {
             it.value.classModel = typeClassModel
             it.value.implClassModel = typeImplClassModel
             
-            buildTypeClassModel(codeModel, it.value, typeClassModel, typeImplClassModel, ((it.value.kind != CodegenTypeKind.RESOURCE) ||
+            buildTypeClassModel(codeModel, it.value, typeClassModel, typeImplClassModel, ((it.value.kind != DatatypeKindType.RESOURCE) ||
                 (typeClassModel.name() == RESOURCE_TYPE_CLASS_NAME)))
         }
     }
@@ -68,7 +69,7 @@ class FhirTypeCodegenPlugin extends AbstractTypeCodegenPlugin {
                 ((type = this.normalizedTypes[normalizedTypeId]) != null)) {
                 typeClassSimpleName = nameConv.toClassName(it.key)
                 
-                if (type.kind == CodegenTypeKind.PRIMITIVE) {
+                if (type.kind == DatatypeKindType.PRIMITIVE) {
                     typeClassSimpleName += PRIMITIVE_TYPE_CLASS_NAME_SUFFIX
                 }
                 
@@ -84,20 +85,20 @@ class FhirTypeCodegenPlugin extends AbstractTypeCodegenPlugin {
         CompositeNameConverter nameConv = ((CompositeNameConverter) opts.nameConverter)
         nameConv.delegates.add(new FhirTypeCodegenNameConverter(this.typeClassSimpleNames))
         
-        CodegenTypeKind typeKind
+        DatatypeKindType typeKind
         String typeId
         TypeCodegenModel type
         
         for (Element typeElem : SdcctFhirCodegenUtils.buildResourceItemElements(SdcctFhirCodegenUtils.STRUCTURE_DEFINITION_ELEM_NAME,
             [ TYPE_DATA_FILE_PROJECT_PROP_NAME, RESOURCE_TYPE_DATA_FILE_PROJECT_PROP_NAME ].collect{ new File(this.project.properties.getProperty(it)) })) {
-            if ((typeKind = SdcctEnumUtils.findById(CodegenTypeKind, buildKind(typeElem))) == null) {
+            if ((typeKind = SdcctEnumUtils.findById(DatatypeKindType, buildKind(typeElem))) == null) {
                 continue
             }
             
             typeId = SdcctFhirCodegenUtils.buildId(typeElem)
             
-            this.types[typeId] = type = new TypeCodegenModel(typeElem, (((typeKind == CodegenTypeKind.COMPLEX) &&
-                Character.isLowerCase(typeId.toCharArray()[0])) ? CodegenTypeKind.PRIMITIVE : typeKind), typeId)
+            this.types[typeId] = type = new TypeCodegenModel(typeElem, (((typeKind == DatatypeKindType.COMPLEX) &&
+                Character.isLowerCase(typeId.toCharArray()[0])) ? DatatypeKindType.PRIMITIVE : typeKind), typeId)
             
             this.normalizedTypes[SdcctCodegenUtils.buildNormalizedId(typeId)] = type
         }

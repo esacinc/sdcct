@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nonnegative;
-import javax.net.ssl.SSLEngine;
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
 import org.apache.catalina.Service;
@@ -20,6 +19,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.webresources.StandardRoot;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.tomcat.util.net.NioEndpoint;
@@ -27,26 +27,19 @@ import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.TaskThreadFactory;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 import org.springframework.boot.context.embedded.EmbeddedServletContainer;
-import org.springframework.boot.context.embedded.ServletContextInitializer;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
+import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 
 public class SdcctTomcatEmbeddedServletContainerFactory extends TomcatEmbeddedServletContainerFactory {
-    public static class SdcctNioEndpoint extends NioEndpoint {
-        @Override
-        protected SSLEngine createSSLEngine() {
-            SSLEngine engine = this.getSSLContext().createSSLEngine();
-            engine.setUseClientMode(false);
-
-            return engine;
-        }
-    }
-
     public static class SdcctHttp11NioProtocol extends Http11NioProtocol {
         public SdcctHttp11NioProtocol() {
             super();
+        }
 
-            ((SdcctNioEndpoint) (this.endpoint = new SdcctNioEndpoint())).setHandler(((Http11ConnectionHandler) this.getHandler()));
+        @Override
+        public NioEndpoint getEndpoint() {
+            return ((NioEndpoint) super.getEndpoint());
         }
     }
 
@@ -134,7 +127,7 @@ public class SdcctTomcatEmbeddedServletContainerFactory extends TomcatEmbeddedSe
     protected void customizeConnector(Connector conn) {
         super.customizeConnector(conn);
 
-        Http11NioProtocol connProtocol = ((Http11NioProtocol) conn.getProtocolHandler());
+        SdcctHttp11NioProtocol connProtocol = ((SdcctHttp11NioProtocol) conn.getProtocolHandler());
         connProtocol.setExecutor(new SdcctThreadPoolExecutor(Collections.singletonMap(SdcctPropertyNames.HTTP_SERVER_TX_ID, this.txIdGen)));
         connProtocol.setConnectionTimeout(this.connTimeout);
         connProtocol.getEndpoint().setName(this.connEndpointName);
@@ -152,7 +145,12 @@ public class SdcctTomcatEmbeddedServletContainerFactory extends TomcatEmbeddedSe
         context.setXmlNamespaceAware(true);
         context.setXmlValidation(true);
 
-        ((StandardContext) context).setWorkDir(this.workDir.getAbsolutePath());
+        StandardContext standardContext = ((StandardContext) context);
+        standardContext.setWorkDir(this.workDir.getAbsolutePath());
+
+        StandardRoot standardRoot = new StandardRoot(standardContext);
+        standardRoot.setCachingAllowed(false);
+        standardContext.setResources(standardRoot);
 
         super.configureContext(context, servletContextInits);
     }

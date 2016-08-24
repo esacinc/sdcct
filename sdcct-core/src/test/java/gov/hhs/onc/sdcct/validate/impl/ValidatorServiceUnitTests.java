@@ -1,16 +1,18 @@
 package gov.hhs.onc.sdcct.validate.impl;
 
-import gov.hhs.onc.sdcct.fhir.FhirForm;
+import gov.hhs.onc.sdcct.fhir.form.FhirForm;
 import gov.hhs.onc.sdcct.form.SdcctForm;
-import gov.hhs.onc.sdcct.rfd.RfdForm;
+import gov.hhs.onc.sdcct.rfd.form.RfdForm;
 import gov.hhs.onc.sdcct.test.impl.AbstractSdcctUnitTests;
 import gov.hhs.onc.sdcct.validate.SdcctValidatorService;
 import gov.hhs.onc.sdcct.validate.ValidationException;
+import gov.hhs.onc.sdcct.xml.impl.SdcctXmlInputFactory;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -70,6 +72,10 @@ public class ValidatorServiceUnitTests extends AbstractSdcctUnitTests {
     @Resource(name = "validatorServiceRfd")
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
     private SdcctValidatorService rfdValidatorService;
+
+    @Autowired
+    @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
+    private SdcctXmlInputFactory xmlInFactory;
 
     @Test(dependsOnMethods = { "testValidateMalformedXml" })
     public void testValidateBadCharsXml() throws Exception {
@@ -133,10 +139,11 @@ public class ValidatorServiceUnitTests extends AbstractSdcctUnitTests {
 
         try {
             // noinspection ConstantConditions
-            validatorService.validate(testForm.getDocument());
+            validatorService.validate(this.xmlInFactory.createXMLStreamReader(testForm.getDocument().getSource()));
         } catch (ValidationException e) {
             LOGGER.trace(String.format("Test form (name=%s, identifier=%s) was invalid:%s", testFormName, testFormIdentifier,
-                e.getIssues().stream().map(testFormIssue -> String.format("\n{%s}", testFormIssue)).collect(Collectors.joining(StringUtils.EMPTY))), e);
+                e.getResult().getIssues().stream().map(testFormIssue -> String.format("\n{%s}", testFormIssue)).collect(Collectors.joining(StringUtils.EMPTY))),
+                e);
 
             Assert.assertFalse(validExpected, String.format("Test form (name=%s, identifier=%s) was expected to be valid.", testFormName, testFormIdentifier));
 

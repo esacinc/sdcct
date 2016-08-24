@@ -1,11 +1,11 @@
 package gov.hhs.onc.sdcct.web.logging.impl;
 
 import gov.hhs.onc.sdcct.context.SdcctPropertyNames;
-import gov.hhs.onc.sdcct.net.logging.HttpRequestEvent;
-import gov.hhs.onc.sdcct.net.logging.HttpResponseEvent;
+import gov.hhs.onc.sdcct.net.http.logging.HttpRequestEvent;
+import gov.hhs.onc.sdcct.net.http.logging.HttpResponseEvent;
 import gov.hhs.onc.sdcct.net.logging.RestEndpointType;
-import gov.hhs.onc.sdcct.net.logging.impl.HttpRequestEventImpl;
-import gov.hhs.onc.sdcct.net.logging.impl.HttpResponseEventImpl;
+import gov.hhs.onc.sdcct.net.http.logging.impl.HttpRequestEventImpl;
+import gov.hhs.onc.sdcct.net.http.logging.impl.HttpResponseEventImpl;
 import gov.hhs.onc.sdcct.web.filter.impl.AbstractSdcctFilter;
 import gov.hhs.onc.sdcct.web.tomcat.impl.TomcatRequest;
 import gov.hhs.onc.sdcct.web.tomcat.impl.TomcatResponse;

@@ -1,6 +1,6 @@
 package gov.hhs.onc.sdcct.xml;
 
-import gov.hhs.onc.sdcct.api.IssueLevel;
+import gov.hhs.onc.sdcct.api.SdcctIssueSeverity;
 import gov.hhs.onc.sdcct.transform.impl.SdcctLocation;
 import javax.annotation.Nullable;
 import javax.xml.stream.Location;
@@ -13,7 +13,8 @@ import org.codehaus.stax2.validation.XMLValidationProblem;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXParseException;
 
-public interface SdcctXmlReporter extends ErrorHandler, UnfailingErrorListener, ValidationProblemHandler, XMLReporter2 {
+public interface SdcctXmlReporter<T extends SdcctXmlReporter<T>>
+    extends Cloneable, ErrorHandler, UnfailingErrorListener, ValidationProblemHandler, XMLReporter2 {
     @Override
     public void report(String msg, String errorType, @Nullable Object relatedInfo, @Nullable Location loc) throws XMLStreamException;
 
@@ -24,13 +25,15 @@ public interface SdcctXmlReporter extends ErrorHandler, UnfailingErrorListener, 
     public void report(XMLValidationProblem problem) throws XMLStreamException;
 
     @Override
-    public void fatalError(SAXParseException exception);
+    public void fatalError(SAXParseException cause);
 
     @Override
-    public void error(SAXParseException exception);
+    public void error(SAXParseException cause);
 
     @Override
-    public void warning(SAXParseException exception);
+    public void warning(SAXParseException cause);
 
-    public void report(IssueLevel level, String msg, SdcctLocation loc);
+    public void report(SdcctIssueSeverity level, String msg, SdcctLocation loc, @Nullable Throwable cause);
+
+    public T clone();
 }

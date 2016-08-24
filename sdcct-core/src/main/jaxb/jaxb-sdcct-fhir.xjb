@@ -6,25 +6,25 @@
     schemaLocation="../schema/fhir/fhir-single.xsd"
     xmlns:annox="http://annox.dev.java.net"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-    xmlns:sdcct-jaxb="urn:sdcct:jaxb"
+    xmlns:sdcct-xml-jaxb="urn:sdcct:xml:jaxb"
     xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     
     <!--====================================================================================================
     = GLOBAL
     =====================================================================================================-->
-    <sdcct-jaxb:static-value-set-enum class="gov.hhs.onc.sdcct.fhir.ConformanceExpectation" uri="http://hl7.org/fhir/ValueSet/conformance-expectation"
+    <sdcct-xml-jaxb:static-value-set-enum class="gov.hhs.onc.sdcct.fhir.ConformanceExpectation" uri="http://hl7.org/fhir/ValueSet/conformance-expectation"
         specType="fhir"/>
     
-    <sdcct-jaxb:static-value-set-enum class="gov.hhs.onc.sdcct.fhir.DatatypeType" uri="http://hl7.org/fhir/ValueSet/data-types" specType="fhir"/>
+    <sdcct-xml-jaxb:static-value-set-enum class="gov.hhs.onc.sdcct.fhir.DatatypeType" uri="http://hl7.org/fhir/ValueSet/data-types" specType="fhir"/>
     
-    <sdcct-jaxb:static-value-set-enum class="gov.hhs.onc.sdcct.fhir.OperationOutcomeType" uri="http://hl7.org/fhir/ValueSet/operation-outcome" specType="fhir"/>
+    <sdcct-xml-jaxb:static-value-set-enum class="gov.hhs.onc.sdcct.fhir.OperationOutcomeType" uri="http://hl7.org/fhir/ValueSet/operation-outcome" specType="fhir"/>
     
-    <sdcct-jaxb:static-value-set-enum class="gov.hhs.onc.sdcct.fhir.ResourceType" uri="http://hl7.org/fhir/ValueSet/resource-types" specType="fhir"/>
+    <sdcct-xml-jaxb:static-value-set-enum class="gov.hhs.onc.sdcct.fhir.ResourceType" uri="http://hl7.org/fhir/ValueSet/resource-types" specType="fhir"/>
     
-    <sdcct-jaxb:static-value-set-enum class="gov.hhs.onc.sdcct.fhir.SpecialValueType" uri="http://hl7.org/fhir/ValueSet/special-values" specType="fhir"/>
+    <sdcct-xml-jaxb:static-value-set-enum class="gov.hhs.onc.sdcct.fhir.SpecialValueType" uri="http://hl7.org/fhir/ValueSet/special-values" specType="fhir"/>
     
-    <sdcct-jaxb:static-value-set-enum class="gov.hhs.onc.sdcct.fhir.YesNoDontKnowType" uri="http://hl7.org/fhir/ValueSet/yesnodontknow" specType="fhir"/>
+    <sdcct-xml-jaxb:static-value-set-enum class="gov.hhs.onc.sdcct.fhir.YesNoDontKnowType" uri="http://hl7.org/fhir/ValueSet/yesnodontknow" specType="fhir"/>
     
     <!--====================================================================================================
     = SCHEMA
@@ -36,6 +36,10 @@
     <!--====================================================================================================
     = COMPLEX TYPES
     =====================================================================================================-->
+    <jaxb:bindings node="xsd:complexType[@name='Conformance.Interaction1']">
+        <jaxb:class name="ConformanceSystemInteraction"/>
+    </jaxb:bindings>
+    
     <jaxb:bindings node="xsd:complexType[@name='ElementDefinition']">
         <jaxb:bindings node="xsd:complexContent/xsd:extension/xsd:sequence">
             <jaxb:bindings node="xsd:choice[1]">
@@ -70,15 +74,34 @@
     <jaxb:bindings node="xsd:complexType[@name='Extension']">
         <jaxb:bindings node="xsd:complexContent/xsd:extension/xsd:sequence">
             <jaxb:bindings node="xsd:choice">
-                <jaxb:property name="content"/>
+                <jaxb:property name="value"/>
+            </jaxb:bindings>
+        </jaxb:bindings>
+    </jaxb:bindings>
+    
+    <jaxb:bindings node="xsd:complexType[@name='Questionnaire.EnableWhen']">
+        <jaxb:bindings node="xsd:complexContent/xsd:extension/xsd:sequence">
+            <jaxb:bindings node="xsd:choice[1]">
+                <jaxb:property name="answerValue"/>
             </jaxb:bindings>
         </jaxb:bindings>
     </jaxb:bindings>
     
     <jaxb:bindings node="xsd:complexType[@name='Questionnaire.Item']">
         <jaxb:bindings node="xsd:complexContent/xsd:extension/xsd:sequence">
+            <jaxb:bindings node="xsd:choice[1]">
+                <jaxb:property name="initialValue"/>
+            </jaxb:bindings>
             <jaxb:bindings node="xsd:element[@name='options']">
                 <jaxb:property name="optionSet"/>
+            </jaxb:bindings>
+        </jaxb:bindings>
+    </jaxb:bindings>
+    
+    <jaxb:bindings node="xsd:complexType[@name='Questionnaire.Option']">
+        <jaxb:bindings node="xsd:complexContent/xsd:extension/xsd:sequence">
+            <jaxb:bindings node="xsd:choice[1]">
+                <jaxb:property name="value"/>
             </jaxb:bindings>
         </jaxb:bindings>
     </jaxb:bindings>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
+        urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
+    
+    <!--====================================================================================================
+    = FORMS
+    =====================================================================================================-->
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="formFhirTestBadCharsXml" parent="formFhir" autowire-candidate="false"
+        c:name="fhir_test_bad_chars_xml"
+        c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/fhir_test_bad_chars_xml.xml"/>
+    
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="formFhirTestInvalidXml" parent="formFhir" autowire-candidate="false"
+        c:name="fhir_test_invalid_xml"
+        c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/fhir_test_invalid_xml.xml"/>
+    
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="formFhirTestMalformedXml" parent="formFhir" autowire-candidate="false"
+        c:name="fhir_test_malformed_xml"
+        c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/fhir_test_malformed_xml.xml"/>
+    
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="formFhirTestTranscode" parent="formFhir"
+        c:name="fhir_test_transcode"
+        c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/fhir_test_transcode.xml"/>
+</beans:beans>

@@ -1,6 +1,6 @@
 package gov.hhs.onc.sdcct.validate;
 
-import gov.hhs.onc.sdcct.api.IssueLevel;
+import gov.hhs.onc.sdcct.api.SdcctIssueSeverity;
 import javax.annotation.Nullable;
 
 public interface ValidationIssue {
@@ -11,11 +11,11 @@ public interface ValidationIssue {
 
     public void setContextXpathExpression(@Nullable String contextXpathExpr);
 
-    public IssueLevel getLevel();
-
     public ValidationLocation getLocation();
 
     public String getMessage();
+
+    public SdcctIssueSeverity getSeverity();
 
     public boolean hasSource();
 

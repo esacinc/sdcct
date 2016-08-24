@@ -65,6 +65,10 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jdk8</artifactId>
         </dependency>
@@ -448,6 +452,22 @@
             <artifactId>thymeleaf-extras-springsecurity4</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>font-awesome</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>webjars-locator-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>jquery</artifactId>
+        </dependency>
+        <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
         </dependency>
@@ -455,6 +475,11 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -694,7 +719,7 @@
                     <dependency>
                         <groupId>org.jvnet.jaxb2_commons</groupId>
                         <artifactId>jaxb2-basics</artifactId>
-                        <version>0.11.0</version>
+                        <version>0.11.1</version>
                     </dependency>
                     <dependency>
                         <groupId>org.jvnet.jaxb2_commons</groupId>
@@ -704,7 +729,7 @@
                     <dependency>
                         <groupId>org.jvnet.jaxb2_commons</groupId>
                         <artifactId>jaxb2-basics-tools</artifactId>
-                        <version>0.11.0</version>
+                        <version>0.11.1</version>
                     </dependency>
                     <dependency>
                         <groupId>org.jvnet.jaxb2_commons</groupId>
@@ -731,6 +756,7 @@
                                     <value>
                                         gov/hhs/onc/sdcct/*.java
                                         gov/hhs/onc/sdcct/api/Specification*.java
+                                        gov/hhs/onc/sdcct/api/type/*.java
                                         gov/hhs/onc/sdcct/beans/*.java
                                         gov/hhs/onc/sdcct/config/utils/*.java
                                         gov/hhs/onc/sdcct/impl/*.java
@@ -802,6 +828,18 @@
                         <configuration>
                             <scripts>
                                 <script>file://${project.build.scriptSourceDirectory}/sdcct-process-deps-soapui.groovy</script>
+                            </scripts>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>process-deps-jsw</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <scripts>
+                                <script>file://${project.build.scriptSourceDirectory}/sdcct-process-deps-jsw.groovy</script>
                             </scripts>
                         </configuration>
                     </execution>
@@ -1200,6 +1238,10 @@
                                 <script>file://${project.build.scriptSourceDirectory}/sdcct-generate-sources-jaxb.groovy</script>
                             </scripts>
                         </configuration>
+                    </execution>
+                    <execution>
+                        <id>process-resources-app</id>
+                        <phase>none</phase>
                     </execution>
                 </executions>
             </plugin>

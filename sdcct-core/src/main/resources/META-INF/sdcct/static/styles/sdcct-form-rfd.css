@@ -1,0 +1,190 @@
+li {
+    padding: 1px;
+    color: blue;
+    list-style-type: square;
+}
+
+.HeaderGroup {
+    width: 99%;
+    margin: 5px auto;
+    border: solid 1px rgb(0, 0, 128);
+    padding: 5px;
+    clear: both;
+}
+
+.HeaderGroupText {
+    font-size: 12px;
+    font-weight: bold;
+    background-color: white;
+    color: #000080;
+    padding: 8px;
+    vertical-align: bottom;
+}
+
+.HeaderInfoText {
+    font-size: 12px;
+    text-align: right;
+    font-style: italic;
+}
+
+.HeaderText {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    background-color: white;
+    color: rgb(0, 0, 128);
+    padding: 8px;
+    vertical-align: bottom;
+}
+
+.TopHeader {
+    text-align: center;
+    font-size: 30px;
+    font-weight: bold;
+    background-color: rgb(0, 0, 128);
+    color: white;
+    padding: 2px;
+}
+
+
+.subSection {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    background-color: rgb(0, 0, 128);
+    color: white;
+    padding: 2px;
+}
+
+.thinBox {
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    font-style:italic;
+    background-color: rgb(0, 0, 128);
+    color: white;
+    padding: 2px;
+}
+
+.QuestionReset {
+    float: right;
+    padding-left: 2px;
+    font-size: 10px;
+    text-decoration: none;
+    font-style: normal;
+    color: blue;
+}
+
+.QuestionInSection {
+    float: left;
+    padding: 2px;
+}
+
+.QuestionInListItem {
+    padding: 2px 2px 2px 20px;
+}
+
+.QuestionTitle {
+    padding: 2px;
+    background-color: rgb(233, 233, 233);
+    font-size: 13px;
+    font-style: italic;
+    font-weight: bold;
+    clear: both;
+}
+
+.Answer {
+    float: left;
+    padding-top: 2px;
+    width: 93%;
+}
+
+.DisplayProperty {
+    float: left;
+    padding-top: 2px;
+    width: 22%;
+}
+
+.DisplayProperty1 {
+    float: left;
+    padding-top: 2px;
+    padding-left: 5px;
+}
+
+.DisplayedItem {
+    display: block;
+}
+
+.AnswerTextBox {
+    height: 11px;
+    font-size: 10px;
+    padding-left: 2px;
+    margin-left: 4px;
+    width: 70%;
+}
+
+.NoteText {
+    padding: 2px;
+    font-weight: bold;
+    color: blue;
+    clear: both;
+}
+
+.TextBox {
+    padding: 2px;
+    width: 90%;
+}
+
+.SubmitButton {
+    padding: 2px;
+    text-align: center;
+}
+
+.MessageDataResult {
+    clear: both;
+    padding: 20px 10px;
+}
+
+.MessageDataQuestion {
+    padding-left: 20px;
+    color: blue;
+    font-style: italic;
+}
+
+.MessageDataAnswer {
+    padding-left: 20px;
+    color: green;
+    font-style: normal;
+    font-weight: bold;
+}
+
+.MessageDataChecklist {
+    font-weight: bold;
+    color: red;
+}
+
+.header_text {
+    border-bottom: 1px solid black;
+    padding-bottom: 0;
+    text-align:left;
+}
+
+.title {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    font-style:italic;
+    background-color: white;
+    color: rgb(0, 0, 128);
+    padding: 8px;
+    vertical-align: bottom;
+}
+
+#S1 {
+    font-size: 18px;
+    font-weight: bold;
+    background-color: white;
+    color: rgb(0, 0, 128);
+    padding: 8px;
+    vertical-align: bottom;
+}

@@ -8,6 +8,7 @@ import gov.hhs.onc.sdcct.transform.impl.ByteArraySource;
 import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
 import gov.hhs.onc.sdcct.validate.schematron.SdcctSchematron;
 import gov.hhs.onc.sdcct.xml.impl.SdcctXmlOutputFactory;
+import gov.hhs.onc.sdcct.xml.impl.SdcctXmlStreamWriterDestination;
 import gov.hhs.onc.sdcct.xml.impl.XdmDocument;
 import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
 import gov.hhs.onc.sdcct.xml.xslt.impl.SdcctXsltCompiler;
@@ -17,7 +18,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import net.sf.saxon.stax.XMLStreamWriterDestination;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +72,7 @@ public class SdcctSchematronImpl implements SdcctSchematron {
 
         ByteArrayResult schemaResult = new ByteArrayResult(publicId, sysId);
 
-        XMLStreamWriterDestination schemaDest = new XMLStreamWriterDestination(this.xmlOutFactory.createXMLStreamWriter(schemaResult));
+        SdcctXmlStreamWriterDestination schemaDest = new SdcctXmlStreamWriterDestination(this.xmlOutFactory.createXMLStreamWriter(schemaResult));
         xsltTransformers[(xsltTransformers.length - 1)].setDestination(schemaDest);
 
         xsltTransformers[0].transform();

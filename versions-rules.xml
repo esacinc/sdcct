@@ -25,6 +25,24 @@
         </rule>
         
         <!--====================================================================================================
+        = APACHE HTTP COMPONENTS
+        =====================================================================================================-->
+        <!--
+        TEMP: Do not upgrade to v4.4.5 due to required annotations (by SoapUI).
+        -->
+        <rule groupId="org.apache.httpcomponents" artifactId="httpcore">
+            <ignoreVersions>
+                <ignoreVersion type="exact">4.4.5</ignoreVersion>
+            </ignoreVersions>
+        </rule>
+        
+        <rule groupId="org.apache.httpcomponents" artifactId="httpcore-nio">
+            <ignoreVersions>
+                <ignoreVersion type="exact">4.4.5</ignoreVersion>
+            </ignoreVersions>
+        </rule>
+        
+        <!--====================================================================================================
         = APACHE MAVEN
         =====================================================================================================-->
         <rule groupId="org.apache.maven" artifactId="maven-core">
@@ -34,11 +52,14 @@
         </rule>
         
         <!--====================================================================================================
-        = APACHE TOMCAT
+        = JAXB2 COMMONS
         =====================================================================================================-->
-        <rule groupId="org.apache.tomcat.embed">
+        <!--
+        TEMP: Do not upgrade to v1.11.1 due to it's apparent accidental publication.
+        -->
+        <rule groupId="org.jvnet.jaxb2_commons" artifactId="jaxb2-basics-runtime">
             <ignoreVersions>
-                <ignoreVersion type="regex">8\.5\.\d+.*</ignoreVersion>
+                <ignoreVersion type="regex">1\.11\.1(?:\-PUBLISHED\-BY\-MISTAKE)?</ignoreVersion>
             </ignoreVersions>
         </rule>
     </rules>
