@@ -3,8 +3,8 @@ package gov.hhs.onc.sdcct.form.impl;
 import gov.hhs.onc.sdcct.api.SpecificationType;
 import gov.hhs.onc.sdcct.form.SdcctForm;
 import gov.hhs.onc.sdcct.transform.impl.ResourceSource;
-import gov.hhs.onc.sdcct.xml.impl.SdcctDocumentBuilder;
-import gov.hhs.onc.sdcct.xml.impl.XdmDocument;
+import gov.hhs.onc.sdcct.xml.saxon.impl.SdcctDocumentBuilder;
+import gov.hhs.onc.sdcct.xml.saxon.impl.XdmDocument;
 import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
 import javax.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +35,10 @@ public abstract class AbstractSdcctForm<T> implements SdcctForm<T> {
     }
 
     @Override
-    public void build() throws Exception {
+    public SdcctForm<T> build() throws Exception {
         this.bean = this.xmlCodec.decode((this.doc = this.docBuilder.build(this.src)).getUnderlyingNode(), this.beanImplClass, null);
+
+        return this;
     }
 
     @Override

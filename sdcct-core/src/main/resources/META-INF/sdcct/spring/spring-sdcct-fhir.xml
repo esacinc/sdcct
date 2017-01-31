@@ -65,18 +65,6 @@
     </sdcct-xml:xslt-static-options>
     
     <!--====================================================================================================
-    = CONTENT PATH BUILDERS
-    =====================================================================================================-->
-    <beans:bean id="contentPathBuilderFhir" parent="contentPathBuilder"
-        p:namespaces="#{ xpathOptsStaticFhir.namespaces }"/>
-    
-    <!--====================================================================================================
-    = RESOURCE PARAM PROCESSORS
-    =====================================================================================================-->
-    <beans:bean id="resourceParamProcFhir" class="gov.hhs.onc.sdcct.fhir.parameter.impl.FhirResourceParamProcessorImpl"
-        p:contentPathBuilder-ref="contentPathBuilderFhir"/>
-    
-    <!--====================================================================================================
     = RESOURCE PARAM METADATAS
     =====================================================================================================-->
     <beans:bean id="metadataResourceParamFhir" parent="metadataResourceParam" abstract="true">
@@ -127,6 +115,44 @@
         c:path="#{ T(gov.hhs.onc.sdcct.fhir.ResourceType).BUNDLE.id }"
         c:beanClass="#{ T(gov.hhs.onc.sdcct.fhir.Bundle) }"
         c:beanImplClass="#{ T(gov.hhs.onc.sdcct.fhir.impl.BundleImpl) }"/>
+    
+    <beans:bean id="metadataResourceFhirCodeSystem" parent="metadataResourceFhir"
+        c:id="sdc-codesystem"
+        c:name="SDC-CodeSystem"
+        c:path="#{ T(gov.hhs.onc.sdcct.fhir.ResourceType).CODE_SYSTEM.id }"
+        c:beanClass="#{ T(gov.hhs.onc.sdcct.fhir.CodeSystem) }"
+        c:beanImplClass="#{ T(gov.hhs.onc.sdcct.fhir.impl.CodeSystemImpl) }">
+        <beans:property name="schematrons">
+            <beans:array merge="true">
+                <beans:bean parent="schematron"
+                    c:id="sdc-codesystem"
+                    c:name="SDC CodeSystem">
+                    <beans:property name="document">
+                        <sdcct-xml:document>classpath*:${sdcct.schematron.fhir.dir.path}/sdc-codesystem.sch</sdcct-xml:document>
+                    </beans:property>
+                </beans:bean>
+            </beans:array>
+        </beans:property>
+    </beans:bean>
+    
+    <beans:bean id="metadataResourceFhirDataElem" parent="metadataResourceFhir"
+        c:id="sdc-element"
+        c:name="SDC-Element"
+        c:path="#{ T(gov.hhs.onc.sdcct.fhir.ResourceType).DATA_ELEMENT.id }"
+        c:beanClass="#{ T(gov.hhs.onc.sdcct.fhir.DataElement) }"
+        c:beanImplClass="#{ T(gov.hhs.onc.sdcct.fhir.impl.DataElementImpl) }">
+        <beans:property name="schematrons">
+            <beans:array merge="true">
+                <beans:bean parent="schematron"
+                    c:id="sdc-element"
+                    c:name="SDC Element">
+                    <beans:property name="document">
+                        <sdcct-xml:document>classpath*:${sdcct.schematron.fhir.dir.path}/sdc-element.sch</sdcct-xml:document>
+                    </beans:property>
+                </beans:bean>
+            </beans:array>
+        </beans:property>
+    </beans:bean>
     
     <beans:bean id="metadataResourceFhirOpOutcome" parent="metadataResourceFhir"
         c:id="#{ T(gov.hhs.onc.sdcct.fhir.ResourceType).OPERATION_OUTCOME.id }"
@@ -276,13 +302,17 @@
         <beans:property name="profileDocuments">
             <beans:array>
                 <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/profiles-resources.xml</sdcct-xml:document>
-                <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/sdc-questionnaire.profile.xml</sdcct-xml:document>
-                <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/sdc-response.profile.xml</sdcct-xml:document>
-                <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/sdc-valueset.profile.xml</sdcct-xml:document>
                 <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/extension-definitions.xml</sdcct-xml:document>
-                <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/extension-sdc-questionnaire-endpoint.xml</sdcct-xml:document>
-                <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/extension-sdc-questionnaire-optionaldisplay.xml</sdcct-xml:document>
-                <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/extension-sdc-questionnaire-provenancesignaturerequred.xml</sdcct-xml:document>
+                <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/StructureDefinition-sdc-codesystem.xml</sdcct-xml:document>
+                <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/StructureDefinition-sdc-element.xml</sdcct-xml:document>
+                <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/StructureDefinition-sdc-questionnaire.xml</sdcct-xml:document>
+                <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/StructureDefinition-sdc-questionnaire-endpoint.xml</sdcct-xml:document>
+                <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/StructureDefinition-sdc-questionnaire-optionalDisplay.xml</sdcct-xml:document>
+                <sdcct-xml:document>
+                    classpath*:${sdcct.data.fhir.dir.path}/StructureDefinition-sdc-questionnaire-provenanceSignatureRequired.xml
+                </sdcct-xml:document>
+                <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/StructureDefinition-sdc-response.xml</sdcct-xml:document>
+                <sdcct-xml:document>classpath*:${sdcct.data.fhir.dir.path}/StructureDefinition-sdc-valueset.xml</sdcct-xml:document>
             </beans:array>
         </beans:property>
         <beans:property name="searchParamDefsXpathExecutable">
@@ -316,7 +346,6 @@
     = VALIDATOR SERVICES
     =====================================================================================================-->
     <beans:bean id="validatorServiceFhir" parent="validatorService"
-        c:contentPathBuilder-ref="contentPathBuilderFhir"
         c:jaxbContextMetadata-ref="jaxbContextMetadataFhir"
         c:resourceMetadataService-ref="resourceMetadataServiceFhir"/>
     
@@ -324,6 +353,12 @@
     = RESOURCE REGISTRIES
     =====================================================================================================-->
     <beans:bean id="resourceRegistryFhir" class="gov.hhs.onc.sdcct.fhir.impl.FhirResourceRegistryImpl" abstract="true"/>
+    
+    <beans:bean id="resourceRegistryFhirCodeSystem" parent="resourceRegistryFhir"
+        c:resourceMetadata-ref="metadataResourceFhirCodeSystem"/>
+    
+    <beans:bean id="resourceRegistryFhirDataElem" parent="resourceRegistryFhir"
+        c:resourceMetadata-ref="metadataResourceFhirDataElem"/>
     
     <beans:bean id="resourceRegistryFhirQuestionnaire" parent="resourceRegistryFhir"
         c:resourceMetadata-ref="metadataResourceFhirQuestionnaire"/>
@@ -338,6 +373,14 @@
     = SEARCH SERVICES
     =====================================================================================================-->
     <beans:bean id="searchServiceFhir" class="gov.hhs.onc.sdcct.fhir.search.impl.FhirSearchServiceImpl" abstract="true"/>
+    
+    <beans:bean id="searchServiceFhirCodeSystem" parent="searchServiceFhir"
+        c:resourceMetadata-ref="metadataResourceFhirCodeSystem"
+        c:resourceRegistry-ref="resourceRegistryFhirCodeSystem"/>
+    
+    <beans:bean id="searchServiceFhirDataElem" parent="searchServiceFhir"
+        c:resourceMetadata-ref="metadataResourceFhirDataElem"
+        c:resourceRegistry-ref="resourceRegistryFhirDataElem"/>
     
     <beans:bean id="searchServiceFhirQuestionnaire" parent="searchServiceFhir"
         c:resourceMetadata-ref="metadataResourceFhirQuestionnaire"

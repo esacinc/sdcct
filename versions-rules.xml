@@ -16,38 +16,34 @@
     
     <rules>
         <!--====================================================================================================
-        = JAXB
-        =====================================================================================================-->
-        <rule groupId="com.sun.xml.bind" artifactId="jaxb-xjc">
-            <ignoreVersions>
-                <ignoreVersion type="exact">2.2.11</ignoreVersion>
-            </ignoreVersions>
-        </rule>
-        
-        <!--====================================================================================================
         = APACHE HTTP COMPONENTS
         =====================================================================================================-->
         <!--
-        TEMP: Do not upgrade to v4.4.5 due to required annotations (by SoapUI).
+        Do not upgrade past v4.4.4 due to required annotations (by SoapUI).
         -->
+        <rule groupId="org.apache.httpcomponents" artifactId="httpclient">
+            <ignoreVersions>
+                <ignoreVersion type="regex">.+</ignoreVersion>
+            </ignoreVersions>
+        </rule>
+        <rule groupId="org.apache.httpcomponents" artifactId="httpclient-cache">
+            <ignoreVersions>
+                <ignoreVersion type="regex">.+</ignoreVersion>
+            </ignoreVersions>
+        </rule>
         <rule groupId="org.apache.httpcomponents" artifactId="httpcore">
             <ignoreVersions>
-                <ignoreVersion type="exact">4.4.5</ignoreVersion>
+                <ignoreVersion type="regex">.+</ignoreVersion>
             </ignoreVersions>
         </rule>
-        
+        <rule groupId="org.apache.httpcomponents" artifactId="httpmime">
+            <ignoreVersions>
+                <ignoreVersion type="regex">.+</ignoreVersion>
+            </ignoreVersions>
+        </rule>
         <rule groupId="org.apache.httpcomponents" artifactId="httpcore-nio">
             <ignoreVersions>
-                <ignoreVersion type="exact">4.4.5</ignoreVersion>
-            </ignoreVersions>
-        </rule>
-        
-        <!--====================================================================================================
-        = APACHE MAVEN
-        =====================================================================================================-->
-        <rule groupId="org.apache.maven" artifactId="maven-core">
-            <ignoreVersions>
-                <ignoreVersion type="regex">.*</ignoreVersion>
+                <ignoreVersion type="regex">.+</ignoreVersion>
             </ignoreVersions>
         </rule>
         
@@ -55,9 +51,19 @@
         = JAXB2 COMMONS
         =====================================================================================================-->
         <!--
-        TEMP: Do not upgrade to v1.11.1 due to it's apparent accidental publication.
+        Do not upgrade to v1.11.1 due to it's apparent accidental publication.
         -->
+        <rule groupId="org.jvnet.jaxb2_commons" artifactId="jaxb2-basics">
+            <ignoreVersions>
+                <ignoreVersion type="regex">1\.11\.1(?:\-PUBLISHED\-BY\-MISTAKE)?</ignoreVersion>
+            </ignoreVersions>
+        </rule>
         <rule groupId="org.jvnet.jaxb2_commons" artifactId="jaxb2-basics-runtime">
+            <ignoreVersions>
+                <ignoreVersion type="regex">1\.11\.1(?:\-PUBLISHED\-BY\-MISTAKE)?</ignoreVersion>
+            </ignoreVersions>
+        </rule>
+        <rule groupId="org.jvnet.jaxb2_commons" artifactId="jaxb2-basics-tools">
             <ignoreVersions>
                 <ignoreVersion type="regex">1\.11\.1(?:\-PUBLISHED\-BY\-MISTAKE)?</ignoreVersion>
             </ignoreVersions>

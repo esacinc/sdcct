@@ -18,6 +18,8 @@
     
     <title value="fhir_test_bad_chars_xml"/>
     
+    <subjectType value="Questionnaire"/>
+    
     <item>
         <linkId value="section1"/>
         <text value="Section 1"/>

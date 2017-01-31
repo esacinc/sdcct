@@ -3,11 +3,10 @@ package gov.hhs.onc.sdcct.net.http.logging.impl;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import gov.hhs.onc.sdcct.net.http.logging.HttpRequestEvent;
 import gov.hhs.onc.sdcct.net.logging.RestEventType;
-import gov.hhs.onc.sdcct.utils.SdcctStringUtils.SdcctToStringStyle;
+import gov.hhs.onc.sdcct.utils.SdcctStringUtils.SdcctToStringBuilder;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpRequestEvent {
     private String authType;
@@ -36,8 +35,8 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
     }
 
     @Override
-    protected void buildMarkerMessages(StringBuffer msgBuffer, ToStringBuilder msgToStrBuilder, StringBuffer logstashFileMsgBuffer,
-        ToStringBuilder logstashFileMsgToStrBuilder) {
+    protected void buildMarkerMessages(StringBuffer msgBuffer, SdcctToStringBuilder msgToStrBuilder, StringBuffer logstashFileMsgBuffer,
+        SdcctToStringBuilder logstashFileMsgToStrBuilder) {
         super.buildMarkerMessages(msgBuffer, msgToStrBuilder, logstashFileMsgBuffer, logstashFileMsgToStrBuilder);
 
         msgToStrBuilder.append("method", this.method);
@@ -48,8 +47,6 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
         msgToStrBuilder.append("remoteAddr", this.remoteAddr);
         msgToStrBuilder.append("remoteHost", this.remoteHost);
         msgToStrBuilder.append("remotePort", this.remotePort);
-
-        ((SdcctToStringStyle) msgToStrBuilder.getStyle()).removeLastFieldSeparator(msgBuffer);
 
         msgBuffer.append(").");
     }

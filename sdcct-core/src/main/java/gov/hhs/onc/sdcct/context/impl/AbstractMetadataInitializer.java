@@ -10,6 +10,8 @@ import org.springframework.context.ApplicationContextException;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 public abstract class AbstractMetadataInitializer extends AbstractApplicationInitializer implements MetadataInitializer {
+    protected final static String DEFAULT_DATA_DIR_RELATIVE_PATH = "var";
+
     protected String name;
 
     protected AbstractMetadataInitializer(SdcctApplication app, String name) {
@@ -22,6 +24,33 @@ public abstract class AbstractMetadataInitializer extends AbstractApplicationIni
     public void initialize(ConfigurableEnvironment env) {
         this.app.setName(this.name);
         this.app.setHomeDirectory(this.buildHomeDirectory(env));
+        this.app.setDataDirectory(this.buildDataDirectory(env));
+    }
+
+    protected File buildDataDirectory(ConfigurableEnvironment env) {
+        String dataDirPath = this.buildDataDirectoryPath(env);
+
+        if (StringUtils.isBlank(dataDirPath)) {
+            throw new ApplicationContextException("Unable to determine data directory path.");
+        }
+
+        File dataDir = new File(dataDirPath);
+
+        dataDirPath = dataDir.getPath();
+
+        if (!dataDir.exists()) {
+            if (!dataDir.mkdirs()) {
+                throw new ApplicationContextException(String.format("Unable to create data directory (path=%s).", dataDirPath));
+            }
+        } else if (!dataDir.isDirectory()) {
+            throw new ApplicationContextException(String.format("Data directory path (%s) is not a directory.", dataDirPath));
+        }
+
+        return dataDir;
+    }
+
+    protected String buildDataDirectoryPath(ConfigurableEnvironment env) {
+        return env.getProperty(SdcctPropertyNames.DATA_DIR, new File(this.app.getHomeDirectory(), DEFAULT_DATA_DIR_RELATIVE_PATH).getPath());
     }
 
     protected File buildHomeDirectory(ConfigurableEnvironment env) {

@@ -24,7 +24,7 @@ import gov.hhs.onc.sdcct.build.xml.jaxb.utils.SdcctFhirCodegenUtils
 import gov.hhs.onc.sdcct.net.SdcctUris
 import gov.hhs.onc.sdcct.utils.SdcctClassUtils
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils
-import gov.hhs.onc.sdcct.xml.utils.SdcctXmlUtils
+import gov.hhs.onc.sdcct.xml.utils.SdcctDomUtils
 import java.util.regex.Pattern
 import javax.annotation.Nullable
 import javax.xml.namespace.QName
@@ -197,12 +197,12 @@ class FhirTermCodegenPlugin extends AbstractTermCodegenPlugin {
             } else {
                 this.valueSets[termUri] = valueSet = new ValueSetCodegenModel(termElem, termId, termName, termUri, termOid, termVersion)
                 
-                if ((valueSetComposeElem = SdcctXmlUtils.findChildElement(termElem, SdcctUris.FHIR_URL_VALUE, SdcctFhirCodegenUtils.COMPOSE_ELEM_NAME))
+                if ((valueSetComposeElem = SdcctDomUtils.findChildElement(termElem, SdcctUris.FHIR_URL_VALUE, SdcctFhirCodegenUtils.COMPOSE_ELEM_NAME))
                     != null) {
-                    valueSet.addCodeSystemExcludes(SdcctXmlUtils.findChildElements(valueSetComposeElem, SdcctUris.FHIR_URL_VALUE,
+                    valueSet.addCodeSystemExcludes(SdcctDomUtils.findChildElements(valueSetComposeElem, SdcctUris.FHIR_URL_VALUE,
                         SdcctFhirCodegenUtils.EXCLUDE_ELEM_NAME).collect{ new CodeSystemFilterCodegenModel(valueSet, it, buildCodeSystemUri(it), false,
                         mapConceptElements(it).keySet() as String[]) } as CodeSystemFilterCodegenModel[])
-                    valueSet.addCodeSystemIncludes(SdcctXmlUtils.findChildElements(valueSetComposeElem, SdcctUris.FHIR_URL_VALUE,
+                    valueSet.addCodeSystemIncludes(SdcctDomUtils.findChildElements(valueSetComposeElem, SdcctUris.FHIR_URL_VALUE,
                         SdcctFhirCodegenUtils.INCLUDE_ELEM_NAME).collect{ new CodeSystemFilterCodegenModel(valueSet, it, buildCodeSystemUri(it), true,
                         mapConceptElements(it).keySet() as String[]) } as CodeSystemFilterCodegenModel[])
                 }
@@ -219,24 +219,24 @@ class FhirTermCodegenPlugin extends AbstractTermCodegenPlugin {
     private static String buildConceptJavadoc(Element conceptElem) {
         String conceptComments = buildComments(conceptElem)
         
-        return ((conceptComments != null) ? conceptComments : SdcctXmlUtils.findChildElement(conceptElem, SdcctUris.FHIR_URL_VALUE,
+        return ((conceptComments != null) ? conceptComments : SdcctDomUtils.findChildElement(conceptElem, SdcctUris.FHIR_URL_VALUE,
             SdcctFhirCodegenUtils.DEFINITION_ELEM_NAME)?.getAttribute(SdcctFhirCodegenUtils.VALUE_NODE_NAME))
     }
     
     private static String buildConceptDisplayName(Element conceptElem) {
-        return SdcctXmlUtils.findChildElement(conceptElem, SdcctUris.FHIR_URL_VALUE, SdcctFhirCodegenUtils.DISPLAY_ELEM_NAME)?.getAttribute(
+        return SdcctDomUtils.findChildElement(conceptElem, SdcctUris.FHIR_URL_VALUE, SdcctFhirCodegenUtils.DISPLAY_ELEM_NAME)?.getAttribute(
             SdcctFhirCodegenUtils.VALUE_NODE_NAME)
     }
     
     private static Map<String, Element> mapConceptElements(Element elem) {
-        return SdcctXmlUtils.findDescendantElements(elem, SdcctUris.FHIR_URL_VALUE, SdcctFhirCodegenUtils.CONCEPT_ELEM_NAME)
-            .collectEntries(new LinkedHashMap<String, Element>(), { Collections.singletonMap(SdcctXmlUtils.findChildElement(it, SdcctUris.FHIR_URL_VALUE,
+        return SdcctDomUtils.findDescendantElements(elem, SdcctUris.FHIR_URL_VALUE, SdcctFhirCodegenUtils.CONCEPT_ELEM_NAME)
+            .collectEntries(new LinkedHashMap<String, Element>(), { Collections.singletonMap(SdcctDomUtils.findChildElement(it, SdcctUris.FHIR_URL_VALUE,
             SdcctFhirCodegenUtils.CODE_ELEM_NAME).getAttribute(SdcctFhirCodegenUtils.VALUE_NODE_NAME), it) })
     }
     
     @Nullable
     private static String buildCodeSystemUri(@Nullable Element codeSystemElem) {
-        return SdcctXmlUtils.findChildElement(codeSystemElem, SdcctUris.FHIR_URL_VALUE, SdcctFhirCodegenUtils.SYSTEM_ELEM_NAME)?.getAttribute(
+        return SdcctDomUtils.findChildElement(codeSystemElem, SdcctUris.FHIR_URL_VALUE, SdcctFhirCodegenUtils.SYSTEM_ELEM_NAME)?.getAttribute(
             SdcctFhirCodegenUtils.VALUE_NODE_NAME)
     }
     

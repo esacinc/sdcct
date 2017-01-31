@@ -32,4 +32,10 @@
             <xsd:pattern value=".*[^\s]+.*"/>
         </xsd:restriction>
     </xsd:simpleType>
+    
+    <xsd:simpleType name="PositiveInt">
+        <xsd:restriction base="xsd:int">
+            <xsd:minInclusive value="1"/>
+        </xsd:restriction>
+    </xsd:simpleType>
 </xsd:schema>

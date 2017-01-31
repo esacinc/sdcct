@@ -16,7 +16,9 @@ import java.net.URI;
 import java.util.Map;
 import net.sf.saxon.s9api.XdmItem;
 import org.apache.commons.collections4.keyvalue.MultiKey;
+import org.springframework.stereotype.Component;
 
+@Component("resourceParamProcRfd")
 public class RfdResourceParamProcessorImpl extends AbstractResourceParamProcessor<IdentifiedExtensionType, RfdResourceMetadata<?>, RfdResource>
     implements RfdResourceParamProcessor {
     public RfdResourceParamProcessorImpl() {

@@ -3,15 +3,15 @@ package gov.hhs.onc.sdcct.data.db.logging.impl;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.sebhoss.warnings.CompilerWarnings;
 import gov.hhs.onc.sdcct.data.db.DbStatementType;
-import gov.hhs.onc.sdcct.data.db.logging.DbStatementEvent;
 import gov.hhs.onc.sdcct.data.db.logging.DbParam;
+import gov.hhs.onc.sdcct.data.db.logging.DbStatementEvent;
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
+import gov.hhs.onc.sdcct.utils.SdcctStringUtils.SdcctToStringBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class DbStatementEventImpl extends AbstractDbEvent implements DbStatementEvent {
     private final static Pattern SQL_PARAM_PLACEHOLDER_PATTERN = Pattern.compile("(?<=[ \\(=])\\?");
@@ -27,8 +27,8 @@ public class DbStatementEventImpl extends AbstractDbEvent implements DbStatement
 
     @Override
     @SuppressWarnings({ CompilerWarnings.UNCHECKED })
-    protected void buildMarkerMessages(StringBuffer msgBuffer, ToStringBuilder msgToStrBuilder, StringBuffer logstashFileMsgBuffer,
-        ToStringBuilder logstashFileMsgToStrBuilder) {
+    protected void buildMarkerMessages(StringBuffer msgBuffer, SdcctToStringBuilder msgToStrBuilder, StringBuffer logstashFileMsgBuffer,
+        SdcctToStringBuilder logstashFileMsgToStrBuilder) {
         msgBuffer.append("Database ");
         msgBuffer.append(this.type.getId());
         msgBuffer.append(" executed");

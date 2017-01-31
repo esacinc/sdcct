@@ -12,16 +12,21 @@ import java.util.TreeMap;
 public class JaxbSchemaMetadataImpl extends AbstractJaxbContextMetadataComponent<XMLSchemaSchema> implements JaxbSchemaMetadata {
     private Package pkg;
     private Package implPkg;
+    private String prefix;
+    private String xpathPrefix;
     private Map<String, JaxbElementMetadata<?>> elemNames = new TreeMap<>();
     private Map<String, String> elemTypeNames = new TreeMap<>();
     private Map<Class<?>, JaxbTypeMetadata<?, ?>> typeBeanClasses = new TreeMap<>(Comparator.comparing(Class::getName));
     private Map<String, JaxbTypeMetadata<?, ?>> typeNames = new TreeMap<>();
 
-    public JaxbSchemaMetadataImpl(JaxbContextMetadata context, XMLSchemaSchema expr, Package pkg, Package implPkg, String name) {
+    public JaxbSchemaMetadataImpl(JaxbContextMetadata context, XMLSchemaSchema expr, Package pkg, Package implPkg, String name, String prefix,
+        String xpathPrefix) {
         super(context, expr, name);
 
         this.pkg = pkg;
         this.implPkg = implPkg;
+        this.prefix = prefix;
+        this.xpathPrefix = xpathPrefix;
     }
 
     @Override
@@ -53,6 +58,11 @@ public class JaxbSchemaMetadataImpl extends AbstractJaxbContextMetadataComponent
     }
 
     @Override
+    public String getPrefix() {
+        return this.prefix;
+    }
+
+    @Override
     public void addType(JaxbTypeMetadata<?, ?> type) {
         if (type.hasBeanImplClass()) {
             this.typeBeanClasses.put(type.getBeanImplClass(), type);
@@ -69,5 +79,10 @@ public class JaxbSchemaMetadataImpl extends AbstractJaxbContextMetadataComponent
     @Override
     public Map<String, JaxbTypeMetadata<?, ?>> getTypeNames() {
         return this.typeNames;
+    }
+
+    @Override
+    public String getXpathPrefix() {
+        return this.xpathPrefix;
     }
 }

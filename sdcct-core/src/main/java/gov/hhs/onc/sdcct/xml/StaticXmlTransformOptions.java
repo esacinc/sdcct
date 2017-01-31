@@ -1,6 +1,6 @@
 package gov.hhs.onc.sdcct.xml;
 
-import gov.hhs.onc.sdcct.xml.impl.XdmDocument;
+import gov.hhs.onc.sdcct.xml.saxon.impl.XdmDocument;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;

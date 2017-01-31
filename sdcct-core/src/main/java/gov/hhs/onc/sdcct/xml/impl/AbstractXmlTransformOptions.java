@@ -1,7 +1,7 @@
 package gov.hhs.onc.sdcct.xml.impl;
 
 import com.github.sebhoss.warnings.CompilerWarnings;
-import gov.hhs.onc.sdcct.config.impl.AbstractOptions;
+import gov.hhs.onc.sdcct.config.impl.AbstractSdcctOptions;
 import gov.hhs.onc.sdcct.xml.XmlTransformOptions;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -10,7 +10,7 @@ import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmValue;
 import org.apache.commons.collections4.MapUtils;
 
-public abstract class AbstractXmlTransformOptions<T extends XmlTransformOptions<T>> extends AbstractOptions<T> implements XmlTransformOptions<T> {
+public abstract class AbstractXmlTransformOptions<T extends XmlTransformOptions<T>> extends AbstractSdcctOptions<T> implements XmlTransformOptions<T> {
     protected Map<QName, XdmValue> vars = new LinkedHashMap<>();
 
     private final static long serialVersionUID = 0L;

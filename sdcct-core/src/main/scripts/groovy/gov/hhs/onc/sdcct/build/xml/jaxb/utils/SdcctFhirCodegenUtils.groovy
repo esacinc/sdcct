@@ -2,7 +2,7 @@ package gov.hhs.onc.sdcct.build.xml.jaxb.utils
 
 import gov.hhs.onc.sdcct.net.SdcctUris
 import gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes
-import gov.hhs.onc.sdcct.xml.utils.SdcctXmlUtils
+import gov.hhs.onc.sdcct.xml.utils.SdcctDomUtils
 import groovy.xml.DOMBuilder
 import javax.annotation.Nullable
 import javax.xml.xpath.XPath
@@ -76,37 +76,37 @@ final class SdcctFhirCodegenUtils {
     
     @Nullable
     static String buildExtensionValue(@Nullable Node node, String url, String valueElemName, boolean child) {
-        return SdcctXmlUtils.findChildElement((child ? SdcctXmlUtils.findChildElements(node, SdcctUris.FHIR_URL_VALUE, EXTENSION_ELEM_NAME) :
-            SdcctXmlUtils.findDescendantElements(node, SdcctUris.FHIR_URL_VALUE, EXTENSION_ELEM_NAME))
+        return SdcctDomUtils.findChildElement((child ? SdcctDomUtils.findChildElements(node, SdcctUris.FHIR_URL_VALUE, EXTENSION_ELEM_NAME) :
+            SdcctDomUtils.findDescendantElements(node, SdcctUris.FHIR_URL_VALUE, EXTENSION_ELEM_NAME))
             .find{ Objects.equals(it.getAttribute(URL_NODE_NAME), url) }, SdcctUris.FHIR_URL_VALUE, valueElemName)?.getAttribute(VALUE_NODE_NAME)
     }
     
     @Nullable
     static String buildBaseType(@Nullable Node node) {
-        return SdcctXmlUtils.findChildElement(node, SdcctUris.FHIR_URL_VALUE, BASE_TYPE_ELEM_NAME)?.getAttribute(VALUE_NODE_NAME)
+        return SdcctDomUtils.findChildElement(node, SdcctUris.FHIR_URL_VALUE, BASE_TYPE_ELEM_NAME)?.getAttribute(VALUE_NODE_NAME)
     }
     
     @Nullable
     static String buildFhirVersion(@Nullable Node node) {
-        return SdcctXmlUtils.findChildElement(node, SdcctUris.FHIR_URL_VALUE, FHIR_VERSION_ELEM_NAME)?.getAttribute(VALUE_NODE_NAME)
+        return SdcctDomUtils.findChildElement(node, SdcctUris.FHIR_URL_VALUE, FHIR_VERSION_ELEM_NAME)?.getAttribute(VALUE_NODE_NAME)
     }
     
     @Nullable
     static String buildVersion(@Nullable Node node) {
-        return SdcctXmlUtils.findChildElement(node, SdcctUris.FHIR_URL_VALUE, VERSION_ELEM_NAME)?.getAttribute(VALUE_NODE_NAME)
+        return SdcctDomUtils.findChildElement(node, SdcctUris.FHIR_URL_VALUE, VERSION_ELEM_NAME)?.getAttribute(VALUE_NODE_NAME)
     }
     
     static String buildUri(Element elem) {
-        return SdcctXmlUtils.findChildElement(elem, SdcctUris.FHIR_URL_VALUE, URL_NODE_NAME)?.getAttribute(VALUE_NODE_NAME)
+        return SdcctDomUtils.findChildElement(elem, SdcctUris.FHIR_URL_VALUE, URL_NODE_NAME)?.getAttribute(VALUE_NODE_NAME)
     }
     @Nullable
     static String buildName(Element elem) {
-        return SdcctXmlUtils.findChildElement(elem, SdcctUris.FHIR_URL_VALUE, NAME_ELEM_NAME)?.getAttribute(VALUE_NODE_NAME)
+        return SdcctDomUtils.findChildElement(elem, SdcctUris.FHIR_URL_VALUE, NAME_ELEM_NAME)?.getAttribute(VALUE_NODE_NAME)
     }
     
     @Nullable
     static String buildId(@Nullable Node node) {
-        return SdcctXmlUtils.findChildElement(node, SdcctUris.FHIR_URL_VALUE, ID_ELEM_NAME)?.getAttribute(VALUE_NODE_NAME)
+        return SdcctDomUtils.findChildElement(node, SdcctUris.FHIR_URL_VALUE, ID_ELEM_NAME)?.getAttribute(VALUE_NODE_NAME)
     }
     
     static List<Element> buildResourceItemElements(String resourceItemElemName, List<File> dataFiles) {

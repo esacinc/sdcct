@@ -16,7 +16,7 @@
     =====================================================================================================-->
     <sdcct-xml:xpath-static-options id="xpathOptsStaticRfd" abstract="true">
         <sdcct-xml:static-namespace prefix="#{ T(gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes).SDC }">
-            #{ T(gov.hhs.onc.sdcct.net.SdcctUris).SDC_URL_VALUE }
+            #{ T(gov.hhs.onc.sdcct.net.SdcctUris).IHE_QRPH_SDC_URN_VALUE }
         </sdcct-xml:static-namespace>
     </sdcct-xml:xpath-static-options>
     
@@ -25,21 +25,9 @@
     =====================================================================================================-->
     <sdcct-xml:xslt-static-options id="xsltOptsStaticRfd" parent="xsltOptsStatic" abstract="true">
         <sdcct-xml:static-namespace prefix="#{ T(gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes).SDC }">
-            #{ T(gov.hhs.onc.sdcct.net.SdcctUris).SDC_URL_VALUE }
+            #{ T(gov.hhs.onc.sdcct.net.SdcctUris).IHE_QRPH_SDC_URN_VALUE }
         </sdcct-xml:static-namespace>
     </sdcct-xml:xslt-static-options>
-    
-    <!--====================================================================================================
-    = CONTENT PATH BUILDERS
-    =====================================================================================================-->
-    <beans:bean id="contentPathBuilderRfd" parent="contentPathBuilder"
-        p:namespaces="#{ xpathOptsStaticRfd.namespaces }"/>
-    
-    <!--====================================================================================================
-    = RESOURCE PARAM PROCESSORS
-    =====================================================================================================-->
-    <beans:bean id="resourceParamProcRfd" class="gov.hhs.onc.sdcct.rfd.parameter.impl.RfdResourceParamProcessorImpl"
-        p:contentPathBuilder-ref="contentPathBuilderRfd"/>
     
     <!--====================================================================================================
     = RESOURCE PARAM METADATAS
@@ -51,6 +39,10 @@
     <!--====================================================================================================
     = SCHEMATRONS
     =====================================================================================================-->
+    <!--
+    TODO: Re-enable if/when the SDC Schematrons' SDC XML namespace URIs are updated.
+    -->
+    <!--
     <beans:bean id="schematronSdc" parent="schematron"
         c:id="sdc"
         c:name="SDC">
@@ -58,6 +50,7 @@
             <sdcct-xml:document>classpath*:${sdcct.schematron.sdc.dir.path}/SDC.sch</sdcct-xml:document>
         </beans:property>
     </beans:bean>
+    -->
     
     <!--====================================================================================================
     = RESOURCE METADATAS
@@ -71,11 +64,16 @@
                 </sdcct-xml:xpath-executable>
             </beans:array>
         </beans:property>
+        <!--
+        TODO: Re-enable if/when the SDC Schematrons' SDC XML namespace URIs are updated.
+        -->
+        <!--
         <beans:property name="schematrons">
             <beans:array>
                 <beans:ref bean="schematronSdc"/>
             </beans:array>
         </beans:property>
+        -->
     </beans:bean>
     
     <beans:bean id="metadataResourceRfdFormDesign" parent="metadataResourceRfd"
@@ -171,7 +169,6 @@
     = VALIDATOR SERVICES
     =====================================================================================================-->
     <beans:bean id="validatorServiceRfd" parent="validatorService"
-        c:contentPathBuilder-ref="contentPathBuilderRfd"
         c:jaxbContextMetadata-ref="jaxbContextMetadataRfd"
         c:resourceMetadataService-ref="resourceMetadataServiceRfd"/>
     

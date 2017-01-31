@@ -18,6 +18,8 @@
     
     <title value="fhir_test_invalid_xml"/>
     
+    <subjectType value="Questionnaire"/>
+    
     <badElement value="badElementValue"/>
     
     <item>

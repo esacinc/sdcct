@@ -7,6 +7,7 @@ import com.sun.xml.bind.v2.model.runtime.RuntimeLeafInfo;
 import com.sun.xml.bind.v2.model.runtime.RuntimeNonElement;
 import com.sun.xml.bind.v2.model.runtime.RuntimePropertyInfo;
 import com.sun.xml.bind.v2.model.runtime.RuntimeTypeInfoSet;
+import gov.hhs.onc.sdcct.transform.SdcctTransformException;
 import gov.hhs.onc.sdcct.transform.content.path.AttributePathSegment;
 import gov.hhs.onc.sdcct.transform.content.path.ContentPath;
 import gov.hhs.onc.sdcct.transform.content.path.ContentPathBuilder;
@@ -17,6 +18,7 @@ import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
 import gov.hhs.onc.sdcct.xml.jaxb.JaxbContextRepository;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbComplexTypeMetadata;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbContextMetadata;
+import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbSchemaMetadata;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbSimpleTypeMetadata;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbTypeMetadata;
 import java.util.LinkedList;
@@ -32,24 +34,36 @@ import net.sf.saxon.tree.iter.AxisIterator;
 import net.sf.saxon.type.Type;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component("contentPathBuilder")
 public class ContentPathBuilderImpl implements ContentPathBuilder {
-    @Autowired
-    private JaxbContextRepository jaxbContextRepo;
-
     private ClassLoader beanClassLoader;
-    private Map<String, String> namespaces = new TreeMap<>();
 
     @Override
-    public ContentPath build(boolean typed, NodeInfo nodeInfo) throws Exception {
-        return this.build(typed, buildSegments(new LinkedList<>(), nodeInfo, nodeInfo.getPrefix(), nodeInfo.getURI(), nodeInfo.getLocalPart()));
+    public ContentPath build(@Nullable JaxbContextRepository jaxbContextRepo, boolean typed, NodeInfo nodeInfo) throws SdcctTransformException {
+        return this.build(jaxbContextRepo, typed,
+            buildSegments(new LinkedList<>(), nodeInfo, nodeInfo.getPrefix(), nodeInfo.getURI(), nodeInfo.getLocalPart()));
     }
 
     @Override
-    public ContentPath build(boolean typed, LinkedList<ContentPathSegment<?, ?>> segments) throws Exception {
-        return new ContentPathImpl(this.namespaces, (typed ? this.buildSegmentTypes(segments) : segments), buildFluentPathExpression(segments),
-            buildJsonPointerExpression(segments), this.buildXpathExpression(segments));
+    public ContentPath build(@Nullable JaxbContextRepository jaxbContextRepo, boolean typed, LinkedList<ContentPathSegment<?, ?>> segments)
+        throws SdcctTransformException {
+        Map<String, String> namespaces = new TreeMap<>();
+
+        if (jaxbContextRepo != null) {
+            String nsUri;
+            JaxbSchemaMetadata jaxbSchemaMetadata;
+
+            for (ContentPathSegment<?, ?> segment : segments) {
+                if ((jaxbSchemaMetadata = jaxbContextRepo.findSchemaMetadata((nsUri = segment.getNamespaceUri()))) != null) {
+                    namespaces.put(jaxbSchemaMetadata.getXpathPrefix(), nsUri);
+                }
+            }
+        }
+
+        return new ContentPathImpl(namespaces, (typed ? this.buildSegmentTypes(jaxbContextRepo, namespaces, segments) : segments),
+            buildFluentPathExpression(segments), buildJsonPointerExpression(segments), this.buildXpathExpression(namespaces, segments));
     }
 
     private static LinkedList<ContentPathSegment<?, ?>> buildSegments(LinkedList<ContentPathSegment<?, ?>> segments, NodeInfo nodeInfo,
@@ -129,7 +143,8 @@ public class ContentPathBuilderImpl implements ContentPathBuilder {
         return builder.build();
     }
 
-    private LinkedList<ContentPathSegment<?, ?>> buildSegmentTypes(LinkedList<ContentPathSegment<?, ?>> segments) throws Exception {
+    private LinkedList<ContentPathSegment<?, ?>> buildSegmentTypes(JaxbContextRepository jaxbContextRepo, Map<String, String> namespaces,
+        LinkedList<ContentPathSegment<?, ?>> segments) throws SdcctTransformException {
         String segmentLocalName;
         JaxbContextMetadata jaxbContextMetadata = null;
         RuntimeTypeInfoSet jaxbTypeInfoSet = null;
@@ -141,20 +156,25 @@ public class ContentPathBuilderImpl implements ContentPathBuilder {
             segmentLocalName = segment.getLocalName();
 
             if (jaxbContextMetadata == null) {
-                for (RuntimeElementInfo jaxbElemInfoItem : (jaxbTypeInfoSet =
-                    (jaxbContextMetadata = this.jaxbContextRepo.findContextMetadata(segment.getNamespaceUri())).getContext().getRuntimeTypeInfoSet())
-                        .getAllElements()) {
-                    if (jaxbElemInfoItem.getElementName().getLocalPart().equals(segmentLocalName)) {
-                        ((ElementPathSegment) segment).setJaxbTypeMetadata((jaxbElemTypeMetadata = ((JaxbComplexTypeMetadata<?>) this.jaxbContextRepo
-                            .findTypeMetadata((jaxbClassInfo = ((RuntimeClassInfo) jaxbElemInfoItem.getContentType())).getClazz()))));
-                        segment.setBeanClass(jaxbElemTypeMetadata.getBeanImplClass());
+                try {
+                    for (RuntimeElementInfo jaxbElemInfoItem : (jaxbTypeInfoSet =
+                        (jaxbContextMetadata = jaxbContextRepo.findContextMetadata(segment.getNamespaceUri())).getContext().getRuntimeTypeInfoSet())
+                            .getAllElements()) {
+                        if (jaxbElemInfoItem.getElementName().getLocalPart().equals(segmentLocalName)) {
+                            ((ElementPathSegment) segment).setJaxbTypeMetadata((jaxbElemTypeMetadata = ((JaxbComplexTypeMetadata<?>) jaxbContextRepo
+                                .findTypeMetadata((jaxbClassInfo = ((RuntimeClassInfo) jaxbElemInfoItem.getContentType())).getClazz()))));
+                            segment.setBeanClass(jaxbElemTypeMetadata.getBeanImplClass());
 
-                        break;
+                            break;
+                        }
                     }
+                } catch (JAXBException e) {
+                    throw new SdcctTransformException(String.format("Unable to build content path (xpath=%s) segment (qname=%s) JAXB context.",
+                        this.buildXpathExpression(namespaces, segments), segment.getQname()), e);
                 }
             } else {
                 // noinspection ConstantConditions
-                jaxbPropTypeInfo = this.buildSegmentJaxbPropertyTypeInfo(jaxbTypeInfoSet, segments, segment,
+                jaxbPropTypeInfo = this.buildSegmentJaxbPropertyTypeInfo(jaxbContextRepo, namespaces, jaxbTypeInfoSet, segments, segment,
                     jaxbClassInfo.getProperty(StringUtils.uncapitalize(JAXBRIContext.mangleNameToPropertyName(segmentLocalName))));
 
                 if (segment instanceof ElementPathSegment) {
@@ -166,8 +186,9 @@ public class ContentPathBuilderImpl implements ContentPathBuilder {
         return segments;
     }
 
-    private RuntimeNonElement buildSegmentJaxbPropertyTypeInfo(RuntimeTypeInfoSet jaxbTypeInfoSet, LinkedList<ContentPathSegment<?, ?>> segments,
-        ContentPathSegment<?, ?> segment, RuntimePropertyInfo jaxbPropInfo) throws Exception {
+    private RuntimeNonElement buildSegmentJaxbPropertyTypeInfo(JaxbContextRepository jaxbContextRepo, Map<String, String> namespaces,
+        RuntimeTypeInfoSet jaxbTypeInfoSet, LinkedList<ContentPathSegment<?, ?>> segments, ContentPathSegment<?, ?> segment, RuntimePropertyInfo jaxbPropInfo)
+        throws SdcctTransformException {
         Class<?> jaxbPropTypeClass = ((Class<?>) jaxbPropInfo.getIndividualType());
         boolean jaxbLeafProp = (jaxbPropInfo instanceof RuntimeLeafInfo);
 
@@ -175,9 +196,9 @@ public class ContentPathBuilderImpl implements ContentPathBuilder {
             try {
                 jaxbPropTypeClass = SdcctClassUtils.buildImplClass(this.beanClassLoader, Object.class, jaxbPropTypeClass);
             } catch (ClassNotFoundException e) {
-                throw new IllegalStateException(
+                throw new SdcctTransformException(
                     String.format("Unable to build content path (xpath=%s) segment (qname=%s) JAXB property type (class=%s) implementation class.",
-                        this.buildXpathExpression(segments), segment.getQname(), jaxbPropTypeClass.getName()),
+                        this.buildXpathExpression(namespaces, segments), segment.getQname(), jaxbPropTypeClass.getName()),
                     e);
             }
         }
@@ -185,15 +206,15 @@ public class ContentPathBuilderImpl implements ContentPathBuilder {
         RuntimeNonElement jaxbPropTypeInfo = jaxbTypeInfoSet.getClassInfo(jaxbPropTypeClass);
 
         if (jaxbPropTypeInfo == null) {
-            throw new IllegalStateException(String.format("Unable to build content path (xpath=%s) segment (qname=%s) JAXB property type (class=%s) info.",
-                this.buildXpathExpression(segments), segment.getQname(), jaxbPropTypeClass.getName()));
+            throw new SdcctTransformException(String.format("Unable to build content path (xpath=%s) segment (qname=%s) JAXB property type (class=%s) info.",
+                this.buildXpathExpression(namespaces, segments), segment.getQname(), jaxbPropTypeClass.getName()));
         }
 
         if (jaxbLeafProp) {
             segment.setBeanClass(((Class<?>) jaxbPropTypeInfo.getType()));
         } else {
             try {
-                JaxbTypeMetadata<?, ?> jaxbPropTypeMetadata = this.jaxbContextRepo.findTypeMetadata(jaxbPropTypeClass);
+                JaxbTypeMetadata<?, ?> jaxbPropTypeMetadata = jaxbContextRepo.findTypeMetadata(jaxbPropTypeClass);
 
                 if (segment instanceof AttributePathSegment) {
                     ((AttributePathSegment) segment).setJaxbTypeMetadata(((JaxbSimpleTypeMetadata<?>) jaxbPropTypeMetadata));
@@ -203,9 +224,9 @@ public class ContentPathBuilderImpl implements ContentPathBuilder {
 
                 segment.setBeanClass(jaxbPropTypeMetadata.getBeanImplClass());
             } catch (JAXBException e) {
-                throw new IllegalStateException(
+                throw new SdcctTransformException(
                     String.format("Unable to find content path (xpath=%s) segment (qname=%s) JAXB property type (class=%s) metadata.",
-                        this.buildXpathExpression(segments), segment.getQname(), jaxbPropTypeClass.getName()),
+                        this.buildXpathExpression(namespaces, segments), segment.getQname(), jaxbPropTypeClass.getName()),
                     e);
             }
         }
@@ -213,7 +234,7 @@ public class ContentPathBuilderImpl implements ContentPathBuilder {
         return jaxbPropTypeInfo;
     }
 
-    private String buildXpathExpression(LinkedList<ContentPathSegment<?, ?>> segments) {
+    private String buildXpathExpression(Map<String, String> namespaces, LinkedList<ContentPathSegment<?, ?>> segments) {
         StrBuilder builder = new StrBuilder();
         String nsPrefix;
         boolean attrSegmentItem;
@@ -228,7 +249,7 @@ public class ContentPathBuilderImpl implements ContentPathBuilder {
 
             final String nsUri = segment.getNamespaceUri();
 
-            if (!(nsPrefix = this.namespaces.entrySet().stream().filter(nsEntry -> nsEntry.getValue().equals(nsUri)).findFirst().map(Entry::getKey)
+            if (!(nsPrefix = namespaces.entrySet().stream().filter(nsEntry -> nsEntry.getValue().equals(nsUri)).findFirst().map(Entry::getKey)
                 .orElseGet(segment::getNamespacePrefix)).isEmpty()) {
                 builder.append(nsPrefix);
                 builder.append(SdcctStringUtils.COLON_CHAR);
@@ -250,16 +271,5 @@ public class ContentPathBuilderImpl implements ContentPathBuilder {
     @Override
     public void setBeanClassLoader(ClassLoader beanClassLoader) {
         this.beanClassLoader = beanClassLoader;
-    }
-
-    @Override
-    public Map<String, String> getNamespaces() {
-        return this.namespaces;
-    }
-
-    @Override
-    public void setNamespaces(Map<String, String> namespaces) {
-        this.namespaces.clear();
-        this.namespaces.putAll(namespaces);
     }
 }

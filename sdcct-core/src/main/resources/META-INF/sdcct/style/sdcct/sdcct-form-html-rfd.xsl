@@ -2,7 +2,7 @@
 <xsl:stylesheet
     exclude-result-prefixes="#all"
     version="2.0"
-    xmlns:sdc="http://healthIT.gov/sdc"
+    xmlns:sdc="urn:ihe:qrph:sdc:2016"
     xmlns:sdcct="urn:sdcct:core"
     xmlns:sdcct-xml="urn:sdcct:xml"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"

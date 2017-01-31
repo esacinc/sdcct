@@ -1,2 +1,5 @@
 gov.hhs.onc.sdcct.context.MetadataInitializer=\
     gov.hhs.onc.sdcct.web.context.impl.WebMetadataInitializer
+
+org.springframework.boot.SpringApplicationRunListener=\
+    gov.hhs.onc.sdcct.web.context.impl.WebApplicationContextRunListener

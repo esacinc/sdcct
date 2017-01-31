@@ -4,7 +4,7 @@ import gov.hhs.onc.sdcct.api.SpecificationType;
 import gov.hhs.onc.sdcct.data.metadata.ResourceMetadata;
 import gov.hhs.onc.sdcct.data.metadata.ResourceParamMetadata;
 import gov.hhs.onc.sdcct.validate.schematron.SdcctSchematron;
-import gov.hhs.onc.sdcct.xml.xpath.impl.SdcctXpathExecutable;
+import gov.hhs.onc.sdcct.xml.xpath.saxon.impl.SdcctXpathExecutable;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Stream;

@@ -33,6 +33,7 @@
                 <!--suppress SpringPlaceholdersInspection -->
                 <beans:entry key="#{ T(gov.hhs.onc.sdcct.ws.WsPropertyNames).ERROR_STACK_TRACE }" value="${sdcct.ws.context.error.stack.trace}"
                     value-type="java.lang.Boolean"/>
+                <beans:entry key="#{ T(javax.xml.stream.XMLInputFactory).name }" value-ref="xmlInFactory"/>
             </beans:map>
         </beans:property>
     </beans:bean>

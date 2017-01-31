@@ -1,51 +1,109 @@
 package gov.hhs.onc.sdcct.rfd.ws.impl;
 
+import com.ctc.wstx.sr.ValidatingStreamReader;
 import com.github.sebhoss.warnings.CompilerWarnings;
-import gov.hhs.onc.sdcct.transform.impl.SdcctConfiguration;
+import gov.hhs.onc.sdcct.rfd.ws.RfdWsException;
+import gov.hhs.onc.sdcct.transform.saxon.impl.SdcctSaxonConfiguration;
+import gov.hhs.onc.sdcct.transform.location.SdcctLocator;
 import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
 import gov.hhs.onc.sdcct.validate.SdcctValidatorService;
+import gov.hhs.onc.sdcct.validate.ValidationException;
+import gov.hhs.onc.sdcct.xml.impl.SdcctXmlStreamReader;
+import gov.hhs.onc.sdcct.xml.saxon.impl.XdmDocument;
+import gov.hhs.onc.sdcct.xml.impl.XmlCodec.UnmarshallingXmlStreamReader;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbContextMetadata;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbSchemaMetadata;
+import gov.hhs.onc.sdcct.xml.validate.impl.CompositeXmlValidator;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxb.io.DataReaderImpl;
+import org.apache.cxf.service.model.MessagePartInfo;
+import org.apache.cxf.staxutils.DepthXMLStreamReader;
+import org.codehaus.stax2.util.StreamReader2Delegate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class RfdJaxbDataBinding extends JAXBDataBinding implements InitializingBean {
+    private static class MessagePartXmlStreamReader extends StreamReader2Delegate {
+        private SdcctLocator locator;
+        private CompositeXmlValidator validator;
+        private boolean firstEvent = true;
+        private int depth;
+
+        public MessagePartXmlStreamReader(ValidatingStreamReader delegate, SdcctLocator locator, CompositeXmlValidator validator) {
+            super(delegate);
+
+            this.locator = locator;
+            this.validator = validator;
+        }
+
+        @Override
+        public int next() throws XMLStreamException {
+            int eventType;
+
+            if (this.firstEvent) {
+                this.firstEvent = false;
+
+                this.locator.popElement();
+
+                this.validator.validateElementStart(this.getLocalName(), this.getNamespaceURI(), this.getPrefix());
+
+                eventType = this.getEventType();
+            } else {
+                eventType = super.next();
+            }
+
+            if (eventType == START_ELEMENT) {
+                this.depth++;
+            } else if (eventType == END_ELEMENT) {
+                this.depth--;
+            }
+
+            return this.getEventType();
+        }
+
+        @Override
+        public boolean hasNext() throws XMLStreamException {
+            return (this.firstEvent || (this.depth > 0));
+        }
+    }
+
     private class RfdJaxbDataReader extends DataReaderImpl<XMLStreamReader> {
         public RfdJaxbDataReader() {
             super(RfdJaxbDataBinding.this, RfdJaxbDataBinding.this.isUnwrapJAXBElement());
         }
 
-        /**
-         * TODO: Re-enable once Saxon <-> StAX(2) translation is fixed for validation.
-         */
-        // @formatter:off
-        /*
         @Override
         public Object read(MessagePartInfo msgPartInfo, XMLStreamReader reader) {
             QName msgPartQname = msgPartInfo.getElementQName();
 
             if (RfdJaxbDataBinding.this.schemaMetadatas.containsKey(msgPartQname.getNamespaceURI())) {
+                SdcctXmlStreamReader delegatingReader =
+                    ((SdcctXmlStreamReader) ((reader instanceof DepthXMLStreamReader) ? ((DepthXMLStreamReader) reader).getReader() : reader));
+                ValidatingStreamReader delegateReader = ((ValidatingStreamReader) delegatingReader.getParent());
                 XdmDocument msgPartDoc;
 
                 try {
-                    msgPartDoc = RfdJaxbDataBinding.this.validatorService.validate(new SdcctXmlStreamReader(
-                        ((XMLStreamReader2) ((reader instanceof DepthXMLStreamReader) ? ((DepthXMLStreamReader) reader).getReader() : reader))));
+                    delegatingReader.setParent(new MessagePartXmlStreamReader(delegateReader, delegatingReader.getLocator(), delegatingReader.getValidator()));
+
+                    msgPartDoc = RfdJaxbDataBinding.this.validatorService.validate(delegatingReader);
                 } catch (ValidationException e) {
                     throw new RfdWsException(
                         String.format("Web service request message part (qname=%s, typeClass=%s) is invalid.", msgPartQname, msgPartInfo.getTypeClass()), e);
+                } finally {
+                    delegatingReader.setParent(delegateReader);
                 }
 
                 reader = new UnmarshallingXmlStreamReader(msgPartDoc.getUnderlyingNode(), RfdJaxbDataBinding.this.config.makePipelineConfiguration());
@@ -55,8 +113,6 @@ public class RfdJaxbDataBinding extends JAXBDataBinding implements InitializingB
 
             return super.read(msgPartInfo, reader);
         }
-        */
-        // @formatter:on
     }
 
     private final static Class<?>[] SUPPORTED_READER_FORMATS = new Class<?>[] { XMLStreamReader.class };
@@ -65,7 +121,7 @@ public class RfdJaxbDataBinding extends JAXBDataBinding implements InitializingB
     private final static Logger LOGGER = LoggerFactory.getLogger(RfdJaxbDataBinding.class);
 
     @Autowired
-    private SdcctConfiguration config;
+    private SdcctSaxonConfiguration config;
 
     private JaxbContextMetadata[] contextMetadatas;
     private SdcctValidatorService validatorService;

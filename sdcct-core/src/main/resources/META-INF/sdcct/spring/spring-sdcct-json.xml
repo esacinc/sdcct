@@ -35,8 +35,9 @@
         </beans:property>
         <beans:property name="modules">
             <beans:list>
-                <beans:ref bean="moduleJaxb"/>
                 <beans:bean class="com.fasterxml.jackson.datatype.jdk8.Jdk8Module"/>
+                <beans:ref bean="moduleJaxb"/>
+                <beans:ref bean="moduleFhir"/>
             </beans:list>
         </beans:property>
     </beans:bean>
@@ -45,25 +46,19 @@
         p:indentOutput="true"/>
     
     <!--====================================================================================================
+    = XML MAPPERS
+    =====================================================================================================-->
+    <beans:bean id="xmlMapper" class="gov.hhs.onc.sdcct.json.xml.impl.XmlMapperFactoryBean" parent="objMapper"/>
+    
+    <!--====================================================================================================
     = CONTENT CODECS
     =====================================================================================================-->
     <beans:bean id="contentCodecJson" class="gov.hhs.onc.sdcct.json.impl.JsonCodec">
         <beans:constructor-arg name="defaultDecodeOpts">
-            <beans:bean class="gov.hhs.onc.sdcct.json.impl.JsonDecodeOptionsImpl">
-                <beans:property name="modules">
-                    <beans:array>
-                        <beans:ref bean="moduleFhir"/>
-                    </beans:array>
-                </beans:property>
-            </beans:bean>
+            <beans:bean class="gov.hhs.onc.sdcct.json.impl.JsonDecodeOptionsImpl"/>
         </beans:constructor-arg>
         <beans:constructor-arg name="defaultEncodeOpts">
             <beans:bean class="gov.hhs.onc.sdcct.json.impl.JsonEncodeOptionsImpl">
-                <beans:property name="modules">
-                    <beans:array>
-                        <beans:ref bean="moduleFhir"/>
-                    </beans:array>
-                </beans:property>
                 <beans:property name="options">
                     <beans:map>
                         <beans:entry key="#{ T(gov.hhs.onc.sdcct.transform.content.ContentCodecOptions).PRETTY }" value="false"
@@ -73,4 +68,9 @@
             </beans:bean>
         </beans:constructor-arg>
     </beans:bean>
+    
+    <!--====================================================================================================
+    = XML TRANSCODERS
+    =====================================================================================================-->
+    <beans:bean id="xmlTranscoder" class="gov.hhs.onc.sdcct.json.xml.impl.XmlTranscoder"/>
 </beans:beans>

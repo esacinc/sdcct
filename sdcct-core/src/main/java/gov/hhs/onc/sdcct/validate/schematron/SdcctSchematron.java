@@ -2,8 +2,8 @@ package gov.hhs.onc.sdcct.validate.schematron;
 
 import gov.hhs.onc.sdcct.beans.IdentifiedBean;
 import gov.hhs.onc.sdcct.beans.NamedBean;
-import gov.hhs.onc.sdcct.xml.impl.XdmDocument;
-import gov.hhs.onc.sdcct.xml.xslt.impl.SdcctXsltExecutable;
+import gov.hhs.onc.sdcct.xml.saxon.impl.XdmDocument;
+import gov.hhs.onc.sdcct.xml.xslt.saxon.impl.SdcctXsltExecutable;
 import java.util.Map;
 import org.springframework.beans.factory.InitializingBean;
 

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project activeEnvironment="Default" name="form-archiver-rfd" resourceRoot="${projectDir}" soapui-version="5.2.1" xmlns:con="http://eviware.com/soapui/config">
+  <con:settings/>
+  <con:interface xsi:type="con:WsdlInterface" wsaVersion="NONE" name="RFDFormArchiver_Binding_Soap12" type="wsdl" bindingName="{urn:ihe:iti:rfd:2007}RFDFormArchiver_Binding_Soap12" soapVersion="1_2" anonymous="optional" definition="${#Spring#$(sdcct.ws.form.archiver.rfd.wsdl.url)}" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <con:settings/>
+    <con:endpoints>
+      <con:endpoint>${#Spring#$(sdcct.ws.form.archiver.rfd.url)}</con:endpoint>
+    </con:endpoints>
+    <con:operation isOneWay="false" action="urn:ihe:iti:2007:ArchiveForm" name="RFDFormArchiver_ArchiveForm" bindingOperationName="RFDFormArchiver_ArchiveForm" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional">
+      <con:settings/>
+    </con:operation>
+  </con:interface>
+  <con:testSuite name="form-archiver-rfd">
+    <con:settings/>
+    <con:runType>SEQUENTIAL</con:runType>
+  </con:testSuite>
+  <con:properties/>
+  <con:wssContainer/>
+  <con:oAuth2ProfileContainer/>
+</con:soapui-project>

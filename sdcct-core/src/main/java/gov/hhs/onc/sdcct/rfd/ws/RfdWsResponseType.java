@@ -2,7 +2,7 @@ package gov.hhs.onc.sdcct.rfd.ws;
 
 import gov.hhs.onc.sdcct.beans.ContentTypeBean;
 import gov.hhs.onc.sdcct.beans.IdentifiedBean;
-import gov.hhs.onc.sdcct.io.SdcctMediaTypes;
+import gov.hhs.onc.sdcct.net.mime.SdcctMediaTypes;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nullable;

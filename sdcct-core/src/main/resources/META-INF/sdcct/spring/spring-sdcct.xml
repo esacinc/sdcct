@@ -16,20 +16,15 @@
     <!--====================================================================================================
     = CONTEXT
     =====================================================================================================-->
-    <context:spring-configured/>
-    
-    <context:component-scan base-package="gov.hhs.onc.sdcct"/>
+    <context:component-scan base-package="gov.hhs.onc.sdcct">
+        <context:exclude-filter expression="org.springframework.boot.context.TypeExcludeFilter" type="custom"/>
+    </context:component-scan>
     
     <!--====================================================================================================
     = PROPERTY SOURCES PLACEHOLDER CONFIGURERS
     =====================================================================================================-->
     <beans:bean id="propSourcesPlaceholderConfigurer" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"
-        p:fileEncoding="#{ T(java.nio.charset.StandardCharsets).UTF_8.name() }"
-        p:ignoreUnresolvablePlaceholders="true">
-        <beans:property name="locations">
-            <beans:array/>
-        </beans:property>
-    </beans:bean>
+        p:fileEncoding="#{ T(java.nio.charset.StandardCharsets).UTF_8.name() }"/>
     
     <!--====================================================================================================
     = MESSAGE SOURCES
@@ -50,11 +45,11 @@
     <beans:bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean" primary="true">
         <beans:property name="converters">
             <beans:set>
-                <beans:ref bean="convDocUri"/>
-                <beans:ref bean="convInetAddr"/>
-                <beans:ref bean="convQname"/>
-                <beans:ref bean="convResourceSrc"/>
-                <beans:ref bean="convXdmValue"/>
+                <beans:bean class="gov.hhs.onc.sdcct.net.convert.impl.InetAddressConverter"/>
+                <beans:bean class="gov.hhs.onc.sdcct.transform.convert.impl.ResourceSourceConverter"/>
+                <beans:bean class="gov.hhs.onc.sdcct.xml.qname.convert.impl.QnameConverter"/>
+                <beans:bean class="gov.hhs.onc.sdcct.xml.saxon.convert.impl.SdcctDocumentUriConverter"/>
+                <beans:bean class="gov.hhs.onc.sdcct.xml.saxon.convert.impl.XdmValueConverter"/>
             </beans:set>
         </beans:property>
     </beans:bean>

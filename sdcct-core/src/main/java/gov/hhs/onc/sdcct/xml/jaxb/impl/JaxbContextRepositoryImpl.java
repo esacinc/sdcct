@@ -3,8 +3,8 @@ package gov.hhs.onc.sdcct.xml.jaxb.impl;
 import com.github.sebhoss.warnings.CompilerWarnings;
 import gov.hhs.onc.sdcct.beans.NamedBean;
 import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
-import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbContextMetadata;
 import gov.hhs.onc.sdcct.xml.jaxb.JaxbContextRepository;
+import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbContextMetadata;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbElementMetadata;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbSchemaMetadata;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbTypeMetadata;
@@ -119,8 +119,27 @@ public class JaxbContextRepositoryImpl implements JaxbContextRepository {
 
     @Override
     public JaxbContextMetadata findContextMetadata(String schemaNsUri) throws JAXBException {
-        return this.contextMetadatas.values().stream().filter(contextMetadata -> contextMetadata.getSchemas().containsKey(schemaNsUri)).findFirst()
-            .orElseThrow(() -> new JAXBException(String.format("Unable to find JAXB schema (nsUri=%s) context metadata.", schemaNsUri)));
+        JaxbSchemaMetadata schemaMetadata = this.findSchemaMetadata(schemaNsUri);
+
+        if (schemaMetadata == null) {
+            throw new JAXBException(String.format("Unable to find JAXB schema (nsUri=%s) context metadata.", schemaNsUri));
+        }
+
+        return schemaMetadata.getContext();
+    }
+
+    @Nullable
+    @Override
+    public JaxbSchemaMetadata findSchemaMetadata(String schemaNsUri) {
+        Map<String, JaxbSchemaMetadata> schemaMetadatas;
+
+        for (JaxbContextMetadata contextMetadata : this.contextMetadatas.values()) {
+            if ((schemaMetadatas = contextMetadata.getSchemas()).containsKey(schemaNsUri)) {
+                return schemaMetadatas.get(schemaNsUri);
+            }
+        }
+
+        return null;
     }
 
     @Override

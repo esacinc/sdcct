@@ -8,7 +8,7 @@ import gov.hhs.onc.sdcct.rfd.ws.RfdFormWebService;
 import gov.hhs.onc.sdcct.rfd.ws.metadata.RfdInteractionWsMetadata;
 import gov.hhs.onc.sdcct.rfd.ws.metadata.RfdResourceWsMetadata;
 import gov.hhs.onc.sdcct.rfd.ws.metadata.RfdWsMetadata;
-import gov.hhs.onc.sdcct.transform.impl.SdcctConfiguration;
+import gov.hhs.onc.sdcct.transform.saxon.impl.SdcctSaxonConfiguration;
 import gov.hhs.onc.sdcct.xml.html.impl.HtmlTranscoder;
 import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
 import javax.annotation.Resource;
@@ -25,7 +25,7 @@ public abstract class AbstractRfdFormWebService
     protected XmlCodec xmlCodec;
 
     @Autowired
-    protected SdcctConfiguration config;
+    protected SdcctSaxonConfiguration config;
 
     @Resource
     protected WebServiceContext wsContext;

@@ -7,7 +7,7 @@ import gov.hhs.onc.sdcct.fhir.ws.metadata.FhirInteractionWsMetadata;
 import gov.hhs.onc.sdcct.fhir.ws.metadata.FhirResourceWsMetadata;
 import gov.hhs.onc.sdcct.fhir.ws.metadata.FhirWsMetadata;
 import gov.hhs.onc.sdcct.form.ws.FormWebService;
-import gov.hhs.onc.sdcct.io.SdcctMediaTypes;
+import gov.hhs.onc.sdcct.net.mime.SdcctMediaTypes;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;

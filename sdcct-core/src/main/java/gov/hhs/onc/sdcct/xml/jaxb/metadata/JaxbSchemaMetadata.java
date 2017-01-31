@@ -14,9 +14,13 @@ public interface JaxbSchemaMetadata extends JaxbContextMetadataComponent<XMLSche
 
     public Package getPackage();
 
+    public String getPrefix();
+
     public void addType(JaxbTypeMetadata<?, ?> type);
 
     public Map<Class<?>, JaxbTypeMetadata<?, ?>> getTypeBeanClasses();
 
     public Map<String, JaxbTypeMetadata<?, ?>> getTypeNames();
+
+    public String getXpathPrefix();
 }

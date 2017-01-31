@@ -7,15 +7,14 @@ import com.sun.msv.grammar.xmlschema.SimpleTypeExp;
 import com.sun.msv.grammar.xmlschema.XMLSchemaSchema;
 import com.sun.msv.grammar.xmlschema.XMLSchemaTypeExp;
 import com.sun.xml.bind.api.JAXBRIContext;
-import gov.hhs.onc.sdcct.transform.content.path.ContentPathBuilder;
 import gov.hhs.onc.sdcct.transform.impl.ResourceSource;
 import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
-import gov.hhs.onc.sdcct.validate.schema.MsvSchemaBuilder;
-import gov.hhs.onc.sdcct.validate.schema.impl.MsvSchema;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbComplexTypeMetadata;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbContextMetadata;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbSchemaMetadata;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbTypeMetadata;
+import gov.hhs.onc.sdcct.xml.validate.MsvXmlSchemaBuilder;
+import gov.hhs.onc.sdcct.xml.validate.impl.MsvXmlSchemaImpl;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -43,15 +42,16 @@ public class JaxbContextMetadataImpl extends AbstractJaxbMetadataComponent imple
     private final static Logger LOGGER = LoggerFactory.getLogger(JaxbContextMetadataImpl.class);
 
     @Autowired
-    private MsvSchemaBuilder msvSchemaBuilder;
+    private MsvXmlSchemaBuilder msvSchemaBuilder;
 
-    private ContentPathBuilder contentPathBuilder;
     private Map<String, Object> contextProps = new HashMap<>();
     private Map<String, Package> schemaImplPkgs = new TreeMap<>();
     private Map<String, Package> schemaPkgs = new TreeMap<>();
+    private Map<String, String> schemaPrefixes = new TreeMap<>();
     private Map<String, ResourceSource> schemaSrcs;
+    private Map<String, String> schemaXpathPrefixes = new TreeMap<>();
     private JAXBRIContext context;
-    private MsvSchema validationSchema;
+    private MsvXmlSchemaImpl validationSchema;
     private Map<String, JaxbSchemaMetadata> schemas = new TreeMap<>();
     private Map<String, Object> schemaObjFactories = new TreeMap<>();
 
@@ -68,7 +68,7 @@ public class JaxbContextMetadataImpl extends AbstractJaxbMetadataComponent imple
         this.context = ((JAXBRIContext) JAXBContextCache
             .getCachedContextAndSchemas(new LinkedHashSet<>(schemaObjFactoryClasses.values()), null, contextProps, null, true).getContext());
 
-        this.validationSchema = this.msvSchemaBuilder.build(this.contentPathBuilder, this.name, this.name, this.schemaSrcs);
+        this.validationSchema = this.msvSchemaBuilder.build(this.name, this.name, this.schemaSrcs);
 
         Package schemaPkg, schemaImplPkg;
         JaxbSchemaMetadata schema;
@@ -91,7 +91,8 @@ public class JaxbContextMetadataImpl extends AbstractJaxbMetadataComponent imple
 
             this.schemas.put(schemaExpr.targetNamespace,
                 (schema = new JaxbSchemaMetadataImpl(this, schemaExpr, (schemaPkg = this.schemaPkgs.get(schemaExpr.targetNamespace)),
-                    (schemaImplPkg = this.schemaImplPkgs.get(schemaExpr.targetNamespace)), schemaExpr.targetNamespace)));
+                    (schemaImplPkg = this.schemaImplPkgs.get(schemaExpr.targetNamespace)), schemaExpr.targetNamespace,
+                    this.schemaPrefixes.get(schemaExpr.targetNamespace), this.schemaXpathPrefixes.get(schemaExpr.targetNamespace))));
 
             schemaTypeBeanClasses.clear();
             schemaTypeBeanImplClasses.clear();
@@ -194,16 +195,6 @@ public class JaxbContextMetadataImpl extends AbstractJaxbMetadataComponent imple
     }
 
     @Override
-    public ContentPathBuilder getContentPathBuilder() {
-        return this.contentPathBuilder;
-    }
-
-    @Override
-    public void setContentPathBuilder(ContentPathBuilder contentPathBuilder) {
-        this.contentPathBuilder = contentPathBuilder;
-    }
-
-    @Override
     public JAXBRIContext getContext() {
         return this.context;
     }
@@ -253,6 +244,17 @@ public class JaxbContextMetadataImpl extends AbstractJaxbMetadataComponent imple
     }
 
     @Override
+    public Map<String, String> getSchemaPrefixes() {
+        return this.schemaPrefixes;
+    }
+
+    @Override
+    public void setSchemaPrefixes(Map<String, String> schemaPrefixes) {
+        this.schemaPrefixes.clear();
+        this.schemaPrefixes.putAll(schemaPrefixes);
+    }
+
+    @Override
     public Map<String, JaxbSchemaMetadata> getSchemas() {
         return this.schemas;
     }
@@ -268,7 +270,18 @@ public class JaxbContextMetadataImpl extends AbstractJaxbMetadataComponent imple
     }
 
     @Override
-    public MsvSchema getValidationSchema() {
+    public Map<String, String> getSchemaXpathPrefixes() {
+        return this.schemaXpathPrefixes;
+    }
+
+    @Override
+    public void setSchemaXpathPrefixes(Map<String, String> schemaXpathPrefixes) {
+        this.schemaXpathPrefixes.clear();
+        this.schemaXpathPrefixes.putAll(schemaXpathPrefixes);
+    }
+
+    @Override
+    public MsvXmlSchemaImpl getValidationSchema() {
         return this.validationSchema;
     }
 }

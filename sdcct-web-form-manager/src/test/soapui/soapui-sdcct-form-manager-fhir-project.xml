@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project activeEnvironment="Default" name="form-manager-fhir" resourceRoot="" soapui-version="5.2.1" xmlns:con="http://eviware.com/soapui/config">
+  <con:settings/>
+  <con:interface xsi:type="con:RestService" wadlVersion="http://wadl.dev.java.net/2009/02" name="form-manager-fhir" type="rest" basePath="${#Spring#$(sdcct.ws.base.url.path)}${#Spring#$(sdcct.ws.form.manager.fhir.url.path)}" definitionUrl="${#Spring#$(sdcct.ws.form.manager.fhir.wadl.url)}" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <con:settings/>
+    <con:endpoints>
+      <con:endpoint>${#Spring#$(sdcct.tomcat.server.context.url)}</con:endpoint>
+    </con:endpoints>
+    <con:resource name="/" path="/">
+      <con:settings/>
+      <con:parameters/>
+      <con:resource name="Questionnaire/{id}" path="Questionnaire/{id}">
+        <con:settings/>
+        <con:parameters>
+          <con:parameter>
+            <con:name>id</con:name>
+            <con:value/>
+            <con:style>TEMPLATE</con:style>
+            <con:default/>
+          </con:parameter>
+        </con:parameters>
+        <con:method name="GET" method="GET">
+          <con:settings/>
+          <con:parameters/>
+          <con:representation type="RESPONSE" id="">
+            <con:mediaType>${#Spring##( T(gov.hhs.onc.sdcct.net.mime.SdcctMediaTypes).APP_JSON_FHIR_VALUE )}</con:mediaType>
+            <con:params/>
+            <con:element xsi:nil="true"/>
+            <con:description xsi:nil="true"/>
+          </con:representation>
+          <con:representation type="RESPONSE" id="">
+            <con:mediaType>${#Spring##( T(gov.hhs.onc.sdcct.net.mime.SdcctMediaTypes).APP_XML_FHIR_VALUE )}</con:mediaType>
+            <con:params/>
+            <con:element xsi:nil="true"/>
+            <con:description xsi:nil="true"/>
+          </con:representation>
+        </con:method>
+      </con:resource>
+      <con:resource name="Questionnaire" path="Questionnaire">
+        <con:settings/>
+        <con:parameters/>
+        <con:method name="GET" method="GET">
+          <con:settings/>
+          <con:parameters>
+            <con:parameter>
+              <con:name>identifier</con:name>
+              <con:value/>
+              <con:style>QUERY</con:style>
+              <con:default/>
+            </con:parameter>
+          </con:parameters>
+          <con:representation type="RESPONSE" id="">
+            <con:mediaType>${#Spring##( T(gov.hhs.onc.sdcct.net.mime.SdcctMediaTypes).APP_JSON_FHIR_VALUE )}</con:mediaType>
+            <con:params/>
+            <con:element xsi:nil="true"/>
+            <con:description xsi:nil="true"/>
+          </con:representation>
+          <con:representation type="RESPONSE" id="">
+            <con:mediaType>${#Spring##( T(gov.hhs.onc.sdcct.net.mime.SdcctMediaTypes).APP_XML_FHIR_VALUE )}</con:mediaType>
+            <con:params/>
+            <con:element xsi:nil="true"/>
+            <con:description xsi:nil="true"/>
+          </con:representation>
+        </con:method>
+      </con:resource>
+      <con:resource name="Questionnaire/_search" path="Questionnaire/_search">
+        <con:settings/>
+        <con:parameters/>
+        <con:method name="POST" method="POST">
+          <con:settings/>
+          <con:parameters>
+            <con:parameter>
+              <con:name>identifier</con:name>
+              <con:value/>
+              <con:style>PLAIN</con:style>
+              <con:default/>
+            </con:parameter>
+          </con:parameters>
+          <con:representation type="RESPONSE" id="">
+            <con:mediaType>${#Spring##( T(gov.hhs.onc.sdcct.net.mime.SdcctMediaTypes).APP_JSON_FHIR_VALUE )}</con:mediaType>
+            <con:params/>
+            <con:element xsi:nil="true"/>
+            <con:description xsi:nil="true"/>
+          </con:representation>
+          <con:representation type="RESPONSE" id="">
+            <con:mediaType>${#Spring##( T(gov.hhs.onc.sdcct.net.mime.SdcctMediaTypes).APP_JSON_XML_VALUE )}</con:mediaType>
+            <con:params/>
+            <con:element xsi:nil="true"/>
+            <con:description xsi:nil="true"/>
+          </con:representation>
+        </con:method>
+      </con:resource>
+    </con:resource>
+  </con:interface>
+  <con:testSuite name="form-manager-fhir">
+    <con:settings/>
+    <con:runType>SEQUENTIAL</con:runType>
+    <con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="form-manager-fhir_questionnaire-read-json" searchProperties="true">
+      <con:settings/>
+      <con:testStep type="restrequest" name="form-manager-fhir_questionnaire-read-json">
+        <con:settings/>
+        <con:config service="form-manager-fhir" resourcePath="${#Spring#$(sdcct.ws.base.url.path)}${#Spring#$(sdcct.ws.form.manager.fhir.url.path)}/Questionnaire/{id}" methodName="GET" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:restRequest name="form-manager-fhir_questionnaire-read-json" mediaType="*/*" accept="${#Spring##( T(gov.hhs.onc.sdcct.net.mime.SdcctMediaTypes).APP_JSON_FHIR_VALUE )}">
+            <con:settings/>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>${#Spring#$(sdcct.tomcat.server.context.url)}</con:endpoint>
+            <con:request/>
+            <con:credentials>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:jmsPropertyConfig/>
+            <con:parameters>
+              <entry key="id" value="1" xmlns="http://eviware.com/soapui/config"/>
+            </con:parameters>
+            <con:assertion type="Valid HTTP Status Codes" name="Valid HTTP Status Codes">
+              <con:configuration>
+                <codes>200</codes>
+              </con:configuration>
+            </con:assertion>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+    </con:testCase>
+    <con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="form-manager-fhir_questionnaire-read-xml" searchProperties="true">
+      <con:settings/>
+      <con:testStep type="restrequest" name="form-manager-fhir_questionnaire-read-xml">
+        <con:settings/>
+        <con:config service="form-manager-fhir" resourcePath="${#Spring#$(sdcct.ws.base.url.path)}${#Spring#$(sdcct.ws.form.manager.fhir.url.path)}/Questionnaire/{id}" methodName="GET" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:restRequest name="form-manager-fhir_questionnaire-read-xml" mediaType="*/*" accept="${#Spring##( T(gov.hhs.onc.sdcct.net.mime.SdcctMediaTypes).APP_XML_FHIR_VALUE )}">
+            <con:settings/>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>${#Spring#$(sdcct.tomcat.server.context.url)}</con:endpoint>
+            <con:request/>
+            <con:credentials>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:jmsPropertyConfig/>
+            <con:parameters>
+              <entry key="id" value="1" xmlns="http://eviware.com/soapui/config"/>
+            </con:parameters>
+            <con:assertion type="Valid HTTP Status Codes" name="Valid HTTP Status Codes">
+              <con:configuration>
+                <codes>200</codes>
+              </con:configuration>
+            </con:assertion>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+    </con:testCase>
+    <con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="form-manager-fhir_questionnaire-search-get" searchProperties="true">
+      <con:settings/>
+      <con:testStep type="restrequest" name="form-manager-fhir_questionnaire-search-get">
+        <con:settings/>
+        <con:config service="form-manager-fhir" resourcePath="${#Spring#$(sdcct.ws.base.url.path)}${#Spring#$(sdcct.ws.form.manager.fhir.url.path)}/Questionnaire" methodName="GET" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:restRequest name="form-manager-fhir_questionnaire-search-get" mediaType="*/*" accept="${#Spring##( T(gov.hhs.onc.sdcct.net.mime.SdcctMediaTypes).APP_JSON_FHIR_VALUE )}">
+            <con:settings/>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>${#Spring#$(sdcct.tomcat.server.context.url)}</con:endpoint>
+            <con:request/>
+            <con:credentials>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:jmsPropertyConfig/>
+            <con:parameters>
+              <entry key="identifier" value="${#Spring##( formFhir1a.identifier )}" xmlns="http://eviware.com/soapui/config"/>
+            </con:parameters>
+            <con:assertion type="Valid HTTP Status Codes" name="Valid HTTP Status Codes">
+              <con:configuration>
+                <codes>200</codes>
+              </con:configuration>
+            </con:assertion>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+    </con:testCase>
+    <con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="form-manager-fhir_questionnaire-search-post" searchProperties="true">
+      <con:settings/>
+      <con:testStep type="restrequest" name="form-manager-fhir_questionnaire-search-post">
+        <con:settings/>
+        <con:config service="form-manager-fhir" resourcePath="${#Spring#$(sdcct.ws.base.url.path)}${#Spring#$(sdcct.ws.form.manager.fhir.url.path)}/Questionnaire/_search" methodName="POST" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:restRequest name="form-manager-fhir_questionnaire-search-post" mediaType="application/x-www-form-urlencoded" accept="${#Spring##( T(gov.hhs.onc.sdcct.net.mime.SdcctMediaTypes).APP_JSON_FHIR_VALUE )}">
+            <con:settings/>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>${#Spring#$(sdcct.tomcat.server.context.url)}</con:endpoint>
+            <con:request><![CDATA[identifier=${#Spring##( formFhir1a.identifier )}]]></con:request>
+            <con:credentials>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:jmsPropertyConfig/>
+            <con:parameters>
+              <entry key="identifier" value="${#Spring##( formFhir1a.identifier )}" xmlns="http://eviware.com/soapui/config"/>
+            </con:parameters>
+            <con:assertion type="Valid HTTP Status Codes" name="Valid HTTP Status Codes">
+              <con:configuration>
+                <codes>200</codes>
+              </con:configuration>
+            </con:assertion>
+          </con:restRequest>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+    </con:testCase>
+    <con:properties/>
+  </con:testSuite>
+  <con:properties/>
+  <con:wssContainer/>
+  <con:oAuth2ProfileContainer/>
+</con:soapui-project>

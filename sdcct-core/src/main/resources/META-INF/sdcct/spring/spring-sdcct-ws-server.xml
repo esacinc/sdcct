@@ -42,7 +42,7 @@
         </beans:property>
         <beans:property name="outFaultInterceptors">
             <beans:list>
-                <beans:ref bean="interceptorSoapFaultStackTrace"/>
+                <beans:ref bean="interceptorSoapFaultRfd"/>
             </beans:list>
         </beans:property>
     </beans:bean>

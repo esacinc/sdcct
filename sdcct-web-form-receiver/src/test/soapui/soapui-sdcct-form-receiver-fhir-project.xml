@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project activeEnvironment="Default" name="form-receiver-fhir" resourceRoot="" soapui-version="5.2.1" xmlns:con="http://eviware.com/soapui/config">
+  <con:settings/>
+  <con:interface xsi:type="con:RestService" wadlVersion="http://wadl.dev.java.net/2009/02" name="form-receiver-fhir" type="rest" basePath="${#Spring#$(sdcct.ws.base.url.path)}${#Spring#$(sdcct.ws.form.receiver.fhir.url.path)}" definitionUrl="${#Spring#$(sdcct.ws.form.receiver.fhir.wadl.url)}" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <con:settings/>
+    <con:endpoints>
+      <con:endpoint>${#Spring#$(sdcct.tomcat.server.context.url)}</con:endpoint>
+    </con:endpoints>
+    <con:resource name="/" path="/">
+      <con:settings/>
+      <con:parameters/>
+      <con:resource name="QuestionnaireResponse/{id}" path="QuestionnaireResponse/{id}">
+        <con:settings/>
+        <con:parameters>
+          <con:parameter>
+            <con:name>id</con:name>
+            <con:value/>
+            <con:style>TEMPLATE</con:style>
+            <con:default/>
+          </con:parameter>
+        </con:parameters>
+        <con:method name="PUT" method="PUT">
+          <con:settings/>
+          <con:parameters/>
+          <con:representation type="RESPONSE" id="">
+            <con:mediaType>${#Spring##( T(gov.hhs.onc.sdcct.net.mime.SdcctMediaTypes).APP_JSON_FHIR_VALUE )}</con:mediaType>
+            <con:params/>
+            <con:element xsi:nil="true"/>
+            <con:description xsi:nil="true"/>
+          </con:representation>
+          <con:representation type="RESPONSE" id="">
+            <con:mediaType>${#Spring##( T(gov.hhs.onc.sdcct.net.mime.SdcctMediaTypes).APP_XML_FHIR_VALUE )}</con:mediaType>
+            <con:params/>
+            <con:element xsi:nil="true"/>
+            <con:description xsi:nil="true"/>
+          </con:representation>
+        </con:method>
+      </con:resource>
+      <con:resource name="QuestionnaireResponse" path="QuestionnaireResponse">
+        <con:settings/>
+        <con:parameters/>
+        <con:method name="POST" method="POST">
+          <con:settings/>
+          <con:parameters/>
+          <con:representation type="RESPONSE" id="">
+            <con:mediaType>${#Spring##( T(gov.hhs.onc.sdcct.net.mime.SdcctMediaTypes).APP_JSON_FHIR_VALUE )}</con:mediaType>
+            <con:params/>
+            <con:element xsi:nil="true"/>
+            <con:description xsi:nil="true"/>
+          </con:representation>
+          <con:representation type="RESPONSE" id="">
+            <con:mediaType>${#Spring##( T(gov.hhs.onc.sdcct.net.mime.SdcctMediaTypes).APP_XML_FHIR_VALUE )}</con:mediaType>
+            <con:params/>
+            <con:element xsi:nil="true"/>
+            <con:description xsi:nil="true"/>
+          </con:representation>
+        </con:method>
+      </con:resource>
+    </con:resource>
+  </con:interface>
+  <con:testSuite name="form-receiver-fhir">
+    <con:settings/>
+    <con:runType>SEQUENTIAL</con:runType>
+    <con:properties/>
+  </con:testSuite>
+  <con:properties/>
+  <con:wssContainer/>
+  <con:oAuth2ProfileContainer/>
+</con:soapui-project>

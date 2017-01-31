@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project activeEnvironment="Default" name="form-manager-rfd" resourceRoot="${projectDir}" soapui-version="5.2.1" xmlns:con="http://eviware.com/soapui/config">
+  <con:settings/>
+  <con:interface xsi:type="con:WsdlInterface" wsaVersion="NONE" name="RFDFormManager_Binding_Soap12" type="wsdl" bindingName="{urn:ihe:iti:rfd:2007}RFDFormManager_Binding_Soap12" soapVersion="1_2" anonymous="optional" definition="${#Spring#$(sdcct.ws.form.manager.rfd.wsdl.url)}" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <con:settings/>
+    <con:endpoints>
+      <con:endpoint>${#Spring#$(sdcct.ws.form.manager.rfd.url)}</con:endpoint>
+    </con:endpoints>
+    <con:operation isOneWay="false" action="urn:ihe:iti:2007:RetrieveClarification" name="RFDFormManager_RetrieveClarification" bindingOperationName="RFDFormManager_RetrieveClarification" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional">
+      <con:settings/>
+    </con:operation>
+    <con:operation isOneWay="false" action="urn:ihe:iti:2007:RetrieveForm" name="RFDFormManager_RetrieveForm" bindingOperationName="RFDFormManager_RetrieveForm" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional">
+      <con:settings/>
+    </con:operation>
+  </con:interface>
+  <con:testSuite name="form-manager-rfd">
+    <con:settings/>
+    <con:runType>SEQUENTIAL</con:runType>
+    <con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="form-manager-rfd_retrieve-clarification" searchProperties="true">
+      <con:settings/>
+      <con:testStep type="request" name="form-manager-rfd_retrieve-clarification">
+        <con:settings/>
+        <con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:interface>RFDFormManager_Binding_Soap12</con:interface>
+          <con:operation>RFDFormManager_RetrieveClarification</con:operation>
+          <con:request name="form-manager-rfd_retrieve-clarification">
+            <con:settings/>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>${#Spring#$(sdcct.ws.form.manager.rfd.url)}</con:endpoint>
+            <con:request><![CDATA[<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:urn="urn:ihe:iti:rfd:2007" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <soap:Header/>
+   <soap:Body>
+      <urn:RetrieveClarificationRequest>
+         <urn:clarificationData>
+            <urn:orgID>org1</urn:orgID>
+            <urn:encodedResponse>true</urn:encodedResponse>
+            <urn:context xsi:nil="true"/>
+         </urn:clarificationData>
+      </urn:RetrieveClarificationRequest>
+   </soap:Body>
+</soap:Envelope>]]></con:request>
+            <con:assertion type="Valid HTTP Status Codes" name="Valid HTTP Status Codes">
+              <con:configuration>
+                <codes>500</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="SOAP Response" name="SOAP Response">
+              <con:settings/>
+              <con:configuration/>
+            </con:assertion>
+            <con:credentials>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:jmsPropertyConfig/>
+            <con:wsaConfig action="urn:ihe:iti:2007:RetrieveClarification" mustUnderstand="NONE" version="200508"/>
+            <con:wsrmConfig version="1.2"/>
+          </con:request>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+    </con:testCase>
+    <con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="form-manager-rfd_retrieve-form-xml" searchProperties="true">
+      <con:settings/>
+      <con:testStep type="request" name="form-manager-rfd_retrieve-form-xml">
+        <con:settings/>
+        <con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:interface>RFDFormManager_Binding_Soap12</con:interface>
+          <con:operation>RFDFormManager_RetrieveForm</con:operation>
+          <con:request name="form-manager-rfd_retrieve-form-xml">
+            <con:settings/>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>${#Spring#$(sdcct.ws.form.manager.rfd.url)}</con:endpoint>
+            <con:request><![CDATA[<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:urn="urn:ihe:iti:rfd:2007" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <soap:Header/>
+   <soap:Body>
+      <urn:RetrieveFormRequest>
+         <urn:prepopData xsi:nil="true"/>
+         <urn:workflowData>
+            <urn:formID>${#Spring##( formRfd1a.identifier )}</urn:formID>
+            <urn:encodedResponse responseContentType="${#Spring##( T(gov.hhs.onc.sdcct.rfd.ws.RfdWsResponseType).XML.mediaType.toString() )}">true</urn:encodedResponse>
+            <urn:context xsi:nil="true"/>
+            <urn:instanceID xsi:nil="true"/>
+         </urn:workflowData>
+      </urn:RetrieveFormRequest>
+   </soap:Body>
+</soap:Envelope>]]></con:request>
+            <con:assertion type="Valid HTTP Status Codes" name="Valid HTTP Status Codes">
+              <con:configuration>
+                <codes>200</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="SOAP Response" name="SOAP Response">
+              <con:settings/>
+              <con:configuration/>
+            </con:assertion>
+            <con:credentials>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:jmsPropertyConfig/>
+            <con:wsaConfig action="urn:ihe:iti:2007:RetrieveForm" mustUnderstand="NONE" version="200508"/>
+            <con:wsrmConfig version="1.2"/>
+          </con:request>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+    </con:testCase>
+    <con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="form-manager-rfd_retrieve-form-html" searchProperties="true">
+      <con:settings/>
+      <con:testStep type="request" name="form-manager-rfd_retrieve-form-html">
+        <con:settings/>
+        <con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:interface>RFDFormManager_Binding_Soap12</con:interface>
+          <con:operation>RFDFormManager_RetrieveForm</con:operation>
+          <con:request name="form-manager-rfd_retrieve-form-html">
+            <con:settings/>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>${#Spring#$(sdcct.ws.form.manager.rfd.url)}</con:endpoint>
+            <con:request><![CDATA[<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:urn="urn:ihe:iti:rfd:2007" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <soap:Header/>
+   <soap:Body>
+      <urn:RetrieveFormRequest>
+         <urn:prepopData xsi:nil="true"/>
+         <urn:workflowData>
+            <urn:formID>${#Spring##( formRfd1a.identifier )}</urn:formID>
+            <urn:encodedResponse responseContentType="${#Spring##( T(gov.hhs.onc.sdcct.rfd.ws.RfdWsResponseType).HTML.mediaType.toString() )}">true</urn:encodedResponse>
+            <urn:context xsi:nil="true"/>
+            <urn:instanceID xsi:nil="true"/>
+         </urn:workflowData>
+      </urn:RetrieveFormRequest>
+   </soap:Body>
+</soap:Envelope>]]></con:request>
+            <con:assertion type="Valid HTTP Status Codes" name="Valid HTTP Status Codes">
+              <con:configuration>
+                <codes>200</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="SOAP Response" name="SOAP Response">
+              <con:settings/>
+              <con:configuration/>
+            </con:assertion>
+            <con:credentials>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:jmsPropertyConfig/>
+            <con:wsaConfig action="urn:ihe:iti:2007:RetrieveForm" mustUnderstand="NONE" version="200508"/>
+            <con:wsrmConfig version="1.2"/>
+          </con:request>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+    </con:testCase>
+    <con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="form-manager-rfd_retrieve-form-uri" searchProperties="true">
+      <con:settings/>
+      <con:testStep type="request" name="form-manager-rfd_retrieve-form-uri">
+        <con:settings/>
+        <con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:interface>RFDFormManager_Binding_Soap12</con:interface>
+          <con:operation>RFDFormManager_RetrieveForm</con:operation>
+          <con:request name="form-manager-rfd_retrieve-form-uri">
+            <con:settings/>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>${#Spring#$(sdcct.ws.form.manager.rfd.url)}</con:endpoint>
+            <con:request><![CDATA[<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:urn="urn:ihe:iti:rfd:2007" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <soap:Header/>
+   <soap:Body>
+      <urn:RetrieveFormRequest>
+         <urn:prepopData xsi:nil="true"/>
+         <urn:workflowData>
+            <urn:formID>${#Spring##( formRfd1a.identifier )}</urn:formID>
+            <urn:encodedResponse>false</urn:encodedResponse>
+            <urn:context xsi:nil="true"/>
+            <urn:instanceID xsi:nil="true"/>
+         </urn:workflowData>
+      </urn:RetrieveFormRequest>
+   </soap:Body>
+</soap:Envelope>]]></con:request>
+            <con:assertion type="Valid HTTP Status Codes" name="Valid HTTP Status Codes">
+              <con:configuration>
+                <codes>200</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="SOAP Response" name="SOAP Response">
+              <con:settings/>
+              <con:configuration/>
+            </con:assertion>
+            <con:credentials>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:jmsPropertyConfig/>
+            <con:wsaConfig action="urn:ihe:iti:2007:RetrieveForm" mustUnderstand="NONE" version="200508"/>
+            <con:wsrmConfig version="1.2"/>
+          </con:request>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+    </con:testCase>
+    <con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="form-manager-rfd_retrieve-form-xml-invalid" searchProperties="true">
+      <con:settings/>
+      <con:testStep type="request" name="form-manager-rfd_retrieve-form-xml-invalid">
+        <con:settings/>
+        <con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:interface>RFDFormManager_Binding_Soap12</con:interface>
+          <con:operation>RFDFormManager_RetrieveForm</con:operation>
+          <con:request name="form-manager-rfd_retrieve-form-xml-invalid">
+            <con:settings/>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>${#Spring#$(sdcct.ws.form.manager.rfd.url)}</con:endpoint>
+            <con:request><![CDATA[<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:urn="urn:ihe:iti:rfd:2007" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <soap:Header/>
+   <soap:Body>
+      <urn:RetrieveFormRequest>
+         <urn:prepopData xsi:nil="true"/>
+         <urn:workflowData badAttribute="badAttributeValue">
+            <urn:formID>${#Spring##( formRfd1a.identifier )}</urn:formID>
+            <urn:encodedResponse responseContentType="${#Spring##( T(gov.hhs.onc.sdcct.rfd.ws.RfdWsResponseType).XML.mediaType.toString() )}">true</urn:encodedResponse>
+            <urn:context xsi:nil="true"/>
+            <urn:instanceID xsi:nil="true"/>
+            <badElement value="badElementValue"/>
+         </urn:workflowData>
+      </urn:RetrieveFormRequest>
+   </soap:Body>
+</soap:Envelope>]]></con:request>
+            <con:assertion type="Valid HTTP Status Codes" name="Valid HTTP Status Codes">
+              <con:configuration>
+                <codes>500</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="SOAP Response" name="SOAP Response">
+              <con:settings/>
+              <con:configuration/>
+            </con:assertion>
+            <con:credentials>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:jmsPropertyConfig/>
+            <con:wsaConfig action="urn:ihe:iti:2007:RetrieveForm" mustUnderstand="NONE" version="200508"/>
+            <con:wsrmConfig version="1.2"/>
+          </con:request>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+    </con:testCase>
+    <con:properties/>
+  </con:testSuite>
+  <con:properties/>
+  <con:wssContainer/>
+  <con:oAuth2ProfileContainer/>
+</con:soapui-project>

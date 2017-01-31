@@ -17,7 +17,7 @@ import gov.hhs.onc.sdcct.build.xml.jaxb.utils.SdcctFhirCodegenUtils
 import gov.hhs.onc.sdcct.net.SdcctUris
 import gov.hhs.onc.sdcct.utils.SdcctClassUtils
 import gov.hhs.onc.sdcct.utils.SdcctEnumUtils
-import gov.hhs.onc.sdcct.xml.utils.SdcctXmlUtils
+import gov.hhs.onc.sdcct.xml.utils.SdcctDomUtils
 import org.apache.commons.lang3.ClassUtils
 import org.apache.maven.plugin.logging.Log
 import org.apache.maven.project.MavenProject
@@ -105,7 +105,7 @@ class FhirTypeCodegenPlugin extends AbstractTypeCodegenPlugin {
     }
     
     protected static String buildKind(Element elem) {
-        return SdcctXmlUtils.findChildElement(elem, SdcctUris.FHIR_URL_VALUE, SdcctFhirCodegenUtils.KIND_ELEM_NAME)?.
+        return SdcctDomUtils.findChildElement(elem, SdcctUris.FHIR_URL_VALUE, SdcctFhirCodegenUtils.KIND_ELEM_NAME)?.
             getAttribute(SdcctFhirCodegenUtils.VALUE_NODE_NAME)
     }
 }

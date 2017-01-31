@@ -1,12 +1,12 @@
 package gov.hhs.onc.sdcct.xml;
 
-import gov.hhs.onc.sdcct.config.Options;
+import gov.hhs.onc.sdcct.config.SdcctOptions;
 import java.util.Map;
 import javax.annotation.Nullable;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmValue;
 
-public interface XmlTransformOptions<T extends XmlTransformOptions<T>> extends Options<T> {
+public interface XmlTransformOptions<T extends XmlTransformOptions<T>> extends SdcctOptions<T> {
     public T addVariable(QName qname, XdmValue value);
 
     public boolean hasVariables();

@@ -4,14 +4,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import gov.hhs.onc.sdcct.net.logging.RestEventType;
 import gov.hhs.onc.sdcct.net.logging.impl.AbstractRestEvent;
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
-import gov.hhs.onc.sdcct.utils.SdcctStringUtils.SdcctToStringStyle;
+import gov.hhs.onc.sdcct.utils.SdcctStringUtils.SdcctToStringBuilder;
 import gov.hhs.onc.sdcct.ws.WsDirection;
 import gov.hhs.onc.sdcct.ws.logging.WsEvent;
-import gov.hhs.onc.sdcct.ws.logging.WsMessageType;
+import gov.hhs.onc.sdcct.ws.WsMessageType;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public abstract class AbstractWsEvent extends AbstractRestEvent implements WsEvent {
     protected String bindingName;
@@ -34,8 +33,8 @@ public abstract class AbstractWsEvent extends AbstractRestEvent implements WsEve
     }
 
     @Override
-    protected void buildMarkerMessages(StringBuffer msgBuffer, ToStringBuilder msgToStrBuilder, StringBuffer logstashFileMsgBuffer,
-        ToStringBuilder logstashFileMsgToStrBuilder) {
+    protected void buildMarkerMessages(StringBuffer msgBuffer, SdcctToStringBuilder msgToStrBuilder, StringBuffer logstashFileMsgBuffer,
+        SdcctToStringBuilder logstashFileMsgToStrBuilder) {
         boolean msgTypeAvailable = this.hasMessageType(), soapMsgType = (this.msgType == WsMessageType.SOAP);
         String msgTypeId = (msgTypeAvailable ? this.msgType.getId() : null);
 
@@ -76,8 +75,6 @@ public abstract class AbstractWsEvent extends AbstractRestEvent implements WsEve
             msgToStrBuilder.append("soapHeaders", this.soapHeaders);
             msgToStrBuilder.append("soapFault", this.soapFault);
         }
-
-        ((SdcctToStringStyle) msgToStrBuilder.getStyle()).removeLastFieldSeparator(msgBuffer);
 
         msgBuffer.append("):\n");
         msgBuffer.append((this.hasPrettyPayload() ? this.prettyPayload : this.payload));

@@ -17,7 +17,7 @@ import com.sun.tools.xjc.model.Model
 import com.sun.tools.xjc.outline.ClassOutline
 import com.sun.tools.xjc.outline.Outline
 import gov.hhs.onc.sdcct.build.xml.jaxb.utils.SdcctCodegenUtils
-import gov.hhs.onc.sdcct.config.utils.SdcctPropertiesUtils.LinkedProperties
+import gov.hhs.onc.sdcct.config.property.utils.SdcctPropertiesUtils.LinkedProperties
 import java.nio.charset.StandardCharsets
 import javax.xml.bind.JAXBElement
 import org.apache.commons.collections4.keyvalue.MultiKey
@@ -50,7 +50,7 @@ class AccessorCodegenPlugin extends AbstractCodegenPlugin {
             } else if (pluralizedProp2) {
                 return 1
             } else {
-                return privatePropName1.compareTo(privatePropName2)
+                return privatePropName1 <=> privatePropName2
             }
         }
     }

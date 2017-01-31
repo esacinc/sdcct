@@ -4,12 +4,12 @@ import gov.hhs.onc.sdcct.beans.NamedBean;
 import gov.hhs.onc.sdcct.beans.SpecifiedBean;
 import gov.hhs.onc.sdcct.data.SdcctResourceDescriptor;
 import gov.hhs.onc.sdcct.transform.impl.ResourceSource;
-import gov.hhs.onc.sdcct.xml.impl.XdmDocument;
+import gov.hhs.onc.sdcct.xml.saxon.impl.XdmDocument;
 import javax.annotation.Nullable;
 import org.springframework.beans.factory.InitializingBean;
 
 public interface SdcctForm<T> extends InitializingBean, NamedBean, SdcctResourceDescriptor<T>, SpecifiedBean {
-    public void build() throws Exception;
+    public SdcctForm<T> build() throws Exception;
 
     public boolean hasBean();
 

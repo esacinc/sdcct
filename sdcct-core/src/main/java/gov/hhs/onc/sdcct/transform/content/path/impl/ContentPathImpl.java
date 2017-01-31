@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.Map;
 
 public class ContentPathImpl implements ContentPath {
+    private final static String TO_STR_FORMAT = "fluentPathExpr=%s, jsonPointerExpr=%s, xpathExpr=%s";
+
     private Map<String, String> namespaces;
     private LinkedList<ContentPathSegment<?, ?>> segments;
     private String fluentPathExpr;
@@ -19,6 +21,11 @@ public class ContentPathImpl implements ContentPath {
         this.fluentPathExpr = fluentPathExpr;
         this.jsonPointerExpr = jsonPointerExpr;
         this.xpathExpr = xpathExpr;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(TO_STR_FORMAT, this.fluentPathExpr, this.jsonPointerExpr, this.xpathExpr);
     }
 
     @Override

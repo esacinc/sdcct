@@ -14,7 +14,5 @@
     <!--====================================================================================================
     = INET ADDRESSES
     =====================================================================================================-->
-    <beans:bean id="inetAddr" class="java.net.InetAddress"/>
-    
-    <beans:bean id="inetAddrLoopback" parent="inetAddr" factory-method="getLoopbackAddress"/>
+    <beans:bean id="inetAddrLoopback" class="java.net.InetAddress" factory-method="getLoopbackAddress"/>
 </beans:beans>

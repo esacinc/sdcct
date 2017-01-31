@@ -1,7 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project
     xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xsi:schemaLocation="
+        http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     
     <modelVersion>4.0.0</modelVersion>
     
@@ -23,6 +25,10 @@
         <!-- Project build Debian properties -->
         <project.build.debShareWebappDataDirectoryPath>${project.build.debShareDataDirectoryPath}/webapp</project.build.debShareWebappDataDirectoryPath>
         <project.build.debShareWebappDataDirectory>${project.build.debDataDirectory}/${project.build.debShareWebappDataDirectoryPath}</project.build.debShareWebappDataDirectory>
+        <!-- Project build SoapUI properties -->
+        <project.build.soapUiDirectory>${project.build.testVarDirectory}/soapui</project.build.soapUiDirectory>
+        <!-- Project build test properties -->
+        <project.build.testWebappDirectory>${project.build.directory}/test-webapp</project.build.testWebappDirectory>
     </properties>
     
     <repositories>
@@ -59,12 +65,12 @@
             <dependency>
                 <groupId>org.apache.tomcat.embed</groupId>
                 <artifactId>tomcat-embed-core</artifactId>
-                <version>8.5.4</version>
+                <version>8.5.5</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-web</artifactId>
-                <version>4.1.2.RELEASE</version>
+                <version>4.1.3.RELEASE</version>
             </dependency>
             <!-- Test dependencies -->
             <dependency>
@@ -213,25 +219,6 @@
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>copy-test-dependencies-web</id>
-                            <phase>prepare-package</phase>
-                            <goals>
-                                <goal>copy-dependencies</goal>
-                            </goals>
-                            <inherited>true</inherited>
-                            <configuration>
-                                <excludeScope>provided</excludeScope>
-                                <includeTypes>jar,test-jar</includeTypes>
-                                <outputDirectory>${project.build.directory}/${project.artifactId}-test/WEB-INF/lib</outputDirectory>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <executions>
                         <execution>
@@ -246,29 +233,52 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
+                    <artifactId>maven-resources-plugin</artifactId>
                     <executions>
                         <execution>
-                            <id>default-test</id>
-                        </execution>
-                        <execution>
-                            <id>test-integration</id>
+                            <id>copy-test-resources-soapui</id>
+                            <phase>process-test-resources</phase>
+                            <goals>
+                                <goal>copy-resources</goal>
+                            </goals>
+                            <inherited>true</inherited>
                             <configuration>
-                                <systemPropertyVariables>
-                                    <sdcct.webapp.dir>${project.build.directory}/${project.artifactId}-test</sdcct.webapp.dir>
-                                </systemPropertyVariables>
+                                <outputDirectory>${project.build.soapUiDirectory}</outputDirectory>
+                                <resources>
+                                    <resource>
+                                        <directory>${project.basedir.all}/sdcct-web-core/src/test/soapui</directory>
+                                        <includes>
+                                            <include>*.xml</include>
+                                        </includes>
+                                    </resource>
+                                    <resource>
+                                        <directory>${project.basedir}/src/test/soapui</directory>
+                                        <includes>
+                                            <include>*.xml</include>
+                                        </includes>
+                                    </resource>
+                                </resources>
                             </configuration>
                         </execution>
                     </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <systemPropertyVariables>
+                            <sdcct.soapui.dir>${project.build.soapUiDirectory}</sdcct.soapui.dir>
+                            <sdcct.webapp.dir>${project.build.testWebappDirectory}</sdcct.webapp.dir>
+                        </systemPropertyVariables>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>2.6</version>
+                    <version>3.0.0</version>
                     <inherited>true</inherited>
                     <configuration>
                         <archiveClasses>true</archiveClasses>
-                        <failOnMissingWebXml>false</failOnMissingWebXml>
                         <packagingExcludes>WEB-INF/classes/**</packagingExcludes>
                     </configuration>
                     <executions>
@@ -289,26 +299,36 @@
                                 </webResources>
                             </configuration>
                         </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.gmavenplus</groupId>
+                    <artifactId>gmavenplus-plugin</artifactId>
+                    <executions>
                         <execution>
-                            <id>war-test</id>
-                            <goals>
-                                <goal>exploded</goal>
-                            </goals>
-                            <inherited>true</inherited>
+                            <id>compile-scripts</id>
+                        </execution>
+                        <execution>
+                            <id>process-project-properties</id>
+                        </execution>
+                        <execution>
+                            <id>process-resources-app</id>
+                        </execution>
+                        <execution>
+                            <id>process-test-resources</id>
                             <configuration>
-                                <classifier>test</classifier>
-                                <primaryArtifact>false</primaryArtifact>
-                                <warSourceDirectory>${project.build.directory}/${project.artifactId}</warSourceDirectory>
-                                <webappDirectory>${project.build.directory}/${project.artifactId}-test</webappDirectory>
-                                <webResources>
--                                    <resource>
--                                        <directory>${project.build.directory}</directory>
--                                        <includes>
--                                            <include>${project.build.finalName}-tests.jar</include>
--                                        </includes>
--                                        <targetPath>WEB-INF/lib</targetPath>
--                                    </resource>
--                                </webResources>
+                                <properties>
+                                    <property>
+                                        <name>dirs</name>
+                                        <value>
+                                            ${project.build.testCacheDirectory}
+                                            ${project.build.testConfDirectory}
+                                            ${project.build.testLogDirectory}
+                                            ${project.build.testVarDirectory}
+                                            ${project.build.testWebappDirectory}
+                                        </value>
+                                    </property>
+                                </properties>
                             </configuration>
                         </execution>
                     </executions>

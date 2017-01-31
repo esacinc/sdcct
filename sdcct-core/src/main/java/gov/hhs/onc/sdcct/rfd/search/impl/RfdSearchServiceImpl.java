@@ -23,7 +23,7 @@ public class RfdSearchServiceImpl<T extends IdentifiedExtensionType>
     @Override
     @SuppressWarnings({ CompilerWarnings.UNCHECKED })
     public List<T> search(MultivaluedMap<String, String> params) throws Exception {
-        // TEMP: dev
+        // TEMP: placeholder
         if (!params.containsKey(ResourceParamNames.IDENTIFIER)) {
             return super.search(params);
         }

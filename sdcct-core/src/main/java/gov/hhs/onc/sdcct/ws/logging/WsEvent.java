@@ -3,6 +3,7 @@ package gov.hhs.onc.sdcct.ws.logging;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import gov.hhs.onc.sdcct.net.logging.RestEvent;
 import gov.hhs.onc.sdcct.ws.WsDirection;
+import gov.hhs.onc.sdcct.ws.WsMessageType;
 import java.util.Map;
 import javax.annotation.Nullable;
 

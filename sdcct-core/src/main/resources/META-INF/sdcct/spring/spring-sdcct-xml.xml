@@ -27,29 +27,24 @@
                 <beans:entry key="#{ T(javax.xml.stream.XMLInputFactory).IS_REPLACING_ENTITY_REFERENCES }" value="false" value-type="java.lang.Boolean"/>
                 <beans:entry key="#{ T(javax.xml.stream.XMLInputFactory).IS_SUPPORTING_EXTERNAL_ENTITIES }" value="false" value-type="java.lang.Boolean"/>
                 <beans:entry key="#{ T(com.ctc.wstx.api.WstxInputProperties).P_CACHE_DTDS }" value="false" value-type="java.lang.Boolean"/>
-                <!--suppress SpringPlaceholdersInspection -->
                 <beans:entry key="#{ T(com.ctc.wstx.api.WstxInputProperties).P_INPUT_BUFFER_LENGTH }" value="${sdcct.xml.input.buffer.size}"
                     value-type="java.lang.Integer"/>
-                <!--suppress SpringPlaceholdersInspection -->
+                <beans:entry key="#{ T(org.codehaus.stax2.XMLInputFactory2).P_LAZY_PARSING }" value="false" value-type="java.lang.Boolean"/>
                 <beans:entry key="#{ T(com.ctc.wstx.api.WstxInputProperties).P_MAX_ATTRIBUTES_PER_ELEMENT }" value="${sdcct.xml.input.elem.attr.max}"
                     value-type="java.lang.Integer"/>
-                <!--suppress SpringPlaceholdersInspection -->
                 <beans:entry key="#{ T(com.ctc.wstx.api.WstxInputProperties).P_MAX_ATTRIBUTE_SIZE }" value="${sdcct.xml.input.attr.size.max}"
                     value-type="java.lang.Integer"/>
-                <!--suppress SpringPlaceholdersInspection -->
                 <beans:entry key="#{ T(com.ctc.wstx.api.WstxInputProperties).P_MAX_CHARACTERS }" value="${sdcct.xml.input.char.max}"
                     value-type="java.lang.Long"/>
-                <!--suppress SpringPlaceholdersInspection -->
                 <beans:entry key="#{ T(com.ctc.wstx.api.WstxInputProperties).P_MAX_CHILDREN_PER_ELEMENT }" value="${sdcct.xml.input.elem.child.max}"
                     value-type="java.lang.Integer"/>
-                <!--suppress SpringPlaceholdersInspection -->
                 <beans:entry key="#{ T(com.ctc.wstx.api.WstxInputProperties).P_MAX_ELEMENT_COUNT }" value="${sdcct.xml.input.elem.max}"
                     value-type="java.lang.Long"/>
-                <!--suppress SpringPlaceholdersInspection -->
                 <beans:entry key="#{ T(com.ctc.wstx.api.WstxInputProperties).P_MAX_ELEMENT_DEPTH }" value="${sdcct.xml.input.elem.depth.max}"
                     value-type="java.lang.Integer"/>
-                <!--suppress SpringPlaceholdersInspection -->
                 <beans:entry key="#{ T(com.ctc.wstx.api.WstxInputProperties).P_MAX_TEXT_LENGTH }" value="${sdcct.xml.input.text.size.max}"
+                    value-type="java.lang.Integer"/>
+                <beans:entry key="#{ T(com.ctc.wstx.api.WstxInputProperties).P_MIN_TEXT_SEGMENT }" value="${sdcct.xml.input.text.size.min}"
                     value-type="java.lang.Integer"/>
                 <beans:entry key="#{ T(javax.xml.stream.XMLInputFactory).SUPPORT_DTD }" value="false" value-type="java.lang.Boolean"/>
                 <beans:entry key="#{ T(org.codehaus.stax2.XMLStreamProperties).XSP_SUPPORT_XMLID }"
@@ -99,8 +94,7 @@
     <beans:bean id="serializerXmlPretty" parent="serializerXml" factory-bean="processor" factory-method="newSerializer">
         <beans:property name="localOutputProperties">
             <beans:map merge="true">
-                <beans:entry key="#{ T(javax.xml.transform.OutputKeys).INDENT }" value="#{ T(gov.hhs.onc.sdcct.config.utils.SdcctOptionUtils).YES_VALUE }"/>
-                <!--suppress SpringPlaceholdersInspection -->
+                <beans:entry key="#{ T(javax.xml.transform.OutputKeys).INDENT }" value="#{ T(gov.hhs.onc.sdcct.config.SdcctOptionValues).YES }"/>
                 <beans:entry key="#{ T(net.sf.saxon.lib.SaxonOutputKeys).INDENT_SPACES }" value="${sdcct.transform.content.pretty.indent.size}"/>
             </beans:map>
         </beans:property>
@@ -111,7 +105,7 @@
             <beans:map>
                 <beans:entry key="#{ T(javax.xml.transform.OutputKeys).METHOD }" value="html"/>
                 <beans:entry key="#{ T(javax.xml.transform.OutputKeys).OMIT_XML_DECLARATION }"
-                    value="#{ T(gov.hhs.onc.sdcct.config.utils.SdcctOptionUtils).YES_VALUE }"/>
+                    value="#{ T(gov.hhs.onc.sdcct.config.SdcctOptionValues).YES }"/>
             </beans:map>
         </beans:property>
     </beans:bean>
@@ -120,8 +114,7 @@
     <beans:bean id="serializerHtmlPretty" parent="serializerHtml" factory-bean="processor" factory-method="newSerializer">
         <beans:property name="localOutputProperties">
             <beans:map merge="true">
-                <beans:entry key="#{ T(javax.xml.transform.OutputKeys).INDENT }" value="#{ T(gov.hhs.onc.sdcct.config.utils.SdcctOptionUtils).YES_VALUE }"/>
-                <!--suppress SpringPlaceholdersInspection -->
+                <beans:entry key="#{ T(javax.xml.transform.OutputKeys).INDENT }" value="#{ T(gov.hhs.onc.sdcct.config.SdcctOptionValues).YES }"/>
                 <beans:entry key="#{ T(net.sf.saxon.lib.SaxonOutputKeys).INDENT_SPACES }" value="${sdcct.transform.content.pretty.indent.size}"/>
             </beans:map>
         </beans:property>

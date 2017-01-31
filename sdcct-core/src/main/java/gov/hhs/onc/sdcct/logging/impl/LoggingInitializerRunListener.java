@@ -53,7 +53,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 
-@Order(Ordered.HIGHEST_PRECEDENCE + 1)
+@Order((Ordered.HIGHEST_PRECEDENCE + 1))
 public class LoggingInitializerRunListener extends AbstractApplicationInitializerRunListener<LoggingInitializer> {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     private class LoggerContextAwareBeanPostProcessor extends AbstractSdcctBeanPostProcessor<ContextAware> {
@@ -73,7 +73,7 @@ public class LoggingInitializerRunListener extends AbstractApplicationInitialize
         }
     }
 
-    @Order(Ordered.HIGHEST_PRECEDENCE + 1)
+    @Order((Ordered.HIGHEST_PRECEDENCE + 1))
     private class LogstashEncoderBeanPostProcessor extends AbstractSdcctBeanPostProcessor<SdcctLogstashEncoder> {
         public LogstashEncoderBeanPostProcessor() {
             super(SdcctLogstashEncoder.class);
@@ -96,11 +96,11 @@ public class LoggingInitializerRunListener extends AbstractApplicationInitialize
         }
     }
 
-    private final static String CONSOLE_APPENDER_PATTERN = "%xT%" + TxMdcConverter.WORD + "{true}%" + PriorityColorCompositeConverter.WORD + " - %"
-        + MessageMarkerConverter.WORD + "{" + AppenderType.CONSOLE.getId() + "}%n%" + RootCauseThrowableProxyConverter.WORD;
+    private final static String CONSOLE_APPENDER_PATTERN = "%xT%" + TxMdcConverter.WORD + "{true}%" + PriorityColorCompositeConverter.WORD + " - %" +
+        MessageMarkerConverter.WORD + "{" + AppenderType.CONSOLE.getId() + "}%n%" + RootCauseThrowableProxyConverter.WORD;
 
-    private final static String FILE_APPENDER_PATTERN = "%d{yyyy-MM-dd HH:mm:ss z} [%C:%L %t] %" + TxMdcConverter.WORD + "%p - %" + MessageMarkerConverter.WORD
-        + "{" + AppenderType.FILE.getId() + "}%n%" + RootCauseThrowableProxyConverter.WORD;
+    private final static String FILE_APPENDER_PATTERN = "%d{yyyy-MM-dd HH:mm:ss z} [%C:%L %t] %" + TxMdcConverter.WORD + "%p - %" +
+        MessageMarkerConverter.WORD + "{" + AppenderType.FILE.getId() + "}%n%" + RootCauseThrowableProxyConverter.WORD;
 
     private LoggerContext loggerContext;
     private Map<AppenderType, Appender<ILoggingEvent>> appenders = new EnumMap<>(AppenderType.class);
@@ -163,15 +163,15 @@ public class LoggingInitializerRunListener extends AbstractApplicationInitialize
 
             this.buildLogger(loggerName, loggerLvl, false, ((loggerPropValueParts.length == 2)
                 ? Stream.of(org.springframework.util.StringUtils.commaDelimitedListToStringArray(loggerPropValueParts[1])).map(loggerAppenderName -> {
-                AppenderType loggerAppenderType = SdcctEnumUtils.findById(AppenderType.class, loggerAppenderName);
+                    AppenderType loggerAppenderType = SdcctEnumUtils.findById(AppenderType.class, loggerAppenderName);
 
-                if (!this.appenders.containsKey(loggerAppenderType)) {
-                    throw new ApplicationContextException(String.format("Unknown application (name=%s) logger (name=%s) appender type (name=%s).",
-                        this.app.getName(), loggerName, loggerAppenderName));
-                }
+                    if (!this.appenders.containsKey(loggerAppenderType)) {
+                        throw new ApplicationContextException(String.format("Unknown application (name=%s) logger (name=%s) appender type (name=%s).",
+                            this.app.getName(), loggerName, loggerAppenderName));
+                    }
 
-                return this.appenders.get(loggerAppenderType);
-            }).collect(Collectors.toList()) : this.appenders.values()));
+                    return this.appenders.get(loggerAppenderType);
+                }).collect(Collectors.toList()) : this.appenders.values()));
         });
 
         StatusManager statusManager = this.loggerContext.getStatusManager();

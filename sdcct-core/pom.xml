@@ -1,7 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project
     xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xsi:schemaLocation="
+        http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     
     <modelVersion>4.0.0</modelVersion>
     
@@ -19,8 +21,6 @@
     <properties>
         <!-- Project properties -->
         <project.basedir.all>${project.basedir}/..</project.basedir.all>
-        <!-- Project build form test properties -->
-        <project.build.testFormDirectory>${project.build.testOutputDirectory}/META-INF/sdcct/data/form</project.build.testFormDirectory>
         <!-- Project build JAXB properties -->
         <project.build.jaxbDirectory>${project.build.outputDirectory}/META-INF/sdcct/jaxb</project.build.jaxbDirectory>
         <project.build.jaxbPluralsPropertyFile>${project.build.jaxbDirectory}/jaxb-sdcct-plurals.properties</project.build.jaxbPluralsPropertyFile>
@@ -30,6 +30,7 @@
         <project.build.jaxbRfdGeneratedSourceDirectory>${project.build.directory}/generated-sources/jaxb-rfd</project.build.jaxbRfdGeneratedSourceDirectory>
         <project.build.jaxbSchematronGeneratedSourceDirectory>${project.build.directory}/generated-sources/jaxb-schematron</project.build.jaxbSchematronGeneratedSourceDirectory>
         <project.build.jaxbSdcGeneratedSourceDirectory>${project.build.directory}/generated-sources/jaxb-sdc</project.build.jaxbSdcGeneratedSourceDirectory>
+        <project.build.jaxbSdcctGeneratedSourceDirectory>${project.build.directory}/generated-sources/jaxb-sdcct</project.build.jaxbSdcctGeneratedSourceDirectory>
         <!-- Project build schema properties -->
         <project.build.schemaDirectory>${project.build.outputDirectory}/META-INF/sdcct/schema</project.build.schemaDirectory>
         <!-- Project build schema source properties -->
@@ -38,6 +39,8 @@
         <project.build.schematronDirectory>${project.build.outputDirectory}/META-INF/sdcct/schematron</project.build.schematronDirectory>
         <!-- Project build XSLT properties -->
         <project.build.styleDirectory>${project.build.outputDirectory}/META-INF/sdcct/style</project.build.styleDirectory>
+        <!-- Project build test form properties -->
+        <project.build.testFormDirectory>${project.build.testOutputDirectory}/META-INF/sdcct/data/form</project.build.testFormDirectory>
         <!-- Project build WSDL properties -->
         <project.build.wsdlDirectory>${project.build.outputDirectory}/META-INF/sdcct/wsdl</project.build.wsdlDirectory>
     </properties>
@@ -96,10 +99,12 @@
             <groupId>com.ryantenney.metrics</groupId>
             <artifactId>metrics-spring</artifactId>
         </dependency>
+        <!--
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-xjc</artifactId>
         </dependency>
+        -->
         <dependency>
             <groupId>com.sun.xml.ws</groupId>
             <artifactId>jaxws-rt</artifactId>
@@ -473,6 +478,11 @@
         </dependency>
         <!-- Test dependencies (inherited) -->
         <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <scope>test</scope>
@@ -495,6 +505,30 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
+                    <!--
+                    NOTE: Workaround for the incompatibility between the jaxws-wscompile v2.2.10 and jaxb-xjc v.2.2.11. Specifically,
+                    com.sun.tools.ws.Invoker uses com.sun.tools.xjc.api.util.ToolsJarNotFoundException, which was removed. This issue was fixed in 2014
+                    (see https://java.net/projects/jax-ws/sources/git/revision/f81f1c0992af062ab4d75dffa5fc488a3bebd301), but there has not been a JAX-WS
+                    release since.
+                    -->
+                    <execution>
+                        <id>unpack-jaxb-xjc-compat-classes</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.sun.xml.bind</groupId>
+                                    <artifactId>jaxb-xjc</artifactId>
+                                    <version>2.2.10</version>
+                                    <includes>/com/sun/tools/xjc/api/util/ToolsJarNotFoundException.class</includes>
+                                    <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>copy-dependencies-deb</id>
                         <phase>none</phase>
@@ -605,9 +639,6 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>copy-test-resources-testng</id>
-                    </execution>
-                    <execution>
                         <id>copy-resources-deb-control</id>
                         <phase>none</phase>
                     </execution>
@@ -636,16 +667,38 @@
                     <execution>
                         <id>test-unit</id>
                         <configuration>
+                            <properties>
+                                <property>
+                                    <name>suitename</name>
+                                    <value>sdcct-test-unit</value>
+                                </property>
+                                <property>
+                                    <name>testname</name>
+                                    <value>sdcct-test-unit</value>
+                                </property>
+                            </properties>
                             <systemPropertyVariables>
+                                <sdcct.data.db.name>sdcct-test-unit</sdcct.data.db.name>
                                 <sdcct.logging.file.name>sdcct-test-unit</sdcct.logging.file.name>
                                 <sdcct.logging.logstash.file.name>sdcct-logstash-test-unit</sdcct.logging.logstash.file.name>
                             </systemPropertyVariables>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>test-integration</id>
+                        <id>test-it</id>
                         <configuration>
+                            <properties>
+                                <property>
+                                    <name>suitename</name>
+                                    <value>sdcct-test-it</value>
+                                </property>
+                                <property>
+                                    <name>testname</name>
+                                    <value>sdcct-test-it</value>
+                                </property>
+                            </properties>
                             <systemPropertyVariables>
+                                <sdcct.data.db.name>sdcct-test-it</sdcct.data.db.name>
                                 <sdcct.logging.file.name>sdcct-test-it</sdcct.logging.file.name>
                                 <sdcct.logging.logstash.file.name>sdcct-logstash-test-it</sdcct.logging.logstash.file.name>
                             </systemPropertyVariables>
@@ -758,6 +811,7 @@
                                         gov/hhs/onc/sdcct/api/Specification*.java
                                         gov/hhs/onc/sdcct/api/type/*.java
                                         gov/hhs/onc/sdcct/beans/*.java
+                                        gov/hhs/onc/sdcct/config/property/utils/*.java
                                         gov/hhs/onc/sdcct/config/utils/*.java
                                         gov/hhs/onc/sdcct/impl/*.java
                                         gov/hhs/onc/sdcct/io/**/*.java
@@ -840,6 +894,64 @@
                         <configuration>
                             <scripts>
                                 <script>file://${project.build.scriptSourceDirectory}/sdcct-process-deps-jsw.groovy</script>
+                            </scripts>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-sources-jaxb-sdcct</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <properties>
+                                <property>
+                                    <name>bindingIncludes</name>
+                                    <value>
+                                        jaxb-sdcct.xjb
+                                        jaxb-sdcct-validate.xjb
+                                    </value>
+                                </property>
+                                <property>
+                                    <name>defaultBaseUri</name>
+                                    <value>file:${project.build.schemaDirectory}/sdcct/</value>
+                                </property>
+                                <property>
+                                    <name>outDir</name>
+                                    <value>${project.build.jaxbSdcctGeneratedSourceDirectory}</value>
+                                </property>
+                                <property>
+                                    <name>pkgNames</name>
+                                    <value>
+                                        sdcct-validate=gov.hhs.onc.sdcct.validate
+                                    </value>
+                                </property>
+                                <property>
+                                    <name>schemaIncludes</name>
+                                    <value>
+                                        sdcct/sdcct.xsd
+                                        sdcct/sdcct-validate.xsd
+                                    </value>
+                                </property>
+                                <property>
+                                    <name>verbose</name>
+                                    <value>true</value>
+                                </property>
+                                <property>
+                                    <name>xmlNsPrefixes</name>
+                                    <value>
+                                        sdcct-validate=gov.hhs.onc.sdcct.xml.SdcctXmlPrefixes.SDCCT_VALIDATE
+                                    </value>
+                                </property>
+                                <property>
+                                    <name>xmlNsUris</name>
+                                    <value>
+                                        sdcct-validate=gov.hhs.onc.sdcct.net.SdcctUris.SDCCT_VALIDATE_URN_VALUE
+                                    </value>
+                                </property>
+                            </properties>
+                            <scripts>
+                                <script>file://${project.build.scriptSourceDirectory}/sdcct-generate-sources-jaxb.groovy</script>
                             </scripts>
                         </configuration>
                     </execution>
@@ -1163,7 +1275,7 @@
                                 <property>
                                     <name>xmlNsUris</name>
                                     <value>
-                                        sdc=gov.hhs.onc.sdcct.net.SdcctUris.SDC_URL_VALUE
+                                        sdc=gov.hhs.onc.sdcct.net.SdcctUris.IHE_QRPH_SDC_URN_VALUE
                                     </value>
                                 </property>
                             </properties>
@@ -1243,6 +1355,9 @@
                         <id>process-resources-app</id>
                         <phase>none</phase>
                     </execution>
+                    <execution>
+                        <id>process-test-resources</id>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -1261,6 +1376,7 @@
                                 <source>${project.build.jaxbRfdGeneratedSourceDirectory}</source>
                                 <source>${project.build.jaxbSchematronGeneratedSourceDirectory}</source>
                                 <source>${project.build.jaxbSdcGeneratedSourceDirectory}</source>
+                                <source>${project.build.jaxbSdcctGeneratedSourceDirectory}</source>
                             </sources>
                         </configuration>
                     </execution>

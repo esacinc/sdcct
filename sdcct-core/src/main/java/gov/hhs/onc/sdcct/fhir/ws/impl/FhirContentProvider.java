@@ -9,13 +9,15 @@ import gov.hhs.onc.sdcct.fhir.ws.FhirWsException;
 import gov.hhs.onc.sdcct.fhir.ws.FhirWsQueryParamNames;
 import gov.hhs.onc.sdcct.fhir.ws.utils.SdcctFhirOperationOutcomeUtils.OperationOutcomeBuilder;
 import gov.hhs.onc.sdcct.fhir.ws.utils.SdcctFhirOperationOutcomeUtils.OperationOutcomeIssueBuilder;
-import gov.hhs.onc.sdcct.io.utils.SdcctMediaTypeUtils;
+import gov.hhs.onc.sdcct.net.mime.utils.SdcctMediaTypeUtils;
 import gov.hhs.onc.sdcct.net.http.SdcctHttpStatus;
 import gov.hhs.onc.sdcct.transform.content.ContentCodec;
 import gov.hhs.onc.sdcct.transform.content.ContentCodecOptions;
 import gov.hhs.onc.sdcct.transform.content.SdcctContentType;
 import gov.hhs.onc.sdcct.utils.SdcctEnumUtils;
 import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
+import gov.hhs.onc.sdcct.validate.SdcctValidatorService;
+import gov.hhs.onc.sdcct.xml.impl.SdcctXmlInputFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -49,7 +51,11 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
     @Autowired
     private List<ContentCodec<?, ?>> codecs;
 
+    @Autowired
+    private SdcctXmlInputFactory xmlInFactory;
+
     private Map<String, String> defaultQueryParams = new HashMap<>();
+    private SdcctValidatorService validatorService;
     private Map<FhirFormatType, ContentCodec<?, ?>> formatCodecs;
     private Map<String, FhirFormatType> formatQueryParamValues;
 
@@ -124,16 +130,37 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
     @Override
     public T readFrom(Class<T> type, Type genericType, Annotation[] annos, javax.ws.rs.core.MediaType mediaType, MultivaluedMap<String, String> headers,
         InputStream entityStream) throws IOException, WebApplicationException {
-        ContentCodec<?, ?> codec = this.formatCodecs.get(SdcctMediaTypeUtils.findCompatible(FhirFormatType.class, MediaType.valueOf(mediaType.toString())));
-
-        // JAXRSUtils.getCurrentMessage().put(ContentCodec.class, codec);
+        FhirFormatType formatType = SdcctMediaTypeUtils.findCompatible(FhirFormatType.class, MediaType.valueOf(mediaType.toString()));
+        ContentCodec<?, ?> codec = this.formatCodecs.get(formatType);
 
         try {
             byte[] entityBytes = IOUtils.toByteArray(entityStream);
 
             entityStream.close();
 
-            return (type.equals(byte[].class) ? type.cast(entityBytes) : codec.decode(entityBytes, type, null));
+            if (type.equals(byte[].class)) {
+                return type.cast(entityBytes);
+            }
+
+            // TEMP: dev
+            // @formatter:off
+            /*
+            if (formatType == FhirFormatType.XML) {
+                try {
+                    XdmDocument doc = this.validatorService.validate(this.xmlInFactory.createXMLStreamReader(new ByteArraySource(entityBytes)));
+
+                    return ((XmlCodec) codec).decode(doc.getUnderlyingNode(), type, null);
+                } catch (ValidationException e) {
+                    throw new FhirWsException(
+                        String.format("Web service request message body (typeClass=%s, mediaType=%s) is invalid.", type.getName(), mediaType), e);
+                }
+            }
+            */
+            // @formatter:on
+
+            return codec.decode(entityBytes, type, null);
+        } catch (FhirWsException e) {
+            throw e;
         } catch (Exception e) {
             throw new FhirWsException(String.format("Unable to decode (mediaType=%s) content object (class=%s).", mediaType, type.getName()), e)
                 .setOperationOutcome(new OperationOutcomeBuilder().addIssues(new OperationOutcomeIssueBuilder().setType(IssueType.STRUCTURE).build()).build());
@@ -185,5 +212,13 @@ public class FhirContentProvider<T> extends AbstractConfigurableProvider impleme
     public void setDefaultQueryParameters(Map<String, String> defaultQueryParams) {
         this.defaultQueryParams.clear();
         this.defaultQueryParams.putAll(defaultQueryParams);
+    }
+
+    public SdcctValidatorService getValidatorService() {
+        return this.validatorService;
+    }
+
+    public void setValidatorService(SdcctValidatorService validatorService) {
+        this.validatorService = validatorService;
     }
 }

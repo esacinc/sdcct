@@ -19,7 +19,6 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.webresources.StandardRoot;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.tomcat.util.net.NioEndpoint;
@@ -145,12 +144,7 @@ public class SdcctTomcatEmbeddedServletContainerFactory extends TomcatEmbeddedSe
         context.setXmlNamespaceAware(true);
         context.setXmlValidation(true);
 
-        StandardContext standardContext = ((StandardContext) context);
-        standardContext.setWorkDir(this.workDir.getAbsolutePath());
-
-        StandardRoot standardRoot = new StandardRoot(standardContext);
-        standardRoot.setCachingAllowed(false);
-        standardContext.setResources(standardRoot);
+        ((StandardContext) context).setWorkDir(this.workDir.getAbsolutePath());
 
         super.configureContext(context, servletContextInits);
     }

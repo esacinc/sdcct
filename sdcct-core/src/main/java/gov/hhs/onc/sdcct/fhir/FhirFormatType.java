@@ -1,7 +1,7 @@
 package gov.hhs.onc.sdcct.fhir;
 
 import gov.hhs.onc.sdcct.beans.ContentTypeBean;
-import gov.hhs.onc.sdcct.io.SdcctMediaTypes;
+import gov.hhs.onc.sdcct.net.mime.SdcctMediaTypes;
 import gov.hhs.onc.sdcct.transform.content.SdcctContentType;
 import java.util.Collections;
 import java.util.LinkedHashSet;

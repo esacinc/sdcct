@@ -27,7 +27,7 @@ public class PropertySourcesMessageSource extends AbstractMessageSource implemen
         return ((msg != null) ? this.createMessageFormat(msg, Locale.ROOT) : null);
     }
 
-    public MutablePropertySources getPropSources() {
+    public MutablePropertySources getPropertySources() {
         return this.propSrcs;
     }
 

@@ -5,10 +5,6 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.BooleanUtils;
 
 public final class SdcctOptionUtils {
-    public final static String NO_VALUE = "no";
-    public final static String OMIT_VALUE = "omit";
-    public final static String YES_VALUE = "yes";
-
     private SdcctOptionUtils() {
     }
 

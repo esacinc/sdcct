@@ -1,7 +1,7 @@
 gov.hhs.onc.sdcct.beans.factory.xml.SdcctBeanDefinitionParser=\
-    gov.hhs.onc.sdcct.xml.impl.XdmDocumentBeanDefinitionParser,\
-    gov.hhs.onc.sdcct.xml.xpath.impl.XpathBeanDefinitionParser,\
-    gov.hhs.onc.sdcct.xml.xslt.impl.XsltBeanDefinitionParser
+    gov.hhs.onc.sdcct.xml.saxon.beans.factory.xml.impl.XdmDocumentBeanDefinitionParser,\
+    gov.hhs.onc.sdcct.xml.xpath.beans.factory.xml.impl.XpathBeanDefinitionParser,\
+    gov.hhs.onc.sdcct.xml.xslt.beans.factory.xml.impl.XsltBeanDefinitionParser
 
 org.springframework.boot.SpringApplicationRunListener=\
     gov.hhs.onc.sdcct.context.impl.MetadataInitializerRunListener,\

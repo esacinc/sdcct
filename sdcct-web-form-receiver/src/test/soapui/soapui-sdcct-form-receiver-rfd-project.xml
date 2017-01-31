@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project activeEnvironment="Default" name="form-receiver-rfd" resourceRoot="${projectDir}" soapui-version="5.2.1" xmlns:con="http://eviware.com/soapui/config">
+  <con:settings/>
+  <con:interface xsi:type="con:WsdlInterface" wsaVersion="NONE" name="RFDFormReceiver_Binding_Soap12" type="wsdl" bindingName="{urn:ihe:iti:rfd:2007}RFDFormReceiver_Binding_Soap12" soapVersion="1_2" anonymous="optional" definition="${#Spring#$(sdcct.ws.form.receiver.rfd.wsdl.url)}" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <con:settings/>
+    <con:endpoints>
+      <con:endpoint>${#Spring#$(sdcct.ws.form.receiver.rfd.url)}</con:endpoint>
+    </con:endpoints>
+    <con:operation isOneWay="false" action="urn:ihe:iti:2007:SubmitForm" name="RFDFormReceiver_SubmitForm" bindingOperationName="RFDFormReceiver_SubmitForm" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional">
+      <con:settings/>
+    </con:operation>
+  </con:interface>
+  <con:testSuite name="form-receiver-rfd">
+    <con:settings/>
+    <con:runType>SEQUENTIAL</con:runType>
+    <con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="form-receiver-submit-form" searchProperties="true">
+      <con:settings/>
+      <con:testStep type="request" name="form-receiver-submit-form">
+        <con:settings/>
+        <con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:interface>RFDFormReceiver_Binding_Soap12</con:interface>
+          <con:operation>RFDFormReceiver_SubmitForm</con:operation>
+          <con:request name="form-receiver-submit-form">
+            <con:settings/>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>${#Spring#$(sdcct.ws.form.receiver.rfd.url)}</con:endpoint>
+            <con:request><![CDATA[<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:urn="urn:ihe:iti:rfd:2007">
+   <soap:Header/>
+   <soap:Body>
+      <urn:SubmitFormRequest>${#Spring##( new java.lang.String(formRfd1a.source.bytes, T(java.nio.charset.StandardCharsets).UTF_8).split(T(org.apache.commons.lang3.StringUtils).LF, 2)[1] )}</urn:SubmitFormRequest>
+   </soap:Body>
+</soap:Envelope>]]></con:request>
+            <con:assertion type="Valid HTTP Status Codes" name="Valid HTTP Status Codes">
+              <con:configuration>
+                <codes>200</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="SOAP Response" name="SOAP Response">
+              <con:settings/>
+              <con:configuration/>
+            </con:assertion>
+            <con:credentials>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:jmsPropertyConfig/>
+            <con:wsaConfig action="urn:ihe:iti:2007:SubmitForm" mustUnderstand="NONE" version="200508"/>
+            <con:wsrmConfig version="1.2"/>
+          </con:request>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+    </con:testCase>
+    <!--
+    TODO: Refactor to test applying validation to nested SDC XML package content.
+    -->
+    <con:testCase disabled="true" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="form-receiver-submit-form-invalid" searchProperties="true">
+      <con:settings/>
+      <con:testStep type="request" name="form-receiver-submit-form-invalid">
+        <con:settings/>
+        <con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:interface>RFDFormReceiver_Binding_Soap12</con:interface>
+          <con:operation>RFDFormReceiver_SubmitForm</con:operation>
+          <con:request name="form-receiver-submit-form-invalid">
+            <con:settings/>
+            <con:encoding>UTF-8</con:encoding>
+            <con:endpoint>${#Spring#$(sdcct.ws.form.receiver.rfd.url)}</con:endpoint>
+            <con:request><![CDATA[<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:urn="urn:ihe:iti:rfd:2007">
+   <soap:Header/>
+   <soap:Body>
+      <urn:SubmitFormRequest>${#Spring##( new java.lang.String(formRfdTestInvalidXml.source.bytes, T(java.nio.charset.StandardCharsets).UTF_8).split(T(org.apache.commons.lang3.StringUtils).LF, 2)[1] )}</urn:SubmitFormRequest>
+   </soap:Body>
+</soap:Envelope>]]></con:request>
+            <con:assertion type="Valid HTTP Status Codes" name="Valid HTTP Status Codes">
+              <con:configuration>
+                <codes>500</codes>
+              </con:configuration>
+            </con:assertion>
+            <con:assertion type="SOAP Response" name="SOAP Response">
+              <con:settings/>
+              <con:configuration/>
+            </con:assertion>
+            <con:credentials>
+              <con:authType>No Authorization</con:authType>
+            </con:credentials>
+            <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+            <con:jmsPropertyConfig/>
+            <con:wsaConfig action="urn:ihe:iti:2007:SubmitForm" mustUnderstand="NONE" version="200508"/>
+            <con:wsrmConfig version="1.2"/>
+          </con:request>
+        </con:config>
+      </con:testStep>
+      <con:properties/>
+    </con:testCase>
+  </con:testSuite>
+  <con:properties/>
+  <con:wssContainer/>
+  <con:oAuth2ProfileContainer/>
+</con:soapui-project>

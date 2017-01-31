@@ -1,5 +1,6 @@
 package gov.hhs.onc.sdcct.xml.impl;
 
+import gov.hhs.onc.sdcct.SdcctException;
 import gov.hhs.onc.sdcct.io.SdcctFileNameExtensions;
 import gov.hhs.onc.sdcct.transform.ResourceSourceResolver;
 import gov.hhs.onc.sdcct.transform.impl.ByteArraySource;
@@ -11,7 +12,6 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
-import net.sf.saxon.s9api.SaxonApiUncheckedException;
 import net.sf.saxon.trans.XPathException;
 import org.apache.commons.lang3.SystemUtils;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -21,6 +21,8 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class SdcctXmlResolverImpl implements SdcctXmlResolver {
+    private final static String XML_SCHEMA_FILE_LOC = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/schemas/wsdl/xml." + SdcctFileNameExtensions.XSD;
+
     private ResourceSourceResolver resourceSrcResolver;
     private URI defaultBaseUri;
     private boolean resolve;
@@ -33,17 +35,32 @@ public class SdcctXmlResolverImpl implements SdcctXmlResolver {
     }
 
     public SdcctXmlResolverImpl(ResourceSourceResolver resourceSrcResolver, URI defaultBaseUri, boolean resolve) {
-        super();
+        this(resourceSrcResolver, defaultBaseUri, resolve, null, null, null);
 
+        try {
+            this.addStaticSource(XMLConstants.XML_NS_URI, XMLConstants.XML_NS_URI, null, this.resourceSrcResolver.resolve(XML_SCHEMA_FILE_LOC));
+        } catch (IOException e) {
+            throw new SdcctException(String.format("Unable to resolve XML schema file resource (loc=%s)", XML_SCHEMA_FILE_LOC), e);
+        }
+    }
+
+    private SdcctXmlResolverImpl(ResourceSourceResolver resourceSrcResolver, URI defaultBaseUri, boolean resolve,
+        @Nullable Map<String, ByteArraySource> nsUriStaticSrcs, @Nullable Map<String, ByteArraySource> publicIdStaticSrcs,
+        @Nullable Map<String, ByteArraySource> sysIdStaticSrcs) {
         this.resourceSrcResolver = resourceSrcResolver;
         this.defaultBaseUri = defaultBaseUri;
         this.resolve = resolve;
 
-        try {
-            this.addStaticSource(XMLConstants.XML_NS_URI, XMLConstants.XML_NS_URI, null,
-                this.resourceSrcResolver.resolve((ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + "/schemas/wsdl/xml." + SdcctFileNameExtensions.XSD)));
-        } catch (IOException e) {
-            throw new SaxonApiUncheckedException(e);
+        if (nsUriStaticSrcs != null) {
+            this.nsUriStaticSrcs.putAll(nsUriStaticSrcs);
+        }
+
+        if (publicIdStaticSrcs != null) {
+            this.publicIdStaticSrcs.putAll(publicIdStaticSrcs);
+        }
+
+        if (sysIdStaticSrcs != null) {
+            this.sysIdStaticSrcs.putAll(sysIdStaticSrcs);
         }
     }
 
@@ -76,23 +93,7 @@ public class SdcctXmlResolverImpl implements SdcctXmlResolver {
     @Nullable
     @Override
     public ByteArraySource resolve(@Nullable String nsUri, @Nullable String name, @Nullable String baseUri, @Nullable String publicId, @Nullable String sysId) {
-        boolean sysIdAvailable = (sysId != null);
-
-        if (sysIdAvailable && this.sysIdStaticSrcs.containsKey(sysId)) {
-            return this.sysIdStaticSrcs.get(sysId);
-        } else if ((publicId != null) && this.publicIdStaticSrcs.containsKey(publicId)) {
-            return this.publicIdStaticSrcs.get(publicId);
-        } else if ((nsUri != null) && this.nsUriStaticSrcs.containsKey(nsUri)) {
-            return this.nsUriStaticSrcs.get(nsUri);
-        } else if (sysIdAvailable && resolve) {
-            try {
-                return this.resourceSrcResolver.resolve(((baseUri != null) ? URI.create(baseUri) : this.defaultBaseUri).resolve(sysId).toString());
-            } catch (IOException e) {
-                throw new SaxonApiUncheckedException(e);
-            }
-        }
-
-        return null;
+        return this.resolve(this.resolve, nsUri, name, baseUri, publicId, sysId);
     }
 
     @Override
@@ -110,14 +111,34 @@ public class SdcctXmlResolverImpl implements SdcctXmlResolver {
         }
     }
 
+    @Nullable
+    private ByteArraySource resolve(boolean resolve, @Nullable String nsUri, @Nullable String name, @Nullable String baseUri, @Nullable String publicId,
+        @Nullable String sysId) {
+        boolean sysIdAvailable = (sysId != null);
+
+        if (sysIdAvailable && this.sysIdStaticSrcs.containsKey(sysId)) {
+            return this.sysIdStaticSrcs.get(sysId);
+        } else if ((publicId != null) && this.publicIdStaticSrcs.containsKey(publicId)) {
+            return this.publicIdStaticSrcs.get(publicId);
+        } else if ((nsUri != null) && this.nsUriStaticSrcs.containsKey(nsUri)) {
+            return this.nsUriStaticSrcs.get(nsUri);
+        } else if (sysIdAvailable && resolve) {
+            try {
+                return this.resourceSrcResolver.resolve(((baseUri != null) ? URI.create(baseUri) : this.defaultBaseUri).resolve(sysId).toString());
+            } catch (IOException e) {
+                throw new SdcctException(
+                    String.format("Unable to resolve source (nsUri=%s, name=%s, baseUri=%s, publicId=%s, sysId=%s).", nsUri, name, baseUri, publicId, sysId),
+                    e);
+            }
+        }
+
+        return null;
+    }
+
     @Override
     @SuppressWarnings({ "CloneDoesntCallSuperClone" })
     public SdcctXmlResolver clone() {
-        SdcctXmlResolverImpl resolver = new SdcctXmlResolverImpl(this.resourceSrcResolver, this.defaultBaseUri, this.resolve);
-        resolver.nsUriStaticSrcs.putAll(this.nsUriStaticSrcs);
-        resolver.publicIdStaticSrcs.putAll(this.publicIdStaticSrcs);
-        resolver.sysIdStaticSrcs.putAll(this.sysIdStaticSrcs);
-
-        return resolver;
+        return new SdcctXmlResolverImpl(this.resourceSrcResolver, this.defaultBaseUri, this.resolve, this.nsUriStaticSrcs, this.publicIdStaticSrcs,
+            this.sysIdStaticSrcs);
     }
 }

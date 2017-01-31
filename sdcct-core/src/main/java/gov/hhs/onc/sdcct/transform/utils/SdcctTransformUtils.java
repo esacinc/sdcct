@@ -35,17 +35,9 @@ public final class SdcctTransformUtils {
         return getPropertyValue(obj, Integer.class, COLUMN_NUM_PROP_NAMES, -1);
     }
 
-    public static void setColumnNumber(Object obj, int colNum) {
-        setPropertyValue(obj, Integer.class, COLUMN_NUM_PROP_NAMES, colNum);
-    }
-
     public static int getLineNumber(Object obj) {
         // noinspection ConstantConditions
         return getPropertyValue(obj, Integer.class, LINE_NUM_PROP_NAMES, -1);
-    }
-
-    public static void setLineNumber(Object obj, int lineNum) {
-        setPropertyValue(obj, Integer.class, LINE_NUM_PROP_NAMES, lineNum);
     }
 
     @Nullable
@@ -53,17 +45,9 @@ public final class SdcctTransformUtils {
         return getPropertyValue(obj, String.class, PUBLIC_ID_PROP_NAMES, null);
     }
 
-    public static void setPublicId(Object obj, @Nullable String publicId) {
-        setPropertyValue(obj, String.class, PUBLIC_ID_PROP_NAMES, publicId);
-    }
-
     @Nullable
     public static String getSystemId(Object obj) {
         return getPropertyValue(obj, String.class, SYS_ID_PROP_NAMES, null);
-    }
-
-    public static void setSystemId(Object obj, @Nullable String sysId) {
-        setPropertyValue(obj, String.class, SYS_ID_PROP_NAMES, sysId);
     }
 
     @Nullable
@@ -82,24 +66,6 @@ public final class SdcctTransformUtils {
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new IllegalStateException(String.format("Unable to invoke object (class=%s) property (class=%s, names=%s) getter method (name=%s).",
                 clazz.getName(), propClass.getName(), propNames, propGetterMethod.getName()), e);
-        }
-    }
-
-    private static <T> void setPropertyValue(Object obj, Class<T> propClass, Set<String> propNames, @Nullable T propValue) {
-        Class<?> clazz = obj.getClass();
-        PropertyDescriptor propDesc = SdcctBeanUtils.findProperty(clazz, propClass, null, true, propNames.stream());
-
-        if (propDesc == null) {
-            return;
-        }
-
-        Method propSetterMethod = propDesc.getWriteMethod();
-
-        try {
-            propSetterMethod.invoke(obj, propValue);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new IllegalStateException(String.format("Unable to invoke object (class=%s) property (class=%s, names=%s) setter method (name=%s).",
-                clazz.getName(), propClass.getName(), propNames, propSetterMethod.getName()), e);
         }
     }
 

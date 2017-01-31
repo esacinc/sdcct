@@ -2,8 +2,8 @@ package gov.hhs.onc.sdcct.fhir.metadata;
 
 import gov.hhs.onc.sdcct.data.metadata.ResourceMetadataService;
 import gov.hhs.onc.sdcct.fhir.Resource;
-import gov.hhs.onc.sdcct.xml.impl.XdmDocument;
-import gov.hhs.onc.sdcct.xml.xpath.impl.SdcctXpathExecutable;
+import gov.hhs.onc.sdcct.xml.saxon.impl.XdmDocument;
+import gov.hhs.onc.sdcct.xml.xpath.saxon.impl.SdcctXpathExecutable;
 
 public interface FhirResourceMetadataService extends ResourceMetadataService<Resource, FhirResourceMetadata<?>> {
     public SdcctXpathExecutable getElementDefXpathExecutable();

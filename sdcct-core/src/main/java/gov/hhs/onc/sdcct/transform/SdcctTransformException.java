@@ -1,7 +1,7 @@
 package gov.hhs.onc.sdcct.transform;
 
 import gov.hhs.onc.sdcct.SdcctException;
-import gov.hhs.onc.sdcct.transform.impl.SdcctLocation;
+import gov.hhs.onc.sdcct.transform.location.impl.SdcctLocation;
 import javax.annotation.Nullable;
 
 public class SdcctTransformException extends SdcctException {

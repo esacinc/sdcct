@@ -14,7 +14,7 @@
     <!--====================================================================================================
     = CONFIGURATIONS
     =====================================================================================================-->
-    <beans:bean id="config" class="gov.hhs.onc.sdcct.transform.impl.SdcctConfiguration"
+    <beans:bean id="config" class="gov.hhs.onc.sdcct.transform.saxon.impl.SdcctSaxonConfiguration"
         p:errorHandler-ref="xmlReporterLogging"
         p:errorListener-ref="xmlReporterLogging"
         p:lineNumbering="true"
@@ -33,7 +33,7 @@
         <beans:property name="defaultSerializationProperties">
             <beans:map>
                 <beans:entry key="#{ T(javax.xml.transform.OutputKeys).ENCODING }" value="#{ T(java.nio.charset.StandardCharsets).UTF_8.name() }"/>
-                <beans:entry key="#{ T(javax.xml.transform.OutputKeys).STANDALONE }" value="#{ T(gov.hhs.onc.sdcct.config.utils.SdcctOptionUtils).YES_VALUE }"/>
+                <beans:entry key="#{ T(javax.xml.transform.OutputKeys).STANDALONE }" value="#{ T(gov.hhs.onc.sdcct.config.SdcctOptionValues).YES }"/>
             </beans:map>
         </beans:property>
     </beans:bean>
@@ -41,11 +41,6 @@
     <!--====================================================================================================
     = PROCESSORS
     =====================================================================================================-->
-    <beans:bean id="processor" class="gov.hhs.onc.sdcct.transform.impl.SdcctProcessor"
+    <beans:bean id="processor" class="gov.hhs.onc.sdcct.transform.saxon.impl.SdcctSaxonProcessor"
         c:config-ref="config"/>
-    
-    <!--====================================================================================================
-    = CONTENT PATH BUILDERS
-    =====================================================================================================-->
-    <beans:bean id="contentPathBuilder" class="gov.hhs.onc.sdcct.transform.content.path.impl.ContentPathBuilderImpl"/>
 </beans:beans>

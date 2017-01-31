@@ -1,7 +1,7 @@
 package gov.hhs.onc.sdcct.web.controller.impl;
 
 import gov.hhs.onc.sdcct.io.SdcctFileNameExtensions;
-import gov.hhs.onc.sdcct.io.SdcctMediaTypes;
+import gov.hhs.onc.sdcct.net.mime.SdcctMediaTypes;
 import gov.hhs.onc.sdcct.transform.ResourceSourceResolver;
 import gov.hhs.onc.sdcct.transform.impl.ResourceSource;
 import gov.hhs.onc.sdcct.utils.SdcctResourceUtils;

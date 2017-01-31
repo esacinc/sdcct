@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FormDesign
     ID="rfd_test_schematron"
-    xmlns="http://healthIT.gov/sdc">
+    xmlns="urn:ihe:qrph:sdc:2016">
     
     <Body ID="body">
         <ChildItems>

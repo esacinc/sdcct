@@ -5,11 +5,12 @@ import gov.hhs.onc.sdcct.transform.content.SdcctContentType;
 import gov.hhs.onc.sdcct.transform.content.impl.AbstractContentCodec;
 import gov.hhs.onc.sdcct.transform.impl.ByteArrayResult;
 import gov.hhs.onc.sdcct.transform.impl.ByteArraySource;
-import gov.hhs.onc.sdcct.transform.impl.SdcctConfiguration;
-import gov.hhs.onc.sdcct.transform.impl.SdcctPipelineConfiguration;
+import gov.hhs.onc.sdcct.transform.saxon.impl.SdcctSaxonConfiguration;
+import gov.hhs.onc.sdcct.transform.saxon.impl.SdcctPipelineConfiguration;
 import gov.hhs.onc.sdcct.xml.XmlDecodeOptions;
 import gov.hhs.onc.sdcct.xml.XmlEncodeOptions;
 import gov.hhs.onc.sdcct.xml.jaxb.JaxbContextRepository;
+import gov.hhs.onc.sdcct.xml.saxon.impl.SdcctSerializer;
 import java.util.NoSuchElementException;
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
@@ -19,6 +20,7 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import net.sf.saxon.evpull.Decomposer;
+import net.sf.saxon.evpull.EventToStaxBridge;
 import net.sf.saxon.om.NodeInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,9 +29,9 @@ public class XmlCodec extends AbstractContentCodec<XmlDecodeOptions, XmlEncodeOp
      * Workaround for the fact that the {@link com.sun.xml.bind.v2.runtime.unmarshaller.StAXStreamConnector#bridge JAXB Unmarshaller StAX bridging} calls
      * {@link XMLStreamReader#next()} an extra time.
      */
-    public static class UnmarshallingXmlStreamReader extends EventXmlStreamReader {
+    public static class UnmarshallingXmlStreamReader extends EventToStaxBridge {
         public UnmarshallingXmlStreamReader(NodeInfo srcNodeInfo, SdcctPipelineConfiguration pipelineConfig) {
-            super(new Decomposer(srcNodeInfo, pipelineConfig));
+            super(new Decomposer(srcNodeInfo, pipelineConfig), pipelineConfig);
         }
 
         @Override
@@ -55,7 +57,7 @@ public class XmlCodec extends AbstractContentCodec<XmlDecodeOptions, XmlEncodeOp
     private SdcctXmlInputFactory xmlInFactory;
 
     @Autowired
-    private SdcctConfiguration config;
+    private SdcctSaxonConfiguration config;
 
     public XmlCodec(XmlDecodeOptions defaultDecodeOpts, XmlEncodeOptions defaultEncodeOpts) {
         super(SdcctContentType.XML, defaultDecodeOpts, defaultEncodeOpts);

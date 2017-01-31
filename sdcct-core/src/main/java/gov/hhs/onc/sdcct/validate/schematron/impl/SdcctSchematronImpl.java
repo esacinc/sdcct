@@ -8,16 +8,16 @@ import gov.hhs.onc.sdcct.transform.impl.ByteArraySource;
 import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
 import gov.hhs.onc.sdcct.validate.schematron.SdcctSchematron;
 import gov.hhs.onc.sdcct.xml.impl.SdcctXmlOutputFactory;
-import gov.hhs.onc.sdcct.xml.impl.SdcctXmlStreamWriterDestination;
-import gov.hhs.onc.sdcct.xml.impl.XdmDocument;
+import gov.hhs.onc.sdcct.xml.saxon.impl.XdmDocument;
 import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
-import gov.hhs.onc.sdcct.xml.xslt.impl.SdcctXsltCompiler;
-import gov.hhs.onc.sdcct.xml.xslt.impl.SdcctXsltExecutable;
-import gov.hhs.onc.sdcct.xml.xslt.impl.SdcctXsltTransformer;
+import gov.hhs.onc.sdcct.xml.xslt.saxon.impl.SdcctXsltCompiler;
+import gov.hhs.onc.sdcct.xml.xslt.saxon.impl.SdcctXsltExecutable;
+import gov.hhs.onc.sdcct.xml.xslt.saxon.impl.SdcctXsltTransformer;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import net.sf.saxon.stax.XMLStreamWriterDestination;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,9 +71,7 @@ public class SdcctSchematronImpl implements SdcctSchematron {
             .forEach(xsltTransformerIndex -> xsltTransformers[xsltTransformerIndex].setDestination(xsltTransformers[(xsltTransformerIndex + 1)]));
 
         ByteArrayResult schemaResult = new ByteArrayResult(publicId, sysId);
-
-        SdcctXmlStreamWriterDestination schemaDest = new SdcctXmlStreamWriterDestination(this.xmlOutFactory.createXMLStreamWriter(schemaResult));
-        xsltTransformers[(xsltTransformers.length - 1)].setDestination(schemaDest);
+        xsltTransformers[(xsltTransformers.length - 1)].setDestination(new XMLStreamWriterDestination(this.xmlOutFactory.createXMLStreamWriter(schemaResult)));
 
         xsltTransformers[0].transform();
 

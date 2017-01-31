@@ -23,7 +23,7 @@
                     <sdcct-xml:xslt-document>classpath*:${sdcct.style.schematron.dir.path}/iso_dsdl_include.xsl</sdcct-xml:xslt-document>
                     <sdcct-xml:xslt-static-options>
                         <sdcct-xml:static-variable name="allow-foreign">true</sdcct-xml:static-variable>
-                        <sdcct-xml:static-variable name="diagnose">#{ T(gov.hhs.onc.sdcct.config.utils.SdcctOptionUtils).YES_VALUE }</sdcct-xml:static-variable>
+                        <sdcct-xml:static-variable name="diagnose">#{ T(gov.hhs.onc.sdcct.config.SdcctOptionValues).YES }</sdcct-xml:static-variable>
                         <sdcct-xml:static-variable name="full-path-notation">2</sdcct-xml:static-variable>
                         <sdcct-xml:static-variable name="generate-path">true</sdcct-xml:static-variable>
                         <sdcct-xml:static-variable name="langCode">#{ T(java.util.Locale).ENGLISH.language }</sdcct-xml:static-variable>

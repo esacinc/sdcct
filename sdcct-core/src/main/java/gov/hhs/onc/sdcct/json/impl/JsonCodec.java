@@ -25,37 +25,17 @@ public class JsonCodec extends AbstractContentCodec<JsonDecodeOptions, JsonEncod
 
     @Override
     public byte[] encode(Object src, @Nullable JsonEncodeOptions opts) throws Exception {
-        return this.buildEncodeObjectMapper(opts).writeValueAsBytes(src);
+        // noinspection ConstantConditions
+        return ((opts = this.defaultEncodeOpts.clone().merge(opts)).getOption(ContentCodecOptions.PRETTY) ? this.prettyObjMapper : this.objMapper)
+            .writeValueAsBytes(src);
     }
 
     @Override
     public <T> T decode(byte[] src, Class<T> resultClass, @Nullable JsonDecodeOptions opts) throws Exception {
-        return this.buildDecodeObjectMapper(opts).readValue(src, resultClass);
+        return this.objMapper.readValue(src, resultClass);
     }
 
     public JsonNode decode(byte[] src, @Nullable JsonDecodeOptions opts) throws Exception {
-        return this.buildDecodeObjectMapper(opts).readTree(src);
-    }
-
-    private ObjectMapper buildEncodeObjectMapper(@Nullable JsonEncodeOptions opts) {
-        // noinspection ConstantConditions
-        ObjectMapper srcObjMapper =
-            ((opts = this.defaultEncodeOpts.clone().merge(opts)).getOption(ContentCodecOptions.PRETTY) ? this.prettyObjMapper : this.objMapper);
-
-        if (opts.hasModules()) {
-            (srcObjMapper = srcObjMapper.copy()).registerModules(opts.getModules());
-        }
-
-        return srcObjMapper;
-    }
-
-    private ObjectMapper buildDecodeObjectMapper(@Nullable JsonDecodeOptions opts) {
-        ObjectMapper srcObjMapper = this.objMapper;
-
-        if ((opts = this.defaultDecodeOpts.clone().merge(opts)).hasModules()) {
-            (srcObjMapper = srcObjMapper.copy()).registerModules(opts.getModules());
-        }
-
-        return srcObjMapper;
+        return this.objMapper.readTree(src);
     }
 }

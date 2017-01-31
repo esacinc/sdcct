@@ -66,7 +66,9 @@ import net.sf.saxon.s9api.XdmNode;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.keyvalue.MultiKey;
 import org.apache.commons.lang3.ArrayUtils;
+import org.springframework.stereotype.Component;
 
+@Component("resourceParamProcFhir")
 public class FhirResourceParamProcessorImpl extends AbstractResourceParamProcessor<Resource, FhirResourceMetadata<?>, FhirResource>
     implements FhirResourceParamProcessor {
     public FhirResourceParamProcessorImpl() {

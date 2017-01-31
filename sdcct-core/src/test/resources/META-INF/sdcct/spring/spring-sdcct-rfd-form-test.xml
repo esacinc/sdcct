@@ -19,36 +19,13 @@
         c:name="rfd_test_invalid_xml"
         c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/rfd_test_invalid_xml.xml"/>
     
+    <!--
+    TODO: Re-enable if/when the SDC Schematrons' SDC XML namespace URIs are updated.
+    -->
     <!--suppress SpringPlaceholdersInspection -->
+    <!--
     <beans:bean id="formRfdTestSchematron" parent="formRfd" autowire-candidate="false"
         c:name="rfd_test_schematron"
         c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/rfd_test_schematron.xml"/>
-    
-    <!--suppress SpringPlaceholdersInspection -->
-    <beans:bean id="formRfdTestSdcCapAdrenal" parent="formRfd"
-        c:name="rfd_test_sdc_cap_adrenal"
-        c:src="classpath*:${sdcct.data.form.sdc.dir.path}/CAP_Adrenal.xml"
-        p:identifier="129.1000043"
-        p:internal="true"/>
-    
-    <!--suppress SpringPlaceholdersInspection -->
-    <beans:bean id="formRfdTestSdcCapBreastBmk" parent="formRfd"
-        c:name="rfd_test_sdc_cap_breast_bmk"
-        c:src="classpath*:${sdcct.data.form.sdc.dir.path}/CAP_Breast_BMK.xml"
-        p:identifier="169.1000043"
-        p:internal="true"/>
-    
-    <!--suppress SpringPlaceholdersInspection -->
-    <beans:bean id="formRfdTestSdcCapBreastRes" parent="formRfd"
-        c:name="rfd_test_sdc_cap_breast_res"
-        c:src="classpath*:${sdcct.data.form.sdc.dir.path}/CAP_Breast_Res.xml"
-        p:identifier="189.1000043"
-        p:internal="true"/>
-    
-    <!--suppress SpringPlaceholdersInspection -->
-    <beans:bean id="formRfdTestSdcCtLungScreeningTemplate" parent="formRfd"
-        c:name="rfd_test_sdc_ct_lung_screening_template"
-        c:src="classpath*:${sdcct.data.form.sdc.dir.path}/CT_Lung_Screening_Template.xml"
-        p:identifier="LDCT_PNS"
-        p:internal="true"/>
+    -->
 </beans:beans>

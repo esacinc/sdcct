@@ -4,6 +4,7 @@ import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Reporter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gov.hhs.onc.sdcct.beans.impl.AbstractLifecycleBean;
 import gov.hhs.onc.sdcct.logging.impl.MarkerBuilder;
 import gov.hhs.onc.sdcct.logging.logstash.LogstashTags;
 import gov.hhs.onc.sdcct.logging.metrics.SdcctMetricSet;
@@ -15,10 +16,9 @@ import javax.annotation.Nonnegative;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.SmartLifecycle;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
-public class LogstashReporter implements Reporter, SmartLifecycle {
+public class LogstashReporter extends AbstractLifecycleBean implements Reporter {
     private class ReportMetricsTask implements Runnable {
         @Override
         public void run() {
@@ -63,34 +63,18 @@ public class LogstashReporter implements Reporter, SmartLifecycle {
     private ScheduledFuture<?> taskFuture;
 
     @Override
-    public void stop(Runnable callback) {
-        this.stop();
-
-        callback.run();
-    }
-
-    @Override
-    public void stop() {
-        if (this.isRunning()) {
-            this.taskFuture.cancel(true);
-        }
-    }
-
-    @Override
-    public void start() {
-        if (!this.isRunning()) {
-            this.taskFuture = this.taskScheduler.scheduleAtFixedRate(new ReportMetricsTask(), this.period);
-        }
-    }
-
-    @Override
     public boolean isRunning() {
         return ((this.taskFuture != null) && !this.taskFuture.isDone());
     }
 
     @Override
-    public boolean isAutoStartup() {
-        return true;
+    protected void stopInternal() {
+        this.taskFuture.cancel(true);
+    }
+
+    @Override
+    protected void startInternal() {
+        this.taskFuture = this.taskScheduler.scheduleAtFixedRate(new ReportMetricsTask(), this.period);
     }
 
     public ObjectMapper getObjectMapper() {
@@ -108,11 +92,6 @@ public class LogstashReporter implements Reporter, SmartLifecycle {
 
     public void setPeriod(@Nonnegative long period) {
         this.period = period;
-    }
-
-    @Override
-    public int getPhase() {
-        return 0;
     }
 
     public ThreadPoolTaskScheduler getTaskScheduler() {

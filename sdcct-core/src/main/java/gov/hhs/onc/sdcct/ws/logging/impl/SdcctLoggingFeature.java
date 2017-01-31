@@ -1,37 +1,24 @@
 package gov.hhs.onc.sdcct.ws.logging.impl;
 
 import com.sun.xml.ws.encoding.soap.SOAP12Constants;
-import gov.hhs.onc.sdcct.context.SdcctPropertyNames;
 import gov.hhs.onc.sdcct.transform.impl.ByteArraySource;
-import gov.hhs.onc.sdcct.io.utils.SdcctMediaTypeUtils;
+import gov.hhs.onc.sdcct.net.mime.utils.SdcctMediaTypeUtils;
 import gov.hhs.onc.sdcct.json.impl.JsonCodec;
 import gov.hhs.onc.sdcct.json.impl.JsonEncodeOptionsImpl;
 import gov.hhs.onc.sdcct.logging.LoggingEvent;
-import gov.hhs.onc.sdcct.net.http.logging.HttpRequestEvent;
-import gov.hhs.onc.sdcct.net.http.logging.HttpResponseEvent;
-import gov.hhs.onc.sdcct.net.logging.RestEndpointType;
 import gov.hhs.onc.sdcct.net.logging.RestEvent;
 import gov.hhs.onc.sdcct.net.logging.RestEventType;
-import gov.hhs.onc.sdcct.net.http.logging.impl.HttpRequestEventImpl;
-import gov.hhs.onc.sdcct.net.http.logging.impl.HttpResponseEventImpl;
 import gov.hhs.onc.sdcct.transform.content.ContentCodec;
 import gov.hhs.onc.sdcct.transform.content.ContentCodecOptions;
 import gov.hhs.onc.sdcct.transform.content.SdcctContentType;
 import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
-import gov.hhs.onc.sdcct.ws.WsDirection;
-import gov.hhs.onc.sdcct.ws.WsPropertyNames;
 import gov.hhs.onc.sdcct.ws.logging.WsEvent;
-import gov.hhs.onc.sdcct.ws.logging.WsMessageType;
-import gov.hhs.onc.sdcct.ws.logging.WsRequestEvent;
-import gov.hhs.onc.sdcct.ws.logging.WsResponseEvent;
+import gov.hhs.onc.sdcct.ws.WsMessageType;
 import gov.hhs.onc.sdcct.ws.utils.SdcctWsPropertyUtils;
-import gov.hhs.onc.sdcct.xml.impl.SdcctDocumentBuilder;
-import gov.hhs.onc.sdcct.xml.impl.XdmDocument;
+import gov.hhs.onc.sdcct.xml.saxon.impl.SdcctDocumentBuilder;
+import gov.hhs.onc.sdcct.xml.saxon.impl.XdmDocument;
 import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
-import gov.hhs.onc.sdcct.xml.utils.SdcctXmlUtils;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.SequenceInputStream;
+import gov.hhs.onc.sdcct.xml.utils.SdcctDomUtils;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -40,7 +27,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
@@ -51,15 +37,8 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
-import org.apache.cxf.interceptor.StaxOutInterceptor;
-import org.apache.cxf.io.CacheAndWriteOutputStream;
-import org.apache.cxf.io.CachedOutputStream;
-import org.apache.cxf.io.CachedOutputStreamCallback;
-import org.apache.cxf.io.DelegatingInputStream;
 import org.apache.cxf.jaxrs.client.ClientConfiguration;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -67,16 +46,12 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.AbstractPhaseInterceptor;
-import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.OperationInfo;
-import org.apache.cxf.transport.http.Headers;
-import org.apache.cxf.ws.policy.PolicyConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -87,274 +62,6 @@ import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 public class SdcctLoggingFeature extends AbstractFeature implements InitializingBean {
-    private abstract class AbstractLoggingInterceptor<T extends WsEvent> extends AbstractPhaseInterceptor<Message> {
-        protected Class<T> eventClass;
-        protected Supplier<T> eventCreator;
-        protected WsDirection direction;
-        protected RestEndpointType endpointType;
-        protected String txIdPropName;
-        protected WsMessageType msgType;
-
-        protected AbstractLoggingInterceptor(String phase, Class<T> eventClass, Supplier<T> eventCreator, WsDirection direction, RestEndpointType endpointType,
-            String txIdPropName, WsMessageType msgType) {
-            super(phase);
-
-            this.eventClass = eventClass;
-            this.eventCreator = eventCreator;
-            this.direction = direction;
-            this.endpointType = endpointType;
-            this.txIdPropName = txIdPropName;
-            this.msgType = msgType;
-        }
-
-        @Override
-        public void handleMessage(Message msg) throws Fault {
-            Exchange exchange = msg.getExchange();
-            T event;
-            boolean initializeEvent = false;
-
-            if (!SdcctWsPropertyUtils.containsKey(msg, this.eventClass)) {
-                msg.put(this.eventClass, this.eventCreator.get());
-
-                initializeEvent = true;
-            }
-
-            String txId = buildTxId(exchange, msg, (event = msg.get(this.eventClass)), this.txIdPropName);
-
-            this.buildEvent(exchange, msg, event, initializeEvent);
-
-            try {
-                this.handleMessageInternal(exchange, msg, event);
-            } catch (Fault e) {
-                throw e;
-            } catch (Exception e) {
-                throw new Fault(new Exception(String.format("Unable to handle CXF message event (txId=%s) logging.", txId), e));
-            }
-        }
-
-        protected abstract void handleMessageInternal(Exchange exchange, Message msg, T event) throws Exception;
-
-        protected T buildEvent(Exchange exchange, Message msg, T event, boolean initialize) {
-            if (initialize) {
-                event.setDirection(this.direction);
-                event.setEndpointType(this.endpointType);
-                event.setMessageType(this.msgType);
-            }
-
-            return event;
-        }
-    }
-
-    private abstract class AbstractLoggingInInterceptor<T extends WsEvent> extends AbstractLoggingInterceptor<T> {
-        protected AbstractLoggingInInterceptor(String phase, Class<T> eventClass, Supplier<T> eventCreator, RestEndpointType endpointType, String txIdPropName,
-            WsMessageType msgType) {
-            super(phase, eventClass, eventCreator, WsDirection.INBOUND, endpointType, txIdPropName, msgType);
-        }
-    }
-
-    private abstract class AbstractLoggingHookInInterceptor<T extends WsEvent> extends AbstractLoggingInInterceptor<T> {
-        protected AbstractLoggingHookInInterceptor(Class<T> eventClass, Supplier<T> eventCreator, RestEndpointType endpointType, String txIdPropName,
-            WsMessageType msgType) {
-            super(Phase.RECEIVE, eventClass, eventCreator, endpointType, txIdPropName, msgType);
-
-            this.addBefore(PolicyConstants.POLICY_IN_INTERCEPTOR_ID);
-        }
-
-        @Override
-        protected void handleMessageInternal(Exchange exchange, Message msg, T event) throws Exception {
-            InputStream inStream = msg.getContent(InputStream.class), targetInStream;
-            boolean delegatingInStreamAvailable = (inStream instanceof DelegatingInputStream);
-            DelegatingInputStream delegatingInStream = (delegatingInStreamAvailable ? ((DelegatingInputStream) inStream) : null);
-            CachedOutputStream cachedStream = new CachedOutputStream();
-
-            IOUtils.copyAtLeast((targetInStream = (delegatingInStreamAvailable ? delegatingInStream.getInputStream() : inStream)), cachedStream,
-                Integer.MAX_VALUE);
-
-            cachedStream.flush();
-
-            targetInStream = new SequenceInputStream(cachedStream.getInputStream(), targetInStream);
-
-            if (delegatingInStreamAvailable) {
-                delegatingInStream.setInputStream(targetInStream);
-            } else {
-                msg.setContent(InputStream.class, targetInStream);
-            }
-
-            msg.setContent(CachedOutputStream.class, cachedStream);
-        }
-    }
-
-    private class ServerLoggingHookInInterceptor extends AbstractLoggingHookInInterceptor<WsRequestEvent> {
-        public ServerLoggingHookInInterceptor(WsMessageType msgType) {
-            super(WsRequestEvent.class, WsRequestEventImpl::new, RestEndpointType.SERVER, SdcctPropertyNames.WS_SERVER_TX_ID, msgType);
-        }
-    }
-
-    private class ClientLoggingHookInInterceptor extends AbstractLoggingHookInInterceptor<WsResponseEvent> {
-        public ClientLoggingHookInInterceptor(WsMessageType msgType) {
-            super(WsResponseEvent.class, WsResponseEventImpl::new, RestEndpointType.CLIENT, SdcctPropertyNames.WS_CLIENT_TX_ID, msgType);
-        }
-    }
-
-    private abstract class AbstractLoggingProcessInInterceptor<T extends WsEvent> extends AbstractLoggingInInterceptor<T> {
-        protected AbstractLoggingProcessInInterceptor(Class<T> eventClass, Supplier<T> eventCreator, RestEndpointType endpointType, String txIdPropName,
-            WsMessageType msgType) {
-            super(Phase.PRE_INVOKE, eventClass, eventCreator, endpointType, txIdPropName, msgType);
-        }
-
-        @Override
-        protected void handleMessageInternal(Exchange exchange, Message msg, T event) throws Exception {
-            CachedOutputStream cachedStream = msg.getContent(CachedOutputStream.class);
-            cachedStream.close();
-
-            SdcctLoggingFeature.this.processEvent(exchange, msg, event, this.msgType, cachedStream.getBytes());
-        }
-    }
-
-    private class ServerLoggingProcessInInterceptor extends AbstractLoggingProcessInInterceptor<WsRequestEvent> {
-        public ServerLoggingProcessInInterceptor(WsMessageType msgType) {
-            super(WsRequestEvent.class, WsRequestEventImpl::new, RestEndpointType.SERVER, SdcctPropertyNames.WS_SERVER_TX_ID, msgType);
-        }
-    }
-
-    private class ClientLoggingProcessInInterceptor extends AbstractLoggingProcessInInterceptor<WsResponseEvent> {
-        public ClientLoggingProcessInInterceptor(WsMessageType msgType) {
-            super(WsResponseEvent.class, WsResponseEventImpl::new, RestEndpointType.CLIENT, SdcctPropertyNames.WS_CLIENT_TX_ID, msgType);
-        }
-
-        @Override
-        protected void handleMessageInternal(Exchange exchange, Message msg, WsResponseEvent event) throws Exception {
-            HttpResponseEvent httpEvent = new HttpResponseEventImpl();
-
-            buildTxId(exchange, msg, httpEvent, SdcctPropertyNames.HTTP_CLIENT_TX_ID);
-
-            httpEvent.setContentType(SdcctWsPropertyUtils.getProperty(msg, Message.CONTENT_TYPE));
-            httpEvent.setEndpointType(RestEndpointType.CLIENT);
-            httpEvent.setHeaders(Headers.getSetProtocolHeaders(msg));
-            httpEvent.setStatusCode(SdcctWsPropertyUtils.getProperty(msg, Message.RESPONSE_CODE, Integer.class));
-
-            SdcctLoggingFeature.this.logEvent(httpEvent);
-
-            super.handleMessageInternal(exchange, msg, event);
-        }
-    }
-
-    private abstract class AbstractLoggingOutCallback<T extends WsEvent> implements CachedOutputStreamCallback {
-        protected Exchange exchange;
-        protected Message msg;
-        protected T event;
-        protected WsMessageType msgType;
-
-        protected AbstractLoggingOutCallback(Exchange exchange, Message msg, T event, WsMessageType msgType) {
-            this.exchange = exchange;
-            this.msg = msg;
-            this.event = event;
-            this.msgType = msgType;
-        }
-
-        @Override
-        public void onClose(CachedOutputStream cachedStream) {
-            try {
-                this.onCloseInternal(((CacheAndWriteOutputStream) cachedStream));
-            } catch (Fault e) {
-                throw e;
-            } catch (Exception e) {
-                throw new Fault(e);
-            }
-        }
-
-        @Override
-        public void onFlush(CachedOutputStream cachedStream) {
-        }
-
-        protected void onCloseInternal(CacheAndWriteOutputStream cachedStream) throws Exception {
-            try {
-                SdcctLoggingFeature.this.processEvent(this.exchange, this.msg, this.event, this.msgType, cachedStream.getBytes());
-            } finally {
-                OutputStream outStream = cachedStream.getFlowThroughStream();
-
-                cachedStream.lockOutputStream();
-                cachedStream.resetOut(null, false);
-
-                this.msg.setContent(OutputStream.class, outStream);
-            }
-        }
-    }
-
-    private class ServerLoggingOutCallback extends AbstractLoggingOutCallback<WsResponseEvent> {
-        public ServerLoggingOutCallback(Exchange exchange, Message msg, WsResponseEvent event, WsMessageType msgType) {
-            super(exchange, msg, event, msgType);
-        }
-    }
-
-    private class ClientLoggingOutCallback extends AbstractLoggingOutCallback<WsRequestEvent> {
-        public ClientLoggingOutCallback(Exchange exchange, Message msg, WsRequestEvent event, WsMessageType msgType) {
-            super(exchange, msg, event, msgType);
-        }
-
-        @Override
-        protected void onCloseInternal(CacheAndWriteOutputStream cachedStream) throws Exception {
-            super.onCloseInternal(cachedStream);
-
-            HttpRequestEvent httpEvent = new HttpRequestEventImpl();
-
-            buildTxId(exchange, msg, httpEvent, SdcctPropertyNames.HTTP_CLIENT_TX_ID);
-
-            httpEvent.setContentType(SdcctWsPropertyUtils.getProperty(msg, Message.CONTENT_TYPE));
-            httpEvent.setEndpointType(RestEndpointType.CLIENT);
-            httpEvent.setHeaders(Headers.getSetProtocolHeaders(msg));
-            httpEvent.setMethod(SdcctWsPropertyUtils.getProperty(msg, Message.HTTP_REQUEST_METHOD));
-            httpEvent.setPathInfo(SdcctWsPropertyUtils.getProperty(msg, Message.PATH_INFO));
-            httpEvent.setQueryString(SdcctWsPropertyUtils.getProperty(msg, Message.QUERY_STRING));
-            httpEvent.setScheme(SdcctWsPropertyUtils.getProperty(msg, WsPropertyNames.HTTP_SCHEME));
-            httpEvent.setUri(SdcctWsPropertyUtils.getProperty(msg, Message.REQUEST_URI));
-            httpEvent.setUrl(SdcctWsPropertyUtils.getProperty(msg, Message.REQUEST_URL));
-
-            SdcctLoggingFeature.this.logEvent(httpEvent);
-        }
-    }
-
-    private abstract class AbstractLoggingOutInterceptor<T extends WsEvent, U extends AbstractLoggingOutCallback<T>> extends AbstractLoggingInterceptor<T> {
-        protected AbstractLoggingOutInterceptor(Class<T> eventClass, Supplier<T> eventCreator, RestEndpointType endpointType, String txIdPropName,
-            WsMessageType msgType) {
-            super(Phase.PRE_STREAM, eventClass, eventCreator, WsDirection.OUTBOUND, endpointType, txIdPropName, msgType);
-
-            this.addBefore(StaxOutInterceptor.class.getName());
-        }
-
-        @Override
-        protected void handleMessageInternal(Exchange exchange, Message msg, T event) throws Exception {
-            CacheAndWriteOutputStream cachedStream = new CacheAndWriteOutputStream(msg.getContent(OutputStream.class));
-            cachedStream.registerCallback(this.buildCallback(exchange, msg, event, msgType));
-
-            msg.setContent(OutputStream.class, cachedStream);
-        }
-
-        protected abstract U buildCallback(Exchange exchange, Message msg, T event, WsMessageType msgType);
-    }
-
-    private class ServerLoggingOutInterceptor extends AbstractLoggingOutInterceptor<WsResponseEvent, ServerLoggingOutCallback> {
-        public ServerLoggingOutInterceptor(WsMessageType msgType) {
-            super(WsResponseEvent.class, WsResponseEventImpl::new, RestEndpointType.SERVER, SdcctPropertyNames.WS_SERVER_TX_ID, msgType);
-        }
-
-        @Override
-        protected ServerLoggingOutCallback buildCallback(Exchange exchange, Message msg, WsResponseEvent event, WsMessageType msgType) {
-            return new ServerLoggingOutCallback(exchange, msg, event, msgType);
-        }
-    }
-
-    private class ClientLoggingOutInterceptor extends AbstractLoggingOutInterceptor<WsRequestEvent, ClientLoggingOutCallback> {
-        public ClientLoggingOutInterceptor(WsMessageType msgType) {
-            super(WsRequestEvent.class, WsRequestEventImpl::new, RestEndpointType.CLIENT, SdcctPropertyNames.WS_CLIENT_TX_ID, msgType);
-        }
-
-        @Override
-        protected ClientLoggingOutCallback buildCallback(Exchange exchange, Message msg, WsRequestEvent event, WsMessageType msgType) {
-            return new ClientLoggingOutCallback(exchange, msg, event, msgType);
-        }
-    }
-
     private final static Logger LOGGER = LoggerFactory.getLogger(SdcctLoggingFeature.class);
 
     @Autowired
@@ -364,18 +71,18 @@ public class SdcctLoggingFeature extends AbstractFeature implements Initializing
     private SdcctDocumentBuilder docBuilder;
 
     private Map<SdcctContentType, ContentCodec<?, ?>> contentTypeCodecs;
-    private ServerLoggingHookInInterceptor restServerHookInInterceptor = new ServerLoggingHookInInterceptor(WsMessageType.REST),
-        soapServerHookInInterceptor = new ServerLoggingHookInInterceptor(WsMessageType.SOAP);
-    private ServerLoggingProcessInInterceptor restServerProcessInInterceptor = new ServerLoggingProcessInInterceptor(WsMessageType.REST),
-        soapServerProcessInInterceptor = new ServerLoggingProcessInInterceptor(WsMessageType.SOAP);
-    private ServerLoggingOutInterceptor restServerOutInterceptor = new ServerLoggingOutInterceptor(WsMessageType.REST),
-        soapServerOutInterceptor = new ServerLoggingOutInterceptor(WsMessageType.SOAP);
-    private ClientLoggingHookInInterceptor restClientHookInInterceptor = new ClientLoggingHookInInterceptor(WsMessageType.REST),
-        soapClientHookInInterceptor = new ClientLoggingHookInInterceptor(WsMessageType.SOAP);
-    private ClientLoggingProcessInInterceptor restClientProcessInInterceptor = new ClientLoggingProcessInInterceptor(WsMessageType.REST),
-        soapClientProcessInInterceptor = new ClientLoggingProcessInInterceptor(WsMessageType.SOAP);
-    private ClientLoggingOutInterceptor restClientOutInterceptor = new ClientLoggingOutInterceptor(WsMessageType.REST),
-        soapClientOutInterceptor = new ClientLoggingOutInterceptor(WsMessageType.SOAP);
+    private ServerLoggingHookInInterceptor restServerHookInInterceptor = new ServerLoggingHookInInterceptor(this, WsMessageType.REST),
+        soapServerHookInInterceptor = new ServerLoggingHookInInterceptor(this, WsMessageType.SOAP);
+    private ServerLoggingProcessInInterceptor restServerProcessInInterceptor = new ServerLoggingProcessInInterceptor(this, WsMessageType.REST),
+        soapServerProcessInInterceptor = new ServerLoggingProcessInInterceptor(this, WsMessageType.SOAP);
+    private ServerLoggingOutInterceptor restServerOutInterceptor = new ServerLoggingOutInterceptor(this, WsMessageType.REST),
+        soapServerOutInterceptor = new ServerLoggingOutInterceptor(this, WsMessageType.SOAP);
+    private ClientLoggingHookInInterceptor restClientHookInInterceptor = new ClientLoggingHookInInterceptor(this, WsMessageType.REST),
+        soapClientHookInInterceptor = new ClientLoggingHookInInterceptor(this, WsMessageType.SOAP);
+    private ClientLoggingProcessInInterceptor restClientProcessInInterceptor = new ClientLoggingProcessInInterceptor(this, WsMessageType.REST),
+        soapClientProcessInInterceptor = new ClientLoggingProcessInInterceptor(this, WsMessageType.SOAP);
+    private ClientLoggingOutInterceptor restClientOutInterceptor = new ClientLoggingOutInterceptor(this, WsMessageType.REST),
+        soapClientOutInterceptor = new ClientLoggingOutInterceptor(this, WsMessageType.SOAP);
 
     @Override
     public void initialize(Server server, Bus bus) {
@@ -405,7 +112,7 @@ public class SdcctLoggingFeature extends AbstractFeature implements Initializing
         this.contentTypeCodecs = this.codecs.stream().collect(SdcctStreamUtils.toMap(ContentCodec::getType, Function.identity(), HashMap::new));
     }
 
-    private <T extends WsEvent> void processEvent(Exchange exchange, Message msg, T event, WsMessageType msgType, byte ... payloadBytes) throws Exception {
+    public <T extends WsEvent> void processEvent(Exchange exchange, Message msg, T event, WsMessageType msgType, byte ... payloadBytes) throws Exception {
         boolean restMsgType = (msgType == WsMessageType.REST), soapMsgType = (msgType == WsMessageType.SOAP);
         Binding binding = exchange.getBinding();
 
@@ -532,7 +239,7 @@ public class SdcctLoggingFeature extends AbstractFeature implements Initializing
             .ifPresent(soapFaultCodeElem -> soapFaultContentMap.put(SOAP12Constants.QNAME_FAULT_CODE.getLocalPart(),
                 DOMUtils.getContent(DOMUtils.getFirstChildWithName(soapFaultCodeElem, SOAP12Constants.QNAME_FAULT_VALUE))));
 
-        List<Element> soapFaultSubcodeElems = SdcctXmlUtils.findDescendantElements(soapFaultElem, SOAP12Constants.QNAME_FAULT_SUBCODE);
+        List<Element> soapFaultSubcodeElems = SdcctDomUtils.findDescendantElements(soapFaultElem, SOAP12Constants.QNAME_FAULT_SUBCODE);
 
         if (!soapFaultSubcodeElems.isEmpty()) {
             soapFaultContentMap.put(SOAP12Constants.QNAME_FAULT_SUBCODE.getLocalPart(),
@@ -550,7 +257,7 @@ public class SdcctLoggingFeature extends AbstractFeature implements Initializing
 
             if (!soapFaultDetailChildElems.isEmpty()) {
                 soapFaultContentMap.put(SOAP12Constants.QNAME_FAULT_DETAIL.getLocalPart(),
-                    SdcctXmlUtils.mapTreeContent(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER), soapFaultDetailChildElems.stream()));
+                    SdcctDomUtils.mapTreeContent(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER), soapFaultDetailChildElems.stream()));
             }
         });
 
@@ -558,11 +265,11 @@ public class SdcctLoggingFeature extends AbstractFeature implements Initializing
     }
 
     private static <T extends WsEvent> void processSoapHeaders(T event, Element docElem) {
-        List<Element> soapHeaderElems = SdcctXmlUtils.findDescendantElements(docElem, SOAP12Constants.QNAME_SOAP_HEADER).stream()
+        List<Element> soapHeaderElems = SdcctDomUtils.findDescendantElements(docElem, SOAP12Constants.QNAME_SOAP_HEADER).stream()
             .flatMap(soapHeaderContainerElem -> DomUtils.getChildElements(soapHeaderContainerElem).stream()).collect(Collectors.toList());
 
         if (!soapHeaderElems.isEmpty()) {
-            event.setSoapHeaders(SdcctXmlUtils.mapTreeContent(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER), soapHeaderElems.stream()));
+            event.setSoapHeaders(SdcctDomUtils.mapTreeContent(() -> new TreeMap<>(String.CASE_INSENSITIVE_ORDER), soapHeaderElems.stream()));
         }
     }
 
@@ -572,12 +279,12 @@ public class SdcctLoggingFeature extends AbstractFeature implements Initializing
             new String(codec.encode(codec.decode(payloadBytes, null), new JsonEncodeOptionsImpl().setOption(ContentCodecOptions.PRETTY, true)), enc));
     }
 
-    private void logEvent(LoggingEvent event) {
+    public void logEvent(LoggingEvent event) {
         LOGGER.info(event.buildMarker(), StringUtils.EMPTY);
     }
 
     @Nullable
-    private static String buildTxId(Exchange exchange, Message msg, RestEvent event, String propName) {
+    public static String buildTxId(Exchange exchange, Message msg, RestEvent event, String propName) {
         if (msg.containsKey(propName)) {
             return SdcctWsPropertyUtils.getProperty(msg, propName);
         }

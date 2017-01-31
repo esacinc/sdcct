@@ -30,7 +30,7 @@
         c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/fhir_test_malformed_xml.xml"/>
     
     <!--suppress SpringPlaceholdersInspection -->
-    <beans:bean id="formFhirTestTranscode" parent="formFhir"
+    <beans:bean id="formFhirTestTranscode" parent="formFhir" autowire-candidate="false"
         c:name="fhir_test_transcode"
         c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/fhir_test_transcode.xml"/>
 </beans:beans>

@@ -2,6 +2,7 @@ package gov.hhs.onc.sdcct.xml.jaxb;
 
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbContextMetadata;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbElementMetadata;
+import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbSchemaMetadata;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbTypeMetadata;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -22,6 +23,9 @@ public interface JaxbContextRepository {
     public JaxbTypeMetadata<?, ?> findTypeMetadata(Class<?> beanImplClass) throws JAXBException;
 
     public JaxbContextMetadata findContextMetadata(String schemaNsUri) throws JAXBException;
+
+    @Nullable
+    public JaxbSchemaMetadata findSchemaMetadata(String schemaNsUri);
 
     public Map<String, JaxbContextMetadata> getContextMetadatas();
 

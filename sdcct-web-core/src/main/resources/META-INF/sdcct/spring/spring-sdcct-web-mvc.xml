@@ -46,7 +46,6 @@
                 </beans:property>
                 <beans:property name="templateResolvers">
                     <beans:set>
-                        <!--suppress SpringPlaceholdersInspection -->
                         <beans:bean parent="templateResolver"
                             p:prefix="${sdcct.view.dir.path}/"/>
                     </beans:set>

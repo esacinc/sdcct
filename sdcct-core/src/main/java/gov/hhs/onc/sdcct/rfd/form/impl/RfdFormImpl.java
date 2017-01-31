@@ -11,4 +11,9 @@ public class RfdFormImpl extends AbstractSdcctForm<FormDesignType> implements Rf
     public RfdFormImpl(String name, ResourceSource src) {
         super(SpecificationType.RFD, FormDesignType.class, FormDesignTypeImpl.class, name, src);
     }
+
+    @Override
+    public RfdForm build() throws Exception {
+        return ((RfdForm) super.build());
+    }
 }

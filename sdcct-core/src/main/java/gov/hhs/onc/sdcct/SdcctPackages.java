@@ -42,6 +42,11 @@ public final class SdcctPackages {
     public final static String SDC_IMPL_NAME = SDC_NAME + ClassUtils.PACKAGE_SEPARATOR + SdcctClassUtils.IMPL_PKG_NAME;
     public final static Package SDC_IMPL = Package.getPackage(SDC_IMPL_NAME);
 
+    public final static String VALIDATE_NAME = ROOT_NAME + ".validate";
+    public final static Package VALIDATE = Package.getPackage(VALIDATE_NAME);
+    public final static String VALIDATE_IMPL_NAME = VALIDATE_NAME + ClassUtils.PACKAGE_SEPARATOR + SdcctClassUtils.IMPL_PKG_NAME;
+    public final static Package VALIDATE_IMPL = Package.getPackage(VALIDATE_IMPL_NAME);
+
     private SdcctPackages() {
     }
 }

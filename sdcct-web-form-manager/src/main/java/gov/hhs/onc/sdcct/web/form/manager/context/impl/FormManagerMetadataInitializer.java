@@ -5,7 +5,7 @@ import gov.hhs.onc.sdcct.context.impl.SdcctApplication;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
-@Order(Ordered.LOWEST_PRECEDENCE - 1)
+@Order((Ordered.LOWEST_PRECEDENCE - 1))
 public class FormManagerMetadataInitializer extends AbstractMetadataInitializer {
     public FormManagerMetadataInitializer(SdcctApplication app) {
         super(app, "sdcct-web-form-manager");

@@ -12,8 +12,7 @@ File sdcSchemaPkgArchiveFile = SdcctBuildUtils.resolveRemoteArtifact(log, projec
     new URL("${project.properties.getProperty("project.build.sdcSchemaPackageRepoArchiveUrlPrefix")}/${project.properties.getProperty("project.build.sdcSchemaPackageVersion")}.${sdcSchemaPkgArchiveArtifact.type}"),
     true), schemaDir = new File(project.properties.getProperty("project.build.schemaDirectory")),
     schematronDir = new File(project.properties.getProperty("project.build.schematronDirectory")),
-    wsdlDir = new File(project.properties.getProperty("project.build.wsdlDirectory")),
-    sdcTestFormDir = new File("${project.properties.getProperty("project.build.testFormDirectory")}/sdc")
+    wsdlDir = new File(project.properties.getProperty("project.build.wsdlDirectory"))
 
 ant.mkdir(dir: schemaDir)
 
@@ -25,13 +24,11 @@ ant.unzip(src: sdcSchemaPkgArchiveFile, dest: schemaDir) {
     ant.cutdirsmapper(dirs: 2)
 }
 
-ant.mkdir(dir: schematronDir)
-
 ant.unzip(src: sdcSchemaPkgArchiveFile, dest: schematronDir) {
     ant.patternset() {
         ant.include(name: "*/schematron/**/*.${SdcctFileNameExtensions.SCH}")
     }
-    
+
     ant.cutdirsmapper(dirs: 2)
 }
 
@@ -43,14 +40,4 @@ ant.unzip(src: sdcSchemaPkgArchiveFile, dest: wsdlDir) {
     }
     
     ant.cutdirsmapper(dirs: 2)
-}
-
-ant.mkdir(dir: sdcTestFormDir)
-
-ant.unzip(src: sdcSchemaPkgArchiveFile, dest: sdcTestFormDir) {
-    ant.patternset() {
-        ant.include(name: "*/example/form/*.${SdcctFileNameExtensions.XML}")
-    }
-    
-    ant.cutdirsmapper(dirs: 3)
 }

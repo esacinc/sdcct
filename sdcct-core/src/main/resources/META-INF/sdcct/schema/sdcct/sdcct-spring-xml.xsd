@@ -115,7 +115,7 @@
             <xsd:documentation source="java:org.springframework.beans.factory.config.BeanDefinition"/>
             <xsd:appinfo>
                 <tool:annotation>
-                    <tool:exports type="gov.hhs.onc.sdcct.xml.impl.XdmDocument"/>
+                    <tool:exports type="gov.hhs.onc.sdcct.xml.saxon.impl.XdmDocument"/>
                 </tool:annotation>
             </xsd:appinfo>
         </xsd:annotation>
@@ -137,7 +137,7 @@
             <xsd:documentation source="java:org.springframework.beans.factory.config.BeanDefinition"/>
             <xsd:appinfo>
                 <tool:annotation>
-                    <tool:exports type="gov.hhs.onc.sdcct.xml.xpath.impl.SdcctXpathExecutable"/>
+                    <tool:exports type="gov.hhs.onc.sdcct.xml.xpath.saxon.impl.SdcctXpathExecutable"/>
                 </tool:annotation>
             </xsd:appinfo>
         </xsd:annotation>
@@ -159,7 +159,7 @@
             <xsd:documentation source="java:org.springframework.beans.factory.config.BeanDefinition"/>
             <xsd:appinfo>
                 <tool:annotation>
-                    <tool:exports type="gov.hhs.onc.sdcct.xml.xslt.impl.SdcctXsltExecutable"/>
+                    <tool:exports type="gov.hhs.onc.sdcct.xml.xslt.saxon.impl.SdcctXsltExecutable"/>
                 </tool:annotation>
             </xsd:appinfo>
         </xsd:annotation>

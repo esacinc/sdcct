@@ -4,12 +4,13 @@ import gov.hhs.onc.sdcct.fhir.form.FhirForm;
 import gov.hhs.onc.sdcct.form.SdcctForm;
 import gov.hhs.onc.sdcct.rfd.form.RfdForm;
 import gov.hhs.onc.sdcct.test.impl.AbstractSdcctUnitTests;
+import gov.hhs.onc.sdcct.transform.content.ContentCodecOptions;
 import gov.hhs.onc.sdcct.validate.SdcctValidatorService;
 import gov.hhs.onc.sdcct.validate.ValidationException;
 import gov.hhs.onc.sdcct.xml.impl.SdcctXmlInputFactory;
-import java.util.stream.Collectors;
+import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
+import java.nio.charset.StandardCharsets;
 import javax.annotation.Resource;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,29 +42,22 @@ public class ValidatorServiceUnitTests extends AbstractSdcctUnitTests {
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
     private RfdForm testRfdForm;
 
-    @Resource(name = "formRfdTestSdcCapAdrenal")
-    @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
-    private RfdForm testRfdSdcCapAdrenalForm;
-
-    @Resource(name = "formRfdTestSdcCapBreastBmk")
-    @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
-    private RfdForm testRfdSdcCapBreastBmkForm;
-
-    @Resource(name = "formRfdTestSdcCapBreastRes")
-    @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
-    private RfdForm testRfdSdcCapBreastResForm;
-
-    @Resource(name = "formRfdTestSdcCtLungScreeningTemplate")
-    @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
-    private RfdForm testRfdSdcCtLungScreeningTemplateForm;
-
     @Resource(name = "formRfdTestInvalidXml")
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
     private RfdForm testRfdInvalidXmlForm;
 
+    /**
+     * TODO: Re-enable if/when the SDC Schematrons' SDC XML namespace URIs are updated.
+     */
+    // region region
+    // @formatter:off
+    /*
     @Resource(name = "formRfdTestSchematron")
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
     private RfdForm testRfdSchematronForm;
+    */
+    // @formatter:on
+    // endregion
 
     @Resource(name = "validatorServiceFhir")
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
@@ -72,6 +66,10 @@ public class ValidatorServiceUnitTests extends AbstractSdcctUnitTests {
     @Resource(name = "validatorServiceRfd")
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
     private SdcctValidatorService rfdValidatorService;
+
+    @Autowired
+    @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
+    private XmlCodec xmlCodec;
 
     @Autowired
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
@@ -87,27 +85,32 @@ public class ValidatorServiceUnitTests extends AbstractSdcctUnitTests {
         buildForm(this.testFhirMalformedXmlForm, false);
     }
 
-    @Test(dependsOnMethods = { "testValidateSchematron" })
+    @Test(dependsOnMethods = { "testValidateValid" })
     public void testValidateInvalidXml() throws Exception {
         this.validateForm(this.fhirValidatorService, buildForm(this.testFhirInvalidXmlForm, true), false);
 
         this.validateForm(this.rfdValidatorService, buildForm(this.testRfdInvalidXmlForm, true), false);
     }
 
+    /**
+     * TODO: Re-enable if/when the SDC Schematrons' SDC XML namespace URIs are updated.
+     */
+    // region region
+    // @formatter:off
+    /*
     @Test(dependsOnMethods = { "testValidateValid" })
     public void testValidateSchematron() throws Exception {
         this.validateForm(this.rfdValidatorService, buildForm(this.testRfdSchematronForm, true), false);
     }
+    */
+    // @formatter:on
+    // endregion
 
     @Test
     public void testValidateValid() throws Exception {
         this.validateForm(this.fhirValidatorService, buildForm(this.testFhirForm, true), true);
 
         this.validateForm(this.rfdValidatorService, buildForm(this.testRfdForm, true), true);
-        this.validateForm(this.rfdValidatorService, buildForm(this.testRfdSdcCapAdrenalForm, true), true);
-        this.validateForm(this.rfdValidatorService, buildForm(this.testRfdSdcCapBreastBmkForm, true), true);
-        this.validateForm(this.rfdValidatorService, buildForm(this.testRfdSdcCapBreastResForm, true), true);
-        this.validateForm(this.rfdValidatorService, buildForm(this.testRfdSdcCtLungScreeningTemplateForm, true), true);
     }
 
     private static SdcctForm<?> buildForm(SdcctForm<?> testForm, boolean buildableExpected) throws Exception {
@@ -141,11 +144,15 @@ public class ValidatorServiceUnitTests extends AbstractSdcctUnitTests {
             // noinspection ConstantConditions
             validatorService.validate(this.xmlInFactory.createXMLStreamReader(testForm.getDocument().getSource()));
         } catch (ValidationException e) {
-            LOGGER.trace(String.format("Test form (name=%s, identifier=%s) was invalid:%s", testFormName, testFormIdentifier,
-                e.getResult().getIssues().stream().map(testFormIssue -> String.format("\n{%s}", testFormIssue)).collect(Collectors.joining(StringUtils.EMPTY))),
+            String testFormValidationResultStr =
+                new String(this.xmlCodec.encode(e.getResult(), this.xmlCodec.getDefaultEncodeOptions().setOption(ContentCodecOptions.PRETTY, true)),
+                    StandardCharsets.UTF_8);
+
+            LOGGER.trace(String.format("Test form (name=%s, identifier=%s) was invalid:\n%s", testFormName, testFormIdentifier, testFormValidationResultStr),
                 e);
 
-            Assert.assertFalse(validExpected, String.format("Test form (name=%s, identifier=%s) was expected to be valid.", testFormName, testFormIdentifier));
+            Assert.assertFalse(validExpected, String.format("Test form (name=%s, identifier=%s) was expected to be valid:\n%s", testFormName,
+                testFormIdentifier, testFormValidationResultStr));
 
             return;
         }

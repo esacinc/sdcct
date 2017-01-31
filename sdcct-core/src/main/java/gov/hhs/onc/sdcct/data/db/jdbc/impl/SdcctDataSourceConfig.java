@@ -36,22 +36,22 @@ public class SdcctDataSourceConfig extends HikariConfig implements InitializingB
 
             String metricNamePrefix = (POOL_METRIC_NAME_PREFIX + poolName), metricName;
 
-            this.metrics =
-                Stream.of(
-                    new ImmutablePair<>((metricName = (metricNamePrefix + CONN_ACTIVE_METRIC_NAME_SUFFIX)), SdcctDataSourceConfig.this.metricRegistry.register(
-                        metricName, ((Gauge<Integer>) () -> this.poolStats.getActiveConnections()))),
-                    new ImmutablePair<>((this.connAcquireIntervalMetricName = (metricNamePrefix + CONN_ACQUIRE_INTERVAL_METRIC_NAME_SUFFIX)),
-                        SdcctDataSourceConfig.this.metricRegistry.timer(this.connAcquireIntervalMetricName)),
-                    new ImmutablePair<>((metricName = (metricNamePrefix + CONN_IDLE_METRIC_NAME_SUFFIX)), SdcctDataSourceConfig.this.metricRegistry.register(
-                        metricName, ((Gauge<Integer>) () -> this.poolStats.getIdleConnections()))),
-                    new ImmutablePair<>((metricName = (metricNamePrefix + CONN_PENDING_METRIC_NAME_SUFFIX)), SdcctDataSourceConfig.this.metricRegistry
-                        .register(metricName, ((Gauge<Integer>) () -> this.poolStats.getPendingThreads()))),
-                    new ImmutablePair<>((this.connTimeoutRateMetricName = (metricNamePrefix + CONN_TIMEOUT_RATE_METRIC_NAME_SUFFIX)),
-                        SdcctDataSourceConfig.this.metricRegistry.meter(this.connTimeoutRateMetricName)),
-                    new ImmutablePair<>((metricName = (metricNamePrefix + CONN_TOTAL_METRIC_NAME_SUFFIX)), SdcctDataSourceConfig.this.metricRegistry.register(
-                        metricName, ((Gauge<Integer>) () -> this.poolStats.getTotalConnections()))),
-                    new ImmutablePair<>((this.connUsageMetricName = (metricNamePrefix + CONN_USAGE_METRIC_NAME_SUFFIX)),
-                        SdcctDataSourceConfig.this.metricRegistry.histogram(this.connUsageMetricName))).collect(SdcctStreamUtils.toMap(TreeMap::new));
+            this.metrics = Stream.of(
+                new ImmutablePair<>((metricName = (metricNamePrefix + CONN_ACTIVE_METRIC_NAME_SUFFIX)),
+                    SdcctDataSourceConfig.this.metricRegistry.register(metricName, ((Gauge<Integer>) () -> this.poolStats.getActiveConnections()))),
+                new ImmutablePair<>((this.connAcquireIntervalMetricName = (metricNamePrefix + CONN_ACQUIRE_INTERVAL_METRIC_NAME_SUFFIX)),
+                    SdcctDataSourceConfig.this.metricRegistry.timer(this.connAcquireIntervalMetricName)),
+                new ImmutablePair<>((metricName = (metricNamePrefix + CONN_IDLE_METRIC_NAME_SUFFIX)),
+                    SdcctDataSourceConfig.this.metricRegistry.register(metricName, ((Gauge<Integer>) () -> this.poolStats.getIdleConnections()))),
+                new ImmutablePair<>((metricName = (metricNamePrefix + CONN_PENDING_METRIC_NAME_SUFFIX)),
+                    SdcctDataSourceConfig.this.metricRegistry.register(metricName, ((Gauge<Integer>) () -> this.poolStats.getPendingThreads()))),
+                new ImmutablePair<>((this.connTimeoutRateMetricName = (metricNamePrefix + CONN_TIMEOUT_RATE_METRIC_NAME_SUFFIX)),
+                    SdcctDataSourceConfig.this.metricRegistry.meter(this.connTimeoutRateMetricName)),
+                new ImmutablePair<>((metricName = (metricNamePrefix + CONN_TOTAL_METRIC_NAME_SUFFIX)),
+                    SdcctDataSourceConfig.this.metricRegistry.register(metricName, ((Gauge<Integer>) () -> this.poolStats.getTotalConnections()))),
+                new ImmutablePair<>((this.connUsageMetricName = (metricNamePrefix + CONN_USAGE_METRIC_NAME_SUFFIX)),
+                    SdcctDataSourceConfig.this.metricRegistry.histogram(this.connUsageMetricName)))
+                .collect(SdcctStreamUtils.toMap(TreeMap::new));
         }
 
         @Override
@@ -117,6 +117,8 @@ public class SdcctDataSourceConfig extends HikariConfig implements InitializingB
         this.driver = ((Driver) Class.forName(this.getDriverClassName()).newInstance());
 
         this.setDataSource(this.buildDataSource(this.user, false));
+
+        this.setMetricsTrackerFactory(this);
     }
 
     public Driver getDriver() {

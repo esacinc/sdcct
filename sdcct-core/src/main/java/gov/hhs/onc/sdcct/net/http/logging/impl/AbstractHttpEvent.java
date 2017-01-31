@@ -5,12 +5,12 @@ import gov.hhs.onc.sdcct.net.http.logging.HttpEvent;
 import gov.hhs.onc.sdcct.net.logging.RestEventType;
 import gov.hhs.onc.sdcct.net.logging.impl.AbstractRestEvent;
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
+import gov.hhs.onc.sdcct.utils.SdcctStringUtils.SdcctToStringBuilder;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public abstract class AbstractHttpEvent extends AbstractRestEvent implements HttpEvent {
     protected String charEnc;
@@ -24,8 +24,8 @@ public abstract class AbstractHttpEvent extends AbstractRestEvent implements Htt
     }
 
     @Override
-    protected void buildMarkerMessages(StringBuffer msgBuffer, ToStringBuilder msgToStrBuilder, StringBuffer logstashFileMsgBuffer,
-        ToStringBuilder logstashFileMsgToStrBuilder) {
+    protected void buildMarkerMessages(StringBuffer msgBuffer, SdcctToStringBuilder msgToStrBuilder, StringBuffer logstashFileMsgBuffer,
+        SdcctToStringBuilder logstashFileMsgToStrBuilder) {
         msgBuffer.append("HTTP ");
         msgBuffer.append(this.endpointType.getId());
         msgBuffer.append(StringUtils.SPACE);

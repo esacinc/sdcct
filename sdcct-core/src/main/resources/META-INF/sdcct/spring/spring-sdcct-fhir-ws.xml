@@ -70,6 +70,23 @@
         <beans:property name="resourceMetadatas">
             <beans:array value-type="gov.hhs.onc.sdcct.fhir.ws.metadata.FhirResourceWsMetadata">
                 <beans:bean parent="metadataWsResourceFhir"
+                    c:resourceMetadata-ref="metadataResourceFhirCodeSystem">
+                    <beans:property name="interactionMetadatas">
+                        <beans:array merge="true">
+                            <beans:bean parent="metadataWsInteractionFhirRead"/>
+                            <beans:bean parent="metadataWsInteractionFhirVread"/>
+                            <beans:bean parent="metadataWsInteractionFhirUpdate"
+                                p:restricted="true"/>
+                            <beans:bean parent="metadataWsInteractionFhirDelete"
+                                p:restricted="true"/>
+                            <beans:bean parent="metadataWsInteractionFhirHistoryInstance"/>
+                            <beans:bean parent="metadataWsInteractionFhirCreate"
+                                p:restricted="true"/>
+                            <beans:bean parent="metadataWsInteractionFhirSearchType"/>
+                        </beans:array>
+                    </beans:property>
+                </beans:bean>
+                <beans:bean parent="metadataWsResourceFhir"
                     c:resourceMetadata-ref="metadataResourceFhirQuestionnaire">
                     <beans:property name="interactionMetadatas">
                         <beans:array merge="true">

@@ -1,7 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project
     xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xsi:schemaLocation="
+        http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     
     <modelVersion>4.0.0</modelVersion>
     
@@ -18,6 +20,7 @@
         <license>
             <name>The Apache License, Version 2.0</name>
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
         </license>
     </licenses>
     
@@ -49,13 +52,13 @@
     </developers>
     
     <prerequisites>
-        <maven>3.0.5</maven>
+        <maven>3.1.0</maven>
     </prerequisites>
     
     <scm>
-        <connection>scm:git:git://github.com/esacinc/sdcct.git</connection>
-        <developerConnection>scm:git:git://github.com/esacinc/sdcct.git</developerConnection>
-        <url>http://github.com/esacinc/sdcct/tree/master/</url>
+        <connection>scm:git:http://github.com/esacinc/sdcct.git</connection>
+        <developerConnection>scm:git:https://github.com/esacinc/sdcct.git</developerConnection>
+        <url>http://github.com/esacinc/sdcct/</url>
     </scm>
     
     <distributionManagement>
@@ -70,8 +73,6 @@
     </distributionManagement>
     
     <properties>
-        <!-- Java properties -->
-        <java.version>1.8</java.version>
         <!-- Project properties -->
         <project.basedir.all>${project.basedir}/..</project.basedir.all>
         <project.basedir.parent>${project.basedir}/${project.parent.relativePath}</project.basedir.parent>
@@ -86,7 +87,7 @@
         <project.build.debCacheDataDirectoryPath>var/cache/${project.artifactId}</project.build.debCacheDataDirectoryPath>
         <project.build.debConfDataDirectoryPath>etc/${project.artifactId}</project.build.debConfDataDirectoryPath>
         <project.build.debLogDataDirectoryPath>var/log/${project.artifactId}</project.build.debLogDataDirectoryPath>
-        <project.build.debRunDataDirectoryPath>var/run/${project.artifactId}</project.build.debRunDataDirectoryPath>
+        <project.build.debRunDataDirectoryPath>run/${project.artifactId}</project.build.debRunDataDirectoryPath>
         <project.build.debVarDataDirectoryPath>var/lib/${project.artifactId}</project.build.debVarDataDirectoryPath>
         <project.build.debShareDataDirectoryPath>usr/share/${project.artifactId}</project.build.debShareDataDirectoryPath>
         <project.build.debShareBinDataDirectoryPath>${project.build.debShareDataDirectoryPath}/bin</project.build.debShareBinDataDirectoryPath>
@@ -109,15 +110,18 @@
         <project.build.dependenciesDirectory>${project.build.directory}/deps</project.build.dependenciesDirectory>
         <!-- Project build FHIR properties -->
         <project.build.fhirDataDirectory>${project.build.outputDirectory}/META-INF/sdcct/data/fhir</project.build.fhirDataDirectory>
-        <project.build.fhirImplGuideSiteUrlPrefix>http://hl7.org/fhir/2016May</project.build.fhirImplGuideSiteUrlPrefix>
         <project.build.fhirOtherTypeDataFile>${project.build.fhirDataDirectory}/profiles-others.xml</project.build.fhirOtherTypeDataFile>
         <project.build.fhirResourceTypeDataFile>${project.build.fhirDataDirectory}/profiles-resources.xml</project.build.fhirResourceTypeDataFile>
         <project.build.fhirTermDataFile>${project.build.fhirDataDirectory}/valuesets.xml</project.build.fhirTermDataFile>
         <project.build.fhirTypeDataFile>${project.build.fhirDataDirectory}/profiles-types.xml</project.build.fhirTypeDataFile>
         <project.build.fhirV2TermDataFile>${project.build.fhirDataDirectory}/v2-tables.xml</project.build.fhirV2TermDataFile>
         <project.build.fhirV3TermDataFile>${project.build.fhirDataDirectory}/v3-codesystems.xml</project.build.fhirV3TermDataFile>
-        <project.build.fhirSiteUrlPrefix>http://hl7-fhir.github.io</project.build.fhirSiteUrlPrefix>
-        <project.build.fhirVersion>1.5.0-SNAPSHOT</project.build.fhirVersion>
+        <project.build.fhirSdcDeImplGuideSiteUrlPrefix>http://hl7.org/fhir/us/sdcde/2016Sep</project.build.fhirSdcDeImplGuideSiteUrlPrefix>
+        <project.build.fhirSdcDeVersion>1.6.0</project.build.fhirSdcDeVersion>
+        <project.build.fhirSdcImplGuideSiteUrlPrefix>http://hl7.org/fhir/us/sdc/2016Sep</project.build.fhirSdcImplGuideSiteUrlPrefix>
+        <project.build.fhirSdcVersion>1.6.0</project.build.fhirSdcVersion>
+        <project.build.fhirSiteUrlPrefix>http://hl7.org/fhir/2016Sep</project.build.fhirSiteUrlPrefix>
+        <project.build.fhirVersion>1.6.0</project.build.fhirVersion>
         <!-- Project build Java Service Wrapper properties -->
         <project.build.jswOsArch>x86-64</project.build.jswOsArch>
         <project.build.jswOsName>linux</project.build.jswOsName>
@@ -128,18 +132,21 @@
         <project.build.schematronVersion>2010-04-14</project.build.schematronVersion>
         <!-- Project build SDC properties -->
         <project.build.sdcSchemaPackageRepoArchiveUrlPrefix>http://github.com/esacinc/sdc-schema-package/archive</project.build.sdcSchemaPackageRepoArchiveUrlPrefix>
-        <!--
-        TODO: Switch back to 2.0 milestone once SDC schema changes are tagged.
-        -->
-        <project.build.sdcSchemaPackageVersion>master</project.build.sdcSchemaPackageVersion>
-        <project.build.sdcVersion>2.0-SNAPSHOT</project.build.sdcVersion>
+        <project.build.sdcSchemaPackageVersion>2.0-M3</project.build.sdcSchemaPackageVersion>
+        <project.build.sdcVersion>2.0-M3</project.build.sdcVersion>
         <!-- Project build SoapUI properties -->
         <project.build.soapuiVersion>5.2.1</project.build.soapuiVersion>
         <project.build.soapuiRepoUrlPrefix>http://github.com/SmartBear/soapui/raw/${project.build.soapuiVersion}</project.build.soapuiRepoUrlPrefix>
         <!-- Project build source properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Project build test properties -->
+        <project.build.testCacheDirectory>${project.build.directory}/test-work</project.build.testCacheDirectory>
+        <project.build.testConfDirectory>${project.build.directory}/test-conf</project.build.testConfDirectory>
+        <project.build.testLogDirectory>${project.build.directory}/test-logs</project.build.testLogDirectory>
+        <project.build.testVarDirectory>${project.build.directory}/test-data</project.build.testVarDirectory>
         <!-- Project Java properties -->
         <project.java.package>${project.groupId}</project.java.package>
+        <project.java.version>1.8</project.java.version>
     </properties>
     
     <repositories>
@@ -180,37 +187,37 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>2.8.1</version>
+                <version>2.8.3</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
-                <version>2.8.1</version>
+                <version>2.8.3</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.8.1</version>
+                <version>2.8.3</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-xml</artifactId>
-                <version>2.8.1</version>
+                <version>2.8.3</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.datatype</groupId>
                 <artifactId>jackson-datatype-jdk8</artifactId>
-                <version>2.8.1</version>
+                <version>2.8.3</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.module</groupId>
                 <artifactId>jackson-module-jaxb-annotations</artifactId>
-                <version>2.8.1</version>
+                <version>2.8.3</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.woodstox</groupId>
                 <artifactId>woodstox-core</artifactId>
-                <version>5.0.2</version>
+                <version>5.0.3</version>
             </dependency>
             <dependency>
                 <groupId>com.github.sebhoss</groupId>
@@ -266,6 +273,7 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <!--
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-xjc</artifactId>
@@ -281,6 +289,7 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            -->
             <dependency>
                 <groupId>com.sun.xml.ws</groupId>
                 <artifactId>jaxws-rt</artifactId>
@@ -346,12 +355,16 @@
                         <groupId>com.sun.xml.bind</groupId>
                         <artifactId>jaxb-jxc</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>com.sun.xml.bind</groupId>
+                        <artifactId>jaxb-xjc</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
                 <groupId>com.zaxxer</groupId>
                 <artifactId>HikariCP</artifactId>
-                <version>2.4.7</version>
+                <version>2.5.1</version>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
@@ -386,27 +399,27 @@
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-buffer</artifactId>
-                <version>4.1.4.Final</version>
+                <version>4.1.5.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-codec-http</artifactId>
-                <version>4.1.4.Final</version>
+                <version>4.1.5.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-common</artifactId>
-                <version>4.1.4.Final</version>
+                <version>4.1.5.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-handler</artifactId>
-                <version>4.1.4.Final</version>
+                <version>4.1.5.Final</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-transport</artifactId>
-                <version>4.1.4.Final</version>
+                <version>4.1.5.Final</version>
             </dependency>
             <dependency>
                 <groupId>javax.el</groupId>
@@ -456,7 +469,7 @@
             <dependency>
                 <groupId>net.sf.saxon</groupId>
                 <artifactId>Saxon-HE</artifactId>
-                <version>9.7.0-7</version>
+                <version>9.7.0-8</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.ant</groupId>
@@ -631,7 +644,7 @@
             <dependency>
                 <groupId>org.codehaus.janino</groupId>
                 <artifactId>janino</artifactId>
-                <version>3.0.1</version>
+                <version>3.0.6</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.woodstox</groupId>
@@ -646,7 +659,7 @@
             <dependency>
                 <groupId>org.eclipse.persistence</groupId>
                 <artifactId>org.eclipse.persistence.moxy</artifactId>
-                <version>2.6.3</version>
+                <version>2.6.4</version>
             </dependency>
             <dependency>
                 <groupId>org.fusesource.jansi</groupId>
@@ -692,12 +705,16 @@
                 <scope>provided</scope>
                 <exclusions>
                     <exclusion>
-                        <groupId>com.sun.istack</groupId>
-                        <artifactId>istack-commons-tools</artifactId>
+                        <groupId>com.sun</groupId>
+                        <artifactId>tools</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>com.sun.xml.dtd-parser</groupId>
                         <artifactId>dtd-parser</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.ant</groupId>
+                        <artifactId>ant</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -785,7 +802,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
-                <version>4.3.2.RELEASE</version>
+                <version>4.3.3.RELEASE</version>
                 <exclusions>
                     <exclusion>
                         <groupId>commons-logging</groupId>
@@ -800,26 +817,26 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>4.3.2.RELEASE</version>
+                <version>4.3.3.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>1.4.0.RELEASE</version>
+                <version>1.4.1.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-commons</artifactId>
-                <version>1.12.2.RELEASE</version>
+                <version>1.12.3.RELEASE</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-jpa</artifactId>
-                <version>1.10.2.RELEASE</version>
+                <version>1.10.3.RELEASE</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.data</groupId>
@@ -831,19 +848,19 @@
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-bom</artifactId>
-                <version>4.1.2.RELEASE</version>
+                <version>4.1.3.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-config</artifactId>
-                <version>4.1.2.RELEASE</version>
+                <version>4.1.3.RELEASE</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-core</artifactId>
-                <version>4.1.2.RELEASE</version>
+                <version>4.1.3.RELEASE</version>
             </dependency>
             <dependency>
                 <groupId>org.thymeleaf</groupId>
@@ -889,7 +906,7 @@
             <dependency>
                 <groupId>org.webjars.npm</groupId>
                 <artifactId>jquery</artifactId>
-                <version>3.1.0</version>
+                <version>3.1.1</version>
             </dependency>
             <dependency>
                 <groupId>xerces</groupId>
@@ -897,6 +914,12 @@
                 <version>2.11.0</version>
             </dependency>
             <!-- Test dependencies -->
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>3.5.2</version>
+                <scope>test</scope>
+            </dependency>
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
@@ -914,7 +937,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.5.1</version>
+                    <version>3.6.0</version>
                     <inherited>true</inherited>
                     <configuration>
                         <compilerArgs>
@@ -934,8 +957,8 @@
                         <proc>none</proc>
                         <showDeprecation>true</showDeprecation>
                         <showWarnings>true</showWarnings>
-                        <source>${java.version}</source>
-                        <target>${java.version}</target>
+                        <source>${project.java.version}</source>
+                        <target>${project.java.version}</target>
                         <useIncrementalCompilation>false</useIncrementalCompilation>
                     </configuration>
                 </plugin>
@@ -978,7 +1001,7 @@
                             <configuration>
                                 <rules>
                                     <requireJavaVersion>
-                                        <version>[${java.version},)</version>
+                                        <version>[${project.java.version},)</version>
                                     </requireJavaVersion>
                                 </rules>
                             </configuration>
@@ -1021,26 +1044,6 @@
                         <useDefaultDelimiters>false</useDefaultDelimiters>
                     </configuration>
                     <executions>
-                        <execution>
-                            <id>copy-test-resources-testng</id>
-                            <phase>process-test-resources</phase>
-                            <goals>
-                                <goal>copy-resources</goal>
-                            </goals>
-                            <inherited>true</inherited>
-                            <configuration>
-                                <outputDirectory>${project.build.directory}/testng</outputDirectory>
-                                <resources>
-                                    <resource>
-                                        <directory>${project.basedir.all}/sdcct-core/src/test/testng</directory>
-                                        <filtering>true</filtering>
-                                        <includes>
-                                            <include>*.xml</include>
-                                        </includes>
-                                    </resource>
-                                </resources>
-                            </configuration>
-                        </execution>
                         <execution>
                             <id>copy-resources-deb-control</id>
                             <phase>prepare-package</phase>
@@ -1135,14 +1138,24 @@
                     <inherited>true</inherited>
                     <configuration>
                         <argLine>-Xms512m -Xmx1024m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=256m -XX:+UseG1GC -XX:MaxGCPauseMillis=50</argLine>
+                        <includes>
+                            <include>**/*Tests.java</include>
+                        </includes>
+                        <properties combine.children="append">
+                            <property>
+                                <name>surefire.testng.verbose</name>
+                                <value>-1</value>
+                            </property>
+                        </properties>
                         <reportFormat>plain</reportFormat>
                         <systemPropertyVariables combine.children="append">
-                            <sdcct.data.dir>${project.build.directory}/surefire-data</sdcct.data.dir>
+                            <sdcct.conf.dir>${project.build.testConfDirectory}</sdcct.conf.dir>
+                            <sdcct.data.dir>${project.build.testVarDirectory}</sdcct.data.dir>
                             <sdcct.logging.console.thread.name>true</sdcct.logging.console.thread.name>
                             <sdcct.logging.console.tty>true</sdcct.logging.console.tty>
                             <sdcct.logging.console.tx>true</sdcct.logging.console.tx>
-                            <sdcct.logging.file.dir>${project.build.directory}/surefire-logs</sdcct.logging.file.dir>
-                            <sdcct.work.dir>${project.build.directory}/surefire-work</sdcct.work.dir>
+                            <sdcct.logging.file.dir>${project.build.testLogDirectory}</sdcct.logging.file.dir>
+                            <sdcct.work.dir>${project.build.testCacheDirectory}</sdcct.work.dir>
                         </systemPropertyVariables>
                         <trimStackTrace>false</trimStackTrace>
                         <workingDirectory>${project.build.directory}</workingDirectory>
@@ -1160,33 +1173,49 @@
                             </goals>
                             <inherited>true</inherited>
                             <configuration>
+                                <groups>sdcct.test.unit.all</groups>
+                                <properties>
+                                    <property>
+                                        <name>suitename</name>
+                                        <value>${project.artifactId}-test-unit</value>
+                                    </property>
+                                    <property>
+                                        <name>testname</name>
+                                        <value>${project.artifactId}-test-unit</value>
+                                    </property>
+                                </properties>
                                 <reportNameSuffix>unit</reportNameSuffix>
                                 <skipTests>${skipTestsUnit}</skipTests>
-                                <suiteXmlFiles>
-                                    <suiteXmlFile>${project.build.directory}/testng/testng-sdcct-unit.xml</suiteXmlFile>
-                                </suiteXmlFiles>
                                 <systemPropertyVariables>
-                                    <sdcct.data.db.name>sdcct-test-unit</sdcct.data.db.name>
+                                    <sdcct.data.db.name>${project.artifactId}-test-unit</sdcct.data.db.name>
                                     <sdcct.logging.file.name>${project.artifactId}-test-unit</sdcct.logging.file.name>
                                     <sdcct.logging.logstash.file.name>${project.artifactId}-logstash-test-unit</sdcct.logging.logstash.file.name>
                                 </systemPropertyVariables>
                             </configuration>
                         </execution>
                         <execution>
-                            <id>test-integration</id>
+                            <id>test-it</id>
                             <phase>integration-test</phase>
                             <goals>
                                 <goal>test</goal>
                             </goals>
                             <inherited>true</inherited>
                             <configuration>
+                                <groups>sdcct.test.it.all</groups>
+                                <properties>
+                                    <property>
+                                        <name>suitename</name>
+                                        <value>${project.artifactId}-test-it</value>
+                                    </property>
+                                    <property>
+                                        <name>testname</name>
+                                        <value>${project.artifactId}-test-it</value>
+                                    </property>
+                                </properties>
                                 <reportNameSuffix>it</reportNameSuffix>
                                 <skipTests>${skipTestsIt}</skipTests>
-                                <suiteXmlFiles>
-                                    <suiteXmlFile>${project.build.directory}/testng/testng-sdcct-it.xml</suiteXmlFile>
-                                </suiteXmlFiles>
                                 <systemPropertyVariables>
-                                    <sdcct.data.db.name>sdcct-test-it</sdcct.data.db.name>
+                                    <sdcct.data.db.name>${project.artifactId}-test-it</sdcct.data.db.name>
                                     <sdcct.logging.file.name>${project.artifactId}-test-it</sdcct.logging.file.name>
                                     <sdcct.logging.logstash.file.name>${project.artifactId}-logstash-test-it</sdcct.logging.logstash.file.name>
                                 </systemPropertyVariables>
@@ -1247,6 +1276,30 @@
                                 </scripts>
                             </configuration>
                         </execution>
+                        <execution>
+                            <id>process-test-resources</id>
+                            <phase>process-test-resources</phase>
+                            <goals>
+                                <goal>execute</goal>
+                            </goals>
+                            <inherited>true</inherited>
+                            <configuration>
+                                <properties combine.children="append">
+                                    <property>
+                                        <name>dirs</name>
+                                        <value>
+                                            ${project.build.testCacheDirectory}
+                                            ${project.build.testConfDirectory}
+                                            ${project.build.testLogDirectory}
+                                            ${project.build.testVarDirectory}
+                                        </value>
+                                    </property>
+                                </properties>
+                                <scripts>
+                                    <script>file://${project.basedir.all}/sdcct-core/src/main/scripts/sdcct-process-test-resources.groovy</script>
+                                </scripts>
+                            </configuration>
+                        </execution>
                     </executions>
                 </plugin>
                 <plugin>
@@ -1285,6 +1338,10 @@
                                                     <property>
                                                         <name>set.APP_BASE</name>
                                                         <value>..</value>
+                                                    </property>
+                                                    <property>
+                                                        <name>set.LD_PRELOAD</name>
+                                                        <value>/usr/lib/authbind/libauthbind.so.1</value>
                                                     </property>
                                                     <property>
                                                         <name>wrapper.java.classpath.1</name>
@@ -1339,7 +1396,7 @@
                                                 <extraArgument>-XX:+UseG1GC</extraArgument>
                                                 <extraArgument>-XX:MaxGCPauseMillis=50</extraArgument>
                                             </extraArguments>
-                                            <maxStackSize>512m</maxStackSize>
+                                            <maxStackSize>512</maxStackSize>
                                             <systemProperties combine.children="append">
                                                 <systemProperty>java.net.preferIPv4Addresses=true</systemProperty>
                                                 <systemProperty>java.net.preferIPv4Stack=true</systemProperty>

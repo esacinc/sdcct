@@ -6,7 +6,7 @@ import org.codehaus.groovy.ant.Groovyc
 
 Map<String, String> bindingVars = ((Map<String, String>) this.binding.variables)
 Boolean joint = BooleanUtils.toBooleanObject(bindingVars["joint"])
-String javaVersion = project.properties.getProperty("java.version")
+String javaVersion = project.properties.getProperty("project.java.version")
 File javaSrcDir = new File(project.build.sourceDirectory)
 File groovyScriptSrcDir = new File(project.build.scriptSourceDirectory, "groovy")
 File outDir = new File(project.build.outputDirectory)

@@ -30,6 +30,11 @@ public class HsqlServerImpl extends AbstractDbServer implements HsqlServer {
         }
 
         @Override
+        protected void printWithThread(String msg) {
+            this.print(msg);
+        }
+
+        @Override
         protected void print(String msg) {
             LOGGER.debug(msg);
         }
@@ -78,6 +83,7 @@ public class HsqlServerImpl extends AbstractDbServer implements HsqlServer {
 
     @Override
     protected void startInternal() {
+        // noinspection ConstantConditions
         boolean initDb = (!this.dbDir.exists() || (this.dbDir.list().length == 0));
 
         try {

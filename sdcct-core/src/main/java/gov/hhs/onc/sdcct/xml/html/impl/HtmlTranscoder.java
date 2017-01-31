@@ -2,33 +2,31 @@ package gov.hhs.onc.sdcct.xml.html.impl;
 
 import gov.hhs.onc.sdcct.transform.content.ContentCodecOptions;
 import gov.hhs.onc.sdcct.transform.impl.ByteArrayResult;
-import gov.hhs.onc.sdcct.transform.impl.SdcctConfiguration;
-import gov.hhs.onc.sdcct.transform.impl.SdcctPullSource;
+import gov.hhs.onc.sdcct.transform.saxon.impl.SdcctSaxonConfiguration;
+import gov.hhs.onc.sdcct.transform.saxon.impl.SdcctPullEventSource;
 import gov.hhs.onc.sdcct.transform.utils.SdcctTransformUtils;
 import gov.hhs.onc.sdcct.xml.html.HtmlTranscodeOptions;
-import gov.hhs.onc.sdcct.xml.impl.AbstractSdcctCdataXmlFilter;
-import gov.hhs.onc.sdcct.xml.impl.AugmentedDestination;
-import gov.hhs.onc.sdcct.xml.impl.ReceiverDestination;
-import gov.hhs.onc.sdcct.xml.impl.SdcctSerializer;
-import gov.hhs.onc.sdcct.xml.impl.SdcctStaxBridge;
+import gov.hhs.onc.sdcct.xml.saxon.impl.AbstractSdcctCdataXmlFilter;
+import gov.hhs.onc.sdcct.xml.saxon.impl.AugmentedDestination;
+import gov.hhs.onc.sdcct.xml.saxon.impl.ReceiverDestination;
+import gov.hhs.onc.sdcct.xml.saxon.impl.SdcctSerializer;
 import gov.hhs.onc.sdcct.xml.impl.SdcctXmlInputFactory;
 import gov.hhs.onc.sdcct.xml.xslt.DynamicXsltOptions;
 import gov.hhs.onc.sdcct.xml.xslt.impl.DynamicXsltOptionsImpl;
-import gov.hhs.onc.sdcct.xml.xslt.impl.SdcctXsltExecutable;
+import gov.hhs.onc.sdcct.xml.xslt.saxon.impl.SdcctXsltExecutable;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import javax.xml.XMLConstants;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import net.sf.saxon.event.Receiver;
+import net.sf.saxon.evpull.StaxToEventBridge;
 import net.sf.saxon.expr.parser.Location;
 import net.sf.saxon.om.NodeName;
-import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.type.SchemaType;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -56,7 +54,7 @@ public class HtmlTranscoder {
     private SdcctXmlInputFactory xmlInFactory;
 
     @Autowired
-    private SdcctConfiguration config;
+    private SdcctSaxonConfiguration config;
 
     private HtmlTranscodeOptions defaultTranscodeOpts;
 
@@ -70,11 +68,11 @@ public class HtmlTranscoder {
 
     public <T extends Result> T transcode(SdcctXsltExecutable xsltExec, Source src, T result, @Nullable HtmlTranscodeOptions opts) throws Exception {
         if (src instanceof StreamSource) {
-            try {
-                src = new SdcctPullSource(SdcctTransformUtils.getPublicId(src), new SdcctStaxBridge(this.xmlInFactory.createXMLStreamReader(src)));
-            } catch (XMLStreamException e) {
-                throw new SaxonApiException(e);
-            }
+            StaxToEventBridge srcEventIterator = new StaxToEventBridge();
+            srcEventIterator.setPipelineConfiguration(this.config.makePipelineConfiguration());
+            srcEventIterator.setXMLStreamReader(this.xmlInFactory.createXMLStreamReader(src));
+
+            src = new SdcctPullEventSource(SdcctTransformUtils.getPublicId(src), src.getSystemId(), srcEventIterator);
         }
 
         // noinspection ConstantConditions

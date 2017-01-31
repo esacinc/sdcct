@@ -19,9 +19,10 @@ import gov.hhs.onc.sdcct.data.parameter.TokenResourceParam;
 import gov.hhs.onc.sdcct.data.parameter.UriResourceParam;
 import gov.hhs.onc.sdcct.transform.content.path.ContentPathBuilder;
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
-import gov.hhs.onc.sdcct.xml.impl.SdcctDocumentBuilder;
-import gov.hhs.onc.sdcct.xml.impl.XdmDocument;
+import gov.hhs.onc.sdcct.xml.saxon.impl.SdcctDocumentBuilder;
+import gov.hhs.onc.sdcct.xml.saxon.impl.XdmDocument;
 import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
+import gov.hhs.onc.sdcct.xml.jaxb.JaxbContextRepository;
 import gov.hhs.onc.sdcct.xml.xpath.impl.DynamicXpathOptionsImpl;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -59,7 +60,12 @@ public abstract class AbstractResourceParamProcessor<T, U extends ResourceMetada
     @Autowired
     protected SdcctDocumentBuilder docBuilder;
 
+    @Autowired
     protected ContentPathBuilder contentPathBuilder;
+
+    @Autowired
+    protected JaxbContextRepository jaxbContextRepo;
+
     protected Map<String, U> resourceMetadatas;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(AbstractResourceParamProcessor.class);
@@ -327,7 +333,7 @@ public abstract class AbstractResourceParamProcessor<T, U extends ResourceMetada
         Class<?> resultClass;
 
         try {
-            resultClass = this.contentPathBuilder.build(true, node.getUnderlyingNode()).getSegments().getLast().getBeanClass();
+            resultClass = this.contentPathBuilder.build(this.jaxbContextRepo, true, node.getUnderlyingNode()).getSegments().getLast().getBeanClass();
         } catch (Exception e) {
             throw new HibernateException(String.format("Unable to build document (uri=%s) node (qname=%s, lineNum=%d, columnNum=%d) result class.",
                 node.getDocumentURI(), node.getNodeName().getClarkName(), node.getLineNumber(), node.getColumnNumber()), e);
@@ -339,15 +345,5 @@ public abstract class AbstractResourceParamProcessor<T, U extends ResourceMetada
             throw new HibernateException(String.format("Unable to decode (resultClass=%s) document (uri=%s) node (qname=%s, lineNum=%d, columnNum=%d).",
                 resultClass.getName(), node.getDocumentURI(), node.getNodeName().getClarkName(), node.getLineNumber(), node.getColumnNumber()), e);
         }
-    }
-
-    @Override
-    public ContentPathBuilder getContentPathBuilder() {
-        return this.contentPathBuilder;
-    }
-
-    @Override
-    public void setContentPathBuilder(ContentPathBuilder contentPathBuilder) {
-        this.contentPathBuilder = contentPathBuilder;
     }
 }

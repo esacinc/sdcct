@@ -3,19 +3,20 @@ package gov.hhs.onc.sdcct.utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
+import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.commons.lang3.text.StrBuilder;
 
 public final class SdcctStringUtils {
-    public final static String TOKEN_DELIMS = ",;\t\n";
-
     public static class SdcctToStringStyle extends ToStringStyle {
-        public final static SdcctToStringStyle INSTANCE = new SdcctToStringStyle();
-
         private final static long serialVersionUID = 0L;
+
+        private int numFields;
 
         public SdcctToStringStyle() {
             super();
@@ -32,12 +33,89 @@ public final class SdcctStringUtils {
         }
 
         @Override
-        public void removeLastFieldSeparator(StringBuffer buffer) {
-            super.removeLastFieldSeparator(buffer);
+        public void appendNullText(StringBuffer buffer, String fieldName) {
+            super.appendNullText(buffer, fieldName);
+        }
+
+        @Override
+        public void appendFieldEnd(StringBuffer buffer, String fieldName) {
+        }
+
+        @Override
+        public void appendFieldStart(StringBuffer buffer, String fieldName) {
+            if (fieldName != null) {
+                if (this.hasFields()) {
+                    buffer.append(this.getFieldSeparator());
+                }
+
+                super.appendFieldStart(buffer, fieldName);
+
+                this.numFields++;
+            }
+        }
+
+        @Override
+        public void appendContentEnd(StringBuffer buffer) {
+            super.appendContentEnd(buffer);
+        }
+
+        @Override
+        public void appendContentStart(StringBuffer buffer) {
+            super.appendContentStart(buffer);
         }
 
         private Object readResolve() {
-            return INSTANCE;
+            return new SdcctToStringStyle();
+        }
+
+        public boolean hasFields() {
+            return (this.numFields > 0);
+        }
+
+        @Nonnegative
+        public int getNumFields() {
+            return this.numFields;
+        }
+    }
+
+    public static class SdcctToStringBuilder extends ToStringBuilder {
+        public SdcctToStringBuilder() {
+            this(null);
+        }
+
+        public SdcctToStringBuilder(@Nullable StringBuffer buffer) {
+            super(null, new SdcctToStringStyle(), buffer);
+        }
+
+        public SdcctToStringBuilder appendContent(@Nullable String fieldName, @Nullable Object obj) {
+            if (fieldName == null) {
+                return this;
+            }
+
+            SdcctToStringStyle style = this.getStyle();
+            StringBuffer buffer = this.getStringBuffer();
+
+            if (obj != null) {
+                style.appendContentStart(buffer);
+
+                this.append(obj);
+
+                style.appendContentEnd(buffer);
+            } else {
+                style.appendNullText(buffer, fieldName);
+            }
+
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return this.getStringBuffer().toString();
+        }
+
+        @Override
+        public SdcctToStringStyle getStyle() {
+            return ((SdcctToStringStyle) super.getStyle());
         }
     }
 
@@ -82,6 +160,9 @@ public final class SdcctStringUtils {
     public final static String L_BRACKET = "[";
     public final static char L_BRACKET_CHAR = '[';
 
+    public final static String L_PAREN = "(";
+    public final static char L_PAREN_CHAR = '(';
+
     public final static char LF_CHAR = '\n';
 
     public final static String LT = "<";
@@ -102,6 +183,9 @@ public final class SdcctStringUtils {
     public final static String R_BRACKET = "]";
     public final static char R_BRACKET_CHAR = ']';
 
+    public final static String R_PAREN = ")";
+    public final static char R_PAREN_CHAR = ')';
+
     public final static String SLASH = "/";
     public final static char SLASH_CHAR = '/';
 
@@ -109,6 +193,8 @@ public final class SdcctStringUtils {
 
     public final static String UNDERSCORE = "_";
     public final static char UNDERSCORE_CHAR = '_';
+
+    public final static String TOKEN_DELIMS = ",;\t\n";
 
     private SdcctStringUtils() {
     }
@@ -188,11 +274,19 @@ public final class SdcctStringUtils {
         return parts.toArray(new String[parts.size()]);
     }
 
+    public static String[] tokenize(@Nullable String str) {
+        return tokenize(str, null);
+    }
+
+    public static String[] tokenize(@Nullable String str, @Nullable String defaultStr) {
+        return splitTokens(ObjectUtils.defaultIfNull(str, defaultStr));
+    }
+
     public static String[] splitTokens(@Nullable String ... strs) {
         return ((strs != null)
             ? Stream.of(strs)
                 .flatMap(str -> ((str != null) ? Stream.of(org.springframework.util.StringUtils.tokenizeToStringArray(str, TOKEN_DELIMS)) : Stream.empty()))
                 .toArray(String[]::new)
-            : ArrayUtils.toArray());
+            : ArrayUtils.EMPTY_STRING_ARRAY);
     }
 }

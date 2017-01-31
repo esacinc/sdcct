@@ -1,7 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project
     xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xsi:schemaLocation="
+        http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     
     <modelVersion>4.0.0</modelVersion>
     
@@ -75,10 +77,12 @@
             <groupId>com.ryantenney.metrics</groupId>
             <artifactId>metrics-spring</artifactId>
         </dependency>
+        <!--
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-xjc</artifactId>
         </dependency>
+        -->
         <dependency>
             <groupId>com.sun.xml.ws</groupId>
             <artifactId>jaxws-rt</artifactId>
@@ -472,6 +476,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <scope>test</scope>
@@ -496,10 +505,6 @@
                 <executions>
                     <execution>
                         <id>copy-dependencies-deb</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <id>copy-test-dependencies-web</id>
                         <phase>none</phase>
                     </execution>
                 </executions>
@@ -530,7 +535,7 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>copy-test-resources-testng</id>
+                        <id>copy-test-resources-soapui</id>
                     </execution>
                     <execution>
                         <id>copy-resources-deb-control</id>
@@ -561,20 +566,43 @@
                     <execution>
                         <id>test-unit</id>
                         <configuration>
+                            <groups>sdcct.test.unit.web.all</groups>
+                            <properties>
+                                <property>
+                                    <name>suitename</name>
+                                    <value>sdcct-web-test-unit</value>
+                                </property>
+                                <property>
+                                    <name>testname</name>
+                                    <value>sdcct-web-test-unit</value>
+                                </property>
+                            </properties>
                             <systemPropertyVariables>
+                                <sdcct.data.db.name>sdcct-web-test-unit</sdcct.data.db.name>
                                 <sdcct.logging.file.name>sdcct-web-test-unit</sdcct.logging.file.name>
                                 <sdcct.logging.logstash.file.name>sdcct-web-logstash-test-unit</sdcct.logging.logstash.file.name>
                             </systemPropertyVariables>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>test-integration</id>
+                        <id>test-it</id>
                         <configuration>
+                            <groups>sdcct.test.it.web.all</groups>
+                            <properties>
+                                <property>
+                                    <name>suitename</name>
+                                    <value>sdcct-web-test-it</value>
+                                </property>
+                                <property>
+                                    <name>testname</name>
+                                    <value>sdcct-web-test-it</value>
+                                </property>
+                            </properties>
                             <systemPropertyVariables>
+                                <sdcct.data.db.name>sdcct-web-test-it</sdcct.data.db.name>
                                 <sdcct.logging.file.name>sdcct-web-test-it</sdcct.logging.file.name>
                                 <sdcct.logging.logstash.file.name>sdcct-web-logstash-test-it</sdcct.logging.logstash.file.name>
                             </systemPropertyVariables>
-                            <workingDirectory>${project.build.directory}</workingDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -592,6 +620,12 @@
                     <execution>
                         <id>process-resources-app</id>
                         <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>process-test-resources</id>
+                    </execution>
+                    <execution>
+                        <id>process-test-resources-web</id>
                     </execution>
                 </executions>
             </plugin>

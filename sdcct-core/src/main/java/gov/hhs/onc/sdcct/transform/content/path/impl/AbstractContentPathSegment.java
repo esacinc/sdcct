@@ -3,7 +3,7 @@ package gov.hhs.onc.sdcct.transform.content.path.impl;
 import com.sun.msv.grammar.xmlschema.XMLSchemaTypeExp;
 import gov.hhs.onc.sdcct.transform.content.path.ContentPathSegment;
 import gov.hhs.onc.sdcct.xml.jaxb.metadata.JaxbTypeMetadata;
-import gov.hhs.onc.sdcct.xml.utils.SdcctXmlQnameUtils;
+import gov.hhs.onc.sdcct.xml.qname.utils.SdcctQnameUtils;
 import javax.annotation.Nullable;
 import net.sf.saxon.s9api.QName;
 
@@ -16,7 +16,7 @@ public abstract class AbstractContentPathSegment<T extends XMLSchemaTypeExp, U e
     protected U jaxbTypeMetadata;
 
     protected AbstractContentPathSegment(@Nullable String nsPrefix, @Nullable String nsUri, String localName) {
-        this(SdcctXmlQnameUtils.build(nsPrefix, nsUri, localName));
+        this(new QName(SdcctQnameUtils.build(nsPrefix, nsUri, localName)));
     }
 
     protected AbstractContentPathSegment(QName qname) {

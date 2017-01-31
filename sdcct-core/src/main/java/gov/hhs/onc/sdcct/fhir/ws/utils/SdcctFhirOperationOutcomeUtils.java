@@ -17,7 +17,7 @@ import gov.hhs.onc.sdcct.fhir.impl.StringTypeImpl;
 import gov.hhs.onc.sdcct.fhir.impl.UriTypeImpl;
 import gov.hhs.onc.sdcct.net.SdcctUris;
 import gov.hhs.onc.sdcct.transform.content.path.ContentPath;
-import gov.hhs.onc.sdcct.transform.impl.SdcctLocation;
+import gov.hhs.onc.sdcct.transform.location.impl.SdcctLocation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;

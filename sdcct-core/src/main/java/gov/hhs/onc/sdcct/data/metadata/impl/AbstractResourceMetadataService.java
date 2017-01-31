@@ -8,7 +8,7 @@ import gov.hhs.onc.sdcct.data.metadata.ResourceMetadataService;
 import gov.hhs.onc.sdcct.data.metadata.ResourceParamMetadata;
 import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
 import gov.hhs.onc.sdcct.xml.jaxb.JaxbContextRepository;
-import gov.hhs.onc.sdcct.xml.xpath.impl.SdcctXpathCompiler;
+import gov.hhs.onc.sdcct.xml.xpath.saxon.impl.SdcctXpathCompiler;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;

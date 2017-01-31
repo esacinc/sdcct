@@ -2,6 +2,7 @@ package gov.hhs.onc.sdcct.xml.impl;
 
 import com.github.sebhoss.warnings.CompilerWarnings;
 import gov.hhs.onc.sdcct.xml.StaticXmlTransformOptions;
+import gov.hhs.onc.sdcct.xml.saxon.impl.XdmDocument;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

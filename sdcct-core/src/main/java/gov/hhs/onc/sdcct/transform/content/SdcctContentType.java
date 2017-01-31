@@ -2,7 +2,7 @@ package gov.hhs.onc.sdcct.transform.content;
 
 import gov.hhs.onc.sdcct.beans.ContentTypeBean;
 import gov.hhs.onc.sdcct.io.SdcctFileNameExtensions;
-import gov.hhs.onc.sdcct.io.SdcctMediaTypes;
+import gov.hhs.onc.sdcct.net.mime.SdcctMediaTypes;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;

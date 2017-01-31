@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+    attributeFormDefault="unqualified"
+    elementFormDefault="qualified"
+    targetNamespace="urn:sdcct:validate"
+    xmlns:sdcct="urn:sdcct:core"
+    xmlns:sdcct-validate="urn:sdcct:validate"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    
+    <!--====================================================================================================
+    = IMPORTS
+    =====================================================================================================-->
+    <xsd:import namespace="urn:sdcct:core" schemaLocation="sdcct.xsd"/>
+    
+    <!--====================================================================================================
+    = SIMPLE TYPES
+    =====================================================================================================-->
+    <xsd:simpleType name="IssueSeverity">
+        <xsd:restriction base="sdcct:NotBlankString">
+            <xsd:enumeration value="INFORMATION"/>
+            <xsd:enumeration value="WARNING"/>
+            <xsd:enumeration value="ERROR"/>
+            <xsd:enumeration value="FATAL"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <xsd:simpleType name="LocationIndex">
+        <xsd:restriction base="xsd:int">
+            <xsd:pattern value="(\-1|[1-9]|[1-9]\d+)"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <xsd:simpleType name="Type">
+        <xsd:restriction base="sdcct:NotBlankString">
+            <xsd:enumeration value="SCHEMA"/>
+            <xsd:enumeration value="SCHEMATRON"/>
+            <xsd:enumeration value="TERMINOLOGY"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <!--====================================================================================================
+    = COMPLEX TYPES
+    =====================================================================================================-->
+    <xsd:complexType name="Location">
+        <xsd:sequence>
+            <xsd:element name="lineNumber" type="sdcct-validate:LocationIndex"/>
+            <xsd:element name="columnNumber" type="sdcct-validate:LocationIndex"/>
+            <xsd:element name="fluentPathExpression" type="sdcct:NotBlankString" minOccurs="0"/>
+            <xsd:element name="jsonPointerExpression" type="sdcct:NotBlankString" minOccurs="0"/>
+            <xsd:element name="xpathExpression" type="sdcct:NotBlankString" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    
+    <xsd:complexType name="Source">
+        <xsd:sequence>
+            <xsd:element name="id" type="sdcct:NotBlankString"/>
+            <xsd:element name="name" type="sdcct:NotBlankString"/>
+            <xsd:element name="uri" type="xsd:anyURI" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    
+    <xsd:complexType name="Issue">
+        <xsd:sequence>
+            <xsd:element name="type" type="sdcct-validate:Type"/>
+            <xsd:element name="severity" type="sdcct-validate:IssueSeverity"/>
+            <xsd:element name="location" type="sdcct-validate:Location" minOccurs="0"/>
+            <xsd:element name="source" type="sdcct-validate:Source" minOccurs="0"/>
+            <xsd:element name="contextXpathExpression" type="sdcct:NotBlankString" minOccurs="0"/>
+            <xsd:element name="testXpathExpression" type="sdcct:NotBlankString" minOccurs="0"/>
+            <xsd:element name="message" type="sdcct:NotBlankString"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    
+    <xsd:complexType name="Issues">
+        <xsd:sequence>
+            <xsd:element name="issue" type="sdcct-validate:Issue" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    
+    <xsd:complexType name="IssueTotals">
+        <xsd:sequence>
+            <xsd:element name="all" type="sdcct:NonNegativeInt"/>
+            <xsd:element name="information" type="sdcct:NonNegativeInt"/>
+            <xsd:element name="warning" type="sdcct:NonNegativeInt"/>
+            <xsd:element name="error" type="sdcct:NonNegativeInt"/>
+            <xsd:element name="fatal" type="sdcct:NonNegativeInt"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    
+    <xsd:complexType name="Result">
+        <xsd:sequence>
+            <xsd:element name="status" type="xsd:boolean"/>
+            <xsd:element name="issueTotals" type="sdcct-validate:IssueTotals"/>
+            <xsd:element name="issues" type="sdcct-validate:Issues"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    
+    <!--====================================================================================================
+    = ELEMENTS
+    =====================================================================================================-->
+    <xsd:element name="result" type="sdcct-validate:Result"/>
+</xsd:schema>
