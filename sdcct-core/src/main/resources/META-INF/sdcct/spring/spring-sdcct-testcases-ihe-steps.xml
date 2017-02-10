@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
+        urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
+
+    <!--====================================================================================================
+    = IHE TESTCASE STEPS
+    =====================================================================================================-->
+    <beans:bean id="iheTestcaseSendingStep" class="gov.hhs.onc.sdcct.testcases.steps.ihe.IheTestcaseSendingStep" parent="sdcctTestcaseSendingStep" abstract="true"/>
+    <beans:bean id="iheTestcaseSendingStepImpl" class="gov.hhs.onc.sdcct.testcases.steps.ihe.impl.IheTestcaseSendingStepImpl" parent="iheTestcaseSendingStep" abstract="true"/>
+
+    <beans:bean id="iheTestcaseValidationStep" class="gov.hhs.onc.sdcct.testcases.steps.ihe.IheTestcaseValidationStep" parent="sdcctTestcaseValidationStep" abstract="true"/>
+    <beans:bean id="iheTestcaseValidationStepImpl" class="gov.hhs.onc.sdcct.testcases.steps.ihe.impl.IheTestcaseValidationStepImpl" parent="iheTestcaseValidationStep"  abstract="true"/>
+
+    <!--====================================================================================================
+    = IHE TESTCASE SENDING STEPS
+    =====================================================================================================-->
+    <beans:bean id="retrieveFormRequestSendingStep" parent="iheTestcaseSendingStepImpl" lazy-init="true" scope="prototype">
+        <beans:property name="description">
+            <beans:bean parent="sdcctTestcaseStepDescImpl">
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        Sending of RetrieveFormRequest from SDCCT to SDC IHE Form Manager under test.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+
+    <beans:bean id="retrieveFormResponseSendingStep" parent="iheTestcaseSendingStepImpl" lazy-init="true" scope="prototype">
+        <beans:property name="description">
+            <beans:bean parent="sdcctTestcaseStepDescImpl">
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        Sending of RetrieveFormResponse from SDCCT to SDC IHE Form Manager under test.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+
+    <beans:bean id="submitFormRequestSendingStep" parent="iheTestcaseSendingStepImpl" lazy-init="true" scope="prototype">
+        <beans:property name="description">
+            <beans:bean parent="sdcctTestcaseStepDescImpl">
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        Sending of SubmitFormRequest from SDCCT to SDC IHE Form Receiver under test.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+
+    <beans:bean id="submitFormResponseSendingStep" parent="iheTestcaseSendingStepImpl" lazy-init="true" scope="prototype">
+        <beans:property name="description">
+            <beans:bean parent="sdcctTestcaseStepDescImpl">
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        Sending of SubmitFormResponse from SDCCT to SDC IHE Form Receiver under test.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+
+    <beans:bean id="archiveFormRequestSendingStep" parent="iheTestcaseSendingStepImpl" lazy-init="true" scope="prototype">
+        <beans:property name="description">
+            <beans:bean parent="sdcctTestcaseStepDescImpl">
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        Sending of ArchiveFormRequest from SDCCT to SDC IHE Form Archiver under test.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+
+    <beans:bean id="archiveFormResponseSendingStep" parent="iheTestcaseSendingStepImpl" lazy-init="true" scope="prototype">
+        <beans:property name="description">
+            <beans:bean parent="sdcctTestcaseStepDescImpl">
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        Sending of ArchiveFormResponse from SDCCT to SDC IHE Form Archiver under test.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+
+    <!--====================================================================================================
+    = IHE TESTCASE VALIDATION STEPS
+    =====================================================================================================-->
+    <beans:bean id="retrieveFormRequestValidationStep" parent="iheTestcaseValidationStepImpl" lazy-init="true" scope="prototype">
+        <beans:property name="description">
+            <beans:bean parent="sdcctTestcaseStepDescImpl">
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        Validation of RetrieveFormRequest sent by SDC IHE Form Filler under test to SDCCT IHE Form Manager.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+
+    <beans:bean id="retrieveFormResponseValidationStep" parent="iheTestcaseValidationStepImpl" lazy-init="true" scope="prototype">
+        <beans:property name="description">
+            <beans:bean parent="sdcctTestcaseStepDescImpl">
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        Validation of RetrieveFormResponse returned by SDC IHE Form Manager under test to SDCCT.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+
+    <beans:bean id="submitFormRequestValidationStep" parent="iheTestcaseValidationStepImpl" lazy-init="true" scope="prototype">
+        <beans:property name="description">
+            <beans:bean parent="sdcctTestcaseStepDescImpl">
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        Validation of SubmitFormRequest sent by SDC IHE Form Filler under test to SDCCT IHE Form Receiver.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+
+    <beans:bean id="submitFormResponseValidationStep" parent="iheTestcaseValidationStepImpl" lazy-init="true" scope="prototype">
+        <beans:property name="description">
+            <beans:bean parent="sdcctTestcaseStepDescImpl">
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        Validation of SubmitFormResponse returned by SDC IHE Form Receiver under test to SDCCT.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+
+    <beans:bean id="archiveFormRequestValidationStep" parent="iheTestcaseValidationStepImpl" lazy-init="true" scope="prototype">
+        <beans:property name="description">
+            <beans:bean parent="sdcctTestcaseStepDescImpl">
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        Validation of ArchiveFormRequest sent by SDC IHE Form Filler under test to SDCCT IHE Form Archiver.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+
+    <beans:bean id="archiveFormResponseValidationStep" parent="iheTestcaseValidationStepImpl" lazy-init="true" scope="prototype">
+        <beans:property name="description">
+            <beans:bean parent="sdcctTestcaseStepDescImpl">
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        Validation of ArchiveFormResponse returned by SDC IHE Form Archiver under test to SDCCT.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+</beans:beans>

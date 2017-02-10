@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import org.springframework.http.MediaType;
 
 public enum RfdWsResponseType implements ContentTypeBean, IdentifiedBean {
-    XML(null, SdcctMediaTypes.APP_XML_SDC), HTML(null, SdcctMediaTypes.TEXT_HTML_SDC), UNSTRUCTURED("Unstructured", null);
+    XML(null, SdcctMediaTypes.APP_XML_SDC), HTML(null, SdcctMediaTypes.TEXT_HTML_SDC), URL("URL", null);
 
     private final String id;
     private final MediaType mediaType;

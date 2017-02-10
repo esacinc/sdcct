@@ -27,7 +27,7 @@
             <con:request><![CDATA[<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:urn="urn:ihe:iti:rfd:2007">
    <soap:Header/>
    <soap:Body>
-      <urn:SubmitFormRequest>${#Spring##( new java.lang.String(formRfd1a.source.bytes, T(java.nio.charset.StandardCharsets).UTF_8).split(T(org.apache.commons.lang3.StringUtils).LF, 2)[1] )}</urn:SubmitFormRequest>
+      <urn:SubmitFormRequest>${#Spring##( new java.lang.String(formRfda.source.bytes, T(java.nio.charset.StandardCharsets).UTF_8).split(T(org.apache.commons.lang3.StringUtils).LF, 2)[1] )}</urn:SubmitFormRequest>
    </soap:Body>
 </soap:Envelope>]]></con:request>
             <con:assertion type="Valid HTTP Status Codes" name="Valid HTTP Status Codes">

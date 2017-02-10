@@ -22,7 +22,7 @@ import org.testng.annotations.Test;
 public class ValidatorServiceUnitTests extends AbstractSdcctUnitTests {
     private final static Logger LOGGER = LoggerFactory.getLogger(ValidatorServiceUnitTests.class);
 
-    @Resource(name = "formFhir1a")
+    @Resource(name = "formFhira")
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
     private FhirForm testFhirForm;
 
@@ -38,7 +38,7 @@ public class ValidatorServiceUnitTests extends AbstractSdcctUnitTests {
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
     private FhirForm testFhirMalformedXmlForm;
 
-    @Resource(name = "formRfd1a")
+    @Resource(name = "formRfda")
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
     private RfdForm testRfdForm;
 

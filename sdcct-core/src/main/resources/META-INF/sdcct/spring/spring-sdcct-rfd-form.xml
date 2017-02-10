@@ -15,11 +15,18 @@
     = FORMS
     =====================================================================================================-->
     <beans:bean id="formRfd" class="gov.hhs.onc.sdcct.rfd.form.impl.RfdFormImpl" abstract="true"/>
-    
+
+    <!-- TODO: Replace with updated forms. -->
     <!--suppress SpringPlaceholdersInspection -->
-    <beans:bean id="formRfd1a" parent="formRfd"
-        c:name="rfd_1a"
-        c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/rfd_1a.xml"
+    <beans:bean id="formRfda" parent="formRfd"
+        c:name="ihe_a"
+        c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/ihe_a.xml"
+        p:internal="true"/>
+
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="formRfdb" parent="formRfd"
+        c:name="ihe_b"
+        c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/ihe_b.xml"
         p:internal="true"/>
     
     <!--====================================================================================================

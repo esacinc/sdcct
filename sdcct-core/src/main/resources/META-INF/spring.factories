@@ -1,4 +1,5 @@
 gov.hhs.onc.sdcct.beans.factory.xml.SdcctBeanDefinitionParser=\
+    gov.hhs.onc.sdcct.beans.factory.xml.impl.NormalizedStringBeanDefinitionParser,\
     gov.hhs.onc.sdcct.xml.saxon.beans.factory.xml.impl.XdmDocumentBeanDefinitionParser,\
     gov.hhs.onc.sdcct.xml.xpath.beans.factory.xml.impl.XpathBeanDefinitionParser,\
     gov.hhs.onc.sdcct.xml.xslt.beans.factory.xml.impl.XsltBeanDefinitionParser

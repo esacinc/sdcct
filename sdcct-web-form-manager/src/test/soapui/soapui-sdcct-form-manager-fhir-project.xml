@@ -167,7 +167,7 @@
             <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
             <con:jmsPropertyConfig/>
             <con:parameters>
-              <entry key="identifier" value="${#Spring##( formFhir1a.identifier )}" xmlns="http://eviware.com/soapui/config"/>
+              <entry key="identifier" value="${#Spring##( formFhira.identifier )}" xmlns="http://eviware.com/soapui/config"/>
             </con:parameters>
             <con:assertion type="Valid HTTP Status Codes" name="Valid HTTP Status Codes">
               <con:configuration>
@@ -188,14 +188,14 @@
             <con:settings/>
             <con:encoding>UTF-8</con:encoding>
             <con:endpoint>${#Spring#$(sdcct.tomcat.server.context.url)}</con:endpoint>
-            <con:request><![CDATA[identifier=${#Spring##( formFhir1a.identifier )}]]></con:request>
+            <con:request><![CDATA[identifier=${#Spring##( formFhira.identifier )}]]></con:request>
             <con:credentials>
               <con:authType>No Authorization</con:authType>
             </con:credentials>
             <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
             <con:jmsPropertyConfig/>
             <con:parameters>
-              <entry key="identifier" value="${#Spring##( formFhir1a.identifier )}" xmlns="http://eviware.com/soapui/config"/>
+              <entry key="identifier" value="${#Spring##( formFhira.identifier )}" xmlns="http://eviware.com/soapui/config"/>
             </con:parameters>
             <con:assertion type="Valid HTTP Status Codes" name="Valid HTTP Status Codes">
               <con:configuration>

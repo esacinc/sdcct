@@ -466,11 +466,19 @@
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
+            <artifactId>select2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
             <artifactId>webjars-locator-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.webjars.npm</groupId>
+            <groupId>org.webjars</groupId>
             <artifactId>jquery</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>jquery-ui</artifactId>
         </dependency>
         <dependency>
             <groupId>xerces</groupId>
@@ -808,6 +816,7 @@
                                     <name>srcIncludes</name>
                                     <value>
                                         gov/hhs/onc/sdcct/*.java
+                                        gov/hhs/onc/sdcct/api/SdcctIssueSeverity.java
                                         gov/hhs/onc/sdcct/api/Specification*.java
                                         gov/hhs/onc/sdcct/api/type/*.java
                                         gov/hhs/onc/sdcct/beans/*.java

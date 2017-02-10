@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
+        urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
+
+    <!--====================================================================================================
+    = IHE FORM ARCHIVER TESTCASES
+    =====================================================================================================-->
+    <beans:bean id="iheFormArchiverTestcase" class="gov.hhs.onc.sdcct.testcases.ihe.IheFormArchiverTestcase" parent="iheTestcase" abstract="true"/>
+    <beans:bean id="iheFormArchiverTestcaseImpl" class="gov.hhs.onc.sdcct.testcases.ihe.impl.IheFormArchiverTestcaseImpl" parent="iheFormArchiverTestcase"
+        abstract="true"
+        p:transaction="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).ARCHIVE_FORM_OP }"/>
+
+    <beans:bean id="iheFormArchiverTestcaseSdcctInitiated" parent="iheFormArchiverTestcaseImpl" abstract="true"
+        p:roleTested="FORM_ARCHIVER"
+        p:sdcctInitiated="true"/>
+
+    <beans:bean id="iheFormArchiverTestcaseSutInitiated" parent="iheFormArchiverTestcaseImpl" abstract="true"
+        p:roleTested="FORM_FILLER"/>
+
+    <!--====================================================================================================
+    = IHE FORM ARCHIVER TESTCASES - INITIATED BY SDCCT
+    =====================================================================================================-->
+    <beans:bean id="iheTestcase20" parent="iheFormArchiverTestcaseSdcctInitiated"
+        p:contentType="XML"
+        p:id="IHE_20"
+        p:name="IHE_20 - Form Archiver archives completed form">
+        <beans:property name="requestInfo">
+            <beans:bean parent="iheTestcaseRequestInfoImpl"
+                p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
+                <beans:property name="messageDetails">
+                    <beans:map>
+                        <beans:entry key-ref="iheTestcaseConstantStrSdcSubmissionPackage"
+                            value="contains FormDesign with a formID that corresponds to an available XML, HTML, or URI-based form"/>
+                    </beans:map>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+        <beans:property name="responseInfo">
+            <beans:bean parent="iheTestcaseResponseInfoImpl"
+                p:messageName-ref="iheTestcaseConstantStrRetrieveFormResponse">
+                <beans:property name="messageDetails">
+                    <beans:map>
+                        <beans:entry key-ref="iheTestcaseConstantStrResponseCode" value="element exists"/>
+                    </beans:map>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+        <beans:property name="description">
+            <beans:bean parent="iheTestcaseDescImpl">
+                <beans:property name="instructions">
+                    <sdcct:normalized-string>
+                        Enter an endpoint address for your Form Archiver and a formID corresponding to one of the listed forms available to SDCCT and then click
+                        Submit. SDCCT will send an ArchiveFormRequest containing a completed form to your Form Archiver. The response that is returned by your
+                        Form Archiver will be displayed below.
+                    </sdcct:normalized-string>
+                </beans:property>
+                <beans:property name="specifications">
+                    <beans:list>
+                        <beans:ref bean="iheTestcaseConstantStrIti36"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormArchiver"/>
+                    </beans:list>
+                </beans:property>
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        This testcase verifies that your Form Archiver can return a valid ArchiveFormResponse after receiving an ArchiveFormRequest for a
+                        completed form, according to ITI-36.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+
+    <beans:bean id="iheTestcase21" parent="iheFormArchiverTestcaseSdcctInitiated"
+        p:contentType="XML"
+        p:id="IHE_21"
+        p:name="IHE_21 - Form Archiver archives partially completed form">
+        <beans:property name="requestInfo">
+            <beans:bean parent="iheTestcaseRequestInfoImpl"
+                p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
+                <beans:property name="messageDetails">
+                    <beans:map>
+                        <beans:entry key-ref="iheTestcaseConstantStrSdcSubmissionPackage"
+                            value="contains FormDesign with a formID that corresponds to an available XML, HTML, or URI-based form"/>
+                    </beans:map>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+        <beans:property name="responseInfo">
+            <beans:bean parent="iheTestcaseResponseInfoImpl"
+                p:messageName-ref="iheTestcaseConstantStrRetrieveFormResponse">
+                <beans:property name="messageDetails">
+                    <beans:map>
+                        <beans:entry key-ref="iheTestcaseConstantStrResponseCode" value="element exists"/>
+                    </beans:map>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+        <beans:property name="description">
+            <beans:bean parent="iheTestcaseDescImpl">
+                <beans:property name="instructions">
+                    <sdcct:normalized-string>
+                        Enter an endpoint address for your Form Archiver and a formID corresponding to one of the listed forms available to SDCCT and then click
+                        Submit. SDCCT will send an ArchiveFormRequest containing a partially completed form to your Form Archiver. The response that is returned
+                        by your Form Archiver will be displayed below.
+                    </sdcct:normalized-string>
+                </beans:property>
+                <beans:property name="specifications">
+                    <beans:list>
+                        <beans:ref bean="iheTestcaseConstantStrIti36"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormArchiver"/>
+                    </beans:list>
+                </beans:property>
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        This testcase verifies that your Form Archiver can return a valid ArchiveFormResponse after receiving an ArchiveFormRequest for a
+                        partially completed form, according to ITI-36.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+
+    <beans:bean id="iheTestcase22" parent="iheFormArchiverTestcaseSdcctInitiated"
+        p:contentType="XML"
+        p:id="IHE_22"
+        p:name="IHE_22 - Form Archiver cannot archive request contents">
+        <beans:property name="requestInfo">
+            <beans:bean parent="iheTestcaseRequestInfoImpl"
+                p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
+                <beans:property name="messageDetails">
+                    <beans:map>
+                        <beans:entry key-ref="iheTestcaseConstantStrContent"
+                            value="Missing XML elements (profile doesn't specify exactly what this should contain)"/>
+                    </beans:map>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+        <beans:property name="responseInfo">
+            <beans:bean parent="iheTestcaseResponseInfoImpl"
+                p:messageName-ref="iheTestcaseConstantStrRetrieveFormResponse">
+                <beans:property name="messageDetails">
+                    <beans:map>
+                        <beans:entry key-ref="iheTestcaseConstantStrSoapFaultReasonText" value="Required info missing"/>
+                    </beans:map>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+        <beans:property name="description">
+            <beans:bean parent="iheTestcaseDescImpl">
+                <beans:property name="instructions">
+                    <sdcct:normalized-string/>
+                </beans:property>
+                <beans:property name="specifications">
+                    <beans:list>
+                        <beans:ref bean="iheTestcaseConstantStrIti36"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormArchiver"/>
+                    </beans:list>
+                </beans:property>
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        This testcase verifies that your Form Archiver returns a SOAP fault in response to a malformed ArchiveFormRequest, according to ITI-36.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+
+    <!--====================================================================================================
+    = IHE FORM ARCHIVER TESTCASES - INITIATED BY SYSTEM UNDER TEST
+    =====================================================================================================-->
+    <beans:bean id="iheTestcase23" parent="iheFormArchiverTestcaseSutInitiated"
+        p:contentType="XML"
+        p:id="IHE_23"
+        p:name="IHE_23 - Form Filler requests archival of completed form">
+        <beans:property name="requestInfo">
+            <beans:bean parent="iheTestcaseRequestInfoImpl"
+                p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
+                <beans:property name="messageDetails">
+                    <beans:map>
+                        <beans:entry key-ref="iheTestcaseConstantStrSdcSubmissionPackage"
+                            value="contains FormDesign with a formID that corresponds to an available XML, HTML, or URI-based form"/>
+                    </beans:map>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+        <beans:property name="responseInfo">
+            <beans:bean parent="iheTestcaseResponseInfoImpl"
+                p:messageName-ref="iheTestcaseConstantStrRetrieveFormResponse">
+                <beans:property name="messageDetails">
+                    <beans:map>
+                        <beans:entry key-ref="iheTestcaseConstantStrResponseCode" value="element exists"/>
+                    </beans:map>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+        <beans:property name="description">
+            <beans:bean parent="iheTestcaseDescImpl">
+                <beans:property name="instructions">
+                    <sdcct:normalized-string>
+                        Submit a request with a completed form from your Form Filler to the Form Archiver, according to the message request details. Your Form
+                        Filler should receive a response from the Form Archiver, according to the message response details.
+                    </sdcct:normalized-string>
+                </beans:property>
+                <beans:property name="specifications">
+                    <beans:list>
+                        <beans:ref bean="iheTestcaseConstantStrIti36"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormArchiver"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormFiller"/>
+                    </beans:list>
+                </beans:property>
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        This testcase verifies that your Form Filler can submit a valid ArchiveFormRequest for a completed form to a Form Archiver, according to
+                        ITI-36.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+
+    <beans:bean id="iheTestcase24" parent="iheFormArchiverTestcaseSutInitiated"
+        p:contentType="XML"
+        p:id="IHE_24"
+        p:name="IHE_24 - Form Filler requests archival of partially completed form">
+        <beans:property name="requestInfo">
+            <beans:bean parent="iheTestcaseRequestInfoImpl"
+                p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
+                <beans:property name="messageDetails">
+                    <beans:map>
+                        <beans:entry key-ref="iheTestcaseConstantStrSdcSubmissionPackage"
+                            value="contains FormDesign with a formID that corresponds to an available XML, HTML, or URI-based form"/>
+                    </beans:map>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+        <beans:property name="responseInfo">
+            <beans:bean parent="iheTestcaseResponseInfoImpl"
+                p:messageName-ref="iheTestcaseConstantStrRetrieveFormResponse">
+                <beans:property name="messageDetails">
+                    <beans:map>
+                        <beans:entry key-ref="iheTestcaseConstantStrResponseCode" value="element exists"/>
+                    </beans:map>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+        <beans:property name="description">
+            <beans:bean parent="iheTestcaseDescImpl">
+                <beans:property name="instructions">
+                    <sdcct:normalized-string>
+                        Submit a request with a partially completed form from your Form Filler to the Form Archiver, according to the message request details.
+                        Your Form Filler should receive a response from the Form Archiver, according to the message response details.
+                    </sdcct:normalized-string>
+                </beans:property>
+                <beans:property name="specifications">
+                    <beans:list>
+                        <beans:ref bean="iheTestcaseConstantStrIti36"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormArchiver"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormFiller"/>
+                    </beans:list>
+                </beans:property>
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        This testcase verifies that your Form Filler can submit a valid ArchiveFormRequest for a partially completed form to a Form Archiver,
+                        according to ITI-36.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
+</beans:beans>

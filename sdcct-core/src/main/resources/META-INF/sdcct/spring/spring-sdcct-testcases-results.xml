@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
+        urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
+
+    <!--====================================================================================================
+    = TESTCASE RESULTS
+    =====================================================================================================-->
+    <beans:bean id="sdcctTestcaseResult" class="gov.hhs.onc.sdcct.testcases.results.SdcctTestcaseResult" abstract="true"/>
+
+    <beans:bean id="iheTestcaseResult" class="gov.hhs.onc.sdcct.testcases.results.ihe.IheTestcaseResult" parent="sdcctTestcaseResult" abstract="true"/>
+
+    <!--====================================================================================================
+    = IHE FORM MANAGER TESTCASE RESULTS
+    =====================================================================================================-->
+    <beans:bean id="iheFormManagerTestcaseResult" class="gov.hhs.onc.sdcct.testcases.results.ihe.IheFormManagerTestcaseResult"
+        parent="iheTestcaseResult" abstract="true"/>
+    <!--suppress SpringBeanConstructorArgInspection -->
+    <beans:bean id="iheFormManagerTestcaseResultImpl" class="gov.hhs.onc.sdcct.testcases.results.ihe.impl.IheFormManagerTestcaseResultImpl"
+        parent="iheFormManagerTestcaseResult" lazy-init="true" scope="prototype"/>
+
+    <!--====================================================================================================
+    = IHE FORM RECEIVER TESTCASE RESULTS
+    =====================================================================================================-->
+    <beans:bean id="iheFormReceiverTestcaseResult" class="gov.hhs.onc.sdcct.testcases.results.ihe.IheFormReceiverTestcaseResult"
+        parent="iheTestcaseResult" abstract="true"/>
+    <!--suppress SpringBeanConstructorArgInspection -->
+    <beans:bean id="iheFormReceiverTestcaseResultImpl" class="gov.hhs.onc.sdcct.testcases.results.ihe.impl.IheFormReceiverTestcaseResultImpl"
+        parent="iheFormReceiverTestcaseResult" lazy-init="true" scope="prototype"/>
+
+    <!--====================================================================================================
+    = IHE FORM ARCHIVER TESTCASE RESULTS
+    =====================================================================================================-->
+    <beans:bean id="iheFormArchiverTestcaseResult" class="gov.hhs.onc.sdcct.testcases.results.ihe.IheFormArchiverTestcaseResult"
+        parent="iheTestcaseResult" abstract="true"/>
+    <!--suppress SpringBeanConstructorArgInspection -->
+    <beans:bean id="iheFormArchiverTestcaseResultImpl" class="gov.hhs.onc.sdcct.testcases.results.ihe.impl.IheFormArchiverTestcaseResultImpl"
+        parent="iheFormArchiverTestcaseResult" lazy-init="true" scope="prototype"/>
+</beans:beans>

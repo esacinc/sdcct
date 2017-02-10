@@ -1,23 +1,24 @@
 package gov.hhs.onc.sdcct.ws.logging.impl;
 
 import com.sun.xml.ws.encoding.soap.SOAP12Constants;
-import gov.hhs.onc.sdcct.transform.impl.ByteArraySource;
-import gov.hhs.onc.sdcct.net.mime.utils.SdcctMediaTypeUtils;
+import gov.hhs.onc.sdcct.fhir.FhirFormatType;
 import gov.hhs.onc.sdcct.json.impl.JsonCodec;
 import gov.hhs.onc.sdcct.json.impl.JsonEncodeOptionsImpl;
 import gov.hhs.onc.sdcct.logging.LoggingEvent;
 import gov.hhs.onc.sdcct.net.logging.RestEvent;
 import gov.hhs.onc.sdcct.net.logging.RestEventType;
+import gov.hhs.onc.sdcct.net.mime.utils.SdcctMediaTypeUtils;
 import gov.hhs.onc.sdcct.transform.content.ContentCodec;
 import gov.hhs.onc.sdcct.transform.content.ContentCodecOptions;
 import gov.hhs.onc.sdcct.transform.content.SdcctContentType;
+import gov.hhs.onc.sdcct.transform.impl.ByteArraySource;
 import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
-import gov.hhs.onc.sdcct.ws.logging.WsEvent;
 import gov.hhs.onc.sdcct.ws.WsMessageType;
+import gov.hhs.onc.sdcct.ws.logging.WsEvent;
 import gov.hhs.onc.sdcct.ws.utils.SdcctWsPropertyUtils;
+import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
 import gov.hhs.onc.sdcct.xml.saxon.impl.SdcctDocumentBuilder;
 import gov.hhs.onc.sdcct.xml.saxon.impl.XdmDocument;
-import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
 import gov.hhs.onc.sdcct.xml.utils.SdcctDomUtils;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -188,8 +189,17 @@ public class SdcctLoggingFeature extends AbstractFeature implements Initializing
             }
 
             if (codec == null) {
-                codec = this.contentTypeCodecs.get(
-                    SdcctMediaTypeUtils.findCompatible(SdcctContentType.class, MediaType.valueOf(SdcctWsPropertyUtils.getProperty(msg, Message.CONTENT_TYPE))));
+                if (restMsgType) {
+                    FhirFormatType fhirFormatType = SdcctMediaTypeUtils.findCompatible(FhirFormatType.class,
+                        MediaType.valueOf(SdcctWsPropertyUtils.getProperty(msg, Message.CONTENT_TYPE)));
+
+                    if (fhirFormatType != null) {
+                        codec = this.contentTypeCodecs.get(fhirFormatType.getContentType());
+                    }
+                } else {
+                    codec = this.contentTypeCodecs.get(SdcctMediaTypeUtils.findCompatible(SdcctContentType.class,
+                        MediaType.valueOf(SdcctWsPropertyUtils.getProperty(msg, Message.CONTENT_TYPE))));
+                }
             }
 
             if (codec != null) {

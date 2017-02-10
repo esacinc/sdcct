@@ -22,7 +22,7 @@ import org.testng.annotations.Test;
 public class DbUnitTests extends AbstractSdcctUnitTests {
     private final static String NEW_TEST_FORM_IDENTIFIER = "fhir_test_new";
 
-    @Resource(name = "formFhir1a")
+    @Resource(name = "formFhira")
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
     private FhirForm testForm;
 

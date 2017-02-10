@@ -67,10 +67,14 @@ public class RfdFormManagerWebServiceImpl extends AbstractRfdFormWebService impl
                 throw new RfdWsException(String.format("Invalid encodedResponse responseContentType attribute value: %s", reqRespContentTypeValue));
             }
         } else {
-            respType = RfdWsResponseType.UNSTRUCTURED;
+            respType = RfdWsResponseType.URL;
         }
 
         try {
+            if (identifier == null) {
+                throw new RfdWsException("Form (identifier=%s) was not specified.");
+            }
+
             FormDesignType formDesign = this.findBean(FormDesignType.class, this.searchServices.get(FormDesignType.class),
                 new MultivaluedHashMap<>(Collections.singletonMap(ResourceParamNames.IDENTIFIER, identifier)));
 
@@ -80,7 +84,7 @@ public class RfdFormManagerWebServiceImpl extends AbstractRfdFormWebService impl
 
             FormDataType formData = new FormDataTypeImpl();
 
-            if (respType == RfdWsResponseType.UNSTRUCTURED) {
+            if (respType == RfdWsResponseType.URL) {
                 // TODO: implement
                 formData.setContent(StringUtils.EMPTY);
             } else {
@@ -97,7 +101,8 @@ public class RfdFormManagerWebServiceImpl extends AbstractRfdFormWebService impl
                     .encode(retrieveFormPkg, new XdmDocumentDestination(this.config).getReceiver(), null).getXdmNode().getDocument().getDocumentElement()));
             }
 
-            return new RetrieveFormResponseTypeImpl().setForm(formData).setContentType(respType.getId()).setResponseCode(StringUtils.EMPTY);
+            return new RetrieveFormResponseTypeImpl().setForm(formData)
+                .setContentType(respType.getMediaType() != null ? respType.getMediaType().toString() : respType.getId()).setResponseCode(StringUtils.EMPTY);
         } catch (RfdWsException e) {
             throw e;
         } catch (Exception e) {

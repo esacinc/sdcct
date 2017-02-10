@@ -129,7 +129,7 @@
                 </xsl:call-template>
                 <xsl:call-template name="script">
                     <xsl:with-param name="content"
-                        select="sdcct-xml:resource-content('classpath*:${sdcct.static.webjars.jquery.dir.path}/dist/jquery.min.js')"/>
+                        select="sdcct-xml:resource-content('classpath*:${sdcct.static.webjars.jquery.dir.path}/jquery.min.js')"/>
                 </xsl:call-template>
                 <xsl:call-template name="script">
                     <xsl:with-param name="content"

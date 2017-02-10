@@ -4,10 +4,10 @@
     
     <language value="en-US"/>
     
-    <url value="fhir_1a"/>
+    <url value="fhir_a"/>
     
     <identifier>
-        <value value="fhir_1a"/>
+        <value value="fhir_a"/>
     </identifier>
     
     <version value="1"/>
@@ -16,7 +16,7 @@
     
     <date value="2016"/>
     
-    <title value="fhir_1a"/>
+    <title value="fhir_a"/>
     
     <subjectType value="Questionnaire"/>
     

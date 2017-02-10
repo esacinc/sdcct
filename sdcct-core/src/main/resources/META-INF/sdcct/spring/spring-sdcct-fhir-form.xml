@@ -17,11 +17,11 @@
     <beans:bean id="formFhir" class="gov.hhs.onc.sdcct.fhir.form.impl.FhirFormImpl" abstract="true"/>
     
     <!--suppress SpringPlaceholdersInspection -->
-    <beans:bean id="formFhir1a" parent="formFhir"
-        c:name="fhir_1a"
-        c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/fhir_1a.xml"
+    <beans:bean id="formFhira" parent="formFhir"
+        c:name="fhir_a"
+        c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/fhir_a.xml"
         p:internal="true"/>
-    
+
     <!--====================================================================================================
     = FORM INITIALIZERS
     =====================================================================================================-->
