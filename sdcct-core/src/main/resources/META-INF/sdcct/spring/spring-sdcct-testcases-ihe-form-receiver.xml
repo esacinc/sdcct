@@ -187,7 +187,8 @@
     <beans:bean id="iheTestcase16" parent="iheFormReceiverTestcaseSdcctInitiated"
         p:contentType="XML"
         p:id="IHE_16"
-        p:name="IHE_16 - Form Receiver cannot store contents of an invalid SubmitFormRequest">
+        p:name="IHE_16 - Form Receiver cannot store contents of an invalid SubmitFormRequest"
+        p:negative="true">
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
                 p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">

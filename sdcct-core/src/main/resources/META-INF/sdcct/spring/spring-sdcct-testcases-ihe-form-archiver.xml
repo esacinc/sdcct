@@ -132,7 +132,8 @@
     <beans:bean id="iheTestcase22" parent="iheFormArchiverTestcaseSdcctInitiated"
         p:contentType="XML"
         p:id="IHE_22"
-        p:name="IHE_22 - Form Archiver cannot archive request contents">
+        p:name="IHE_22 - Form Archiver cannot archive request contents"
+        p:negative="true">
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
                 p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
@@ -180,7 +181,8 @@
     <beans:bean id="iheTestcase23" parent="iheFormArchiverTestcaseSutInitiated"
         p:contentType="XML"
         p:id="IHE_23"
-        p:name="IHE_23 - Form Filler requests archival of completed form">
+        p:name="IHE_23 - Form Filler requests archival of completed form"
+        p:optional="true">
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
                 p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
@@ -230,7 +232,8 @@
     <beans:bean id="iheTestcase24" parent="iheFormArchiverTestcaseSutInitiated"
         p:contentType="XML"
         p:id="IHE_24"
-        p:name="IHE_24 - Form Filler requests archival of partially completed form">
+        p:name="IHE_24 - Form Filler requests archival of partially completed form"
+        p:optional="true">
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
                 p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">

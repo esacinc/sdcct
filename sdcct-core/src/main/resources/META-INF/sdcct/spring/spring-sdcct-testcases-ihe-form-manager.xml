@@ -237,7 +237,8 @@
     <beans:bean id="iheTestcase4" parent="iheFormManagerTestcaseSdcctInitiated"
         p:contentType="XML"
         p:id="IHE_4"
-        p:name="IHE_4 - Form Manager returns SOAP fault for an unavailable XML form">
+        p:name="IHE_4 - Form Manager returns SOAP fault for an unavailable XML form"
+        p:negative="true">
         <beans:property name="requestParams">
             <beans:bean parent="retrieveFormRequestTypeImpl">
                 <beans:property name="workflowData">
@@ -301,7 +302,8 @@
     <beans:bean id="iheTestcase5" parent="iheFormManagerTestcaseSdcctInitiated"
         p:contentType="XML"
         p:id="IHE_5"
-        p:name="IHE_5 - Form Manager returns SOAP fault in response to a request for an XML form with an unspecified form ID">
+        p:name="IHE_5 - Form Manager returns SOAP fault in response to a request for an XML form with an unspecified form ID"
+        p:negative="true">
         <beans:property name="requestParams">
             <beans:bean parent="retrieveFormRequestTypeImpl">
                 <beans:property name="workflowData">
@@ -363,7 +365,8 @@
     <beans:bean id="iheTestcase6" parent="iheFormManagerTestcaseSdcctInitiated"
         p:contentType="HTML"
         p:id="IHE_6"
-        p:name="IHE_6 - Form Manager returns SOAP fault for an unavailable HTML form">
+        p:name="IHE_6 - Form Manager returns SOAP fault for an unavailable HTML form"
+        p:negative="true">
         <beans:property name="requestParams">
             <beans:bean parent="retrieveFormRequestTypeImpl">
                 <beans:property name="workflowData">
@@ -427,7 +430,8 @@
     <beans:bean id="iheTestcase7" parent="iheFormManagerTestcaseSdcctInitiated"
         p:contentType="HTML"
         p:id="IHE_7"
-        p:name="IHE_7 - Form Manager returns SOAP fault in response to a request for an HTML form with an unspecified form ID">
+        p:name="IHE_7 - Form Manager returns SOAP fault in response to a request for an HTML form with an unspecified form ID"
+        p:negative="true">
         <beans:property name="requestParams">
             <beans:bean parent="retrieveFormRequestTypeImpl">
                 <beans:property name="workflowData">
@@ -489,7 +493,8 @@
     <beans:bean id="iheTestcase8" parent="iheFormManagerTestcaseSdcctInitiated"
         p:contentType="URL"
         p:id="IHE_8"
-        p:name="IHE_8 - Form Manager returns SOAP fault in response to a request for a form that is not available at requested URI">
+        p:name="IHE_8 - Form Manager returns SOAP fault in response to a request for a form that is not available at requested URI"
+        p:negative="true">
         <beans:property name="requestParams">
             <beans:bean parent="retrieveFormRequestTypeImpl">
                 <beans:property name="workflowData">
@@ -553,7 +558,8 @@
     <beans:bean id="iheTestcase9" parent="iheFormManagerTestcaseSdcctInitiated"
         p:contentType="URL"
         p:id="IHE_9"
-        p:name="IHE_9 - Form Manager returns SOAP fault in response to a request for a form available at a URI with an unspecified form ID">
+        p:name="IHE_9 - Form Manager returns SOAP fault in response to a request for a form available at a URI with an unspecified form ID"
+        p:negative="true">
         <beans:property name="requestParams">
             <beans:bean parent="retrieveFormRequestTypeImpl">
                 <beans:property name="workflowData">
@@ -619,6 +625,7 @@
         p:contentType="XML"
         p:id="IHE_10"
         p:name="IHE_10 - Form Filler RetrieveFormRequest to obtain XML form"
+        p:optional="true"
         p:response-ref="retrieveFormResponseTypeXml">
         <beans:property name="requestParams">
             <beans:bean parent="retrieveFormRequestTypeImpl">
@@ -689,6 +696,7 @@
         p:contentType="HTML"
         p:id="IHE_11"
         p:name="IHE_11 - Form Filler RetrieveFormRequest to obtain HTML form"
+        p:optional="true"
         p:response-ref="retrieveFormResponseTypeHtml">
         <beans:property name="requestParams">
             <beans:bean parent="retrieveFormRequestTypeImpl">
@@ -763,6 +771,7 @@
         p:contentType="URL"
         p:id="IHE_12"
         p:name="IHE_12 - Form Filler RetrieveFormRequest to obtain URI-based form"
+        p:optional="true"
         p:response-ref="retrieveFormResponseTypeUri">
         <beans:property name="requestParams">
             <beans:bean parent="retrieveFormRequestTypeImpl">
@@ -800,7 +809,9 @@
             <beans:bean parent="iheTestcaseDescImpl">
                 <beans:property name="instructions">
                     <sdcct:normalized-string>
-Submit a request from your Form Filler for a form that the Form Manager has available and which can be accessed by a URI, according to the message request details. The Form Filler should receive an SDC URI form from the Form Manager in the response.</sdcct:normalized-string>
+                        Submit a request from your Form Filler for a form that the Form Manager has available and which can be accessed by a URI, according to
+                        the message request details. The Form Filler should receive an SDC URI form from the Form Manager in the response.
+                    </sdcct:normalized-string>
                 </beans:property>
                 <beans:property name="specifications">
                     <beans:list>
@@ -812,7 +823,9 @@ Submit a request from your Form Filler for a form that the Form Manager has avai
                 </beans:property>
                 <beans:property name="text">
                     <sdcct:normalized-string>
-This testcase verifies that your Form Filler can request and retrieve an available form that can be accessed by a URI from a Form Manager, according to ITI-34. This testcase is required if your Form Filler supports the SDC URI Form content module.</sdcct:normalized-string>
+                        This testcase verifies that your Form Filler can request and retrieve an available form that can be accessed by a URI from a Form
+                        Manager, according to ITI-34. This testcase is required if your Form Filler supports the SDC URI Form content module.
+                    </sdcct:normalized-string>
                 </beans:property>
             </beans:bean>
         </beans:property>
