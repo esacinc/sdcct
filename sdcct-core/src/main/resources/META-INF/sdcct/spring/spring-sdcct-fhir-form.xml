@@ -17,7 +17,7 @@
     <beans:bean id="formFhir" class="gov.hhs.onc.sdcct.fhir.form.impl.FhirFormImpl" abstract="true"/>
     
     <!--suppress SpringPlaceholdersInspection -->
-    <beans:bean id="formFhira" parent="formFhir"
+    <beans:bean id="formFhirA" parent="formFhir"
         c:name="fhir_a"
         c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/fhir_a.xml"
         p:internal="true"/>

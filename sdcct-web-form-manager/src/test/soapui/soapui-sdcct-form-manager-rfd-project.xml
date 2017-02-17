@@ -77,7 +77,7 @@
       <urn:RetrieveFormRequest>
          <urn:prepopData xsi:nil="true"/>
          <urn:workflowData>
-            <urn:formID>${#Spring##( formRfda.identifier )}</urn:formID>
+            <urn:formID>${#Spring##( formRfdA.identifier )}</urn:formID>
             <urn:encodedResponse responseContentType="${#Spring##( T(gov.hhs.onc.sdcct.rfd.ws.RfdWsResponseType).XML.mediaType.toString() )}">true</urn:encodedResponse>
             <urn:context xsi:nil="true"/>
             <urn:instanceID xsi:nil="true"/>
@@ -123,7 +123,7 @@
       <urn:RetrieveFormRequest>
          <urn:prepopData xsi:nil="true"/>
          <urn:workflowData>
-            <urn:formID>${#Spring##( formRfda.identifier )}</urn:formID>
+            <urn:formID>${#Spring##( formRfdA.identifier )}</urn:formID>
             <urn:encodedResponse responseContentType="${#Spring##( T(gov.hhs.onc.sdcct.rfd.ws.RfdWsResponseType).HTML.mediaType.toString() )}">true</urn:encodedResponse>
             <urn:context xsi:nil="true"/>
             <urn:instanceID xsi:nil="true"/>
@@ -169,7 +169,7 @@
       <urn:RetrieveFormRequest>
          <urn:prepopData xsi:nil="true"/>
          <urn:workflowData>
-            <urn:formID>${#Spring##( formRfda.identifier )}</urn:formID>
+            <urn:formID>${#Spring##( formRfdA.identifier )}</urn:formID>
             <urn:encodedResponse>false</urn:encodedResponse>
             <urn:context xsi:nil="true"/>
             <urn:instanceID xsi:nil="true"/>
@@ -215,7 +215,7 @@
       <urn:RetrieveFormRequest>
          <urn:prepopData xsi:nil="true"/>
          <urn:workflowData badAttribute="badAttributeValue">
-            <urn:formID>${#Spring##( formRfda.identifier )}</urn:formID>
+            <urn:formID>${#Spring##( formRfdA.identifier )}</urn:formID>
             <urn:encodedResponse responseContentType="${#Spring##( T(gov.hhs.onc.sdcct.rfd.ws.RfdWsResponseType).XML.mediaType.toString() )}">true</urn:encodedResponse>
             <urn:context xsi:nil="true"/>
             <urn:instanceID xsi:nil="true"/>

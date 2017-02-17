@@ -44,7 +44,7 @@
     <!--====================================================================================================
     = COMPLEX TYPES
     =====================================================================================================-->
-    <xsd:complexType name="NormalizedStringBean">
+    <xsd:complexType name="NormalizedStringType">
         <xsd:complexContent mixed="true">
             <xsd:extension base="beans:identifiedType"/>
         </xsd:complexContent>
@@ -53,7 +53,7 @@
     <!--====================================================================================================
     = ELEMENTS
     =====================================================================================================-->
-    <xsd:element name="normalized-string" type="sdcct-spring:NormalizedStringBean">
+    <xsd:element name="normalized-string" type="sdcct-spring:NormalizedStringType">
         <xsd:annotation>
             <xsd:documentation source="java:org.springframework.beans.factory.config.BeanDefinition"/>
             <xsd:appinfo>

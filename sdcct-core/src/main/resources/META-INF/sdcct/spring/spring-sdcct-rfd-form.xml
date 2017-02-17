@@ -18,13 +18,13 @@
 
     <!-- TODO: Replace with updated forms. -->
     <!--suppress SpringPlaceholdersInspection -->
-    <beans:bean id="formRfda" parent="formRfd"
+    <beans:bean id="formRfdA" parent="formRfd"
         c:name="ihe_a"
         c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/ihe_a.xml"
         p:internal="true"/>
 
     <!--suppress SpringPlaceholdersInspection -->
-    <beans:bean id="formRfdb" parent="formRfd"
+    <beans:bean id="formRfdB" parent="formRfd"
         c:name="ihe_b"
         c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/ihe_b.xml"
         p:internal="true"/>

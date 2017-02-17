@@ -1,18 +1,18 @@
 package gov.hhs.onc.sdcct.beans.impl;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import gov.hhs.onc.sdcct.api.SdcctIssueSeverity;
 import gov.hhs.onc.sdcct.beans.MessageBean;
 import gov.hhs.onc.sdcct.beans.ResultBean;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public abstract class AbstractResultBean implements ResultBean {
-    protected List<MessageBean> messages = new ArrayList<>();
+    protected ListMultimap<SdcctIssueSeverity, MessageBean> messages = ArrayListMultimap.create();
 
     @Override
     public boolean hasMessages(SdcctIssueSeverity severity) {
-        return (this.hasMessages() && this.getMessages().stream().anyMatch(msg -> (msg.getSeverity() == severity)));
+        return (this.hasMessages() && !this.getMessages(severity).isEmpty());
     }
 
     @Override
@@ -22,11 +22,11 @@ public abstract class AbstractResultBean implements ResultBean {
 
     @Override
     public List<MessageBean> getMessages(SdcctIssueSeverity severity) {
-        return this.getMessages().stream().filter(msg -> (msg.getSeverity() == severity)).collect(Collectors.toList());
+        return this.getMessages().get(severity);
     }
 
     @Override
-    public List<MessageBean> getMessages() {
+    public ListMultimap<SdcctIssueSeverity, MessageBean> getMessages() {
         return this.messages;
     }
 

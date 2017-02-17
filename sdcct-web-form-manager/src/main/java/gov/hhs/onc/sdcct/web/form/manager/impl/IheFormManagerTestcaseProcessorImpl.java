@@ -54,7 +54,7 @@ public class IheFormManagerTestcaseProcessorImpl
                 iheFormManagerTestcaseResult.setFault((Fault) e);
             }
 
-            iheFormManagerTestcaseResult.getMessages().add(new MessageBeanImpl(SdcctIssueSeverity.ERROR,
+            iheFormManagerTestcaseResult.getMessages(SdcctIssueSeverity.ERROR).add(new MessageBeanImpl(SdcctIssueSeverity.ERROR,
                 String.format("Unable to invoke IHE Form Manager (endpointAddr=%s, transaction=%s): %s", delegate.getEndpoint(), transaction, e.getMessage())));
         }
 
