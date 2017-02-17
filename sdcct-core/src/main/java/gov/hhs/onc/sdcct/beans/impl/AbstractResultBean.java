@@ -12,7 +12,7 @@ public abstract class AbstractResultBean implements ResultBean {
 
     @Override
     public boolean hasMessages(SdcctIssueSeverity severity) {
-        return (this.hasMessages() && !this.getMessages(severity).isEmpty());
+        return this.messages.containsKey(severity);
     }
 
     @Override
