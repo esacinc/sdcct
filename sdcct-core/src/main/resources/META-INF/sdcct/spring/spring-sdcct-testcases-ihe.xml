@@ -6,8 +6,10 @@
     xmlns:sdcct="urn:sdcct:spring"
     xmlns:sdcct-xml="urn:sdcct:spring:xml"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
     xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
         urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
         urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
 
@@ -123,7 +125,6 @@
         p:value="true"/>
 
     <beans:bean id="encodedResponseUri" parent="encodedResponseImpl" lazy-init="true" scope="prototype"
-        p:responseContentType-ref="iheContentTypeUri"
         p:value="false"/>
 
     <!--====================================================================================================
@@ -139,4 +140,12 @@
         p:contentType-ref="iheContentTypeHtml"/>
     <beans:bean id="retrieveFormResponseTypeUri" parent="retrieveFormResponseTypeImpl" lazy-init="true" scope="prototype"
         p:contentType-ref="iheContentTypeUri"/>
+
+    <!--====================================================================================================
+    = IHE FORM IDS
+    =====================================================================================================-->
+    <util:list id="iheFormIds">
+        <beans:value>#{ formRfdA.identifier }</beans:value>
+        <beans:value>#{ formRfdB.identifier }</beans:value>
+    </util:list>
 </beans:beans>

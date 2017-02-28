@@ -9,10 +9,6 @@ import gov.hhs.onc.sdcct.beans.ResultBean;
 import javax.annotation.Nullable;
 
 public interface SdcctTestcaseStep extends ResultBean {
-    @JsonProperty("msgs")
-    @Override
-    public ListMultimap<SdcctIssueSeverity, MessageBean> getMessages();
-
     @Override
     public boolean isSuccess();
 

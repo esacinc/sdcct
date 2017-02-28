@@ -3,8 +3,8 @@ package gov.hhs.onc.sdcct.web.form.manager.impl;
 import gov.hhs.onc.sdcct.api.SdcctIssueSeverity;
 import gov.hhs.onc.sdcct.rfd.RetrieveFormRequestType;
 import gov.hhs.onc.sdcct.rfd.RetrieveFormResponseType;
-import gov.hhs.onc.sdcct.testcases.results.ihe.IheFormManagerTestcaseResult;
 import gov.hhs.onc.sdcct.testcases.ihe.IheFormManagerTestcase;
+import gov.hhs.onc.sdcct.testcases.results.ihe.IheFormManagerTestcaseResult;
 import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheFormManagerTestcaseSubmission;
 import gov.hhs.onc.sdcct.testcases.submissions.ihe.impl.IheFormManagerTestcaseSubmissionImpl;
 import gov.hhs.onc.sdcct.web.form.manager.IheFormManagerTestcaseProcessor;
@@ -45,14 +45,12 @@ public class IheFormManagerTestcaseProcessorItTests extends AbstractSdcctTestcas
             this.iheFormManagerTestcases.stream().filter(IheFormManagerTestcase::isSdcctInitiated).collect(Collectors.toList());
 
         for (IheFormManagerTestcase testcase : testcases) {
-            IheFormManagerTestcaseSubmission submission = new IheFormManagerTestcaseSubmissionImpl(testcase, this.rfdFormManagerEndpointAddr);
-            submission.setFormId(testcase.getRequestParams().getWorkflowData().getFormId());
-
+            String formId = testcase.getRequestParams().getWorkflowData().hasFormId() ? testcase.getRequestParams().getWorkflowData().getFormId() : null;
+            IheFormManagerTestcaseSubmission submission = new IheFormManagerTestcaseSubmissionImpl(testcase, this.rfdFormManagerEndpointAddr, formId);
             IheFormManagerTestcaseResult result = this.iheFormManagerTestcaseProc.process(submission);
 
-            // TODO: verify result
-
             super.assertTestcaseProperties(testcase);
+            assertTestcaseResultProperties(testcase, result);
         }
     }
 
@@ -62,9 +60,6 @@ public class IheFormManagerTestcaseProcessorItTests extends AbstractSdcctTestcas
             this.iheFormManagerTestcases.stream().filter(testcase -> !testcase.isSdcctInitiated()).collect(Collectors.toList());
 
         for (IheFormManagerTestcase testcase : testcases) {
-            IheFormManagerTestcaseSubmission submission = new IheFormManagerTestcaseSubmissionImpl(testcase, this.rfdFormManagerEndpointAddr);
-            submission.setFormId(testcase.getRequestParams().getWorkflowData().getFormId());
-
             Client delegate = this.testClientFormManagerRfd.buildInvocationDelegate();
             QName transaction = testcase.getTransaction();
             RetrieveFormRequestType retrieveFormRequestType = testcase.getRequestParams();
@@ -90,6 +85,8 @@ public class IheFormManagerTestcaseProcessorItTests extends AbstractSdcctTestcas
     }
 
     private void assertTestcaseResultProperties(IheFormManagerTestcase testcase, IheFormManagerTestcaseResult result) {
+        super.assertTestcaseResultProperties(testcase, result);
+
         String testcaseId = testcase.getId();
 
         if (!testcase.isNegative()) {
@@ -99,8 +96,8 @@ public class IheFormManagerTestcaseProcessorItTests extends AbstractSdcctTestcas
             Assert.assertTrue(result.isSuccess(), String.format("Result for testcase (id=%s) was expected to be successful.", testcaseId));
         } else {
             Assert.assertTrue(result.hasFault(), String.format("Testcase (id=%s) was expected to have a SOAP fault.", testcaseId));
-            Assert.assertTrue(result.getMessages(SdcctIssueSeverity.ERROR).size() > 0,
-                String.format("Result for testcase (id=%s) was expected to have error messages.", testcaseId));
+            Assert.assertTrue(result.getMessages(SdcctIssueSeverity.INFORMATION).size() > 0,
+                String.format("Result for testcase (id=%s) was expected to have informational messages.", testcaseId));
             Assert.assertFalse(result.isSuccess(), String.format("Result for testcase (id=%s) was not expected to be successful.", testcaseId));
         }
     }

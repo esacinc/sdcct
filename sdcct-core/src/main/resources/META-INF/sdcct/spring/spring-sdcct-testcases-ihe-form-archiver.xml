@@ -24,7 +24,8 @@
         p:sdcctInitiated="true"/>
 
     <beans:bean id="iheFormArchiverTestcaseSutInitiated" parent="iheFormArchiverTestcaseImpl" abstract="true"
-        p:roleTested="FORM_FILLER"/>
+        p:roleTested="FORM_FILLER"
+        p:sdcctRole="FORM_ARCHIVER"/>
 
     <!--====================================================================================================
     = IHE FORM ARCHIVER TESTCASES - INITIATED BY SDCCT

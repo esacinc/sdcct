@@ -1,8 +1,8 @@
 package gov.hhs.onc.sdcct.testcases.results.ihe;
 
-import gov.hhs.onc.sdcct.testcases.results.SdcctTestcaseResult;
 import gov.hhs.onc.sdcct.testcases.ihe.IheTestcase;
 import gov.hhs.onc.sdcct.testcases.ihe.IheTestcaseDescription;
+import gov.hhs.onc.sdcct.testcases.results.SdcctTestcaseResult;
 import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheTestcaseSubmission;
 import javax.annotation.Nullable;
 import org.apache.cxf.interceptor.Fault;

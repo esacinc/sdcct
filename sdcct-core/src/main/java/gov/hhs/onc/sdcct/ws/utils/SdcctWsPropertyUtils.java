@@ -1,5 +1,6 @@
 package gov.hhs.onc.sdcct.ws.utils;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nullable;
@@ -63,5 +64,15 @@ public final class SdcctWsPropertyUtils {
     @Nullable
     public static String getProperty(Map<String, Object> props, String propName, @Nullable String defaultPropValue) {
         return Objects.toString(props.get(propName), defaultPropValue);
+    }
+
+    public static Map<String, Object> getContextualProperties(Message msg) {
+        Map<String, Object> props = new HashMap<>();
+
+        for (String key : msg.getContextualPropertyKeys()) {
+            props.put(key, msg.getContextualProperty(key));
+        }
+
+        return props;
     }
 }

@@ -24,7 +24,8 @@
         p:sdcctInitiated="true"/>
 
     <beans:bean id="iheFormReceiverTestcaseSutInitiated" parent="iheFormReceiverTestcaseImpl" abstract="true"
-        p:roleTested="FORM_FILLER"/>
+        p:roleTested="FORM_FILLER"
+        p:sdcctRole="FORM_RECEIVER"/>
 
     <!--====================================================================================================
     = IHE FORM RECEIVER TESTCASES - INITIATED BY SDCCT

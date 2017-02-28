@@ -210,6 +210,11 @@
                 <version>2.8.3</version>
             </dependency>
             <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-guava</artifactId>
+                <version>2.8.6</version>
+            </dependency>
+            <dependency>
                 <groupId>com.fasterxml.jackson.module</groupId>
                 <artifactId>jackson-module-jaxb-annotations</artifactId>
                 <version>2.8.3</version>
@@ -865,12 +870,12 @@
             <dependency>
                 <groupId>org.thymeleaf</groupId>
                 <artifactId>thymeleaf</artifactId>
-                <version>3.0.1.RELEASE</version>
+                <version>3.0.3.RELEASE</version>
             </dependency>
             <dependency>
                 <groupId>org.thymeleaf</groupId>
                 <artifactId>thymeleaf-spring4</artifactId>
-                <version>3.0.1.RELEASE</version>
+                <version>3.0.3.RELEASE</version>
             </dependency>
             <dependency>
                 <groupId>org.thymeleaf.extras</groupId>
@@ -880,7 +885,7 @@
             <dependency>
                 <groupId>org.thymeleaf.extras</groupId>
                 <artifactId>thymeleaf-extras-springsecurity4</artifactId>
-                <version>3.0.0.RELEASE</version>
+                <version>3.0.2.RELEASE</version>
             </dependency>
             <dependency>
                 <groupId>org.webjars</groupId>
@@ -896,7 +901,7 @@
             <dependency>
                 <groupId>org.webjars</groupId>
                 <artifactId>font-awesome</artifactId>
-                <version>4.6.3</version>
+                <version>4.7.0</version>
             </dependency>
             <dependency>
                 <groupId>org.webjars</groupId>
@@ -912,7 +917,7 @@
             <dependency>
                 <groupId>org.webjars</groupId>
                 <artifactId>webjars-locator-core</artifactId>
-                <version>0.31</version>
+                <version>0.32</version>
             </dependency>
             <dependency>
                 <groupId>org.webjars</groupId>

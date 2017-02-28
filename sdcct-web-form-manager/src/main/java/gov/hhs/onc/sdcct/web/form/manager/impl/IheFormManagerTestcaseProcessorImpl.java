@@ -5,10 +5,10 @@ import gov.hhs.onc.sdcct.beans.impl.MessageBeanImpl;
 import gov.hhs.onc.sdcct.rfd.RetrieveFormRequestType;
 import gov.hhs.onc.sdcct.rfd.RetrieveFormResponseType;
 import gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames;
-import gov.hhs.onc.sdcct.testcases.results.ihe.IheFormManagerTestcaseResult;
-import gov.hhs.onc.sdcct.testcases.results.ihe.impl.IheFormManagerTestcaseResultImpl;
 import gov.hhs.onc.sdcct.testcases.ihe.IheFormManagerTestcase;
 import gov.hhs.onc.sdcct.testcases.ihe.impl.AbstractIheTestcaseProcessor;
+import gov.hhs.onc.sdcct.testcases.results.ihe.IheFormManagerTestcaseResult;
+import gov.hhs.onc.sdcct.testcases.results.ihe.impl.IheFormManagerTestcaseResultImpl;
 import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheFormManagerTestcaseSubmission;
 import gov.hhs.onc.sdcct.web.form.manager.IheFormManagerTestcaseProcessor;
 import gov.hhs.onc.sdcct.ws.impl.JaxWsClient;
@@ -30,7 +30,10 @@ public class IheFormManagerTestcaseProcessorImpl
         IheFormManagerTestcase iheFormManagerTestcase = submission.getTestcase();
         // noinspection ConstantConditions
         RetrieveFormRequestType retrieveFormRequestType = iheFormManagerTestcase.getRequestParams();
-        retrieveFormRequestType.getWorkflowData().setFormId(submission.getFormId());
+
+        if (retrieveFormRequestType.getWorkflowData().hasFormId()) {
+            retrieveFormRequestType.getWorkflowData().setFormId(submission.getFormId());
+        }
 
         String endpointAddr = submission.getEndpointAddress();
         JaxWsClient client = (JaxWsClient) this.beanFactory.getBean(this.clientBeanName, endpointAddr);
@@ -49,13 +52,26 @@ public class IheFormManagerTestcaseProcessorImpl
         try {
             RetrieveFormResponseType retrieveFormResponseType = (RetrieveFormResponseType) client.invoke(delegate, transaction, retrieveFormRequestType)[0];
             iheFormManagerTestcaseResult.setResponse(retrieveFormResponseType);
+
+            if (!iheFormManagerTestcaseResult.hasMessages(SdcctIssueSeverity.ERROR) && !iheFormManagerTestcase.isNegative()) {
+                iheFormManagerTestcaseResult.setSuccess(true);
+            }
         } catch (Exception e) {
             if (e instanceof Fault) {
-                iheFormManagerTestcaseResult.setFault((Fault) e);
-            }
+                Fault fault;
 
-            iheFormManagerTestcaseResult.getMessages(SdcctIssueSeverity.ERROR).add(new MessageBeanImpl(SdcctIssueSeverity.ERROR,
-                String.format("Unable to invoke IHE Form Manager (endpointAddr=%s, transaction=%s): %s", delegate.getEndpoint(), transaction, e.getMessage())));
+                iheFormManagerTestcaseResult.setFault(fault = (Fault) e);
+
+                iheFormManagerTestcaseResult.getMessages(SdcctIssueSeverity.INFORMATION)
+                    .add(new MessageBeanImpl(SdcctIssueSeverity.INFORMATION,
+                        String.format(
+                            "Please check that the web service response event payload contains a SOAP fault (message=%s) that corresponds to the associated testcase (id=%s) description.",
+                            fault.getMessage(), iheFormManagerTestcase.getId())));
+            } else {
+                iheFormManagerTestcaseResult.getMessages(SdcctIssueSeverity.ERROR).add(new MessageBeanImpl(SdcctIssueSeverity.ERROR,
+                    String.format("Unable to invoke IHE Form Manager (endpointAddr=%s, transaction=%s): %s", endpointAddr, transaction, e.getMessage())));
+
+            }
         }
 
         return iheFormManagerTestcaseResult;

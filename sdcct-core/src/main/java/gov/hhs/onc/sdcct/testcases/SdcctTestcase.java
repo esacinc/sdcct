@@ -16,6 +16,10 @@ public interface SdcctTestcase<T extends SdcctTestcaseDescription> extends Ident
 
     public void setDescription(@Nullable T desc);
 
+    @JsonProperty
+    @Override
+    public String getId();
+
     public void setId(String id);
 
     public boolean hasName();
@@ -45,6 +49,11 @@ public interface SdcctTestcase<T extends SdcctTestcaseDescription> extends Ident
     public boolean isSdcctInitiated();
 
     public void setSdcctInitiated(boolean sdcctInitiated);
+
+    @JsonProperty
+    public SpecificationRole getSdcctRole();
+
+    public void setSdcctRole(SpecificationRole sdcctRole);
 
     public boolean hasSteps();
 

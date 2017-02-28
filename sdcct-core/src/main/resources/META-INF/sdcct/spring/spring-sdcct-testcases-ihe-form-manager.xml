@@ -17,6 +17,7 @@
     <beans:bean id="iheFormManagerTestcase" class="gov.hhs.onc.sdcct.testcases.ihe.IheFormManagerTestcase" parent="iheTestcase" abstract="true"/>
     <beans:bean id="iheFormManagerTestcaseImpl" class="gov.hhs.onc.sdcct.testcases.ihe.impl.IheFormManagerTestcaseImpl" parent="iheFormManagerTestcase"
         abstract="true"
+        p:formIds-ref="iheFormIds"
         p:transaction="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).RETRIEVE_FORM_OP }"/>
 
     <beans:bean id="iheFormManagerTestcaseSdcctInitiated" parent="iheFormManagerTestcaseImpl" abstract="true"
@@ -24,7 +25,8 @@
         p:sdcctInitiated="true"/>
 
     <beans:bean id="iheFormManagerTestcaseSutInitiated" parent="iheFormManagerTestcaseImpl" abstract="true"
-        p:roleTested="FORM_FILLER"/>
+        p:roleTested="FORM_FILLER"
+        p:sdcctRole="FORM_MANAGER"/>
 
     <!--====================================================================================================
     = IHE FORM MANAGER TESTCASES - INITIATED BY SDCCT
@@ -167,6 +169,10 @@
         </beans:property>
     </beans:bean>
 
+    <!--
+    TODO: Re-enable when formId is determined.
+    -->
+    <!--
     <beans:bean id="iheTestcase3" parent="iheFormManagerTestcaseSdcctInitiated"
         p:contentType="URL"
         p:id="IHE_3"
@@ -176,7 +182,8 @@
             <beans:bean parent="retrieveFormRequestTypeImpl">
                 <beans:property name="workflowData">
                     <beans:bean parent="workflowDataTypeImpl"
-                        p:encodedResponse-ref="encodedResponseUri"/>
+                        p:encodedResponse-ref="encodedResponseUri"
+                        p:formId=""/>
                 </beans:property>
             </beans:bean>
         </beans:property>
@@ -233,12 +240,18 @@
             </beans:list>
         </beans:property>
     </beans:bean>
+    -->
 
     <beans:bean id="iheTestcase4" parent="iheFormManagerTestcaseSdcctInitiated"
         p:contentType="XML"
         p:id="IHE_4"
         p:name="IHE_4 - Form Manager returns SOAP fault for an unavailable XML form"
         p:negative="true">
+        <beans:property name="formIds">
+            <beans:list>
+                <beans:value>ihe_unavailable_form_id</beans:value>
+            </beans:list>
+        </beans:property>
         <beans:property name="requestParams">
             <beans:bean parent="retrieveFormRequestTypeImpl">
                 <beans:property name="workflowData">
@@ -367,6 +380,11 @@
         p:id="IHE_6"
         p:name="IHE_6 - Form Manager returns SOAP fault for an unavailable HTML form"
         p:negative="true">
+        <beans:property name="formIds">
+            <beans:list>
+                <beans:value>ihe_unavailable_form_id</beans:value>
+            </beans:list>
+        </beans:property>
         <beans:property name="requestParams">
             <beans:bean parent="retrieveFormRequestTypeImpl">
                 <beans:property name="workflowData">

@@ -9,6 +9,7 @@ import java.util.List;
 
 public abstract class AbstractResultBean implements ResultBean {
     protected ListMultimap<SdcctIssueSeverity, MessageBean> messages = ArrayListMultimap.create();
+    protected boolean success;
 
     @Override
     public boolean hasMessages(SdcctIssueSeverity severity) {
@@ -32,6 +33,11 @@ public abstract class AbstractResultBean implements ResultBean {
 
     @Override
     public boolean isSuccess() {
-        return !this.hasMessages(SdcctIssueSeverity.ERROR);
+        return this.success;
+    }
+
+    @Override
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 }
