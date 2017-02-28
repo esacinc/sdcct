@@ -10,10 +10,10 @@ public interface ResultBean {
 
     public boolean hasMessages();
 
-    public List<MessageBean> getMessages(SdcctIssueSeverity severity);
+    public List<String> getMessages(SdcctIssueSeverity severity);
 
     @JsonProperty("msgs")
-    public ListMultimap<SdcctIssueSeverity, MessageBean> getMessages();
+    public ListMultimap<SdcctIssueSeverity, String> getMessages();
 
     @JsonProperty
     public boolean isSuccess();

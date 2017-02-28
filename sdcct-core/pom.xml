@@ -329,6 +329,10 @@
         </dependency>
         <dependency>
             <groupId>org.glassfish</groupId>
+            <artifactId>javax.el</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
             <artifactId>javax.json</artifactId>
         </dependency>
         <dependency>
@@ -359,6 +363,10 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-search-orm</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hsqldb</groupId>

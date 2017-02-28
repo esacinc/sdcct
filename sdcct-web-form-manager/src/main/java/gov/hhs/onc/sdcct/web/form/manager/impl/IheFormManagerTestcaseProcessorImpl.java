@@ -1,7 +1,6 @@
 package gov.hhs.onc.sdcct.web.form.manager.impl;
 
 import gov.hhs.onc.sdcct.api.SdcctIssueSeverity;
-import gov.hhs.onc.sdcct.beans.impl.MessageBeanImpl;
 import gov.hhs.onc.sdcct.rfd.RetrieveFormRequestType;
 import gov.hhs.onc.sdcct.rfd.RetrieveFormResponseType;
 import gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames;
@@ -63,13 +62,12 @@ public class IheFormManagerTestcaseProcessorImpl
                 iheFormManagerTestcaseResult.setFault(fault = (Fault) e);
 
                 iheFormManagerTestcaseResult.getMessages(SdcctIssueSeverity.INFORMATION)
-                    .add(new MessageBeanImpl(SdcctIssueSeverity.INFORMATION,
-                        String.format(
-                            "Please check that the web service response event payload contains a SOAP fault (message=%s) that corresponds to the associated testcase (id=%s) description.",
-                            fault.getMessage(), iheFormManagerTestcase.getId())));
+                    .add(String.format(
+                        "Please check that the web service response event payload contains a SOAP fault (message=%s) that corresponds to the associated testcase (id=%s) description.",
+                        fault.getMessage(), iheFormManagerTestcase.getId()));
             } else {
-                iheFormManagerTestcaseResult.getMessages(SdcctIssueSeverity.ERROR).add(new MessageBeanImpl(SdcctIssueSeverity.ERROR,
-                    String.format("Unable to invoke IHE Form Manager (endpointAddr=%s, transaction=%s): %s", endpointAddr, transaction, e.getMessage())));
+                iheFormManagerTestcaseResult.getMessages(SdcctIssueSeverity.ERROR)
+                    .add(String.format("Unable to invoke IHE Form Manager (endpointAddr=%s, transaction=%s): %s", endpointAddr, transaction, e.getMessage()));
 
             }
         }

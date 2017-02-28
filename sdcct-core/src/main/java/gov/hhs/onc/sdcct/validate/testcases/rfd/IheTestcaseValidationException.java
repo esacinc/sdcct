@@ -1,9 +1,9 @@
 package gov.hhs.onc.sdcct.validate.testcases.rfd;
 
-import gov.hhs.onc.sdcct.SdcctException;
+import gov.hhs.onc.sdcct.validate.testcases.TestcaseValidationException;
 import javax.annotation.Nullable;
 
-public class IheTestcaseValidationException extends SdcctException {
+public class IheTestcaseValidationException extends TestcaseValidationException {
     private final static long serialVersionUID = 0L;
 
     public IheTestcaseValidationException(@Nullable String msg) {

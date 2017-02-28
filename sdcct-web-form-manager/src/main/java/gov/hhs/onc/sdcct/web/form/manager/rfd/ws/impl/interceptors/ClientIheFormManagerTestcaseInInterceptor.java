@@ -2,7 +2,6 @@ package gov.hhs.onc.sdcct.web.form.manager.rfd.ws.impl.interceptors;
 
 import com.sun.xml.ws.encoding.soap.SOAP12Constants;
 import gov.hhs.onc.sdcct.api.SdcctIssueSeverity;
-import gov.hhs.onc.sdcct.beans.impl.MessageBeanImpl;
 import gov.hhs.onc.sdcct.net.mime.SdcctMediaTypes;
 import gov.hhs.onc.sdcct.rfd.AnyXmlContentType;
 import gov.hhs.onc.sdcct.rfd.RetrieveFormResponseType;
@@ -70,15 +69,15 @@ public class ClientIheFormManagerTestcaseInInterceptor extends AbstractIheTestca
 
                     if (response != null) {
                         if (testcase.isNegative()) {
-                            result.getMessages().get(SdcctIssueSeverity.ERROR).add(new MessageBeanImpl(SdcctIssueSeverity.ERROR,
-                                String.format("%s was unexpectedly returned for testcase (id=%s).", RfdWsXmlNames.RETRIEVE_FORM_RESP, testcaseId)));
+                            result.getMessages().get(SdcctIssueSeverity.ERROR)
+                                .add(String.format("%s was unexpectedly returned for testcase (id=%s).", RfdWsXmlNames.RETRIEVE_FORM_RESP, testcaseId));
                         } else {
                             this.validateRetrieveFormResponse(submission, testcase, result, response);
                         }
                     } else {
                         if (!testcase.isNegative()) {
-                            result.getMessages().get(SdcctIssueSeverity.ERROR).add(new MessageBeanImpl(SdcctIssueSeverity.ERROR,
-                                String.format("%s was not expected to be returned for testcase (id=%s).", RfdWsXmlNames.RETRIEVE_FORM_RESP, testcaseId)));
+                            result.getMessages().get(SdcctIssueSeverity.ERROR)
+                                .add(String.format("%s was not expected to be returned for testcase (id=%s).", RfdWsXmlNames.RETRIEVE_FORM_RESP, testcaseId));
                         }
                     }
                 } else {
@@ -86,11 +85,10 @@ public class ClientIheFormManagerTestcaseInInterceptor extends AbstractIheTestca
                         Element soapFaultReasonElem = DOMUtils.getFirstChildWithName(soapFaultElem, SOAP12Constants.QNAME_FAULT_REASON);
 
                         result.getMessages().get(SdcctIssueSeverity.ERROR)
-                            .add(new MessageBeanImpl(SdcctIssueSeverity.ERROR,
-                                String.format("Unexpected SOAP fault occurred for testcase (id=%s): %s", testcaseId,
-                                    (soapFaultReasonElem != null)
-                                        ? DOMUtils.getContent(DOMUtils.getFirstChildWithName(soapFaultReasonElem, SOAP12Constants.QNAME_FAULT_REASON_TEXT))
-                                        : "No SOAP fault reason text provided")));
+                            .add(String.format("Unexpected SOAP fault occurred for testcase (id=%s): %s", testcaseId,
+                                (soapFaultReasonElem != null)
+                                    ? DOMUtils.getContent(DOMUtils.getFirstChildWithName(soapFaultReasonElem, SOAP12Constants.QNAME_FAULT_REASON_TEXT))
+                                    : "No SOAP fault reason text provided"));
                     }
                 }
             } catch (Exception e) {
@@ -107,13 +105,13 @@ public class ClientIheFormManagerTestcaseInInterceptor extends AbstractIheTestca
         // noinspection ConstantConditions
         if (!actualResponse.getContentType().equals(expectedResponse.getContentType())) {
             iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR)
-                .add(new MessageBeanImpl(SdcctIssueSeverity.ERROR, String.format("%s contains unexpected contentType (expected=%s, actual=%s).",
-                    RfdWsXmlNames.RETRIEVE_FORM_RESP, expectedResponse.getContentType(), actualResponse.getContentType())));
+                .add(String.format("%s contains unexpected contentType (expected=%s, actual=%s).", RfdWsXmlNames.RETRIEVE_FORM_RESP,
+                    expectedResponse.getContentType(), actualResponse.getContentType()));
         }
 
         if (!actualResponse.getForm().hasContent()) {
             iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR)
-                .add(new MessageBeanImpl(SdcctIssueSeverity.ERROR, String.format("%s form does not contain content.", RfdWsXmlNames.RETRIEVE_FORM_RESP)));
+                .add(String.format("%s form does not contain content.", RfdWsXmlNames.RETRIEVE_FORM_RESP));
         } else {
             Object content = actualResponse.getForm().getContent();
 
@@ -128,46 +126,44 @@ public class ClientIheFormManagerTestcaseInInterceptor extends AbstractIheTestca
 
                         if (expectedFormId != null && !expectedFormId.equals(actualFormId)) {
                             iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR)
-                                .add(new MessageBeanImpl(SdcctIssueSeverity.ERROR,
-                                    String.format("Form ID (%s) in %s does not equal form ID (%s) requested in submission.", actualFormId,
-                                        RfdWsXmlNames.RETRIEVE_FORM_RESP, expectedFormId)));
+                                .add(String.format("Form ID (%s) in %s does not equal form ID (%s) requested in submission.", actualFormId,
+                                    RfdWsXmlNames.RETRIEVE_FORM_RESP, expectedFormId));
                         }
                     } else {
-                        iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR).add(new MessageBeanImpl(SdcctIssueSeverity.ERROR,
-                            String.format("%s for testcase (id=%s) does not contain the Structured element.", RfdWsXmlNames.RETRIEVE_FORM_RESP, testcaseId)));
+                        iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR).add(
+                            String.format("%s for testcase (id=%s) does not contain the Structured element.", RfdWsXmlNames.RETRIEVE_FORM_RESP, testcaseId));
                     }
 
                     break;
 
                 case SdcctMediaTypes.TEXT_HTML_SDC_VALUE:
                     if (!(content instanceof AnyXmlContentType)) {
-                        iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR).add(new MessageBeanImpl(SdcctIssueSeverity.ERROR,
-                            String.format("%s for testcase (id=%s) does not contain the Structured element.", RfdWsXmlNames.RETRIEVE_FORM_RESP, testcaseId)));
+                        iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR).add(
+                            String.format("%s for testcase (id=%s) does not contain the Structured element.", RfdWsXmlNames.RETRIEVE_FORM_RESP, testcaseId));
                     }
 
                     break;
 
                 case "URL":
                     if (!(content instanceof String)) {
-                        iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR).add(new MessageBeanImpl(SdcctIssueSeverity.ERROR,
-                            String.format("%s for testcase (id=%s) does not contain the URL element.", RfdWsXmlNames.RETRIEVE_FORM_RESP, testcaseId)));
+                        iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR)
+                            .add(String.format("%s for testcase (id=%s) does not contain the URL element.", RfdWsXmlNames.RETRIEVE_FORM_RESP, testcaseId));
                     } else {
                         String expectedFormId = submission.getFormId();
                         String actualFormId = (String) content;
 
                         if (expectedFormId != null && !expectedFormId.equals(actualFormId)) {
                             iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR)
-                                .add(new MessageBeanImpl(SdcctIssueSeverity.ERROR,
-                                    String.format("Form ID (%s) in %s does not equal form ID (%s) requested in submission.", actualFormId,
-                                        RfdWsXmlNames.RETRIEVE_FORM_RESP, expectedFormId)));
+                                .add(String.format("Form ID (%s) in %s does not equal form ID (%s) requested in submission.", actualFormId,
+                                    RfdWsXmlNames.RETRIEVE_FORM_RESP, expectedFormId));
                         }
                     }
 
                     break;
 
                 default:
-                    iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR).add(new MessageBeanImpl(SdcctIssueSeverity.ERROR,
-                        String.format("%s for testcase (id=%s) does not contain a valid contentType.", RfdWsXmlNames.RETRIEVE_FORM_RESP, testcaseId)));
+                    iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR)
+                        .add(String.format("%s for testcase (id=%s) does not contain a valid contentType.", RfdWsXmlNames.RETRIEVE_FORM_RESP, testcaseId));
 
                     break;
             }

@@ -2,7 +2,6 @@ package gov.hhs.onc.sdcct.web.form.manager.rfd.ws.impl.interceptors;
 
 import com.sun.xml.ws.encoding.soap.SOAP12Constants;
 import gov.hhs.onc.sdcct.api.SdcctIssueSeverity;
-import gov.hhs.onc.sdcct.beans.impl.MessageBeanImpl;
 import gov.hhs.onc.sdcct.rfd.EncodedResponse;
 import gov.hhs.onc.sdcct.rfd.RetrieveFormRequestType;
 import gov.hhs.onc.sdcct.rfd.impl.RetrieveFormRequestTypeImpl;
@@ -109,18 +108,15 @@ public class ServerIheFormManagerTestcaseInInterceptor extends AbstractIheTestca
 
         if (expectedEncodedResponse.getValue() != actualEncodedResponse.getValue()) {
             iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR)
-                .add(new MessageBeanImpl(SdcctIssueSeverity.ERROR,
-                    String.format("%s for testcase (id=%s) does not contain the expected encodedResponse value (expected=%s, actual=%s).",
-                        RfdWsXmlNames.RETRIEVE_FORM_REQ, iheFormManagerTestcase.getId(), expectedEncodedResponse.getValue(),
-                        actualEncodedResponse.getValue())));
+                .add(String.format("%s for testcase (id=%s) does not contain the expected encodedResponse value (expected=%s, actual=%s).",
+                    RfdWsXmlNames.RETRIEVE_FORM_REQ, iheFormManagerTestcase.getId(), expectedEncodedResponse.getValue(), actualEncodedResponse.getValue()));
         }
 
         if (!expectedEncodedResponse.getResponseContentType().equals(actualEncodedResponse.getResponseContentType())) {
             iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR)
-                .add(new MessageBeanImpl(SdcctIssueSeverity.ERROR,
-                    String.format("%s for testcase (id=%s) does not contain the expected responseContentType value (expected=%s, actual=%s).",
-                        RfdWsXmlNames.RETRIEVE_FORM_REQ, iheFormManagerTestcase.getId(), expectedEncodedResponse.getResponseContentType(),
-                        actualEncodedResponse.getResponseContentType())));
+                .add(String.format("%s for testcase (id=%s) does not contain the expected responseContentType value (expected=%s, actual=%s).",
+                    RfdWsXmlNames.RETRIEVE_FORM_REQ, iheFormManagerTestcase.getId(), expectedEncodedResponse.getResponseContentType(),
+                    actualEncodedResponse.getResponseContentType()));
         }
     }
 }

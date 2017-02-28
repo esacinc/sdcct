@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ListMultimap;
 import gov.hhs.onc.sdcct.api.SdcctIssueSeverity;
 import gov.hhs.onc.sdcct.api.SpecificationType;
-import gov.hhs.onc.sdcct.beans.MessageBean;
 import gov.hhs.onc.sdcct.beans.ResultBean;
 import javax.annotation.Nullable;
 
@@ -23,7 +22,7 @@ public interface SdcctTestcaseStep extends ResultBean {
     public boolean hasExecutionMessages();
 
     @JsonProperty
-    public ListMultimap<SdcctIssueSeverity, MessageBean> getExecutionMessages();
+    public ListMultimap<SdcctIssueSeverity, String> getExecutionMessages();
 
     public boolean isExecutionSuccess();
 
