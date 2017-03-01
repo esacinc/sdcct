@@ -1,7 +1,5 @@
 package gov.hhs.onc.sdcct.utils;
 
-import org.apache.commons.lang3.time.FastDateFormat;
-import javax.annotation.Nullable;
 import java.util.TimeZone;
 
 public final class SdcctDateUtils {
@@ -42,14 +40,6 @@ public final class SdcctDateUtils {
     public final static String UTC_ZULU_TZ_ID = "Z";
     public final static TimeZone UTC_TZ = TimeZone.getTimeZone(UTC_TZ_ID);
 
-    public final static String DISPLAY_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss Z";
-    public final static FastDateFormat DISPLAY_FORMAT = FastDateFormat.getInstance(DISPLAY_FORMAT_PATTERN);
-
     private SdcctDateUtils() {
-    }
-
-    public static String format(FastDateFormat dateFormat, long timestamp, @Nullable TimeZone timeZone) {
-        return (((timeZone != null) && !dateFormat.getTimeZone().equals(timeZone)) ? FastDateFormat.getInstance(dateFormat.getPattern(), timeZone) : dateFormat)
-            .format(timestamp);
     }
 }

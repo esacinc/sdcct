@@ -2,10 +2,10 @@ package gov.hhs.onc.sdcct.web.form.manager.rfd.ws.impl.interceptors;
 
 import com.sun.xml.ws.encoding.soap.SOAP12Constants;
 import gov.hhs.onc.sdcct.api.SdcctIssueSeverity;
-import gov.hhs.onc.sdcct.net.mime.SdcctMediaTypes;
 import gov.hhs.onc.sdcct.rfd.AnyXmlContentType;
 import gov.hhs.onc.sdcct.rfd.RetrieveFormResponseType;
 import gov.hhs.onc.sdcct.rfd.impl.RetrieveFormResponseTypeImpl;
+import gov.hhs.onc.sdcct.rfd.ws.RfdWsResponseType;
 import gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlNames;
 import gov.hhs.onc.sdcct.sdc.SdcRetrieveFormPackageType;
 import gov.hhs.onc.sdcct.sdc.XmlPackage;
@@ -100,13 +100,14 @@ public class ClientIheFormManagerTestcaseInInterceptor extends AbstractIheTestca
     private void validateRetrieveFormResponse(IheFormManagerTestcaseSubmission submission, IheFormManagerTestcase iheFormManagerTestcase,
         IheFormManagerTestcaseResult iheFormManagerTestcaseResult, RetrieveFormResponseType actualResponse) {
         RetrieveFormResponseType expectedResponse = iheFormManagerTestcase.getResponse();
+        // noinspection ConstantConditions
+        String expectedContentType = expectedResponse.getContentType();
         String testcaseId = iheFormManagerTestcase.getId();
 
-        // noinspection ConstantConditions
-        if (!actualResponse.getContentType().equals(expectedResponse.getContentType())) {
+        if (!actualResponse.getContentType().equals(expectedContentType)) {
             iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR)
-                .add(String.format("%s contains unexpected contentType (expected=%s, actual=%s).", RfdWsXmlNames.RETRIEVE_FORM_RESP,
-                    expectedResponse.getContentType(), actualResponse.getContentType()));
+                .add(String.format("%s contains unexpected contentType (expected=%s, actual=%s).", RfdWsXmlNames.RETRIEVE_FORM_RESP, expectedContentType,
+                    actualResponse.getContentType()));
         }
 
         if (!actualResponse.getForm().hasContent()) {
@@ -115,57 +116,47 @@ public class ClientIheFormManagerTestcaseInInterceptor extends AbstractIheTestca
         } else {
             Object content = actualResponse.getForm().getContent();
 
-            switch (expectedResponse.getContentType()) {
-                case SdcctMediaTypes.APP_XML_SDC_VALUE:
-                    if (content instanceof AnyXmlContentType) {
-                        SdcRetrieveFormPackageType packageType =
-                            (SdcRetrieveFormPackageType) ((JAXBElement) ((AnyXmlContentType) content).getAny().get(0)).getValue();
+            // noinspection ConstantConditions
+            if (expectedContentType.equals(RfdWsResponseType.XML.getMediaType().toString())) {
+                if (content instanceof AnyXmlContentType) {
+                    SdcRetrieveFormPackageType packageType =
+                        (SdcRetrieveFormPackageType) ((JAXBElement) ((AnyXmlContentType) content).getAny().get(0)).getValue();
 
-                        String expectedFormId = submission.getFormId();
-                        String actualFormId = ((XmlPackage) packageType.getContent().get(0)).getFormDesign().getId();
+                    String expectedFormId = submission.getFormId();
+                    String actualFormId = ((XmlPackage) packageType.getContent().get(0)).getFormDesign().getId();
 
-                        if (expectedFormId != null && !expectedFormId.equals(actualFormId)) {
-                            iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR)
-                                .add(String.format("Form ID (%s) in %s does not equal form ID (%s) requested in submission.", actualFormId,
-                                    RfdWsXmlNames.RETRIEVE_FORM_RESP, expectedFormId));
-                        }
-                    } else {
-                        iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR).add(
-                            String.format("%s for testcase (id=%s) does not contain the Structured element.", RfdWsXmlNames.RETRIEVE_FORM_RESP, testcaseId));
-                    }
-
-                    break;
-
-                case SdcctMediaTypes.TEXT_HTML_SDC_VALUE:
-                    if (!(content instanceof AnyXmlContentType)) {
-                        iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR).add(
-                            String.format("%s for testcase (id=%s) does not contain the Structured element.", RfdWsXmlNames.RETRIEVE_FORM_RESP, testcaseId));
-                    }
-
-                    break;
-
-                case "URL":
-                    if (!(content instanceof String)) {
+                    if (expectedFormId != null && !expectedFormId.equals(actualFormId)) {
                         iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR)
-                            .add(String.format("%s for testcase (id=%s) does not contain the URL element.", RfdWsXmlNames.RETRIEVE_FORM_RESP, testcaseId));
-                    } else {
-                        String expectedFormId = submission.getFormId();
-                        String actualFormId = (String) content;
-
-                        if (expectedFormId != null && !expectedFormId.equals(actualFormId)) {
-                            iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR)
-                                .add(String.format("Form ID (%s) in %s does not equal form ID (%s) requested in submission.", actualFormId,
-                                    RfdWsXmlNames.RETRIEVE_FORM_RESP, expectedFormId));
-                        }
+                            .add(String.format("Form ID (%s) in %s does not equal form ID (%s) requested in submission.", actualFormId,
+                                RfdWsXmlNames.RETRIEVE_FORM_RESP, expectedFormId));
                     }
-
-                    break;
-
-                default:
+                } else {
                     iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR)
-                        .add(String.format("%s for testcase (id=%s) does not contain a valid contentType.", RfdWsXmlNames.RETRIEVE_FORM_RESP, testcaseId));
+                        .add(String.format("%s for testcase (id=%s) does not contain the Structured element.", RfdWsXmlNames.RETRIEVE_FORM_RESP, testcaseId));
+                }
+            } else // noinspection ConstantConditions
+            if (expectedContentType.equals(RfdWsResponseType.HTML.getMediaType().toString())) {
+                if (!(content instanceof AnyXmlContentType)) {
+                    iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR)
+                        .add(String.format("%s for testcase (id=%s) does not contain the Structured element.", RfdWsXmlNames.RETRIEVE_FORM_RESP, testcaseId));
+                }
+            } else if (expectedContentType.equals(RfdWsResponseType.URL.getId())) {
+                if (!(content instanceof String)) {
+                    iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR)
+                        .add(String.format("%s for testcase (id=%s) does not contain the URL element.", RfdWsXmlNames.RETRIEVE_FORM_RESP, testcaseId));
+                } else {
+                    String expectedFormId = submission.getFormId();
+                    String actualFormId = (String) content;
 
-                    break;
+                    if (expectedFormId != null && !expectedFormId.equals(actualFormId)) {
+                        iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR)
+                            .add(String.format("Form ID (%s) in %s does not equal form ID (%s) requested in submission.", actualFormId,
+                                RfdWsXmlNames.RETRIEVE_FORM_RESP, expectedFormId));
+                    }
+                }
+            } else {
+                iheFormManagerTestcaseResult.getMessages().get(SdcctIssueSeverity.ERROR)
+                    .add(String.format("%s for testcase (id=%s) does not contain a valid contentType.", RfdWsXmlNames.RETRIEVE_FORM_RESP, testcaseId));
             }
         }
     }

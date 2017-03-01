@@ -2,7 +2,7 @@ package gov.hhs.onc.sdcct.web.gateway.controller.impl;
 
 import gov.hhs.onc.sdcct.testcases.SpecificationRole;
 import gov.hhs.onc.sdcct.testcases.ihe.IheTestcase;
-import gov.hhs.onc.sdcct.utils.SdcctDateUtils;
+import gov.hhs.onc.sdcct.utils.SdcctDateFormatUtils;
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
 import gov.hhs.onc.sdcct.web.gateway.controller.SdcctModelAttributes;
 import gov.hhs.onc.sdcct.web.gateway.controller.ViewNames;
@@ -61,7 +61,7 @@ public class HomeController implements InitializingBean {
         this.buildTimestamp = Instant.now().toEpochMilli();
 
         return new ModelAndView(ViewNames.HOME,
-            Collections.singletonMap(SdcctModelAttributes.FORMATTED_BUILD_TIMESTAMP_NAME, SdcctDateUtils.format(SdcctDateUtils.DISPLAY_FORMAT,
+            Collections.singletonMap(SdcctModelAttributes.FORMATTED_BUILD_TIMESTAMP_NAME, SdcctDateFormatUtils.format(SdcctDateFormatUtils.DISPLAY_FORMAT,
                 this.buildTimestamp, ObjectUtils.defaultIfNull(RequestContextUtils.getTimeZone(servletRequest), this.defaultTimeZone))));
     }
 
