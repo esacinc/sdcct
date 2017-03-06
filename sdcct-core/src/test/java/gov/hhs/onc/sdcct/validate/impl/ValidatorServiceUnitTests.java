@@ -42,6 +42,22 @@ public class ValidatorServiceUnitTests extends AbstractSdcctUnitTests {
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
     private RfdForm testRfdForm;
 
+    @Resource(name = "formRfdC")
+    @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
+    private RfdForm testRfdForm;
+
+    @Resource(name = "formRfdCFilled")
+    @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
+    private RfdForm testRfdForm;
+
+    @Resource(name = "formRfdD")
+    @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
+    private RfdForm testRfdForm;
+
+    @Resource(name = "formRfdDFilled")
+    @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
+    private RfdForm testRfdForm;
+
     @Resource(name = "formRfdTestInvalidXml")
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
     private RfdForm testRfdInvalidXmlForm;
