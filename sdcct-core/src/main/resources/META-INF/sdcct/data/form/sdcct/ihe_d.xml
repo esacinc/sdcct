@@ -5,118 +5,77 @@
   <Header ID="E13" title="Endocarditis">
     <Property val="Endocarditis Questionnaire" name="header_text" styleClass="header_text">
       <HTML>
-        <DisplayedItem>
-        </DisplayedItem>
       </HTML>
     </Property>
   </Header>
 
   <Body ID="E14" styleClass="body" title="">
-    <DisplayedItem>
-    </DisplayedItem>
     <ChildItems>
       <Section ID="1" title="All the Properties" visible="false" showInReport="false">
+        <DisplayedItem ID="56" title="displayeditem">
+        </DisplayedItem>
         <ChildItems>
           <Question ID="100" title="Risks">
-            <ChildItems>
-              <ListField>
-                <ListHeaderText>
-                </ListHeaderText>
-                <List>
-                  <ListItem ID="1000" title="Diet">
-                    <ListItemResponseField>
-                      <Response>
-                      </Response>
-                    </ListItemResponseField>
-                  </ListItem>
-                  <ListItem ID="1001" title="Exercise">
-                    <ListItemResponseField>
-                      <Response>
-                      </Response>
-                    </ListItemResponseField>
-                  </ListItem>
-                </List>
-              </ListField>
-              <ResponseField>
-                <Response>
-                </Response>
-                <TextAfterResponse>
-                </TextAfterResponse>
-                <ResponseUnit>
-                </ResponseUnit>
-              </ResponseField>
-            </ChildItems>
+            <ListField>
+              <ListHeaderText>
+              </ListHeaderText>
+              <List>
+                <ListItem ID="1000" title="Diet">
+                  <ListItemResponseField>
+                    <Response>
+                      <string/>
+                    </Response>
+                  </ListItemResponseField>
+                </ListItem>
+                <ListItem ID="1001" title="Exercise">
+                  <ListItemResponseField>
+                    <Response>
+                      <string/>
+                    </Response>
+                  </ListItemResponseField>
+                </ListItem>
+              </List>
+            </ListField>
           </Question>
-          <DisplayedItem>
-          </DisplayedItem>
         </ChildItems>
       </Section>
       <Section ID="2" title="All the Properties repeated">
         <ChildItems>
           <Question ID="101" title="Blood Pressure">
-            <ChildItems>
-              <ListField>
-                <ListHeaderText>
-                </ListHeaderText>
-                <List>
-                  <ListItem ID="1002" title="Date 1">
-                    <ListItemResponseField>
-                      <Response>
-                      </Response>
-                    </ListItemResponseField>
-                  </ListItem>
-                  <ListItem ID="1003" title="Date 2">
-                    <ListItemResponseField>
-                      <Response>
-                      </Response>
-                    </ListItemResponseField>
-                  </ListItem>
-                </List>
-              </ListField>
-              <ResponseField>
-                <Response>
-                </Response>
-                <TextAfterResponse>
-                </TextAfterResponse>
-                <ResponseUnit>
-                </ResponseUnit>
-              </ResponseField>
-            </ChildItems>
+            <ResponseField>
+              <Response>
+                <string/>
+              </Response>
+              <TextAfterResponse>
+              </TextAfterResponse>
+              <ResponseUnits>
+              </ResponseUnits>
+            </ResponseField>
           </Question>
           <Question ID="101" title="Blood Pressure">
-            <ChildItems>
-              <ListField>
-                <ListHeaderText>
-                </ListHeaderText>
-                <List>
-                  <ListItem ID="1002" title="Date 1">
-                    <ListItemResponseField>
-                      <Response>
-                      </Response>
-                    </ListItemResponseField>
-                  </ListItem>
-                  <ListItem ID="1003" title="Date 2">
-                    <ListItemResponseField>
-                      <Response>
-                      </Response>
-                    </ListItemResponseField>
-                  </ListItem>
-                </List>
-              </ListField>
-              <ResponseField>
-                <Response>
-                </Response>
-                <TextAfterResponse>
-                </TextAfterResponse>
-                <ResponseUnit>
-                </ResponseUnit>
-              </ResponseField>
-            </ChildItems>
+            <ListField>
+              <ListHeaderText>
+              </ListHeaderText>
+              <List>
+                <ListItem ID="1002" title="Date 1">
+                  <ListItemResponseField>
+                    <Response>
+                      <string/>
+                    </Response>
+                  </ListItemResponseField>
+                </ListItem>
+                <ListItem ID="1003" title="Date 2">
+                  <ListItemResponseField>
+                    <Response>
+                      <string/>
+                    </Response>
+                  </ListItemResponseField>
+                </ListItem>
+              </List>
+            </ListField>
           </Question>
         </ChildItems>
       </Section>
-      <DisplayedItem>
-      </DisplayedItem>
     </ChildItems>
   </Body>
   <Footer ID="E15" title="footnotes">
