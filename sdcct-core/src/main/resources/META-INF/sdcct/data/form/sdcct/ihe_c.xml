@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FormDesign ID="ihe_c"
+            xmlns="urn:ihe:qrph:sdc:2016">
+
+  <Header ID="E2" title="Elephantiasis">
+    <Property val="Elephantiasis Questionnaire" name="header_text" styleClass="header_text">
+      <HTML>
+      </HTML>
+    </Property>
+  </Header>
+  <Body ID="E2" styleClass="body" title="">
+    <ChildItems>
+      <Section ID="1" title="Repeated Questions" visible="false" showInReport="false">
+        <ChildItems>
+          <Question ID="100" title="Heart Disease" readOnly="true">
+            <ResponseField>
+              <Response>
+                <string/>
+              </Response>
+            </ResponseField>
+          </Question>
+          <Question ID="100" title="Heart Disease" readOnly="true">
+            <ResponseField>
+              <Response>
+                <string/>
+              </Response>
+            </ResponseField>
+          </Question>
+          <Question ID="100" title="Heart Disease" readOnly="true">
+            <ResponseField>
+              <Response>
+                <string/>
+              </Response>
+            </ResponseField>
+          </Question>
+          <Question ID="101" title="Diabetes" readOnly="true">
+            <ListField>
+              <List>
+                <ListItem ID="1000" title="Family Members"> </ListItem>
+                <ListItem ID="1001" title="Personal History"> </ListItem>
+                <ListItem ID="1002" title="Other"> </ListItem>
+              </List>
+            </ListField>
+          </Question>
+          <Question ID="101" title="Diabetes" readOnly="true">
+            <ListField>
+              <List>
+                <ListItem ID="1000" title="Family Members"> </ListItem>
+                <ListItem ID="1001" title="Personal History"> </ListItem>
+                <ListItem ID="1002" title="Other"> </ListItem>
+              </List>
+            </ListField>
+          </Question>
+          <Question ID="101" title="Diabetes" readOnly="true">
+            <ListField>
+              <List>
+                <ListItem ID="1000" title="Family Members"> </ListItem>
+                <ListItem ID="1001" title="Personal History"> </ListItem>
+                <ListItem ID="1002" title="Other"> </ListItem>
+              </List>
+            </ListField>
+          </Question>
+        </ChildItems>
+      </Section>
+      <Section ID="2" title="Nested Questions">
+        <ChildItems>
+          <Question ID="102" title="Inception" readOnly="true">
+            <ResponseField>
+              <Response>
+                <string/>
+              </Response>
+            </ResponseField>
+            <ChildItems>
+              <Question ID="103" title="One level deep">
+                <ResponseField>
+                  <Response>
+                    <decimal/>
+                  </Response>
+                  <ResponseUnits val="cm"/>
+                </ResponseField>
+                <ChildItems>
+                  <Question ID="104" title="Two levels deep">
+                    <ResponseField>
+                      <Response>
+                        <decimal/>
+                      </Response>
+                      <ResponseUnits val="cm"/>
+                    </ResponseField>
+                  </Question>
+                  <Question ID="105" title="Second two levels deep">
+                    <ListField>
+                      <List>
+                        <ListItem ID="1003" title="List"> </ListItem>
+                        <ListItem ID="1004" title="Nested"> </ListItem>
+                        <ListItem ID="1005" title="Other"> </ListItem>
+                      </List>
+                    </ListField>
+                  </Question>
+                </ChildItems>
+              </Question>
+            </ChildItems>
+          </Question>
+        </ChildItems>
+      </Section>
+      <Section ID="3" title="Nested and Duplicated">
+        <ChildItems>
+          <Question ID="106" title="Blood pressure">
+            <ResponseField>
+              <Response>
+                <string/>
+              </Response>
+            </ResponseField>
+            <ChildItems>
+              <Question ID="107" title="One level deep">
+                <ResponseField>
+                  <Response>
+                    <decimal/>
+                  </Response>
+                  <ResponseUnits val="cm"/>
+                </ResponseField>
+                <ChildItems>
+                  <Question ID="108" title="Two levels deep">
+                    <ResponseField>
+                      <Response>
+                        <decimal/>
+                      </Response>
+                      <ResponseUnits val="cm"/>
+                    </ResponseField>
+                  </Question>
+                  <Question ID="109" title="Second two levels deep">
+                    <ListField>
+                      <List>
+                        <ListItem ID="1006" title="List"> </ListItem>
+                        <ListItem ID="1007" title="Nested"> </ListItem>
+                        <ListItem ID="1008" title="Other"> </ListItem>
+                      </List>
+                    </ListField>
+                  </Question>
+                </ChildItems>
+              </Question>
+            </ChildItems>
+          </Question>
+          <Question ID="106" title="Blood pressure">
+            <ResponseField>
+              <Response>
+                <string/>
+              </Response>
+            </ResponseField>
+            <ChildItems>
+              <Question ID="110" title="One level deep">
+                <ResponseField>
+                  <Response>
+                    <decimal/>
+                  </Response>
+                  <ResponseUnits val="cm"/>
+                </ResponseField>
+                <ChildItems>
+                  <Question ID="111" title="Two levels deep">
+                    <ResponseField>
+                      <Response>
+                        <decimal/>
+                      </Response>
+                      <ResponseUnits val="cm"/>
+                    </ResponseField>
+                  </Question>
+                  <Question ID="112" title="Second two levels deep">
+                    <ListField>
+                      <List>
+                        <ListItem ID="1009" title="List"> </ListItem>
+                        <ListItem ID="1010" title="Nested"> </ListItem>
+                        <ListItem ID="1011" title="Other"> </ListItem>
+                      </List>
+                    </ListField>
+                  </Question>
+                </ChildItems>
+              </Question>
+            </ChildItems>
+          </Question>
+        </ChildItems>
+      </Section>
+    </ChildItems>
+  </Body>
+</FormDesign>

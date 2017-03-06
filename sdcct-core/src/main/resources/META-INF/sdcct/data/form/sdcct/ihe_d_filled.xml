@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FormDesign ID="ihe_a"
+            xmlns="urn:ihe:qrph:sdc:2016">
+
+  <Header ID="E13" title="Endocarditis">
+    <Property val="Endocarditis Questionnaire" name="header_text" styleClass="header_text">
+      <HTML>
+        <DisplayedItem>
+          Title of the Questionnaire
+        </DisplayedItem>
+      </HTML>
+    </Property>
+  </Header>
+
+  <Body ID="E14" styleClass="body" title="">
+    <DisplayedItem>
+      This is a displayed item. Probaby a nice photo of Mars.
+    </DisplayedItem>
+    <ChildItems>
+      <Section ID="1" title="All the Properties" visible="false" showInReport="false">
+        <ChildItems>
+          <Question ID="100" title="Risks">
+            <ChildItems>
+              <ListField>
+                <ListHeaderText>
+                  Endocarditis Risk Factors
+                </ListHeaderText>
+                <List>
+                  <ListItem ID="1000" title="Diet">
+                    <ListItemResponseField>
+                      <Response>
+                        Unhealthy diet
+                      </Response>
+                    </ListItemResponseField>
+                  </ListItem>
+                  <ListItem ID="1001" title="Exercise" selected="true">
+                    <ListItemResponseField>
+                      <Response>
+                        Sedentary lifestyle
+                      </Response>
+                    </ListItemResponseField>
+                  </ListItem>
+                </List>
+              </ListField>
+              <ResponseField>
+                <Response>
+                  High Risk for Endocarditis
+                </Response>
+                <TextAfterResponse>
+                  mm
+                </TextAfterResponse>
+                <ResponseUnit>
+                  miles
+                </ResponseUnit>
+              </ResponseField>
+            </ChildItems>
+          </Question>
+          <DisplayedItem>
+            Mars gravity is only 37% of Earth's.
+          </DisplayedItem>
+        </ChildItems>
+      </Section>
+      <Section ID="2" title="All the Properties repeated">
+        <ChildItems>
+          <Question ID="101" title="Blood Pressure">
+            <ChildItems>
+              <ListField>
+                <ListHeaderText>
+                  Dates and Blood Pressure
+                </ListHeaderText>
+                <List>
+                  <ListItem ID="1002" title="Date 1" selected="true">
+                    <ListItemResponseField>
+                      <Response>
+                        May 16, 2016 High
+                      </Response>
+                    </ListItemResponseField>
+                  </ListItem>
+                  <ListItem ID="1003" title="Date 2" selected="true">
+                    <ListItemResponseField>
+                      <Response>
+                        June 13, 2016 Low
+                      </Response>
+                    </ListItemResponseField>
+                  </ListItem>
+                </List>
+              </ListField>
+              <ResponseField>
+                <Response>
+                  High Risk for Endocarditis
+                </Response>
+                <TextAfterResponse>
+                  mm
+                </TextAfterResponse>
+                <ResponseUnit>
+                  miles
+                </ResponseUnit>
+              </ResponseField>
+            </ChildItems>
+          </Question>
+          <Question ID="101" title="Blood Pressure">
+            <ChildItems>
+              <ListField>
+                <ListHeaderText>
+                  More Dates and Blood Pressures
+                </ListHeaderText>
+                <List>
+                  <ListItem ID="1002" title="Date 1" selected="true">
+                    <ListItemResponseField>
+                      <Response>
+                        August 30, 2016 Low
+                      </Response>
+                    </ListItemResponseField>
+                  </ListItem>
+                  <ListItem ID="1003" title="Date 2" selected="true">
+                    <ListItemResponseField>
+                      <Response>
+                        September 10, 2016 Average
+                      </Response>
+                    </ListItemResponseField>
+                  </ListItem>
+                </List>
+              </ListField>
+              <ResponseField>
+                <Response>
+                  High Risk for Endocarditis
+                </Response>
+                <TextAfterResponse>
+                  mm
+                </TextAfterResponse>
+                <ResponseUnit>
+                  miles
+                </ResponseUnit>
+              </ResponseField>
+            </ChildItems>
+          </Question>
+        </ChildItems>
+      </Section>
+      <DisplayedItem>
+        The tallest mountain in the solar system is on Mars.
+      </DisplayedItem>
+    </ChildItems>
+  </Body>
+  <Footer ID="E15" title="footnotes">
+    Footnote: This questionnaire was filled out by a Martian.
+  </Footer>
+</FormDesign>
