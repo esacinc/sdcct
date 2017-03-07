@@ -16,6 +16,7 @@ public abstract class AbstractSdcctTestcase<T extends SdcctTestcaseDescription> 
     protected boolean optional;
     protected SpecificationRole roleTested;
     protected boolean sdcctInitiated;
+    protected SpecificationRole sdcctRole;
     protected List<SdcctTestcaseStep> steps;
 
     @Override
@@ -98,6 +99,16 @@ public abstract class AbstractSdcctTestcase<T extends SdcctTestcaseDescription> 
     @Override
     public void setSdcctInitiated(boolean sdcctInitiated) {
         this.sdcctInitiated = sdcctInitiated;
+    }
+
+    @Override
+    public SpecificationRole getSdcctRole() {
+        return this.sdcctRole;
+    }
+
+    @Override
+    public void setSdcctRole(SpecificationRole sdcctRole) {
+        this.sdcctRole = sdcctRole;
     }
 
     @Override

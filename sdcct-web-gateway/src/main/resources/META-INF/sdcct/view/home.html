@@ -6,9 +6,184 @@
         <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <link type="image/png" rel="icon" th:href="@{/static/images/sdcct-logo-16x16.png}"/>
+        <link type="text/css" rel="stylesheet" th:href="@{/webjars-locator/jquery-ui/jquery-ui.css}"/>
+        <link type="text/css" rel="stylesheet" th:href="@{/webjars-locator/bootstrap/css/bootstrap.min.css}"/>
+        <link type="text/css" rel="stylesheet" th:href="@{/webjars-locator/font-awesome/css/font-awesome.min.css}"/>
+        <link type="text/css" rel="stylesheet" th:href="@{/static/styles/sdcct-web.css}"/>
+        <script type="text/javascript" th:src="@{/webjars-locator/jquery/jquery.min.js}"></script>
+        <script type="text/javascript" th:src="@{/webjars-locator/jquery-ui/jquery-ui.min.js}"></script>
+        <script type="text/javascript" th:src="@{/webjars-locator/bootstrap/js/bootstrap.min.js}"></script>
+        <script type="text/javascript" th:src="@{/static/scripts/sdcct-web.js}"></script>
+        <script type="text/javascript" th:src="@{/static/scripts/sdcct-web-form.js}"></script>
+        <script type="text/javascript" th:src="@{/static/scripts/sdcct-testcases.js}"></script>
+        <script type="text/javascript" th:src="@{/static/scripts/sdcct-testcases-ihe.js}"></script>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            var IHE_TESTCASES = [[${iheTestcases}]];
+            var IHE_ENDPOINT_ADDRESSES = [[${iheEndpointAddresses}]];
+            var IHE_FORM_ARCHIVER_PROCESS = "/ihe/FormArchiver/process";
+            var IHE_FORM_MANAGER_PROCESS = "/ihe/FormManager/process";
+            var IHE_FORM_RECEIVER_PROCESS = "/ihe/FormReceiver/process";
+            /*]]>*/
+        </script>
         <title>SDCCT - Home</title>
     </head>
-    <body>
-        
+    <body th:inline="text">
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a href="#" class="navbar-brand">
+                        <img th:src="@{/static/images/sdcct-logo-32x32.png}" alt="SDCCT Logo"/>
+                        <strong>[[#{sdcct.msg.header.home}]]</strong>
+                    </a>
+                </div>
+                <ul class="nav navbar-nav nav-tabs" role="tablist">
+                    <li class="active" role="presentation">
+                        <a href="#content-tab-home" aria-controls="content-tab-home" role="tab" data-toggle="tab">
+                            <i class="fa fa-home"></i>
+                            <strong>Home</strong>
+                        </a>
+                    </li>
+                    <li role="presentation">
+                        <a href="#content-tab-ihe-conformance-tool" aria-controls="content-tab-ihe-conformance-tool" role="tab" data-toggle="tab">
+                            <i class="fa fa-check"></i>
+                            <strong>IHE Conformance Tool</strong>
+                        </a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a class="link" data-toggle="dropdown">
+                            <i class="fa fa-fw fa-gears"></i>
+                            <strong>About</strong>
+                            <span class="fa fa-fw fa-caret-down"></span>
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li role="presentation">
+                                <a role="menuitem" tabindex="-1" target="_blank" th:href="#{sdcct.msg.github.repository.url}">
+                                    <i class="fa fa-fw fa-github"></i>
+                                    GitHub Repository and Links to Documentation
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div id="content" class="container-fluid">
+            <div id="content-tabs" class="tab-content">
+                <div id="content-tab-home" class="active tab-pane" role="tabpanel">
+                    <h1>
+                        <i class="fa fa-fw fa-info-circle"></i>
+                        <strong>Introduction</strong>
+                    </h1>
+                    <h2><strong>Purpose</strong></h2>
+                    <p>
+                        The Structured Data Capture Conformance Tool (SDCCT) is an interactive tool for ...
+                    </p>
+                    <p>
+                        The SDCCT conforms to the <a href="http://ihe.net/uploadedfiles/documents/qrph/ihe_qrph_suppl_sdc.pdf">
+                        IHE Quality, Research, and Public Health Technical Framework Supplement: Structured Data Capture (SDC) Profile</a>.
+                    </p>
+                    <h2><strong>Background</strong></h2>
+                    <!-- TODO: update text -->
+                    <p>
+                        The SDC initiative has been sponsored by the ... and is being managed by the
+                        <a href="http://www.healthit.gov/">Office of the National Coordinator for Healthcare IT</a>.
+                    </p>
+                </div>
+                <div id="content-tab-ihe-conformance-tool" class="tab-pane" role="tabpanel">
+                    <form id="form-testcases-ihe" name="form-testcases-ihe" action="#" method="post">
+                        <div class="form-group">
+                            <h3>
+                                <strong>Select IHE SDC Role to Test</strong>
+                            </h3>
+                            <div class="form-group">
+                                <label class="radio-inline">
+                                    <input type="radio" name="role-tested" value="FORM_MANAGER"> Form Manager
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="role-tested" value="FORM_RECEIVER"> Form Receiver
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="role-tested" value="FORM_ARCHIVER"> Form Archiver
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="role-tested" value="FORM_FILLER"> Form Filler
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group ihe-testcase-selection-group">
+                                    <h3>
+                                        <strong>Select IHE Testcase</strong>
+                                    </h3>
+                                    <select id="testcase-ihe-select" class="input-sm form-control" name="testcase"></select>
+                                </div>
+                                <div class="input-group ihe-sdcct-initiated-form-group">
+                                    <h3>
+                                        <strong>Enter Endpoint Address</strong>
+                                    </h3>
+                                    <input id="testcase-ihe-endpoint-addr" type="text" class="input-sm form-control" disabled="disabled"/>
+                                </div>
+                                <div class="input-group ihe-sdcct-initiated-form-group">
+                                    <h3>
+                                        <strong>Enter Form ID</strong>
+                                    </h3>
+                                    <input id="testcase-ihe-form-id" type="text" class="input-sm form-control" list="formIds" disabled="disabled"/>
+                                    <datalist id="formIds"></datalist>
+                                </div>
+                            </div>
+                            <div class="form-group form-group-addons">
+                                <div class="has-error">
+                                    <div class="input-group-addon input-group-addon-msgs">
+                                        <strong>Invalid IHE testcase submission</strong>:
+                                        <ul></ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group ihe-sdcct-initiated-form-group">
+                                <button id="testcase-ihe-submit" class="btn btn-default form-control" disabled="disabled" type="submit">
+                                    <i class="fa fa-fw fa-paper-plane"></i>
+                                    Submit
+                                </button>
+                                <button id="testcase-ihe-reset" class="btn btn-default form-control" type="reset">
+                                    <i class="fa fa-fw fa-refresh"></i>
+                                    Reset
+                                </button>
+                            </div>
+                            <div class="form-group ihe-testcase-desc-form-group">
+                                <h3>
+                                    <strong>Description</strong>
+                                </h3>
+                                <div id="testcase-ihe-desc" class="text-muted well well-sm"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <h1>
+                                <i class="fa fa-fw fa-table"></i>
+                                <strong>Results</strong>
+                            </h1>
+                            <div id="well-testcase-ihe-results-processing" class="text-muted well well-sm">
+                                <i class="fa fa-fw fa-spinner fa-spin"></i>
+                                <strong><em>Processing</em></strong>
+                            </div>
+                            <div id="well-testcase-ihe-results-empty" class="text-muted well well-sm">
+                                <strong><em>None</em></strong>
+                            </div>
+                            <div id="testcase-ihe-results" class="panel-group" aria-multiselectable="true" role="tablist">
+                                <div id="testcase-ihe-results-accordion"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <footer class="footer">
+            <div class="container">
+                <i class="fa fa-fw fa-tags"></i>
+                <strong>Version</strong>: [[${buildVersion}]]
+                (<strong>Built</strong>: [[${formattedBuildTimestamp}]])
+            </div>
+        </footer>
     </body>
 </html>

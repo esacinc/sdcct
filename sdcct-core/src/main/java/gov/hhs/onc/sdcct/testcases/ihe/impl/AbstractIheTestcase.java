@@ -6,11 +6,13 @@ import gov.hhs.onc.sdcct.testcases.ihe.IheTestcaseDescription;
 import gov.hhs.onc.sdcct.testcases.ihe.IheTestcaseRequestInfo;
 import gov.hhs.onc.sdcct.testcases.ihe.IheTestcaseResponseInfo;
 import gov.hhs.onc.sdcct.testcases.impl.AbstractSdcctTestcase;
+import java.util.List;
 import javax.annotation.Nullable;
 import javax.xml.namespace.QName;
 
 public abstract class AbstractIheTestcase extends AbstractSdcctTestcase<IheTestcaseDescription> implements IheTestcase {
     protected RfdWsResponseType contentType;
+    protected List<String> formIds;
     protected IheTestcaseRequestInfo requestInfo;
     protected IheTestcaseResponseInfo responseInfo;
     protected QName transaction;
@@ -23,6 +25,16 @@ public abstract class AbstractIheTestcase extends AbstractSdcctTestcase<IheTestc
     @Override
     public void setContentType(RfdWsResponseType contentType) {
         this.contentType = contentType;
+    }
+
+    @Override
+    public List<String> getFormIds() {
+        return this.formIds;
+    }
+
+    @Override
+    public void setFormIds(@Nullable List<String> formIds) {
+        this.formIds = formIds;
     }
 
     @Nullable

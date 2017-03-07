@@ -129,12 +129,20 @@ public final class SdcctDateFormatUtils {
     public final static String HOUR_MIN_SEC_MS_FORMAT_PATTERN = HOUR_MIN_SEC_FORMAT_PATTERN + ".SSS";
     public final static String HOUR_MIN_SEC_MS_TZ_FORMAT_PATTERN = HOUR_MIN_SEC_MS_FORMAT_PATTERN + TZ_FORMAT_PATTERN_SUFFIX;
 
+    public final static String DISPLAY_FORMAT_PATTERN = HOUR_MIN_SEC_TZ_FORMAT_PATTERN;
+    public final static FastDateFormat DISPLAY_FORMAT = FastDateFormat.getInstance(DISPLAY_FORMAT_PATTERN);
+
     private SdcctDateFormatUtils() {
     }
 
     public static String format(Date date, DateTimePrecisionType precisionType, boolean withTz, @Nullable TimeZone tz, @Nullable Locale locale) {
         return FastDateFormat.getInstance((withTz ? precisionType.getTimeZoneFormatPattern() : precisionType.getFormatPattern()),
             ((tz != null) ? tz : SdcctDateUtils.DEFAULT_TZ), ((locale != null) ? locale : SdcctLocaleUtils.DEFAULT_LOCALE)).format(date);
+    }
+
+    public static String format(FastDateFormat dateFormat, long timestamp, @Nullable TimeZone timeZone) {
+        return (((timeZone != null) && !dateFormat.getTimeZone().equals(timeZone)) ? FastDateFormat.getInstance(dateFormat.getPattern(), timeZone) : dateFormat)
+            .format(timestamp);
     }
 
     public static ParsedDate parse(String str, @Nullable TimeZone tz, @Nullable Locale locale) throws ParseException {

@@ -24,7 +24,8 @@
         p:sdcctInitiated="true"/>
 
     <beans:bean id="iheFormArchiverTestcaseSutInitiated" parent="iheFormArchiverTestcaseImpl" abstract="true"
-        p:roleTested="FORM_FILLER"/>
+        p:roleTested="FORM_FILLER"
+        p:sdcctRole="FORM_ARCHIVER"/>
 
     <!--====================================================================================================
     = IHE FORM ARCHIVER TESTCASES - INITIATED BY SDCCT
@@ -77,6 +78,12 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
+        <beans:property name="steps">
+            <beans:list>
+                <beans:ref bean="archiveFormRequestSendingStep"/>
+                <beans:ref bean="archiveFormResponseValidationStep"/>
+            </beans:list>
+        </beans:property>
     </beans:bean>
 
     <beans:bean id="iheTestcase21" parent="iheFormArchiverTestcaseSdcctInitiated"
@@ -127,6 +134,12 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
+        <beans:property name="steps">
+            <beans:list>
+                <beans:ref bean="archiveFormRequestSendingStep"/>
+                <beans:ref bean="archiveFormResponseValidationStep"/>
+            </beans:list>
+        </beans:property>
     </beans:bean>
 
     <beans:bean id="iheTestcase22" parent="iheFormArchiverTestcaseSdcctInitiated"
@@ -172,6 +185,12 @@
                     </sdcct:normalized-string>
                 </beans:property>
             </beans:bean>
+        </beans:property>
+        <beans:property name="steps">
+            <beans:list>
+                <beans:ref bean="archiveFormRequestSendingStep"/>
+                <beans:ref bean="archiveFormResponseValidationStep"/>
+            </beans:list>
         </beans:property>
     </beans:bean>
 
@@ -227,6 +246,12 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
+        <beans:property name="steps">
+            <beans:list>
+                <beans:ref bean="archiveFormRequestSendingStep"/>
+                <beans:ref bean="archiveFormResponseValidationStep"/>
+            </beans:list>
+        </beans:property>
     </beans:bean>
 
     <beans:bean id="iheTestcase24" parent="iheFormArchiverTestcaseSutInitiated"
@@ -277,6 +302,12 @@
                     </sdcct:normalized-string>
                 </beans:property>
             </beans:bean>
+        </beans:property>
+        <beans:property name="steps">
+            <beans:list>
+                <beans:ref bean="archiveFormRequestSendingStep"/>
+                <beans:ref bean="archiveFormResponseValidationStep"/>
+            </beans:list>
         </beans:property>
     </beans:bean>
 </beans:beans>

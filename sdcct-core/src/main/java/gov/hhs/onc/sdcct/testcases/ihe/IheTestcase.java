@@ -3,6 +3,7 @@ package gov.hhs.onc.sdcct.testcases.ihe;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import gov.hhs.onc.sdcct.rfd.ws.RfdWsResponseType;
 import gov.hhs.onc.sdcct.testcases.SdcctTestcase;
+import java.util.List;
 import javax.annotation.Nullable;
 import javax.xml.namespace.QName;
 
@@ -11,6 +12,11 @@ public interface IheTestcase extends SdcctTestcase<IheTestcaseDescription> {
     public RfdWsResponseType getContentType();
 
     public void setContentType(RfdWsResponseType contentType);
+
+    @JsonProperty
+    public List<String> getFormIds();
+
+    public void setFormIds(@Nullable List<String> formIds);
 
     @JsonProperty
     @Nullable

@@ -4,7 +4,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import gov.hhs.onc.sdcct.api.SdcctIssueSeverity;
 import gov.hhs.onc.sdcct.api.SpecificationType;
-import gov.hhs.onc.sdcct.beans.MessageBean;
 import gov.hhs.onc.sdcct.beans.impl.AbstractResultBean;
 import gov.hhs.onc.sdcct.testcases.steps.SdcctTestcaseStep;
 import gov.hhs.onc.sdcct.testcases.steps.SdcctTestcaseStepDescription;
@@ -13,7 +12,7 @@ import org.apache.commons.lang3.ObjectUtils;
 
 public abstract class AbstractSdcctTestcaseStep extends AbstractResultBean implements SdcctTestcaseStep {
     protected SdcctTestcaseStepDescription desc;
-    protected ListMultimap<SdcctIssueSeverity, MessageBean> execMsgs = ArrayListMultimap.create();
+    protected ListMultimap<SdcctIssueSeverity, String> execMsgs = ArrayListMultimap.create();
     protected Boolean execSuccess;
     protected SpecificationType specType;
 
@@ -22,7 +21,7 @@ public abstract class AbstractSdcctTestcaseStep extends AbstractResultBean imple
     }
 
     @Override
-    public ListMultimap<SdcctIssueSeverity, MessageBean> getMessages() {
+    public ListMultimap<SdcctIssueSeverity, String> getMessages() {
         return ArrayListMultimap.create(this.execMsgs);
     }
 
@@ -53,7 +52,7 @@ public abstract class AbstractSdcctTestcaseStep extends AbstractResultBean imple
     }
 
     @Override
-    public ListMultimap<SdcctIssueSeverity, MessageBean> getExecutionMessages() {
+    public ListMultimap<SdcctIssueSeverity, String> getExecutionMessages() {
         return this.execMsgs;
     }
 

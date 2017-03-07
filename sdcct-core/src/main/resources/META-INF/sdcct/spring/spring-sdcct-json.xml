@@ -35,16 +35,22 @@
         </beans:property>
         <beans:property name="modules">
             <beans:list>
+                <beans:bean class="com.fasterxml.jackson.datatype.guava.GuavaModule"/>
                 <beans:bean class="com.fasterxml.jackson.datatype.jdk8.Jdk8Module"/>
                 <beans:ref bean="moduleJaxb"/>
                 <beans:ref bean="moduleFhir"/>
             </beans:list>
         </beans:property>
+        <beans:property name="deserializers">
+            <beans:set>
+                <beans:bean class="gov.hhs.onc.sdcct.json.impl.SdcctTestcaseDeserializer"/>
+            </beans:set>
+        </beans:property>
     </beans:bean>
     
     <beans:bean id="objMapperPretty" parent="objMapper"
         p:indentOutput="true"/>
-    
+
     <!--====================================================================================================
     = XML MAPPERS
     =====================================================================================================-->

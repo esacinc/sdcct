@@ -17,7 +17,7 @@ public final class SdcctTestcasePropertyNames {
     public final static String RFD_RESPONSE_CODE = "responseCode";
     public final static String RFD_SDC_SUBMISSION_PACKAGE = "SDC Submission Package";
     public final static String RFD_SOAP_FAULT = "SOAP Fault";
-    public final static String RFD_SOAP_FAULT_REASON_TEXT = "Reason Text";
+    public final static String RFD_SOAP_FAULT_REASON_TEXT = RFD_SOAP_FAULT + " Reason Text";
     public final static String RFD_URL = RfdWsResponseType.URL.getId();
 
     private SdcctTestcasePropertyNames() {

@@ -3,6 +3,7 @@
     xmlns:beans="http://www.springframework.org/schema/beans"
     xmlns:c="http://www.springframework.org/schema/c"
     xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:lang="http://www.springframework.org/schema/lang"
     xmlns:p="http://www.springframework.org/schema/p"
     xmlns:sdcct="urn:sdcct:spring"
     xmlns:sdcct-xml="urn:sdcct:spring:xml"
@@ -10,6 +11,7 @@
     xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang.xsd
         urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
         urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
     
@@ -19,7 +21,28 @@
     <context:component-scan base-package="gov.hhs.onc.sdcct">
         <context:exclude-filter expression="org.springframework.boot.context.TypeExcludeFilter" type="custom"/>
     </context:component-scan>
-    
+
+    <!--====================================================================================================
+    = TIME ZONES
+    =====================================================================================================-->
+    <beans:bean id="timeZone" class="java.util.TimeZone" abstract="true"/>
+
+    <lang:groovy id="timeZoneUtc">
+        <lang:inline-script><![CDATA[
+        import org.joda.time.DateTimeZone
+
+        return DateTimeZone.UTC.toTimeZone()
+        ]]></lang:inline-script>
+    </lang:groovy>
+
+    <lang:groovy id="timeZoneDefault">
+        <lang:inline-script><![CDATA[
+        import org.joda.time.DateTimeZone
+
+        return DateTimeZone.getDefault().toTimeZone()
+        ]]></lang:inline-script>
+    </lang:groovy>
+
     <!--====================================================================================================
     = PROPERTY SOURCES PLACEHOLDER CONFIGURERS
     =====================================================================================================-->
@@ -38,7 +61,7 @@
             </beans:array>
         </beans:property>
     </beans:bean>
-    
+
     <!--====================================================================================================
     = CONVERSION SERVICES
     =====================================================================================================-->

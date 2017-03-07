@@ -1,5 +1,6 @@
 package gov.hhs.onc.sdcct.testcases.results;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import gov.hhs.onc.sdcct.beans.ResultBean;
 import gov.hhs.onc.sdcct.net.http.logging.HttpRequestEvent;
 import gov.hhs.onc.sdcct.net.http.logging.HttpResponseEvent;
@@ -12,10 +13,12 @@ import javax.annotation.Nullable;
 
 public interface SdcctTestcaseResult<T extends SdcctTestcaseDescription, U extends SdcctTestcase<T>, V extends SdcctTestcaseSubmission<T, U>>
     extends ResultBean {
+    @JsonProperty
     public V getSubmission();
 
     public boolean hasHttpRequestEvent();
 
+    @JsonProperty
     @Nullable
     public HttpRequestEvent getHttpRequestEvent();
 
@@ -23,6 +26,7 @@ public interface SdcctTestcaseResult<T extends SdcctTestcaseDescription, U exten
 
     public boolean hasHttpResponseEvent();
 
+    @JsonProperty
     @Nullable
     public HttpResponseEvent getHttpResponseEvent();
 
@@ -30,6 +34,7 @@ public interface SdcctTestcaseResult<T extends SdcctTestcaseDescription, U exten
 
     public boolean hasWsRequestEvent();
 
+    @JsonProperty
     @Nullable
     public WsRequestEvent getWsRequestEvent();
 
@@ -37,6 +42,7 @@ public interface SdcctTestcaseResult<T extends SdcctTestcaseDescription, U exten
 
     public boolean hasWsResponseEvent();
 
+    @JsonProperty
     @Nullable
     public WsResponseEvent getWsResponseEvent();
 

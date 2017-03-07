@@ -1,15 +1,17 @@
 package gov.hhs.onc.sdcct.testcases.submissions.ihe.impl;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import gov.hhs.onc.sdcct.testcases.ihe.IheFormArchiverTestcase;
 import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheFormArchiverTestcaseSubmission;
 import javax.annotation.Nullable;
 
+@JsonTypeName("iheFormArchiverTestcaseSubmission")
 public class IheFormArchiverTestcaseSubmissionImpl extends AbstractIheTestcaseSubmission<IheFormArchiverTestcase> implements IheFormArchiverTestcaseSubmission {
     public IheFormArchiverTestcaseSubmissionImpl() {
-        this(null, null);
+        this(null, null, null);
     }
 
-    public IheFormArchiverTestcaseSubmissionImpl(@Nullable IheFormArchiverTestcase testcase, @Nullable String endpointAddr) {
-        super(testcase, endpointAddr);
+    public IheFormArchiverTestcaseSubmissionImpl(@Nullable IheFormArchiverTestcase testcase, @Nullable String endpointAddr, @Nullable String formId) {
+        super(testcase, endpointAddr, formId);
     }
 }

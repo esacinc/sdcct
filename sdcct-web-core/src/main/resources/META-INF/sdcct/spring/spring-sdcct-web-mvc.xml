@@ -61,6 +61,9 @@
         <mvc:message-converters register-defaults="false">
             <beans:bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"
                 p:defaultCharset="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"/>
+            <beans:bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"
+                p:defaultCharset="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"
+                p:objectMapper-ref="objMapper"/>
             <beans:bean class="org.springframework.http.converter.StringHttpMessageConverter"
                 p:defaultCharset="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"/>
             <beans:bean class="org.springframework.http.converter.ResourceHttpMessageConverter"

@@ -35,6 +35,16 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
+        <beans:property name="inInterceptors">
+            <beans:list>
+                <beans:ref bean="interceptorServerIheFormManagerTestcaseIn"/>
+            </beans:list>
+        </beans:property>
+        <beans:property name="outInterceptors">
+            <beans:list>
+                <beans:ref bean="interceptorServerIheFormManagerTestcaseOut"/>
+            </beans:list>
+        </beans:property>
     </beans:bean>
     
     <!--====================================================================================================
@@ -45,5 +55,16 @@
         p:endpointName="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).FORM_MANAGER_PORT }"
         p:serviceClass="#{ T(gov.hhs.onc.sdcct.rfd.RfdFormManagerPortType) }"
         p:serviceName="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).FORM_MANAGER_SERVICE }"
-        p:wsdlLocation="${sdcct.ws.form.manager.rfd.wsdl.loc}"/>
+        p:wsdlLocation="${sdcct.ws.form.manager.rfd.wsdl.loc}">
+        <beans:property name="inInterceptors">
+            <beans:list>
+                <beans:ref bean="interceptorClientIheFormManagerTestcaseIn"/>
+            </beans:list>
+        </beans:property>
+        <beans:property name="outInterceptors">
+            <beans:list>
+                <beans:ref bean="interceptorClientIheFormManagerTestcaseOut"/>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
 </beans:beans>

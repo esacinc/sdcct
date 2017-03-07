@@ -1,10 +1,12 @@
 package gov.hhs.onc.sdcct.testcases.ihe.impl;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import gov.hhs.onc.sdcct.rfd.RetrieveFormRequestType;
 import gov.hhs.onc.sdcct.rfd.RetrieveFormResponseType;
 import gov.hhs.onc.sdcct.testcases.ihe.IheFormManagerTestcase;
 import javax.annotation.Nullable;
 
+@JsonTypeName("iheFormManagerTestcase")
 public class IheFormManagerTestcaseImpl extends AbstractIheTestcase implements IheFormManagerTestcase {
     private RetrieveFormRequestType requestParams;
     private RetrieveFormResponseType response;

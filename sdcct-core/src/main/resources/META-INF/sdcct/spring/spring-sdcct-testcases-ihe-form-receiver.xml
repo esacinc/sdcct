@@ -24,7 +24,8 @@
         p:sdcctInitiated="true"/>
 
     <beans:bean id="iheFormReceiverTestcaseSutInitiated" parent="iheFormReceiverTestcaseImpl" abstract="true"
-        p:roleTested="FORM_FILLER"/>
+        p:roleTested="FORM_FILLER"
+        p:sdcctRole="FORM_RECEIVER"/>
 
     <!--====================================================================================================
     = IHE FORM RECEIVER TESTCASES - INITIATED BY SDCCT
@@ -80,6 +81,12 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
+        <beans:property name="steps">
+            <beans:list>
+                <beans:ref bean="submitFormRequestSendingStep"/>
+                <beans:ref bean="submitFormResponseValidationStep"/>
+            </beans:list>
+        </beans:property>
     </beans:bean>
 
     <beans:bean id="iheTestcase14" parent="iheFormReceiverTestcaseSdcctInitiated"
@@ -133,6 +140,12 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
+        <beans:property name="steps">
+            <beans:list>
+                <beans:ref bean="submitFormRequestSendingStep"/>
+                <beans:ref bean="submitFormResponseValidationStep"/>
+            </beans:list>
+        </beans:property>
     </beans:bean>
 
     <beans:bean id="iheTestcase15" parent="iheFormReceiverTestcaseSdcctInitiated"
@@ -181,6 +194,12 @@
                     </sdcct:normalized-string>
                 </beans:property>
             </beans:bean>
+        </beans:property>
+        <beans:property name="steps">
+            <beans:list>
+                <beans:ref bean="submitFormRequestSendingStep"/>
+                <beans:ref bean="submitFormResponseValidationStep"/>
+            </beans:list>
         </beans:property>
     </beans:bean>
 
@@ -231,6 +250,12 @@
                     </sdcct:normalized-string>
                 </beans:property>
             </beans:bean>
+        </beans:property>
+        <beans:property name="steps">
+            <beans:list>
+                <beans:ref bean="submitFormRequestSendingStep"/>
+                <beans:ref bean="submitFormResponseValidationStep"/>
+            </beans:list>
         </beans:property>
     </beans:bean>
 
@@ -288,6 +313,12 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
+        <beans:property name="steps">
+            <beans:list>
+                <beans:ref bean="submitFormRequestValidationStep"/>
+                <beans:ref bean="submitFormResponseSendingStep"/>
+            </beans:list>
+        </beans:property>
     </beans:bean>
 
     <beans:bean id="iheTestcase18" parent="iheFormReceiverTestcaseSutInitiated"
@@ -342,6 +373,12 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
+        <beans:property name="steps">
+            <beans:list>
+                <beans:ref bean="submitFormRequestValidationStep"/>
+                <beans:ref bean="submitFormResponseSendingStep"/>
+            </beans:list>
+        </beans:property>
     </beans:bean>
 
     <beans:bean id="iheTestcase19" parent="iheFormReceiverTestcaseSutInitiated"
@@ -391,6 +428,12 @@
                     </sdcct:normalized-string>
                 </beans:property>
             </beans:bean>
+        </beans:property>
+        <beans:property name="steps">
+            <beans:list>
+                <beans:ref bean="submitFormRequestValidationStep"/>
+                <beans:ref bean="submitFormResponseSendingStep"/>
+            </beans:list>
         </beans:property>
     </beans:bean>
 </beans:beans>
