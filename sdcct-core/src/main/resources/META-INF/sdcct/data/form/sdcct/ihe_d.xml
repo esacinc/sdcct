@@ -12,36 +12,10 @@
   <Body ID="E14" styleClass="body" title="">
     <ChildItems>
       <Section ID="1" title="All the Properties" visible="false" showInReport="false">
-        <DisplayedItem ID="56" title="displayeditem">
-        </DisplayedItem>
         <ChildItems>
+          <DisplayedItem ID="56" title="displayeditem">
+          </DisplayedItem>
           <Question ID="100" title="Risks">
-            <ListField>
-              <ListHeaderText>
-              </ListHeaderText>
-              <List>
-                <ListItem ID="1000" title="Diet">
-                  <ListItemResponseField>
-                    <Response>
-                      <string/>
-                    </Response>
-                  </ListItemResponseField>
-                </ListItem>
-                <ListItem ID="1001" title="Exercise">
-                  <ListItemResponseField>
-                    <Response>
-                      <string/>
-                    </Response>
-                  </ListItemResponseField>
-                </ListItem>
-              </List>
-            </ListField>
-          </Question>
-        </ChildItems>
-      </Section>
-      <Section ID="2" title="All the Properties repeated">
-        <ChildItems>
-          <Question ID="101" title="Blood Pressure">
             <ResponseField>
               <Response>
                 <string/>
@@ -51,6 +25,32 @@
               <ResponseUnits>
               </ResponseUnits>
             </ResponseField>
+          </Question>
+        </ChildItems>
+      </Section>
+      <Section ID="2" title="All the Properties repeated">
+        <ChildItems>
+          <Question ID="101" title="Blood Pressure">
+            <ListField>
+              <ListHeaderText>
+              </ListHeaderText>
+              <List>
+                <ListItem ID="1002" title="Date 1">
+                  <ListItemResponseField>
+                    <Response>
+                      <string/>
+                    </Response>
+                  </ListItemResponseField>
+                </ListItem>
+                <ListItem ID="1003" title="Date 2">
+                  <ListItemResponseField>
+                    <Response>
+                      <string/>
+                    </Response>
+                  </ListItemResponseField>
+                </ListItem>
+              </List>
+            </ListField>
           </Question>
           <Question ID="101" title="Blood Pressure">
             <ListField>
