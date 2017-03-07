@@ -127,6 +127,14 @@ public class ValidatorServiceUnitTests extends AbstractSdcctUnitTests {
         this.validateForm(this.fhirValidatorService, buildForm(this.testFhirForm, true), true);
 
         this.validateForm(this.rfdValidatorService, buildForm(this.testRfdForm, true), true);
+        
+        this.validateForm(this.rfdValidatorService, buildForm(this.testRfdFormC, true), true);
+
+        this.validateForm(this.rfdValidatorService, buildForm(this.testRfdFormCFilled, true), true);
+
+        this.validateForm(this.rfdValidatorService, buildForm(this.testRfdFormD, true), true);
+
+        this.validateForm(this.rfdValidatorService, buildForm(this.testRfdFormDFilled, true), true);
     }
 
     private static SdcctForm<?> buildForm(SdcctForm<?> testForm, boolean buildableExpected) throws Exception {
