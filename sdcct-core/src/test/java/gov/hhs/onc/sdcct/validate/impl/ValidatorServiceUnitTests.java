@@ -42,6 +42,22 @@ public class ValidatorServiceUnitTests extends AbstractSdcctUnitTests {
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
     private RfdForm testRfdForm;
 
+    @Resource(name = "formRfdC")
+    @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
+    private RfdForm testRfdForm;
+
+    @Resource(name = "formRfdCFilled")
+    @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
+    private RfdForm testRfdForm;
+
+    @Resource(name = "formRfdD")
+    @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
+    private RfdForm testRfdForm;
+
+    @Resource(name = "formRfdDFilled")
+    @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
+    private RfdForm testRfdForm;
+
     @Resource(name = "formRfdTestInvalidXml")
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
     private RfdForm testRfdInvalidXmlForm;
@@ -111,6 +127,14 @@ public class ValidatorServiceUnitTests extends AbstractSdcctUnitTests {
         this.validateForm(this.fhirValidatorService, buildForm(this.testFhirForm, true), true);
 
         this.validateForm(this.rfdValidatorService, buildForm(this.testRfdForm, true), true);
+        
+        this.validateForm(this.rfdValidatorService, buildForm(this.testRfdFormC, true), true);
+
+        this.validateForm(this.rfdValidatorService, buildForm(this.testRfdFormCFilled, true), true);
+
+        this.validateForm(this.rfdValidatorService, buildForm(this.testRfdFormD, true), true);
+
+        this.validateForm(this.rfdValidatorService, buildForm(this.testRfdFormDFilled, true), true);
     }
 
     private static SdcctForm<?> buildForm(SdcctForm<?> testForm, boolean buildableExpected) throws Exception {

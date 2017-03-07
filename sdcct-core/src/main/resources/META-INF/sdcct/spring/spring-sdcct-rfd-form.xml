@@ -28,6 +28,30 @@
         c:name="ihe_b"
         c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/ihe_b.xml"
         p:internal="true"/>
+
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="formIheC" parent="formRfd"
+                c:name="ihe_c"
+                c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/ihe_c.xml"
+                p:internal="true"/>
+
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="formIheCFilled" parent="formRfd"
+                c:name="ihe_c_filled"
+                c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/ihe_c_filled.xml"
+                p:internal="true"/>
+
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="formIheD" parent="formRfd"
+                c:name="ihe_d"
+                c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/ihe_d.xml"
+                p:internal="true"/>
+
+    <!--suppress SpringPlaceholdersInspection -->
+    <beans:bean id="formIheDFilled" parent="formRfd"
+                c:name="ihe_d_filled"
+                c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/ihe_d_filled.xml"
+                p:internal="true"/>
     
     <!--====================================================================================================
     = FORM INITIALIZERS

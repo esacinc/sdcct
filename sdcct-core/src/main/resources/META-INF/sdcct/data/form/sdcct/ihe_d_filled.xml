@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FormDesign ID="ihe_d"
+            xmlns="urn:ihe:qrph:sdc:2016">
+
+  <Header ID="E13" title="Endocarditis">
+    <Property val="Endocarditis Questionnaire" name="header_text" styleClass="header_text">
+      <HTML>
+      </HTML>
+    </Property>
+  </Header>
+
+  <Body ID="E14" styleClass="body" title="">
+    <ChildItems>
+      <Section ID="1" title="All the Properties" visible="false" showInReport="false">
+        <ChildItems>
+          <DisplayedItem ID="56" title="displayeditem">
+            <Link>
+              <LinkURI val="www.google.com"/>
+            </Link>
+          </DisplayedItem>
+          <Question ID="100" title="Risks">
+            <ResponseField>
+              <Response>
+                <string val="High risk for Endocarditis"/>
+              </Response>
+              <TextAfterResponse val="mm"/>
+              <ResponseUnits val="miles">
+              </ResponseUnits>
+            </ResponseField>
+          </Question>
+        </ChildItems>
+      </Section>
+      <Section ID="2" title="All the Properties repeated">
+        <ChildItems>
+          <Question ID="101" title="Blood Pressure">
+            <ListField>
+              <ListHeaderText>
+              </ListHeaderText>
+              <List>
+                <ListItem ID="1002" title="Date 1">
+                  <ListItemResponseField>
+                    <Response>
+                      <string val="Low"/>
+                    </Response>
+                  </ListItemResponseField>
+                </ListItem>
+                <ListItem ID="1003" title="Date 2">
+                  <ListItemResponseField>
+                    <Response>
+                      <string val="Average"/>
+                    </Response>
+                  </ListItemResponseField>
+                </ListItem>
+              </List>
+            </ListField>
+          </Question>
+          <Question ID="101" title="Blood Pressure">
+            <ListField>
+              <ListHeaderText>
+              </ListHeaderText>
+              <List>
+                <ListItem ID="1002" title="Date 1">
+                  <ListItemResponseField>
+                    <Response>
+                      <string val="High"/>
+                    </Response>
+                  </ListItemResponseField>
+                </ListItem>
+                <ListItem ID="1003" title="Date 2">
+                  <ListItemResponseField>
+                    <Response>
+                      <string val="High"/>
+                    </Response>
+                  </ListItemResponseField>
+                </ListItem>
+              </List>
+            </ListField>
+          </Question>
+        </ChildItems>
+      </Section>
+    </ChildItems>
+  </Body>
+  <Footer ID="E15" title="footnotes">
+  </Footer>
+</FormDesign>
