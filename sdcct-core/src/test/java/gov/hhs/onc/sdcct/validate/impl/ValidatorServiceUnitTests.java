@@ -40,23 +40,23 @@ public class ValidatorServiceUnitTests extends AbstractSdcctUnitTests {
 
     @Resource(name = "formRfdA")
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
-    private RfdForm testRfdForm;
+    private RfdForm testRfdFormA;
 
     @Resource(name = "formRfdC")
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
-    private RfdForm testRfdForm;
+    private RfdForm testRfdFormC;
 
     @Resource(name = "formRfdCFilled")
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
-    private RfdForm testRfdForm;
+    private RfdForm testRfdFormCFilled;
 
     @Resource(name = "formRfdD")
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
-    private RfdForm testRfdForm;
+    private RfdForm testRfdFormD;
 
     @Resource(name = "formRfdDFilled")
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
-    private RfdForm testRfdForm;
+    private RfdForm testRfdFormDFilled;
 
     @Resource(name = "formRfdTestInvalidXml")
     @SuppressWarnings({ "SpringJavaAutowiringInspection", "SpringJavaAutowiredMembersInspection" })
@@ -126,8 +126,8 @@ public class ValidatorServiceUnitTests extends AbstractSdcctUnitTests {
     public void testValidateValid() throws Exception {
         this.validateForm(this.fhirValidatorService, buildForm(this.testFhirForm, true), true);
 
-        this.validateForm(this.rfdValidatorService, buildForm(this.testRfdForm, true), true);
-        
+        this.validateForm(this.rfdValidatorService, buildForm(this.testRfdFormA, true), true);
+
         this.validateForm(this.rfdValidatorService, buildForm(this.testRfdFormC, true), true);
 
         this.validateForm(this.rfdValidatorService, buildForm(this.testRfdFormCFilled, true), true);
@@ -135,6 +135,7 @@ public class ValidatorServiceUnitTests extends AbstractSdcctUnitTests {
         this.validateForm(this.rfdValidatorService, buildForm(this.testRfdFormD, true), true);
 
         this.validateForm(this.rfdValidatorService, buildForm(this.testRfdFormDFilled, true), true);
+
     }
 
     private static SdcctForm<?> buildForm(SdcctForm<?> testForm, boolean buildableExpected) throws Exception {
