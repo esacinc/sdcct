@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FormDesign ID="ihe_c_filled"
+<?xml version="1.0" encoding="UTF-8"?>
+<FormDesign ID="ihe_c"
             xmlns="urn:ihe:qrph:sdc:2016">
 
   <Header ID="E1" title="Elephantiasis">
