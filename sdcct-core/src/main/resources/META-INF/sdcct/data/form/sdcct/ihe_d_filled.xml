@@ -24,8 +24,7 @@
                 <string val="High risk for Endocarditis"/>
               </Response>
               <TextAfterResponse val="mm"/>
-              <ResponseUnits val="miles">
-              </ResponseUnits>
+              <ResponseUnits val="miles"/>
             </ResponseField>
           </Question>
         </ChildItems>

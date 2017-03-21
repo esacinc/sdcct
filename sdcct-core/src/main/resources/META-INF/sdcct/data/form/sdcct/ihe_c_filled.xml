@@ -37,27 +37,27 @@
           <Question ID="101" title="Diabetes" readOnly="true">
             <ListField>
               <List>
-                <ListItem ID="1000" title="Family Members" selected="true"></ListItem>
-                <ListItem ID="1001" title="Personal History"></ListItem>
-                <ListItem ID="1002" title="Other"></ListItem>
+                <ListItem ID="1000" title="Family Members" selected="true"/>
+                <ListItem ID="1001" title="Personal History"/>
+                <ListItem ID="1002" title="Other"/>
               </List>
             </ListField>
           </Question>
           <Question ID="101" title="Diabetes" readOnly="true">
             <ListField>
               <List>
-                <ListItem ID="1000" title="Family Members"></ListItem>
-                <ListItem ID="1001" title="Personal History" selected="true"></ListItem>
-                <ListItem ID="1002" title="Other"></ListItem>
+                <ListItem ID="1000" title="Family Members"/>
+                <ListItem ID="1001" title="Personal History" selected="true"/>
+                <ListItem ID="1002" title="Other"/>
               </List>
             </ListField>
           </Question>
           <Question ID="101" title="Diabetes" readOnly="true">
             <ListField>
               <List>
-                <ListItem ID="1000" title="Family Members"></ListItem>
-                <ListItem ID="1001" title="Personal History"></ListItem>
-                <ListItem ID="1002" title="Other" selected="true"></ListItem>
+                <ListItem ID="1000" title="Family Members"/>
+                <ListItem ID="1001" title="Personal History"/>
+                <ListItem ID="1002" title="Other" selected="true"/>
               </List>
             </ListField>
           </Question>
@@ -91,9 +91,9 @@
                   <Question ID="105" title="Second two levels deep">
                     <ListField>
                       <List>
-                        <ListItem ID="1003" title="List" selected="true"></ListItem>
-                        <ListItem ID="1004" title="Nested"></ListItem>
-                        <ListItem ID="1005" title="Other"></ListItem>
+                        <ListItem ID="1003" title="List" selected="true"/>
+                        <ListItem ID="1004" title="Nested"/>
+                        <ListItem ID="1005" title="Other"/>
                       </List>
                     </ListField>
                   </Question>
@@ -131,9 +131,9 @@
                   <Question ID="109" title="Second two levels deep">
                     <ListField>
                       <List>
-                        <ListItem ID="1006" title="List"></ListItem>
-                        <ListItem ID="1007" title="Nested" selected="true"></ListItem>
-                        <ListItem ID="1008" title="Other"></ListItem>
+                        <ListItem ID="1006" title="List"/>
+                        <ListItem ID="1007" title="Nested" selected="true"/>
+                        <ListItem ID="1008" title="Other"/>
                       </List>
                     </ListField>
                   </Question>
@@ -167,9 +167,9 @@
                   <Question ID="112" title="Second two levels deep">
                     <ListField>
                       <List>
-                        <ListItem ID="1009" title="List"></ListItem>
-                        <ListItem ID="1010" title="Nested"></ListItem>
-                        <ListItem ID="1011" title="Other" selected="true"></ListItem>
+                        <ListItem ID="1009" title="List"/>
+                        <ListItem ID="1010" title="Nested"/>
+                        <ListItem ID="1011" title="Other" selected="true"/>
                       </List>
                     </ListField>
                   </Question>
