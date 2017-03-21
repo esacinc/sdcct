@@ -15,7 +15,7 @@
     = HANDLER MAPPINGS
     =====================================================================================================-->
     <beans:bean id="handlerMappingService" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping"
-        p:order="#{ (T(org.springframework.core.Ordered).HIGHEST_PRECEDENCE + 1) }">
+        p:order="#{ (T(org.springframework.core.Ordered).HIGHEST_PRECEDENCE + 2) }">
         <beans:property name="urlMap">
             <beans:map>
                 <!--suppress SpringPlaceholdersInspection -->

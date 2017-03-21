@@ -15,4 +15,29 @@
     = INET ADDRESSES
     =====================================================================================================-->
     <beans:bean id="inetAddrLoopback" class="java.net.InetAddress" factory-method="getLoopbackAddress"/>
+    
+    <!--====================================================================================================
+    = HTTP CLIENT FACTORIES
+    =====================================================================================================-->
+    <beans:bean id="httpClientReqFactory" class="org.springframework.http.client.HttpComponentsClientHttpRequestFactory"/>
+
+    <!--====================================================================================================
+    = REST TEMPLATES
+    =====================================================================================================-->
+    <beans:bean id="restTemplate" class="org.springframework.web.client.RestTemplate"
+        p:requestFactory-ref="httpClientReqFactory">
+        <beans:property name="messageConverters">
+            <beans:list>
+                <beans:bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"
+                    p:defaultCharset="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"/>
+                <beans:bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"
+                    p:defaultCharset="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"
+                    p:objectMapper-ref="objMapper"/>
+                <beans:bean class="org.springframework.http.converter.StringHttpMessageConverter"
+                    p:defaultCharset="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"/>
+                <beans:bean class="org.springframework.http.converter.ResourceHttpMessageConverter"
+                    p:defaultCharset="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"/>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
 </beans:beans>

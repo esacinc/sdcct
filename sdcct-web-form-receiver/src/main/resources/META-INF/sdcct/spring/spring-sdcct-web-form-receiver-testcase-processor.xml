@@ -14,10 +14,10 @@
     <!--====================================================================================================
     = IHE FORM RECEIVER TESTCASE PROCESSOR
     =====================================================================================================-->
-    <beans:bean id="iheFormReceiverTestcaseProcessor" class="gov.hhs.onc.sdcct.web.form.receiver.IheFormReceiverTestcaseProcessor"
+    <beans:bean id="iheFormReceiverTestcaseProcessor" class="gov.hhs.onc.sdcct.web.form.receiver.ihe.IheFormReceiverTestcaseProcessor"
         parent="iheTestcaseProcessor" abstract="true"/>
 
-    <beans:bean id="iheFormReceiverTestcaseProcessorImpl" class="gov.hhs.onc.sdcct.web.form.receiver.impl.IheFormReceiverTestcaseProcessorImpl"
+    <beans:bean id="iheFormReceiverTestcaseProcessorImpl" class="gov.hhs.onc.sdcct.web.form.receiver.ihe.impl.IheFormReceiverTestcaseProcessorImpl"
         parent="iheFormReceiverTestcaseProcessor">
         <beans:constructor-arg name="clientBeanName">
             <beans:idref bean="clientFormReceiverRfd"/>

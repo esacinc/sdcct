@@ -1,16 +1,17 @@
 package gov.hhs.onc.sdcct.testcases.results.ihe.impl;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import gov.hhs.onc.sdcct.testcases.ihe.IheFormReceiverTestcase;
 import gov.hhs.onc.sdcct.testcases.results.ihe.IheFormReceiverTestcaseResult;
 import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheFormReceiverTestcaseSubmission;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
-@JsonSubTypes({ @Type(IheFormReceiverTestcaseResultImpl.class) })
+@JsonTypeName("iheFormReceiverTestcaseResult")
 public class IheFormReceiverTestcaseResultImpl extends AbstractIheTestcaseResult<IheFormReceiverTestcase, IheFormReceiverTestcaseSubmission>
     implements IheFormReceiverTestcaseResult {
+    public IheFormReceiverTestcaseResultImpl() {
+        this(null);
+    }
+
     public IheFormReceiverTestcaseResultImpl(IheFormReceiverTestcaseSubmission submission) {
         super(submission);
     }

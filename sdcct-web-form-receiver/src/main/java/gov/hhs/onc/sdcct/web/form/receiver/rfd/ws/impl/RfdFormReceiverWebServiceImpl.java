@@ -5,6 +5,7 @@ import gov.hhs.onc.sdcct.rfd.AnyXmlContentType;
 import gov.hhs.onc.sdcct.rfd.RfdFormReceiverPortType;
 import gov.hhs.onc.sdcct.rfd.SubmitFormResponseType;
 import gov.hhs.onc.sdcct.rfd.impl.SubmitFormResponseTypeImpl;
+import gov.hhs.onc.sdcct.rfd.ws.RfdWsResponseType;
 import gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlNames;
 import gov.hhs.onc.sdcct.rfd.ws.impl.AbstractRfdFormWebService;
 import gov.hhs.onc.sdcct.web.form.receiver.rfd.ws.RfdFormReceiverWebService;
@@ -16,6 +17,7 @@ public class RfdFormReceiverWebServiceImpl extends AbstractRfdFormWebService imp
     @Override
     @SuppressWarnings({ "ValidExternallyBoundObject" })
     public SubmitFormResponseType submitForm(AnyXmlContentType body) {
-        return new SubmitFormResponseTypeImpl().setResponseCode(StringUtils.EMPTY);
+        // noinspection ConstantConditions
+        return new SubmitFormResponseTypeImpl().setContentType(RfdWsResponseType.XML.getMediaType().toString()).setResponseCode(StringUtils.EMPTY);
     }
 }

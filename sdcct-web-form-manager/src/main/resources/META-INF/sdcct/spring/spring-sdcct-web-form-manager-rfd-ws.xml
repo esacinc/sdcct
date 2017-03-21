@@ -40,8 +40,18 @@
                 <beans:ref bean="interceptorServerIheFormManagerTestcaseIn"/>
             </beans:list>
         </beans:property>
+        <beans:property name="inFaultInterceptors">
+            <beans:list merge="true">
+                <beans:ref bean="interceptorServerIheFormManagerTestcaseIn"/>
+            </beans:list>
+        </beans:property>
         <beans:property name="outInterceptors">
             <beans:list>
+                <beans:ref bean="interceptorServerIheFormManagerTestcaseOut"/>
+            </beans:list>
+        </beans:property>
+        <beans:property name="outFaultInterceptors">
+            <beans:list merge="true">
                 <beans:ref bean="interceptorServerIheFormManagerTestcaseOut"/>
             </beans:list>
         </beans:property>

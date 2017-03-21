@@ -17,6 +17,7 @@
     <beans:bean id="iheFormReceiverTestcase" class="gov.hhs.onc.sdcct.testcases.ihe.IheFormReceiverTestcase" parent="iheTestcase" abstract="true"/>
     <beans:bean id="iheFormReceiverTestcaseImpl" class="gov.hhs.onc.sdcct.testcases.ihe.impl.IheFormReceiverTestcaseImpl" parent="iheFormReceiverTestcase"
         abstract="true"
+        p:response-ref="submitFormResponseTypeXml"
         p:transaction="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).SUBMIT_FORM_OP }"/>
 
     <beans:bean id="iheFormReceiverTestcaseSdcctInitiated" parent="iheFormReceiverTestcaseImpl" abstract="true"
@@ -33,7 +34,8 @@
     <beans:bean id="iheTestcase13" parent="iheFormReceiverTestcaseSdcctInitiated"
         p:contentType="XML"
         p:id="IHE_13"
-        p:name="IHE_13 - Form Receiver receives/stores SDCSubmissionPackage for completed form">
+        p:name="IHE_13 - Form Receiver receives/stores SDCSubmissionPackage for completed form"
+        p:forms-ref="iheFormsFilled">
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
                 p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
@@ -92,7 +94,8 @@
     <beans:bean id="iheTestcase14" parent="iheFormReceiverTestcaseSdcctInitiated"
         p:contentType="XML"
         p:id="IHE_14"
-        p:name="IHE_14 - Form Receiver receives/stores SDCSubmissionPackage for partially completed form">
+        p:name="IHE_14 - Form Receiver receives/stores SDCSubmissionPackage for partially completed form"
+        p:forms-ref="iheFormsPartiallyFilled">
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
                 p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
@@ -148,10 +151,14 @@
         </beans:property>
     </beans:bean>
 
+    <!-- TODO: Re-enable when update is clearly defined in the profile
     <beans:bean id="iheTestcase15" parent="iheFormReceiverTestcaseSdcctInitiated"
         p:contentType="XML"
         p:id="IHE_15"
         p:name="IHE_15 - Form Receiver receives/stores an SDCSubmissionPackage that contains an update to a previously submitted form">
+        <beans:property name="forms">
+            <beans:list/>
+        </beans:property>
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
                 p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
@@ -202,7 +209,9 @@
             </beans:list>
         </beans:property>
     </beans:bean>
+    -->
 
+    <!-- TODO: Re-enable when an invalid SubmitFormRequest is clearly defined
     <beans:bean id="iheTestcase16" parent="iheFormReceiverTestcaseSdcctInitiated"
         p:contentType="XML"
         p:id="IHE_16"
@@ -258,6 +267,7 @@
             </beans:list>
         </beans:property>
     </beans:bean>
+    -->
 
     <!--====================================================================================================
     = IHE FORM RECEIVER TESTCASES - INITIATED BY SYSTEM UNDER TEST
@@ -265,7 +275,8 @@
     <beans:bean id="iheTestcase17" parent="iheFormReceiverTestcaseSutInitiated"
         p:contentType="XML"
         p:id="IHE_17"
-        p:name="IHE_17 - Form Filler submits SDCSubmissionPackage for completed form">
+        p:name="IHE_17 - Form Filler submits SDCSubmissionPackage for completed form"
+        p:forms-ref="iheFormsFilled">
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
                 p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
@@ -321,70 +332,14 @@
         </beans:property>
     </beans:bean>
 
-    <beans:bean id="iheTestcase18" parent="iheFormReceiverTestcaseSutInitiated"
-        p:contentType="XML"
-        p:id="IHE_18"
-        p:name="IHE_18 - Form Filler submits SDCSubmissionPackage for partially completed form">
-        <beans:property name="requestInfo">
-            <beans:bean parent="iheTestcaseRequestInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
-                <beans:property name="messageDetails">
-                    <beans:map>
-                        <beans:entry key-ref="iheTestcaseConstantStrSdcSubmissionPackage"
-                            value="contains FormDesign with a formID that corresponds to an available XML, HTML, or URI-based form"/>
-                    </beans:map>
-                </beans:property>
-            </beans:bean>
-        </beans:property>
-        <beans:property name="responseInfo">
-            <beans:bean parent="iheTestcaseResponseInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormResponse">
-                <beans:property name="messageDetails">
-                    <beans:map>
-                        <beans:entry key-ref="iheTestcaseConstantStrContent" value="contains SDCSubmissionPackage with formInstanceVersionURI updated"/>
-                        <beans:entry key-ref="iheTestcaseConstantStrContentType" value-ref="iheContentTypeXml"/>
-                        <beans:entry key-ref="iheTestcaseConstantStrResponseCode" value="element exists"/>
-                    </beans:map>
-                </beans:property>
-            </beans:bean>
-        </beans:property>
-        <beans:property name="description">
-            <beans:bean parent="iheTestcaseDescImpl">
-                <beans:property name="instructions">
-                    <sdcct:normalized-string>
-                        Submit a request with a partially completed form from your Form Filler to the Form Receiver, according to the message request details.
-                        Your Form Filler should receive an SDCSubmissionPackage from the Form Receiver in the response, according to the message response
-                        details.
-                    </sdcct:normalized-string>
-                </beans:property>
-                <beans:property name="specifications">
-                    <beans:list>
-                        <beans:ref bean="iheTestcaseConstantStrIti35"/>
-                        <beans:ref bean="iheTestcaseConstantStrFormReceiver"/>
-                        <beans:ref bean="iheTestcaseConstantStrSdcSubmissionRequest"/>
-                        <beans:ref bean="iheTestcaseConstantStrFormFiller"/>
-                    </beans:list>
-                </beans:property>
-                <beans:property name="text">
-                    <sdcct:normalized-string>
-                        This testcase verifies that your Form Filler can submit a valid SubmitFormRequest containing an SDCSubmissionPackage for a partially
-                        completed form to a Form Receiver, according to ITI-35.
-                    </sdcct:normalized-string>
-                </beans:property>
-            </beans:bean>
-        </beans:property>
-        <beans:property name="steps">
-            <beans:list>
-                <beans:ref bean="submitFormRequestValidationStep"/>
-                <beans:ref bean="submitFormResponseSendingStep"/>
-            </beans:list>
-        </beans:property>
-    </beans:bean>
-
+    <!-- TODO: Re-enable when update is clearly defined in the profile
     <beans:bean id="iheTestcase19" parent="iheFormReceiverTestcaseSutInitiated"
         p:contentType="XML"
         p:id="IHE_19"
         p:name="IHE_19 - Form Filler submits SDCSubmissionPackage that contains an update to a previously submitted form">
+        <beans:property name="forms">
+            <beans:list/>
+        </beans:property>
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
                 p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
@@ -436,4 +391,5 @@
             </beans:list>
         </beans:property>
     </beans:bean>
+    -->
 </beans:beans>

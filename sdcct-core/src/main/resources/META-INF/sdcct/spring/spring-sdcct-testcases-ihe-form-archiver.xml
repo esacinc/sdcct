@@ -33,7 +33,8 @@
     <beans:bean id="iheTestcase20" parent="iheFormArchiverTestcaseSdcctInitiated"
         p:contentType="XML"
         p:id="IHE_20"
-        p:name="IHE_20 - Form Archiver archives completed form">
+        p:name="IHE_20 - Form Archiver archives completed form"
+        p:forms-ref="iheFormsFilled">
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
                 p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
@@ -89,7 +90,8 @@
     <beans:bean id="iheTestcase21" parent="iheFormArchiverTestcaseSdcctInitiated"
         p:contentType="XML"
         p:id="IHE_21"
-        p:name="IHE_21 - Form Archiver archives partially completed form">
+        p:name="IHE_21 - Form Archiver archives partially completed form"
+        p:forms-ref="iheFormsPartiallyFilled">
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
                 p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
@@ -142,6 +144,7 @@
         </beans:property>
     </beans:bean>
 
+    <!-- TODO: Re-enable when profile specifies what an invalid ArchiveFormRequest looks like
     <beans:bean id="iheTestcase22" parent="iheFormArchiverTestcaseSdcctInitiated"
         p:contentType="XML"
         p:id="IHE_22"
@@ -193,6 +196,7 @@
             </beans:list>
         </beans:property>
     </beans:bean>
+    -->
 
     <!--====================================================================================================
     = IHE FORM ARCHIVER TESTCASES - INITIATED BY SYSTEM UNDER TEST
@@ -201,7 +205,8 @@
         p:contentType="XML"
         p:id="IHE_23"
         p:name="IHE_23 - Form Filler requests archival of completed form"
-        p:optional="true">
+        p:optional="true"
+        p:forms-ref="iheFormsFilled">
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
                 p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">

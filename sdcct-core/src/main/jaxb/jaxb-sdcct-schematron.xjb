@@ -15,13 +15,17 @@
     =====================================================================================================-->
     <jaxb:schemaBindings>
         <jaxb:package name="gov.hhs.onc.sdcct.schematron"/>
+        <jaxb:nameXmlTransform>
+            <jaxb:elementName prefix="Schematron"/>
+            <jaxb:typeName prefix="Schematron"/>
+        </jaxb:nameXmlTransform>
     </jaxb:schemaBindings>
     
     <!--====================================================================================================
     = ELEMENTS
     =====================================================================================================-->
     <jaxb:bindings node="xsd:element[@name='assert']">
-        <jaxb:class name="Assertion"/>
+        <jaxb:class name="SchematronAssertion"/>
     </jaxb:bindings>
     
     <jaxb:bindings node="xsd:element[@name='diagnostics']">
@@ -33,27 +37,27 @@
     </jaxb:bindings>
     
     <jaxb:bindings node="xsd:element[@name='dir']">
-        <jaxb:class name="Direction"/>
+        <jaxb:class name="SchematronDirection"/>
     </jaxb:bindings>
     
     <jaxb:bindings node="xsd:element[@name='emph']">
-        <jaxb:class name="Emphasis"/>
+        <jaxb:class name="SchematronEmphasis"/>
     </jaxb:bindings>
     
     <jaxb:bindings node="xsd:element[@name='extends']">
-        <jaxb:class name="Extension"/>
+        <jaxb:class name="SchematronExtension"/>
     </jaxb:bindings>
     
     <jaxb:bindings node="xsd:element[@name='ns']">
-        <jaxb:class name="Namespace"/>
+        <jaxb:class name="SchematronNamespace"/>
     </jaxb:bindings>
     
     <jaxb:bindings node="xsd:element[@name='p']">
-        <jaxb:class name="Paragraph"/>
+        <jaxb:class name="SchematronParagraph"/>
     </jaxb:bindings>
     
     <jaxb:bindings node="xsd:element[@name='param']">
-        <jaxb:class name="Parameter"/>
+        <jaxb:class name="SchematronParameter"/>
     </jaxb:bindings>
     
     <jaxb:bindings node="xsd:element[@name='pattern']">

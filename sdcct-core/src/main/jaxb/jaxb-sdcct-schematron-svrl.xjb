@@ -15,21 +15,33 @@
     =====================================================================================================-->
     <jaxb:schemaBindings>
         <jaxb:package name="gov.hhs.onc.sdcct.schematron.svrl"/>
+        <jaxb:nameXmlTransform>
+            <jaxb:elementName prefix="Svrl"/>
+            <jaxb:typeName prefix="Svrl"/>
+        </jaxb:nameXmlTransform>
     </jaxb:schemaBindings>
     
     <!--====================================================================================================
     = ELEMENTS
     =====================================================================================================-->
+    <jaxb:bindings node="xsd:element[@name='dir']">
+        <jaxb:class name="SvrlDirection"/>
+    </jaxb:bindings>
+    
+    <jaxb:bindings node="xsd:element[@name='emph']">
+        <jaxb:class name="SvrlEmphasis"/>
+    </jaxb:bindings>
+    
     <jaxb:bindings node="xsd:element[@name='failed-assert']">
-        <jaxb:class name="FailedAssertion"/>
+        <jaxb:class name="SvrlFailedAssertion"/>
     </jaxb:bindings>
     
     <jaxb:bindings node="xsd:element[@name='ns-prefix-in-attribute-values']">
-        <jaxb:class name="AttributeValueNamespace"/>
+        <jaxb:class name="SvrlAttributeValueNamespace"/>
     </jaxb:bindings>
     
     <jaxb:bindings node="xsd:element[@name='schematron-output']">
-        <jaxb:class name="Output"/>
+        <jaxb:class name="SvrlOutput"/>
         <jaxb:bindings node="xsd:complexType">
             <jaxb:bindings node="xsd:sequence">
                 <jaxb:property name="content"/>

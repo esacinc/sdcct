@@ -35,6 +35,26 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
+        <beans:property name="inInterceptors">
+            <beans:list>
+                <beans:ref bean="interceptorServerIheFormArchiverTestcaseIn"/>
+            </beans:list>
+        </beans:property>
+        <beans:property name="inFaultInterceptors">
+            <beans:list merge="true">
+                <beans:ref bean="interceptorServerIheFormArchiverTestcaseIn"/>
+            </beans:list>
+        </beans:property>
+        <beans:property name="outInterceptors">
+            <beans:list>
+                <beans:ref bean="interceptorServerIheFormArchiverTestcaseOut"/>
+            </beans:list>
+        </beans:property>
+        <beans:property name="outFaultInterceptors">
+            <beans:list merge="true">
+                <beans:ref bean="interceptorServerIheFormArchiverTestcaseOut"/>
+            </beans:list>
+        </beans:property>
     </beans:bean>
     
     <!--====================================================================================================
@@ -45,5 +65,16 @@
         p:endpointName="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).FORM_ARCHIVER_PORT }"
         p:serviceClass="#{ T(gov.hhs.onc.sdcct.rfd.RfdFormArchiverPortType) }"
         p:serviceName="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).FORM_ARCHIVER_SERVICE }"
-        p:wsdlLocation="${sdcct.ws.form.archiver.rfd.wsdl.loc}"/>
+        p:wsdlLocation="${sdcct.ws.form.archiver.rfd.wsdl.loc}">
+        <beans:property name="inInterceptors">
+            <beans:list>
+                <beans:ref bean="interceptorClientIheFormArchiverTestcaseIn"/>
+            </beans:list>
+        </beans:property>
+        <beans:property name="outInterceptors">
+            <beans:list>
+                <beans:ref bean="interceptorClientIheFormArchiverTestcaseOut"/>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
 </beans:beans>

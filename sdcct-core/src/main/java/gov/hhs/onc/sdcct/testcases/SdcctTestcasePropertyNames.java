@@ -1,12 +1,21 @@
 package gov.hhs.onc.sdcct.testcases;
 
 import gov.hhs.onc.sdcct.rfd.ws.RfdWsResponseType;
+import gov.hhs.onc.sdcct.testcases.results.ihe.IheFormArchiverTestcaseResult;
 import gov.hhs.onc.sdcct.testcases.results.ihe.IheFormManagerTestcaseResult;
+import gov.hhs.onc.sdcct.testcases.results.ihe.IheFormReceiverTestcaseResult;
+import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheFormArchiverTestcaseSubmission;
 import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheFormManagerTestcaseSubmission;
+import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheFormReceiverTestcaseSubmission;
 
 public final class SdcctTestcasePropertyNames {
+    public final static String IHE_FORM_ARCHIVER_TESTCASE_RESULT = IheFormArchiverTestcaseResult.class.getName();
     public final static String IHE_FORM_MANAGER_TESTCASE_RESULT = IheFormManagerTestcaseResult.class.getName();
+    public final static String IHE_FORM_RECEIVER_TESTCASE_RESULT = IheFormReceiverTestcaseResult.class.getName();
+
+    public final static String IHE_FORM_ARCHIVER_TESTCASE_SUBMISSION = IheFormArchiverTestcaseSubmission.class.getName();
     public final static String IHE_FORM_MANAGER_TESTCASE_SUBMISSION = IheFormManagerTestcaseSubmission.class.getName();
+    public final static String IHE_FORM_RECEIVER_TESTCASE_SUBMISSION = IheFormReceiverTestcaseSubmission.class.getName();
 
     public final static String RFD_CONTENT = "content";
     public final static String RFD_CONTENT_TYPE = "contentType";

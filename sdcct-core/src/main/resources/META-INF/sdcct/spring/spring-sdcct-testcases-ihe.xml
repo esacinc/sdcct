@@ -142,10 +142,32 @@
         p:contentType-ref="iheContentTypeUri"/>
 
     <!--====================================================================================================
+    = SUBMIT FORM RESPONSE TYPE
+    =====================================================================================================-->
+    <beans:bean id="submitFormResponseType" class="gov.hhs.onc.sdcct.rfd.SubmitFormResponseType" abstract="true"/>
+    <beans:bean id="submitFormResponseTypeImpl" class="gov.hhs.onc.sdcct.rfd.impl.SubmitFormResponseTypeImpl" parent="submitFormResponseType" abstract="true"/>
+
+    <beans:bean id="submitFormResponseTypeXml" parent="submitFormResponseTypeImpl" lazy-init="true" scope="prototype"
+        p:contentType-ref="iheContentTypeXml"/>
+
+    <!--====================================================================================================
+    = IHE FORMS
+    =====================================================================================================-->
+    <util:list id="iheFormsPartiallyFilled">
+        <beans:ref bean="formRfdC"/>
+        <beans:ref bean="formRfdD"/>
+    </util:list>
+
+    <util:list id="iheFormsFilled">
+        <beans:ref bean="formRfdCFilled"/>
+        <beans:ref bean="formRfdDFilled"/>
+    </util:list>
+
+    <!--====================================================================================================
     = IHE FORM IDS
     =====================================================================================================-->
     <util:list id="iheFormIds">
-        <beans:value>#{ formRfdA.identifier }</beans:value>
-        <beans:value>#{ formRfdB.identifier }</beans:value>
+        <beans:value>#{ formRfdC.identifier }</beans:value>
+        <beans:value>#{ formRfdD.identifier }</beans:value>
     </util:list>
 </beans:beans>

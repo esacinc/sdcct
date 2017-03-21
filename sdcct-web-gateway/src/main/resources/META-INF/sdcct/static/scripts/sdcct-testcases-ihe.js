@@ -22,7 +22,6 @@
                     },
                     "success": function (resp, respHttpStatusText, req) {
                         $(formElem).sdcct.testcases.buildTestcaseResults(testcaseIheResultsAccordion, resp);
-                        $(".tabs").tabs();
                     },
                     "type": formElem.attr("method"),
                     "url": formElem.attr("action")
@@ -36,7 +35,7 @@
     $(document).ready(function () {
         iheTestcaseInfo = {
             "FORM_ARCHIVER": {
-                "action": IHE_FORM_ARCHIVER_PROCESS,
+                "action": IHE_TESTCASES_PROCESS_URLS[$.sdcct.roles.FORM_ARCHIVER],
                 "testcases": IHE_TESTCASES[$.sdcct.roles.FORM_ARCHIVER],
                 "testcaseSubmissionType": "iheFormArchiverTestcaseSubmission"
             },
@@ -44,12 +43,12 @@
                 "testcases": IHE_TESTCASES[$.sdcct.roles.FORM_FILLER]
             },
             "FORM_MANAGER": {
-                "action": IHE_FORM_MANAGER_PROCESS,
+                "action": IHE_TESTCASES_PROCESS_URLS[$.sdcct.roles.FORM_MANAGER],
                 "testcases": IHE_TESTCASES[$.sdcct.roles.FORM_MANAGER],
                 "testcaseSubmissionType": "iheFormManagerTestcaseSubmission"
             },
             "FORM_RECEIVER": {
-                "action": IHE_FORM_RECEIVER_PROCESS,
+                "action": IHE_TESTCASES_PROCESS_URLS[$.sdcct.roles.FORM_RECEIVER],
                 "testcases": IHE_TESTCASES[$.sdcct.roles.FORM_RECEIVER],
                 "testcaseSubmissionType": "iheFormReceiverTestcaseSubmission"
             }
@@ -140,7 +139,14 @@
                 
                 testcaseIheDescFormGroup.show();
                 testcaseIheEndpointAddr.enable();
-                testcaseIheFormId.enable();
+                
+                if (selectedIheTestcase["negative"] && selectedIheTestcase["formIds"].length == 0) {
+                    testcaseIheFormId.val("");
+                    testcaseIheFormId.disable();
+                } else {
+                    testcaseIheFormId.enable();
+                }
+                
                 testcaseIheSubmit.enable();
             } else {
                 testcaseIheEndpointAddr.disable();
@@ -155,11 +161,14 @@
             testcaseIheSelectionGroup.hide();
             testcaseIheSdcctInitiatedFormGroup.hide();
             testcaseIheDescFormGroup.hide();
+            iheTestcaseResultsEmptyWellElem.show();
             testcaseIheResultsAccordion.empty();
             testcaseIheEndpointAddr.disable();
             testcaseIheFormId.disable();
             
             $.sdcct.form.clearErrorMessages(formTestcasesIhe);
         });
+        
+        $.fn.sdcct.testcases.streamIncomingIheTestcaseEvents(testcaseIheResultsAccordion, iheTestcaseResultsEmptyWellElem);
     });
 })(jQuery);

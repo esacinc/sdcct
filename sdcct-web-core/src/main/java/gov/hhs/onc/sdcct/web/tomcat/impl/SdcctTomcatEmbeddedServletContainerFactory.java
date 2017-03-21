@@ -89,6 +89,7 @@ public class SdcctTomcatEmbeddedServletContainerFactory extends TomcatEmbeddedSe
 
     private final static String SOCKET_PROCESSOR_CLASS_NAME = NioEndpoint.class.getName() + ClassUtils.INNER_CLASS_SEPARATOR_CHAR + "SocketProcessor";
 
+    private int asyncTimeout;
     private File baseDir;
     private String connEndpointName;
     private int connKeepAliveTimeout;
@@ -126,6 +127,8 @@ public class SdcctTomcatEmbeddedServletContainerFactory extends TomcatEmbeddedSe
     protected void customizeConnector(Connector conn) {
         super.customizeConnector(conn);
 
+        conn.setAsyncTimeout(this.asyncTimeout);
+
         SdcctHttp11NioProtocol connProtocol = ((SdcctHttp11NioProtocol) conn.getProtocolHandler());
         connProtocol.setExecutor(new SdcctThreadPoolExecutor(Collections.singletonMap(SdcctPropertyNames.HTTP_SERVER_TX_ID, this.txIdGen)));
         connProtocol.setConnectionTimeout(this.connTimeout);
@@ -147,6 +150,15 @@ public class SdcctTomcatEmbeddedServletContainerFactory extends TomcatEmbeddedSe
         ((StandardContext) context).setWorkDir(this.workDir.getAbsolutePath());
 
         super.configureContext(context, servletContextInits);
+    }
+
+    @Nonnegative
+    public int getAsyncTimeout() {
+        return this.asyncTimeout;
+    }
+
+    public void setAsyncTimeout(@Nonnegative int asyncTimeout) {
+        this.asyncTimeout = asyncTimeout;
     }
 
     public File getBaseDirectory() {

@@ -21,9 +21,8 @@
             /*<![CDATA[*/
             var IHE_TESTCASES = [[${iheTestcases}]];
             var IHE_ENDPOINT_ADDRESSES = [[${iheEndpointAddresses}]];
-            var IHE_FORM_ARCHIVER_PROCESS = "/ihe/FormArchiver/process";
-            var IHE_FORM_MANAGER_PROCESS = "/ihe/FormManager/process";
-            var IHE_FORM_RECEIVER_PROCESS = "/ihe/FormReceiver/process";
+            var IHE_TESTCASES_EVENT_STREAM_URL = [[${iheTestcasesEventStreamUrl}]];
+            var IHE_TESTCASES_PROCESS_URLS = [[${iheTestcasesProcessUrls}]];
             /*]]>*/
         </script>
         <title>SDCCT - Home</title>
@@ -181,8 +180,6 @@
         <footer class="footer">
             <div class="container">
                 <i class="fa fa-fw fa-tags"></i>
-                <strong>Version</strong>: [[${buildVersion}]]
-                (<strong>Built</strong>: [[${formattedBuildTimestamp}]])
             </div>
         </footer>
     </body>

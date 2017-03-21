@@ -14,10 +14,10 @@
     <!--====================================================================================================
     = IHE FORM ARCHIVER TESTCASE PROCESSOR
     =====================================================================================================-->
-    <beans:bean id="iheFormArchiverTestcaseProcessor" class="gov.hhs.onc.sdcct.web.form.archiver.IheFormArchiverTestcaseProcessor"
+    <beans:bean id="iheFormArchiverTestcaseProcessor" class="gov.hhs.onc.sdcct.web.form.archiver.ihe.IheFormArchiverTestcaseProcessor"
         parent="iheTestcaseProcessor" abstract="true"/>
 
-    <beans:bean id="iheFormArchiverTestcaseProcessorImpl" class="gov.hhs.onc.sdcct.web.form.archiver.impl.IheFormArchiverTestcaseProcessorImpl"
+    <beans:bean id="iheFormArchiverTestcaseProcessorImpl" class="gov.hhs.onc.sdcct.web.form.archiver.ihe.impl.IheFormArchiverTestcaseProcessorImpl"
         parent="iheFormArchiverTestcaseProcessor">
         <beans:constructor-arg name="clientBeanName">
             <beans:idref bean="clientFormArchiverRfd"/>

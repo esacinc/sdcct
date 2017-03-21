@@ -5,20 +5,28 @@ import org.apache.maven.artifact.Artifact
 import org.apache.maven.artifact.DefaultArtifact
 import org.apache.maven.artifact.handler.DefaultArtifactHandler
 
-Artifact schematronXsltArchiveArtifact = new DefaultArtifact("org.oclc.purl.dsdl.schematron", "iso-schematron-xslt2",
+final String SCHEMATRON_ARCHIVE_STYLE_DIR_PATH = "**/schematron/code"
+
+final String[] SCHEMATRON_STYLE_FILE_NAMES = [
+    "iso_abstract_expand.${SdcctFileNameExtensions.XSL}",
+    "iso_dsdl_include.${SdcctFileNameExtensions.XSL}",
+    "iso_schematron_skeleton_for_saxon.${SdcctFileNameExtensions.XSL}",
+    "iso_svrl_for_xslt2.${SdcctFileNameExtensions.XSL}"
+]
+
+Artifact schematronArchiveArtifact = new DefaultArtifact("org.iso.schematron", "iso-schematron",
     project.properties.getProperty("project.build.schematronVersion"), Artifact.SCOPE_COMPILE, SdcctFileNameExtensions.ZIP, StringUtils.EMPTY,
     new DefaultArtifactHandler());
-File schematronXsltArchiveFile = SdcctBuildUtils.resolveRemoteArtifact(log, project, ant, schematronXsltArchiveArtifact,
-    new URL("${project.properties.getProperty("project.build.schematronUrlPrefix")}/${schematronXsltArchiveArtifact.artifactId}.${schematronXsltArchiveArtifact.type}"),
+File schematronArchiveLocalRepoFile = SdcctBuildUtils.resolveRemoteArtifact(log, project, ant, schematronArchiveArtifact,
+    new URL("${project.properties.getProperty("project.build.schematronRepoArchiveUrlPrefix")}/${project.properties.getProperty("project.build.schematronRepoVersion")}.${schematronArchiveArtifact.type}"),
     true), schematronStyleDir = new File("${project.properties.getProperty("project.build.styleDirectory")}/schematron")
 
 ant.mkdir(dir: schematronStyleDir)
 
-ant.unzip(src: schematronXsltArchiveFile, dest: schematronStyleDir) {
+ant.unzip(src: schematronArchiveLocalRepoFile, dest: schematronStyleDir) {
     ant.patternset() {
-        ant.include(name: "iso_abstract_expand.${SdcctFileNameExtensions.XSL}")
-        ant.include(name: "iso_dsdl_include.${SdcctFileNameExtensions.XSL}")
-        ant.include(name: "iso_schematron_skeleton_for_saxon.${SdcctFileNameExtensions.XSL}")
-        ant.include(name: "iso_svrl_for_xslt2.${SdcctFileNameExtensions.XSL}")
+        SCHEMATRON_STYLE_FILE_NAMES.collect{ ant.include(name: "${SCHEMATRON_ARCHIVE_STYLE_DIR_PATH}/${it}") }
     }
+    
+    ant.flattenmapper()
 }

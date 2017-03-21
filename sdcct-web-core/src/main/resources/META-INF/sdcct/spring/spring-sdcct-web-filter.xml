@@ -14,5 +14,5 @@
     <!--====================================================================================================
     = FILTER REGISTRATION BEANS
     =====================================================================================================-->
-    <beans:bean id="regBeanFilter" class="org.springframework.boot.context.embedded.FilterRegistrationBean" abstract="true"/>
+    <beans:bean id="regBeanFilter" class="org.springframework.boot.web.servlet.FilterRegistrationBean" abstract="true"/>
 </beans:beans>

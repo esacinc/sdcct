@@ -22,6 +22,7 @@
     =====================================================================================================-->
     <!--suppress ELValidationInJSP SpringElInspection SpringPlaceholdersInspection -->
     <beans:bean id="embeddedServletContainerFactoryTomcat" class="gov.hhs.onc.sdcct.web.tomcat.impl.SdcctTomcatEmbeddedServletContainerFactory"
+        p:asyncTimeout="${sdcct.tomcat.server.async.timeout}"
         p:baseDirectory="#{ app.homeDirectory }"
         p:connectionEndpointName="#{ threadGroup.name }-tomcat-server-http"
         p:connectionKeepAliveTimeout="${sdcct.tomcat.server.conn.keep.alive.timeout}"

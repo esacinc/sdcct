@@ -14,10 +14,10 @@
     <!--====================================================================================================
     = IHE FORM MANAGER TESTCASE PROCESSOR
     =====================================================================================================-->
-    <beans:bean id="iheFormManagerTestcaseProcessor" class="gov.hhs.onc.sdcct.web.form.manager.IheFormManagerTestcaseProcessor"
+    <beans:bean id="iheFormManagerTestcaseProcessor" class="gov.hhs.onc.sdcct.web.form.manager.ihe.IheFormManagerTestcaseProcessor"
         parent="iheTestcaseProcessor" abstract="true"/>
 
-    <beans:bean id="iheFormManagerTestcaseProcessorImpl" class="gov.hhs.onc.sdcct.web.form.manager.impl.IheFormManagerTestcaseProcessorImpl"
+    <beans:bean id="iheFormManagerTestcaseProcessorImpl" class="gov.hhs.onc.sdcct.web.form.manager.ihe.impl.IheFormManagerTestcaseProcessorImpl"
         parent="iheFormManagerTestcaseProcessor">
         <beans:constructor-arg name="clientBeanName">
             <beans:idref bean="clientFormManagerRfd"/>

@@ -249,7 +249,7 @@
         p:negative="true">
         <beans:property name="formIds">
             <beans:list>
-                <beans:value>ihe_unavailable_form_id</beans:value>
+                <beans:value>${sdcct.testcases.ihe.form.id.unavailable}</beans:value>
             </beans:list>
         </beans:property>
         <beans:property name="requestParams">
@@ -257,7 +257,7 @@
                 <beans:property name="workflowData">
                     <beans:bean parent="workflowDataTypeImpl"
                         p:encodedResponse-ref="encodedResponseXml"
-                        p:formId="ihe_unavailable_form_id"/>
+                        p:formId="${sdcct.testcases.ihe.form.id.unavailable}"/>
                 </beans:property>
             </beans:bean>
         </beans:property>
@@ -317,6 +317,9 @@
         p:id="IHE_5"
         p:name="IHE_5 - Form Manager returns SOAP fault in response to a request for an XML form with an unspecified form ID"
         p:negative="true">
+        <beans:property name="formIds">
+            <beans:list/>
+        </beans:property>
         <beans:property name="requestParams">
             <beans:bean parent="retrieveFormRequestTypeImpl">
                 <beans:property name="workflowData">
@@ -382,7 +385,7 @@
         p:negative="true">
         <beans:property name="formIds">
             <beans:list>
-                <beans:value>ihe_unavailable_form_id</beans:value>
+                <beans:value>${sdcct.testcases.ihe.form.id.unavailable}</beans:value>
             </beans:list>
         </beans:property>
         <beans:property name="requestParams">
@@ -390,7 +393,7 @@
                 <beans:property name="workflowData">
                     <beans:bean parent="workflowDataTypeImpl"
                         p:encodedResponse-ref="encodedResponseHtml"
-                        p:formId="ihe_unavailable_form_id"/>
+                        p:formId="${sdcct.testcases.ihe.form.id.unavailable}"/>
                 </beans:property>
             </beans:bean>
         </beans:property>
@@ -450,6 +453,9 @@
         p:id="IHE_7"
         p:name="IHE_7 - Form Manager returns SOAP fault in response to a request for an HTML form with an unspecified form ID"
         p:negative="true">
+        <beans:property name="formIds">
+            <beans:list/>
+        </beans:property>
         <beans:property name="requestParams">
             <beans:bean parent="retrieveFormRequestTypeImpl">
                 <beans:property name="workflowData">
@@ -578,6 +584,9 @@
         p:id="IHE_9"
         p:name="IHE_9 - Form Manager returns SOAP fault in response to a request for a form available at a URI with an unspecified form ID"
         p:negative="true">
+        <beans:property name="formIds">
+            <beans:list/>
+        </beans:property>
         <beans:property name="requestParams">
             <beans:bean parent="retrieveFormRequestTypeImpl">
                 <beans:property name="workflowData">

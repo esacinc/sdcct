@@ -30,6 +30,19 @@
                     });
                 }
                 
+                var forms = testcase["forms"];
+                
+                if (testcase["roleTested"] == $.sdcct.roles.FORM_RECEIVER || testcase["roleTested"] == $.sdcct.roles.FORM_ARCHIVER) {
+                    var formId;
+                    
+                    if ($.isUndefined(formIds) && !$.isUndefined(forms)) {
+                        $.each(forms, function (index, value) {
+                            formId = value["identifier"];
+                            options.append($("<option/>").text(formId));
+                        });
+                    }
+                }
+                
                 return formIds;
             },
             "buildTestcaseDescription": function (testcase) {
@@ -41,9 +54,21 @@
                     testcaseDescElem.append(elem.sdcct.testcases.buildTestcaseItem("Endpoint Address", testcase["endpointAddr"]));
                 }
                 
-                // TODO: determine how to present form ids for various testcases
-                if (!$.isNull(testcase["formIds"])) {
+                var formIds = testcase["formIds"];
+                
+                if (!$.isNull(formIds) && !$.isUndefined(formIds)) {
                     testcaseDescElem.append(elem.sdcct.testcases.buildTestcaseItem("Form IDs", testcase["formIds"]));
+                } else {
+                    var forms = testcase["forms"];
+                    formIds = [];
+                    
+                    if (!$.isUndefined(forms)) {
+                        $.each(forms, function (index, value) {
+                            formIds.push(value["identifier"]);
+                        });
+                    }
+                    
+                    testcaseDescElem.append(elem.sdcct.testcases.buildTestcaseItem("Form IDs", formIds));
                 }
                 
                 testcaseDescElem.append(elem.sdcct.testcases.buildTestcaseItem("Content Type", testcase["contentType"]));
@@ -58,12 +83,15 @@
                 return testcaseDescElem;
             },
             "buildTestcaseSteps": function (testcaseStepsLbl, testcaseSteps) {
-                // TODO: update with status and messages
                 var testcaseStepsList = $("<ol/>");
                 
-                testcaseSteps.forEach(function (testcaseStep) {
-                    testcaseStepsList.append($("<li/>").append($.fn.sdcct.testcases.buildTestcaseItem(testcaseStep["desc"]["text"], [ $.fn.sdcct.testcases.buildTestcaseItem("Specification Type", testcaseStep["specType"]) ])));
-                });
+                if (!$.isEmptyObject(testcaseSteps)) {
+                    testcaseSteps.forEach(function (testcaseStep) {
+                        testcaseStepsList.append($("<li/>").append($.fn.sdcct.testcases.buildTestcaseItem(testcaseStep["desc"]["text"], [ $.fn.sdcct.testcases.buildTestcaseItem("Specification Type", testcaseStep["specType"]) ])));
+                    });
+                } else {
+                    testcaseStepsList.append("None");
+                }
                 
                 return $.fn.sdcct.testcases.buildTestcaseItem(testcaseStepsLbl, testcaseStepsList);
             },
@@ -134,7 +162,8 @@
                 var testcaseSuccess = !$.isUndefined(testcaseResult["success"]) ? testcaseResult["success"] : false;
                 var testcaseSuccessStr = testcaseSuccess ? "success" : "error";
                 var testcaseSubmission = testcaseResult["submission"];
-                var testcaseName = testcaseSubmission["testcase"]["name"];
+                var testcase = testcaseSubmission["testcase"];
+                var testcaseName = !$.isUndefined(testcase) ? testcase["name"] : "None";
                 
                 var testcaseResultHeaderElem = $("<h3/>");
                 testcaseResultHeaderElem.enableClass("testcase-result-header");
@@ -161,7 +190,7 @@
                 });
                 
                 testcaseResultBodyElem.append($.fn.sdcct.testcases.buildTestcaseItem("Message(s)", testcaseResultMsgs));
-                testcaseResultBodyElem.append($.fn.sdcct.testcases.buildTestcaseSteps("Testcase Steps", testcaseSubmission["testcase"]["steps"]));
+                testcaseResultBodyElem.append($.fn.sdcct.testcases.buildTestcaseSteps("Testcase Steps", !$.isUndefined(testcase) ? testcase["steps"] : []));
                 
                 // TODO: update to include HttpRequestEvent and HttpResponseEvent
                 if (!$.isUndefined(testcaseResult["wsRequestEvent"]) || !$.isUndefined(testcaseResult["wsResponseEvent"])) {
@@ -191,6 +220,8 @@
                         testcaseResultHeaderIcon.enableClass("glyphicon-type-error");
                     }
                 });
+                
+                $(".tabs").tabs();
             },
             "buildTestcaseResultEventTabs": function (numTestcaseResults, testcaseResult) {
                 var testcaseResultEventElem = $("<div/>").attr({
@@ -208,10 +239,8 @@
                 return testcaseResultEventElem;
             },
             "buildTestcaseWsEvent": function (testcaseWsEventTabId, testcaseWsEvent) {
-                // TODO: determine better grouping of items
                 var elem = $(this), testcaseWsEventElem = $("<div/>").attr("id", testcaseWsEventTabId);
                 
-                // TODO: add additional request info
                 if ($.isUndefined(testcaseWsEvent)) {
                     return testcaseWsEventElem.append("<strong><em>None</em></strong>");
                 }
@@ -227,11 +256,29 @@
                 testcaseWsEventElem.append(elem.sdcct.testcases.buildTestcaseItem("Port Type Name", testcaseWsEvent["portTypeName"]));
                 testcaseWsEventElem.append(elem.sdcct.testcases.buildTestcaseItem("Service Name", testcaseWsEvent["serviceName"]));
                 testcaseWsEventElem.append(elem.sdcct.testcases.buildTestcaseItem("SOAP Headers", testcaseWsEvent["soapHeaders"]));
-                testcaseWsEventElem.append(elem.sdcct.testcases.buildTestcaseItem("SOAP Fault", $.isUndefined(testcaseWsEvent["soapFault"])));
+                testcaseWsEventElem.append(elem.sdcct.testcases.buildTestcaseItem("SOAP Fault", !$.isUndefined(testcaseWsEvent["soapFault"])));
                 testcaseWsEventElem.append(elem.sdcct.testcases.buildTestcaseItem("Transaction ID", testcaseWsEvent["txId"]));
                 testcaseWsEventElem.append(elem.sdcct.testcases.buildTestcaseItem("Payload", $("<pre/>").text(!$.isUndefined(testcaseWsEvent["prettyPayload"]) ? testcaseWsEvent["prettyPayload"] : testcaseWsEvent["payload"])));
                 
                 return testcaseWsEventElem;
+            },
+            "streamIncomingIheTestcaseEvents": function (resultsElem, resultsEmptyWellElem) {
+                var source = new EventSource(IHE_TESTCASES_EVENT_STREAM_URL);
+                
+                source.addEventListener("open", function (event) {
+                    console.log("Connection open for incoming IHE testcases event stream.");
+                });
+                
+                source.addEventListener("message", function (event) {
+                    resultsEmptyWellElem.hide();
+                    $.fn.sdcct.testcases.buildTestcaseResults(resultsElem, JSON.parse(event.data));
+                }, false);
+                
+                source.addEventListener("error", function (event) {
+                    if (event.readyState == EventSource.CLOSED) {
+                        $.fn.sdcct.testcases.streamIncomingIheTestcaseEvents(resultsElem);
+                    }
+                }, false);
             }
         })
     });

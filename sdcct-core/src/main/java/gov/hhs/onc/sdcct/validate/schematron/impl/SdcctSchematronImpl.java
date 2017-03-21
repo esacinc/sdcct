@@ -1,15 +1,15 @@
 package gov.hhs.onc.sdcct.validate.schematron.impl;
 
-import gov.hhs.onc.sdcct.schematron.Namespace;
-import gov.hhs.onc.sdcct.schematron.Schema;
-import gov.hhs.onc.sdcct.schematron.impl.SchemaImpl;
+import gov.hhs.onc.sdcct.schematron.SchematronNamespace;
+import gov.hhs.onc.sdcct.schematron.SchematronSchema;
+import gov.hhs.onc.sdcct.schematron.impl.SchematronSchemaImpl;
 import gov.hhs.onc.sdcct.transform.impl.ByteArrayResult;
 import gov.hhs.onc.sdcct.transform.impl.ByteArraySource;
 import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
 import gov.hhs.onc.sdcct.validate.schematron.SdcctSchematron;
 import gov.hhs.onc.sdcct.xml.impl.SdcctXmlOutputFactory;
-import gov.hhs.onc.sdcct.xml.saxon.impl.XdmDocument;
 import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
+import gov.hhs.onc.sdcct.xml.saxon.impl.XdmDocument;
 import gov.hhs.onc.sdcct.xml.xslt.saxon.impl.SdcctXsltCompiler;
 import gov.hhs.onc.sdcct.xml.xslt.saxon.impl.SdcctXsltExecutable;
 import gov.hhs.onc.sdcct.xml.xslt.saxon.impl.SdcctXsltTransformer;
@@ -54,13 +54,13 @@ public class SdcctSchematronImpl implements SdcctSchematron {
     }
 
     private void buildSchema() throws Exception {
-        Schema schema = this.xmlCodec.decode(this.doc.getSource(), SchemaImpl.class, null);
+        SchematronSchema schema = this.xmlCodec.decode(this.doc.getSource(), SchematronSchemaImpl.class, null);
         schema.setId(this.id);
         schema.setQueryBinding(this.queryBinding);
         schema.setSchemaVersion(this.schemaVersion);
 
-        this.schemaNamespaces = SdcctStreamUtils.asInstances(schema.getContent().stream(), Namespace.class)
-            .collect(SdcctStreamUtils.toMap(Namespace::getPrefix, Namespace::getUri, TreeMap::new));
+        this.schemaNamespaces = SdcctStreamUtils.asInstances(schema.getContent().stream(), SchematronNamespace.class)
+            .collect(SdcctStreamUtils.toMap(SchematronNamespace::getPrefix, SchematronNamespace::getUri, TreeMap::new));
 
         String publicId = this.doc.getPublicId(), sysId = this.doc.getSystemId();
 

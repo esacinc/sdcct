@@ -128,8 +128,9 @@
         <project.build.jswUrlPrefix>http://wrapper.tanukisoftware.com/download</project.build.jswUrlPrefix>
         <project.build.jswVersion>3.5.30</project.build.jswVersion>
         <!-- Project build Schematron properties -->
-        <project.build.schematronUrlPrefix>http://www.schematron.com/tmp</project.build.schematronUrlPrefix>
-        <project.build.schematronVersion>2010-04-14</project.build.schematronVersion>
+        <project.build.schematronRepoArchiveUrlPrefix>http://github.com/Schematron/schematron/archive</project.build.schematronRepoArchiveUrlPrefix>
+        <project.build.schematronRepoVersion>master</project.build.schematronRepoVersion>
+        <project.build.schematronVersion>2016-01-15</project.build.schematronVersion>
         <!-- Project build SDC properties -->
         <project.build.sdcSchemaPackageRepoArchiveUrlPrefix>http://github.com/esacinc/sdc-schema-package/archive</project.build.sdcSchemaPackageRepoArchiveUrlPrefix>
         <project.build.sdcSchemaPackageVersion>2.0-M3</project.build.sdcSchemaPackageVersion>
@@ -578,6 +579,11 @@
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-ws-policy</artifactId>
                 <version>3.1.7</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>4.5.2</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>

@@ -12,11 +12,30 @@
         http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
         urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
         urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
-    
+
     <!--====================================================================================================
-    = HANDLERS
+    = ASYNC SUPPORT
     =====================================================================================================-->
-    <mvc:default-servlet-handler/>
+    <mvc:annotation-driven>
+        <mvc:async-support task-executor="taskExecThreadPoolAsync"/>
+    </mvc:annotation-driven>
+
+    <!--====================================================================================================
+    = MVC
+    =====================================================================================================-->
+    <mvc:annotation-driven conversion-service="conversionService">
+        <mvc:message-converters register-defaults="false">
+            <beans:bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"
+                p:defaultCharset="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"/>
+            <beans:bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"
+                p:defaultCharset="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"
+                p:objectMapper-ref="objMapper"/>
+            <beans:bean class="org.springframework.http.converter.StringHttpMessageConverter"
+                p:defaultCharset="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"/>
+            <beans:bean class="org.springframework.http.converter.ResourceHttpMessageConverter"
+                p:defaultCharset="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"/>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
     
     <!--====================================================================================================
     = INTERCEPTORS
@@ -31,6 +50,13 @@
                 p:useExpiresHeader="true"/>
         </mvc:interceptor>
     </mvc:interceptors>
+    
+    <!--====================================================================================================
+    = RESOURCES
+    =====================================================================================================-->
+    <!--suppress SpringModelInspection -->
+    <mvc:resources location="classpath:${sdcct.static.dir.path}/" mapping="${sdcct.static.dir.url.path}/**"
+        order="#{ T(org.springframework.core.Ordered).HIGHEST_PRECEDENCE }"/>
     
     <!--====================================================================================================
     = VIEW RESOLVERS
@@ -53,24 +79,7 @@
             </beans:bean>
         </beans:property>
     </beans:bean>
-    
-    <!--====================================================================================================
-    = MVC
-    =====================================================================================================-->
-    <mvc:annotation-driven conversion-service="conversionService">
-        <mvc:message-converters register-defaults="false">
-            <beans:bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"
-                p:defaultCharset="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"/>
-            <beans:bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"
-                p:defaultCharset="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"
-                p:objectMapper-ref="objMapper"/>
-            <beans:bean class="org.springframework.http.converter.StringHttpMessageConverter"
-                p:defaultCharset="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"/>
-            <beans:bean class="org.springframework.http.converter.ResourceHttpMessageConverter"
-                p:defaultCharset="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"/>
-        </mvc:message-converters>
-    </mvc:annotation-driven>
-    
+
     <!--====================================================================================================
     = SERVLET REGISTRATION BEANS
     =====================================================================================================-->

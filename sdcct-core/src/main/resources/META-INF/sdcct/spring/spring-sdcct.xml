@@ -100,6 +100,12 @@
     <beans:bean id="taskExecThreadPoolDynamic" parent="taskExecThreadPool" abstract="true"
         p:allowCoreThreadTimeOut="true"
         p:corePoolSize="0"/>
+
+    <beans:bean id="taskExecThreadPoolAsync" parent="taskExecThreadPoolDynamic"
+        p:keepAliveSeconds="${sdcct.task.exec.async.keep.alive.timeout}"
+        p:maxPoolSize="${sdcct.task.exec.async.pool.size.max}"
+        p:threadNamePrefix="#{ threadGroup.name }-async">
+    </beans:bean>
     
     <!--====================================================================================================
     = TASK SCHEDULERS

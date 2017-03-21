@@ -4,12 +4,12 @@ import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheFormArchiverTestcaseSubmis
 import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheFormManagerTestcaseSubmission;
 import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheFormReceiverTestcaseSubmission;
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
-import gov.hhs.onc.sdcct.web.form.archiver.IheFormArchiverTestcaseProcessor;
-import gov.hhs.onc.sdcct.web.form.manager.IheFormManagerTestcaseProcessor;
-import gov.hhs.onc.sdcct.web.form.receiver.IheFormReceiverTestcaseProcessor;
+import gov.hhs.onc.sdcct.web.controller.JsonPostRequestMapping;
+import gov.hhs.onc.sdcct.web.controller.PathNames;
+import gov.hhs.onc.sdcct.web.form.archiver.ihe.IheFormArchiverTestcaseProcessor;
+import gov.hhs.onc.sdcct.web.form.manager.ihe.IheFormManagerTestcaseProcessor;
+import gov.hhs.onc.sdcct.web.form.receiver.ihe.IheFormReceiverTestcaseProcessor;
 import gov.hhs.onc.sdcct.web.gateway.controller.InvalidRequestException;
-import gov.hhs.onc.sdcct.web.gateway.controller.JsonPostRequestMapping;
-import gov.hhs.onc.sdcct.web.gateway.controller.ViewNames;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController("controllerIhe")
-@RequestMapping(SdcctStringUtils.SLASH + ViewNames.IHE)
+@RequestMapping(SdcctStringUtils.SLASH + PathNames.IHE)
 public class IheController {
     @Autowired
     private IheFormArchiverTestcaseProcessor iheFormArchiverTestcaseProc;
@@ -32,7 +32,7 @@ public class IheController {
 
     private final static String INVALID_REQUEST = "Invalid request";
 
-    @JsonPostRequestMapping(value = { SdcctStringUtils.SLASH + ViewNames.FORM_ARCHIVER_PROCESS })
+    @JsonPostRequestMapping(value = { SdcctStringUtils.SLASH + PathNames.FORM_ARCHIVER_PROCESS })
     public ResponseEntity<?> processIheFormArchiverTestcase(@Valid @RequestBody IheFormArchiverTestcaseSubmission iheFormArchiverTestcaseSubmission,
         BindingResult bindingResult) throws Exception {
         if (!bindingResult.hasErrors()) {
@@ -42,7 +42,7 @@ public class IheController {
         }
     }
 
-    @JsonPostRequestMapping(value = { SdcctStringUtils.SLASH + ViewNames.FORM_MANAGER_PROCESS })
+    @JsonPostRequestMapping(value = { SdcctStringUtils.SLASH + PathNames.FORM_MANAGER_PROCESS })
     public ResponseEntity<?> processIheFormManagerTestcase(@Valid @RequestBody IheFormManagerTestcaseSubmission iheFormManagerTestcaseSubmission,
         BindingResult bindingResult) throws Exception {
         if (!bindingResult.hasErrors()) {
@@ -52,7 +52,7 @@ public class IheController {
         }
     }
 
-    @JsonPostRequestMapping(value = { SdcctStringUtils.SLASH + ViewNames.FORM_RECEIVER_PROCESS })
+    @JsonPostRequestMapping(value = { SdcctStringUtils.SLASH + PathNames.FORM_RECEIVER_PROCESS })
     public ResponseEntity<?> processIheFormReceiverTestcase(@Valid @RequestBody IheFormReceiverTestcaseSubmission iheFormReceiverTestcaseSubmission,
         BindingResult bindingResult) {
         if (!bindingResult.hasErrors()) {

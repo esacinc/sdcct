@@ -1,11 +1,12 @@
 package gov.hhs.onc.sdcct.validate.schematron.impl;
 
 import gov.hhs.onc.sdcct.data.metadata.ResourceMetadata;
-import gov.hhs.onc.sdcct.schematron.svrl.AttributeValueNamespace;
-import gov.hhs.onc.sdcct.schematron.svrl.FailedAssertion;
-import gov.hhs.onc.sdcct.schematron.svrl.FiredRule;
-import gov.hhs.onc.sdcct.schematron.svrl.impl.OutputImpl;
+import gov.hhs.onc.sdcct.schematron.svrl.SvrlAttributeValueNamespace;
+import gov.hhs.onc.sdcct.schematron.svrl.SvrlFailedAssertion;
+import gov.hhs.onc.sdcct.schematron.svrl.SvrlFiredRule;
+import gov.hhs.onc.sdcct.schematron.svrl.impl.SvrlOutputImpl;
 import gov.hhs.onc.sdcct.transform.impl.ByteArrayResult;
+import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
 import gov.hhs.onc.sdcct.validate.ValidationException;
 import gov.hhs.onc.sdcct.validate.ValidationIssueSeverity;
 import gov.hhs.onc.sdcct.validate.ValidationIssues;
@@ -17,14 +18,15 @@ import gov.hhs.onc.sdcct.validate.impl.ValidationIssueImpl;
 import gov.hhs.onc.sdcct.validate.impl.ValidationSourceImpl;
 import gov.hhs.onc.sdcct.validate.schematron.SchematronValidator;
 import gov.hhs.onc.sdcct.validate.schematron.SdcctSchematron;
-import gov.hhs.onc.sdcct.xml.saxon.impl.XdmDocument;
 import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
+import gov.hhs.onc.sdcct.xml.saxon.impl.XdmDocument;
 import gov.hhs.onc.sdcct.xml.xpath.impl.DynamicXpathOptionsImpl;
-import gov.hhs.onc.sdcct.xml.xpath.saxon.impl.SdcctXpathCompiler;
 import gov.hhs.onc.sdcct.xml.xpath.impl.StaticXpathOptionsImpl;
+import gov.hhs.onc.sdcct.xml.xpath.saxon.impl.SdcctXpathCompiler;
 import gov.hhs.onc.sdcct.xml.xslt.saxon.impl.SdcctXsltTransformer;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 import javax.xml.XMLConstants;
 import net.sf.saxon.stax.XMLStreamWriterDestination;
 import net.sf.saxon.tree.linked.DocumentImpl;
@@ -59,8 +61,8 @@ public class SchematronValidatorImpl extends AbstractSdcctValidator implements S
         String docPublicId = docInfo.getPublicId(), docSysId = docInfo.getSystemId(), nsUri = docElemInfo.getURI(), id, name, contextXpathExpr = null;
         ValidationSource src;
         Map<String, String> namespaces = new TreeMap<>();
-        AttributeValueNamespace attrValueNs;
-        FailedAssertion failedAssertion;
+        SvrlAttributeValueNamespace attrValueNs;
+        SvrlFailedAssertion failedAssertion;
 
         // noinspection ConstantConditions
         for (SdcctSchematron schematron : resourceMetadata.getSchematrons()) {
@@ -81,20 +83,23 @@ public class SchematronValidatorImpl extends AbstractSdcctValidator implements S
 
                 schemaXsltTransformer.transform();
 
-                for (Object outputContentItem : this.xmlCodec.decode(schemaResult.getBytes(), OutputImpl.class, null).getContent()) {
-                    if (outputContentItem instanceof AttributeValueNamespace) {
-                        namespaces.put((attrValueNs = ((AttributeValueNamespace) outputContentItem)).getPrefix(), attrValueNs.getUri());
-                    } else if (outputContentItem instanceof FiredRule) {
-                        contextXpathExpr = ((FiredRule) outputContentItem).getContext();
-                    } else if (outputContentItem instanceof FailedAssertion) {
+                for (Object outputContentItem : this.xmlCodec.decode(schemaResult.getBytes(), SvrlOutputImpl.class, null).getContent()) {
+                    if (outputContentItem instanceof SvrlAttributeValueNamespace) {
+                        namespaces.put((attrValueNs = ((SvrlAttributeValueNamespace) outputContentItem)).getPrefix(), attrValueNs.getUri());
+                    } else if (outputContentItem instanceof SvrlFiredRule) {
+                        contextXpathExpr = ((SvrlFiredRule) outputContentItem).getContext();
+                    } else if (outputContentItem instanceof SvrlFailedAssertion) {
                         // noinspection ConstantConditions
                         issues.addIssues(new ValidationIssueImpl().setType(ValidationType.SCHEMATRON).setSeverity(ValidationIssueSeverity.ERROR)
-                            .setLocation(buildLocation(this.contentPathBuilder, this.xpathCompiler
-                                .compile((failedAssertion = ((FailedAssertion) outputContentItem)).getLocation(),
-                                    new StaticXpathOptionsImpl().setNamespaces(namespaces))
-                                .load(new DynamicXpathOptionsImpl().setContextItem(docInfo)).evaluateNode().getUnderlyingNode()))
+                            .setLocation(buildLocation(this.contentPathBuilder,
+                                this.xpathCompiler
+                                    .compile((failedAssertion = ((SvrlFailedAssertion) outputContentItem)).getLocation(),
+                                        new StaticXpathOptionsImpl().setNamespaces(namespaces))
+                                    .load(new DynamicXpathOptionsImpl().setContextItem(docInfo)).evaluateNode().getUnderlyingNode()))
                             .setSource(src).setContextXpathExpression(contextXpathExpr).setTestXpathExpression(failedAssertion.getTest())
-                            .setMessage(failedAssertion.getText()));
+                            .setMessage((failedAssertion.hasText()
+                                ? SdcctStreamUtils.asInstances(failedAssertion.getText().getContent().stream(), String.class).collect(Collectors.joining())
+                                : null)));
                     }
                 }
             } catch (Exception e) {

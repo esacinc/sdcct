@@ -16,7 +16,6 @@
     =====================================================================================================-->
     <beans:bean id="formRfd" class="gov.hhs.onc.sdcct.rfd.form.impl.RfdFormImpl" abstract="true"/>
 
-    <!-- TODO: Replace with updated forms. -->
     <!--suppress SpringPlaceholdersInspection -->
     <beans:bean id="formRfdA" parent="formRfd"
         c:name="ihe_a"
@@ -39,7 +38,8 @@
     <beans:bean id="formRfdCFilled" parent="formRfd"
         c:name="ihe_c_filled"
         c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/ihe_c_filled.xml"
-        p:internal="true"/>
+        p:identifier="ihe_c"
+        p:internal="false"/>
 
     <!--suppress SpringPlaceholdersInspection -->
     <beans:bean id="formRfdD" parent="formRfd"
@@ -51,8 +51,9 @@
     <beans:bean id="formRfdDFilled" parent="formRfd"
         c:name="ihe_d_filled"
         c:src="classpath*:${sdcct.data.form.sdcct.dir.path}/ihe_d_filled.xml"
-        p:internal="true"/>
-    
+        p:identifier="ihe_d"
+        p:internal="false"/>
+
     <!--====================================================================================================
     = FORM INITIALIZERS
     =====================================================================================================-->

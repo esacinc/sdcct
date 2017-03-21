@@ -22,6 +22,8 @@ public class SdcctTestcaseDeserializer<T extends SdcctTestcaseDescription> exten
     @SuppressWarnings({ "SpringJavaAutowiringInspection" })
     private List<SdcctTestcase<T>> testcases;
 
+    private final static String TESTCASE_ID = "id";
+
     @SuppressWarnings({ CompilerWarnings.UNCHECKED })
     protected SdcctTestcaseDeserializer() {
         super(SdcctTestcase.class);
@@ -30,7 +32,8 @@ public class SdcctTestcaseDeserializer<T extends SdcctTestcaseDescription> exten
     @Override
     public SdcctTestcase<T> deserialize(JsonParser jsonParser, DeserializationContext context) throws IOException, JsonProcessingException {
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);
+        String testcaseId = node.has(TESTCASE_ID) ? node.get(TESTCASE_ID).asText() : node.asText();
 
-        return this.testcases.stream().filter(sdcctTestcase -> sdcctTestcase.getId().equals(node.asText())).findFirst().orElse(null);
+        return this.testcases.stream().filter(sdcctTestcase -> sdcctTestcase.getId().equals(testcaseId)).findFirst().orElse(null);
     }
 }

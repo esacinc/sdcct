@@ -14,5 +14,5 @@
     <!--====================================================================================================
     = SERVLET REGISTRATION BEANS
     =====================================================================================================-->
-    <beans:bean id="regBeanServlet" class="org.springframework.boot.context.embedded.ServletRegistrationBean" abstract="true"/>
+    <beans:bean id="regBeanServlet" class="org.springframework.boot.web.servlet.ServletRegistrationBean" abstract="true"/>
 </beans:beans>

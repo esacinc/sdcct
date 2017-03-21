@@ -1,5 +1,6 @@
 package gov.hhs.onc.sdcct.form;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import gov.hhs.onc.sdcct.beans.NamedBean;
 import gov.hhs.onc.sdcct.beans.SpecifiedBean;
 import gov.hhs.onc.sdcct.data.SdcctResourceDescriptor;
@@ -13,6 +14,7 @@ public interface SdcctForm<T> extends InitializingBean, NamedBean, SdcctResource
 
     public boolean hasBean();
 
+    @JsonIgnore
     @Nullable
     public T getBean();
 
@@ -20,6 +22,7 @@ public interface SdcctForm<T> extends InitializingBean, NamedBean, SdcctResource
 
     public boolean hasDocument();
 
+    @JsonIgnore
     @Nullable
     public XdmDocument getDocument();
 
@@ -33,5 +36,6 @@ public interface SdcctForm<T> extends InitializingBean, NamedBean, SdcctResource
 
     public void setInternal(boolean internal);
 
+    @JsonIgnore
     public ResourceSource getSource();
 }

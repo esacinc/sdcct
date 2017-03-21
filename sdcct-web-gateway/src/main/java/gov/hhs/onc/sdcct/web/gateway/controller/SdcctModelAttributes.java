@@ -5,6 +5,8 @@ public final class SdcctModelAttributes {
     public final static String BUILD_VERSION_NAME = "buildVersion";
 
     public final static String IHE_TESTCASES_NAME = "iheTestcases";
+    public final static String IHE_TESTCASES_EVENT_STREAM_URL_NAME = IHE_TESTCASES_NAME + "EventStreamUrl";
+    public final static String IHE_TESTCASES_PROCESS_URLS_NAME = IHE_TESTCASES_NAME + "ProcessUrls";
     public final static String IHE_ENDPOINT_ADDRESSES_NAME = "iheEndpointAddresses";
 
     private SdcctModelAttributes() {
