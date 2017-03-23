@@ -168,7 +168,7 @@
             
             $.sdcct.form.clearErrorMessages(formTestcasesIhe);
         });
-        
-        $.fn.sdcct.testcases.streamIncomingIheTestcaseEvents(testcaseIheResultsAccordion, iheTestcaseResultsEmptyWellElem);
+
+        $.fn.sdcct.testcases.pollIncomingIheTestcaseEvents(testcaseIheResultsAccordion, iheTestcaseResultsEmptyWellElem, 30000);
     });
 })(jQuery);

@@ -14,6 +14,6 @@
     <!--====================================================================================================
     = TRANSACTION ID GENERATORS
     =====================================================================================================-->
-    <beans:bean id="txIdGenServerSentEvent" parent="txIdGen"
-        c:name="serverSentEvent"/>
+    <beans:bean id="txIdGenIheTestcaseEvent" parent="txIdGen"
+        c:name="iheTestcaseEvent"/>
 </beans:beans>

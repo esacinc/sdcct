@@ -6,9 +6,9 @@ public final class PathNames {
     public final static String IHE = "ihe";
     public final static String EVENT = "event";
     public final static String PROCESS = "process";
-    public final static String STREAM = "stream";
+    public final static String POLL = "poll";
 
-    public final static String IHE_EVENT_STREAM = IHE + SdcctStringUtils.SLASH + EVENT + SdcctStringUtils.SLASH + STREAM;
+    public final static String IHE_EVENT_POLL = IHE + SdcctStringUtils.SLASH + EVENT + SdcctStringUtils.SLASH + POLL;
 
     public final static String FORM_ARCHIVER = "FormArchiver";
     public final static String FORM_MANAGER = "FormManager";

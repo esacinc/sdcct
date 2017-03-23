@@ -14,13 +14,6 @@
         urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
 
     <!--====================================================================================================
-    = ASYNC SUPPORT
-    =====================================================================================================-->
-    <mvc:annotation-driven>
-        <mvc:async-support task-executor="taskExecThreadPoolAsync"/>
-    </mvc:annotation-driven>
-
-    <!--====================================================================================================
     = MVC
     =====================================================================================================-->
     <mvc:annotation-driven conversion-service="conversionService">

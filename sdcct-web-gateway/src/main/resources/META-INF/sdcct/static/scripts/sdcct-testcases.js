@@ -262,23 +262,26 @@
                 
                 return testcaseWsEventElem;
             },
-            "streamIncomingIheTestcaseEvents": function (resultsElem, resultsEmptyWellElem) {
-                var source = new EventSource(IHE_TESTCASES_EVENT_STREAM_URL);
-                
-                source.addEventListener("open", function (event) {
-                    console.log("Connection open for incoming IHE testcases event stream.");
-                });
-                
-                source.addEventListener("message", function (event) {
-                    resultsEmptyWellElem.hide();
-                    $.fn.sdcct.testcases.buildTestcaseResults(resultsElem, JSON.parse(event.data));
-                }, false);
-                
-                source.addEventListener("error", function (event) {
-                    if (event.readyState == EventSource.CLOSED) {
-                        $.fn.sdcct.testcases.streamIncomingIheTestcaseEvents(resultsElem);
-                    }
-                }, false);
+            "pollIncomingIheTestcaseEvents": function (resultsElem, resultsEmptyWellElem, timeout) {
+                setTimeout(function() {
+                    $.ajax({
+                        "cache": false,
+                        "complete": function (jqXhr, status) {
+                            $.fn.sdcct.testcases.pollIncomingIheTestcaseEvents(resultsElem, resultsEmptyWellElem, timeout);
+                        },
+                        "contentType": "application/json",
+                        "dataType": "json",
+                        "success": function (resp, respHttpStatusText, req) {
+                            if (!$.isUndefined(resp)) {
+                                resultsEmptyWellElem.hide();
+                                $.fn.sdcct.testcases.buildTestcaseResults(resultsElem, resp);
+                            }
+                        },
+                        "type": "GET",
+                        "url": IHE_TESTCASES_EVENT_POLL_URL,
+                        "timeout": timeout
+                    })
+                }, timeout);
             }
         })
     });

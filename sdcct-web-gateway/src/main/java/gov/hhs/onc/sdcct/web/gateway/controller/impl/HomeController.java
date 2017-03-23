@@ -41,8 +41,8 @@ public class HomeController implements InitializingBean {
     @Value("${sdcct.testcases.form.receiver.ihe.process.url}")
     private String iheFormReceiverProcessAddr;
 
-    @Value("${sdcct.testcases.ihe.event.stream.url}")
-    private String iheTestcasesEventStreamUrl;
+    @Value("${sdcct.testcases.ihe.event.poll.url}")
+    private String iheTestcasesEventPollUrl;
 
     @Autowired
     private List<IheTestcase> iheTestcases;
@@ -56,9 +56,9 @@ public class HomeController implements InitializingBean {
         return new ModelAndView(ViewNames.HOME, new HashMap<>());
     }
 
-    @ModelAttribute(value = SdcctModelAttributes.IHE_TESTCASES_EVENT_STREAM_URL_NAME)
-    private String getIheTestcasesEventStreamUrl() {
-        return this.iheTestcasesEventStreamUrl;
+    @ModelAttribute(value = SdcctModelAttributes.IHE_TESTCASES_EVENT_POLL_URL_NAME)
+    private String getIheTestcasesEventPollUrl() {
+        return this.iheTestcasesEventPollUrl;
     }
 
     @ModelAttribute(value = SdcctModelAttributes.IHE_TESTCASES_NAME)
