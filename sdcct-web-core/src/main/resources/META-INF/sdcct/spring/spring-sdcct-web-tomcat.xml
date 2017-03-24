@@ -33,6 +33,8 @@
         p:minConnectionThreads="${sdcct.tomcat.server.conn.thread.min}"
         p:txIdGenerator-ref="txIdGenHttpServer"
         p:port="${sdcct.tomcat.server.port.http}"
+        p:proxyHost="${sdcct.tomcat.server.proxy.host}"
+        p:proxyPort="${sdcct.tomcat.server.proxy.port.http}"
         p:uriEncoding="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"
         p:workDirectory="${sdcct.work.dir}">
         <beans:property name="contextLifecycleListeners">

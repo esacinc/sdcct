@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nonnegative;
+import javax.annotation.Nullable;
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
 import org.apache.catalina.Service;
@@ -20,6 +21,7 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.threads.TaskQueue;
@@ -96,6 +98,8 @@ public class SdcctTomcatEmbeddedServletContainerFactory extends TomcatEmbeddedSe
     private int maxConns;
     private int maxConnThreads;
     private int minConnThreads;
+    private String proxyHost;
+    private int proxyPort;
     private TxIdGenerator txIdGen;
     private File workDir;
     private Tomcat tomcat;
@@ -125,6 +129,11 @@ public class SdcctTomcatEmbeddedServletContainerFactory extends TomcatEmbeddedSe
     @Override
     protected void customizeConnector(Connector conn) {
         super.customizeConnector(conn);
+
+        if (!StringUtils.isEmpty(this.proxyHost) && (this.proxyPort > 0)) {
+            conn.setProxyName(this.proxyHost);
+            conn.setProxyPort(this.proxyPort);
+        }
 
         SdcctHttp11NioProtocol connProtocol = ((SdcctHttp11NioProtocol) conn.getProtocolHandler());
         connProtocol.setExecutor(new SdcctThreadPoolExecutor(Collections.singletonMap(SdcctPropertyNames.HTTP_SERVER_TX_ID, this.txIdGen)));
@@ -209,6 +218,24 @@ public class SdcctTomcatEmbeddedServletContainerFactory extends TomcatEmbeddedSe
 
     public void setMinConnectionThreads(@Nonnegative int minConnThreads) {
         this.minConnThreads = minConnThreads;
+    }
+
+    @Nullable
+    public String getProxyHost() {
+        return this.proxyHost;
+    }
+
+    public void setProxyHost(@Nullable String proxyHost) {
+        this.proxyHost = proxyHost;
+    }
+
+    @Nonnegative
+    public int getProxyPort() {
+        return this.proxyPort;
+    }
+
+    public void setProxyPort(@Nonnegative int proxyPort) {
+        this.proxyPort = proxyPort;
     }
 
     public Tomcat getTomcat() {

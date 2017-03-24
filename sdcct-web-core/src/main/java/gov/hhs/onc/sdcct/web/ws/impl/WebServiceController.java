@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.context.ServletConfigAware;
+import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.Controller;
 
@@ -38,7 +39,8 @@ public class WebServiceController implements Controller, ServletConfigAware {
     @Nullable
     @Override
     public ModelAndView handleRequest(HttpServletRequest servletReq, HttpServletResponse servletResp) throws Exception {
-        String destPath = StringUtils.removeStart(servletReq.getRequestURI(), this.baseUrlPath), txId;
+        String destPath = StringUtils.removeStart(((String) servletReq.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE)), this.baseUrlPath),
+            txId;
         DestinationRegistry destReg =
             ((HTTPTransportFactory) this.bus.getExtension(DestinationFactoryManager.class).getDestinationFactoryForUri(HTTP_TRANSPORT_NS_URI)).getRegistry();
         AbstractHTTPDestination dest = destReg.getDestinationForPath(destPath, true);
