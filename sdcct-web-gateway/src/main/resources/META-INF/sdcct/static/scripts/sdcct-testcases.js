@@ -262,26 +262,35 @@
                 
                 return testcaseWsEventElem;
             },
-            "pollIncomingIheTestcaseEvents": function (resultsElem, resultsEmptyWellElem, timeout) {
-                setTimeout(function() {
-                    $.ajax({
-                        "cache": false,
-                        "complete": function (jqXhr, status) {
-                            $.fn.sdcct.testcases.pollIncomingIheTestcaseEvents(resultsElem, resultsEmptyWellElem, timeout);
-                        },
-                        "contentType": "application/json",
-                        "dataType": "json",
-                        "success": function (resp, respHttpStatusText, req) {
-                            if (!$.isUndefined(resp)) {
-                                resultsEmptyWellElem.hide();
-                                $.fn.sdcct.testcases.buildTestcaseResults(resultsElem, resp);
-                            }
-                        },
-                        "type": "GET",
-                        "url": IHE_TESTCASES_EVENT_POLL_URL,
-                        "timeout": timeout
-                    })
-                }, timeout);
+            "pollIncomingIheTestcaseEvents": function (resultsElem, resultsEmptyWellElem) {
+                $.ajax({
+                    "cache": false,
+                    "complete": function (jqXhr, status) {
+                        if (jqXhr["status"] == 200) {
+                            resultsEmptyWellElem.hide();
+                            $.fn.sdcct.testcases.buildTestcaseResults(resultsElem, $.parseJSON(jqXhr["responseText"]));
+                        }
+                        
+                        $.sdcct.poll.pollTimeoutId = setTimeout(function () {
+                            $.fn.sdcct.testcases.pollIncomingIheTestcaseEvents(resultsElem, resultsEmptyWellElem);
+                        }, $.sdcct.poll.POLL_TIMEOUT);
+                        $.sdcct.poll.pollIntervalId = setInterval(function () {
+                            $.fn.sdcct.testcases.pollIncomingIheTestcaseEvents(resultsElem, resultsEmptyWellElem);
+                        }, $.sdcct.poll.POLL_INTERVAL);
+                    },
+                    "contentType": "application/json",
+                    "error": function (jqXhr, status, error) {
+                        clearInterval($.sdcct.poll.pollIntervalId);
+                        clearTimeout($.sdcct.poll.pollTimeoutId);
+                    },
+                    "success": function (resp, respHttpStatusText, req) {
+                        clearInterval($.sdcct.poll.pollIntervalId);
+                        clearTimeout($.sdcct.poll.pollTimeoutId);
+                    },
+                    "type": "GET",
+                    "url": IHE_TESTCASES_EVENT_POLL_URL,
+                    "timeout": $.sdcct.poll.POLL_TIMEOUT
+                })
             }
         })
     });

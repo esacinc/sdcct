@@ -46,6 +46,12 @@
     });
 
     $.extend($.sdcct, {
+        "poll": {
+            "pollIntervalId": undefined,
+            "pollTimeoutId": undefined,
+            "POLL_INTERVAL": 5000,
+            "POLL_TIMEOUT": 15000
+        },
         "roles": {
             "FORM_ARCHIVER": "FORM_ARCHIVER",
             "FORM_FILLER": "FORM_FILLER",

@@ -168,7 +168,12 @@
             
             $.sdcct.form.clearErrorMessages(formTestcasesIhe);
         });
-
-        $.fn.sdcct.testcases.pollIncomingIheTestcaseEvents(testcaseIheResultsAccordion, iheTestcaseResultsEmptyWellElem, 30000);
+        
+        $.sdcct.poll.pollTimeoutId = setTimeout(function () {
+            $.fn.sdcct.testcases.pollIncomingIheTestcaseEvents(testcaseIheResultsAccordion, iheTestcaseResultsEmptyWellElem);
+        }, $.sdcct.poll.POLL_TIMEOUT);
+        $.sdcct.poll.pollIntervalId = setInterval(function () {
+            $.fn.sdcct.testcases.pollIncomingIheTestcaseEvents(testcaseIheResultsAccordion, iheTestcaseResultsEmptyWellElem);
+        }, $.sdcct.poll.POLL_INTERVAL);
     });
 })(jQuery);
