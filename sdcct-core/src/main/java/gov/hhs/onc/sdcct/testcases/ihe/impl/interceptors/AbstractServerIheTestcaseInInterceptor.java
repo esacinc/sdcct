@@ -18,6 +18,7 @@ import gov.hhs.onc.sdcct.ws.logging.impl.WsRequestEventImpl;
 import gov.hhs.onc.sdcct.ws.utils.SdcctWsEventUtils;
 import gov.hhs.onc.sdcct.ws.utils.SdcctWsPropertyUtils;
 import gov.hhs.onc.sdcct.xml.saxon.impl.XdmDocument;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -129,6 +130,8 @@ public abstract class AbstractServerIheTestcaseInInterceptor<T extends IheTestca
         U testcaseSubmission =
             this.beanFactory.getBean(this.submissionImplClass, testcase, SdcctWsPropertyUtils.getProperty(inMsg, Message.REQUEST_URL), formId);
         V testcaseResult = this.beanFactory.getBean(this.resultImplClass, testcaseSubmission);
+
+        testcaseResult.setTxId(Instant.now().toEpochMilli());
 
         inMsg.put(this.resultPropName, testcaseResult);
 

@@ -11,9 +11,4 @@
         urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
         urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
 
-    <!--====================================================================================================
-    = TRANSACTION ID GENERATORS
-    =====================================================================================================-->
-    <beans:bean id="txIdGenIheTestcaseEvent" parent="txIdGen"
-        c:name="iheTestcaseEvent"/>
 </beans:beans>

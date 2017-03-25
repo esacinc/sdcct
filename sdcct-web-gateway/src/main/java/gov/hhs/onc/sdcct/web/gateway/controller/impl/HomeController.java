@@ -3,6 +3,7 @@ package gov.hhs.onc.sdcct.web.gateway.controller.impl;
 import gov.hhs.onc.sdcct.testcases.SpecificationRole;
 import gov.hhs.onc.sdcct.testcases.ihe.IheTestcase;
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
+import gov.hhs.onc.sdcct.web.controller.ParameterNames;
 import gov.hhs.onc.sdcct.web.gateway.controller.SdcctModelAttributes;
 import gov.hhs.onc.sdcct.web.gateway.controller.ViewNames;
 import java.util.Comparator;
@@ -74,6 +75,11 @@ public class HomeController implements InitializingBean {
     @ModelAttribute(value = SdcctModelAttributes.IHE_ENDPOINT_ADDRESSES_NAME)
     private Map<SpecificationRole, String> getIheEndpointAddresses() {
         return this.iheEndpointAddressesMap;
+    }
+
+    @ModelAttribute(value = SdcctModelAttributes.LAST_SEEN_TX_ID)
+    private String getLastSeenTxId() {
+        return ParameterNames.LAST_SEEN_TX_ID;
     }
 
     @Override

@@ -169,9 +169,6 @@
             $.sdcct.form.clearErrorMessages(formTestcasesIhe);
         });
         
-        $.sdcct.poll.pollTimeoutId = setTimeout(function () {
-            $.fn.sdcct.testcases.pollIncomingIheTestcaseEvents(testcaseIheResultsAccordion, iheTestcaseResultsEmptyWellElem);
-        }, $.sdcct.poll.POLL_TIMEOUT);
         $.sdcct.poll.pollIntervalId = setInterval(function () {
             $.fn.sdcct.testcases.pollIncomingIheTestcaseEvents(testcaseIheResultsAccordion, iheTestcaseResultsEmptyWellElem);
         }, $.sdcct.poll.POLL_INTERVAL);

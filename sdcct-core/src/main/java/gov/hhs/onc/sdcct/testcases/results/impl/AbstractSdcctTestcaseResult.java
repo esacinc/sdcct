@@ -16,6 +16,7 @@ public abstract class AbstractSdcctTestcaseResult<T extends SdcctTestcaseDescrip
     protected V submission;
     protected HttpRequestEvent httpRequestEvent;
     protected HttpResponseEvent httpResponseEvent;
+    protected long txId;
     protected WsRequestEvent wsRequestEvent;
     protected WsResponseEvent wsResponseEvent;
 
@@ -63,6 +64,16 @@ public abstract class AbstractSdcctTestcaseResult<T extends SdcctTestcaseDescrip
     @Override
     public boolean hasWsRequestEvent() {
         return this.wsRequestEvent != null;
+    }
+
+    @Override
+    public long getTxId() {
+        return this.txId;
+    }
+
+    @Override
+    public void setTxId(long txId) {
+        this.txId = txId;
     }
 
     @Nullable

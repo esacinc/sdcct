@@ -35,6 +35,11 @@ public interface SdcctTestcaseResult<T extends SdcctTestcaseDescription, U exten
     public boolean hasWsRequestEvent();
 
     @JsonProperty
+    public long getTxId();
+
+    public void setTxId(long txId);
+
+    @JsonProperty
     @Nullable
     public WsRequestEvent getWsRequestEvent();
 

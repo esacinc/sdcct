@@ -268,28 +268,23 @@
                     "complete": function (jqXhr, status) {
                         if (jqXhr["status"] == 200) {
                             resultsEmptyWellElem.hide();
-                            $.fn.sdcct.testcases.buildTestcaseResults(resultsElem, $.parseJSON(jqXhr["responseText"]));
+                            
+                            $.each($.parseJSON(jqXhr["responseText"]), function (idx, result) {
+                                $.fn.sdcct.testcases.buildTestcaseResults(resultsElem, result);
+                                $.sdcct.poll.lastSeenTxId = result["txId"];
+                            });
                         }
-                        
-                        $.sdcct.poll.pollTimeoutId = setTimeout(function () {
-                            $.fn.sdcct.testcases.pollIncomingIheTestcaseEvents(resultsElem, resultsEmptyWellElem);
-                        }, $.sdcct.poll.POLL_TIMEOUT);
-                        $.sdcct.poll.pollIntervalId = setInterval(function () {
-                            $.fn.sdcct.testcases.pollIncomingIheTestcaseEvents(resultsElem, resultsEmptyWellElem);
-                        }, $.sdcct.poll.POLL_INTERVAL);
                     },
                     "contentType": "application/json",
                     "error": function (jqXhr, status, error) {
                         clearInterval($.sdcct.poll.pollIntervalId);
-                        clearTimeout($.sdcct.poll.pollTimeoutId);
-                    },
-                    "success": function (resp, respHttpStatusText, req) {
-                        clearInterval($.sdcct.poll.pollIntervalId);
-                        clearTimeout($.sdcct.poll.pollTimeoutId);
+                        
+                        $.sdcct.poll.pollIntervalId = setInterval(function () {
+                            $.fn.sdcct.testcases.pollIncomingIheTestcaseEvents(resultsElem, resultsEmptyWellElem);
+                        }, $.sdcct.poll.POLL_INTERVAL);
                     },
                     "type": "GET",
-                    "url": IHE_TESTCASES_EVENT_POLL_URL,
-                    "timeout": $.sdcct.poll.POLL_TIMEOUT
+                    "url": IHE_TESTCASES_EVENT_POLL_URL + "?" + LAST_SEEN_TX_ID + "=" + $.sdcct.poll.lastSeenTxId
                 })
             }
         })

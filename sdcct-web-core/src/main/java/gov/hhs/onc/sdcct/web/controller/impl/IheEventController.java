@@ -1,7 +1,6 @@
 package gov.hhs.onc.sdcct.web.controller.impl;
 
 import com.github.sebhoss.warnings.CompilerWarnings;
-import gov.hhs.onc.sdcct.logging.impl.TxIdGenerator;
 import gov.hhs.onc.sdcct.testcases.ihe.IheTestcase;
 import gov.hhs.onc.sdcct.testcases.results.ihe.IheFormArchiverTestcaseResult;
 import gov.hhs.onc.sdcct.testcases.results.ihe.IheFormManagerTestcaseResult;
@@ -11,16 +10,16 @@ import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheTestcaseSubmission;
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
 import gov.hhs.onc.sdcct.web.controller.JsonPostRequestMapping;
 import gov.hhs.onc.sdcct.web.controller.PathNames;
+import java.util.Collections;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.Resource;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
+import org.apache.commons.collections.map.LRUMap;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import static gov.hhs.onc.sdcct.web.controller.PathNames.FORM_ARCHIVER_EVENT;
 import static gov.hhs.onc.sdcct.web.controller.PathNames.FORM_MANAGER_EVENT;
@@ -29,20 +28,15 @@ import static gov.hhs.onc.sdcct.web.controller.PathNames.FORM_RECEIVER_EVENT;
 @RestController("controllerIheEvent")
 @RequestMapping(SdcctStringUtils.SLASH + PathNames.IHE)
 public class IheEventController<T extends IheTestcase, U extends IheTestcaseSubmission<T>, V extends IheTestcaseResult<T, U>> {
-    private final Map<UUID, V> iheTestcaseEvents = new ConcurrentHashMap<>();
+    private final static int NUM_RECENT_TESTCASE_EVENTS = 25;
 
-    @Resource(name = "txIdGenIheTestcaseEvent")
-    private TxIdGenerator txIdGen;
+    @SuppressWarnings({ CompilerWarnings.UNCHECKED })
+    private final Map<Long, V> iheTestcaseEvents = Collections.synchronizedMap(new LRUMap(NUM_RECENT_TESTCASE_EVENTS));
 
     @RequestMapping(method = { RequestMethod.GET }, value = { SdcctStringUtils.SLASH + PathNames.EVENT + SdcctStringUtils.SLASH + PathNames.POLL })
-    public ResponseEntity<?> poll() {
+    public ResponseEntity<?> poll(@RequestParam("lastSeenTxId") long txId) {
         if (!this.iheTestcaseEvents.isEmpty()) {
-            // noinspection ConstantConditions
-            Entry<UUID, V> entrySet = this.iheTestcaseEvents.entrySet().stream().findFirst().get();
-
-            this.iheTestcaseEvents.remove(entrySet.getKey());
-
-            return ResponseEntity.ok(entrySet.getValue());
+            return ResponseEntity.ok(this.iheTestcaseEvents.values().stream().filter(result -> result.getTxId() > txId).collect(Collectors.toList()));
         }
 
         return ResponseEntity.noContent().build();
@@ -67,6 +61,6 @@ public class IheEventController<T extends IheTestcase, U extends IheTestcaseSubm
     }
 
     private void sendResult(V testcaseResult) {
-        this.iheTestcaseEvents.put(this.txIdGen.generateId(), testcaseResult);
+        this.iheTestcaseEvents.put(testcaseResult.getTxId(), testcaseResult);
     }
 }
