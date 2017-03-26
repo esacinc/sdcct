@@ -1,10 +1,12 @@
 package gov.hhs.onc.sdcct.net.http.logging.impl;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import gov.hhs.onc.sdcct.net.http.logging.HttpResponseEvent;
 import gov.hhs.onc.sdcct.net.logging.RestEventType;
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils.SdcctToStringBuilder;
 
+@JsonTypeName("httpResponseEvent")
 public class HttpResponseEventImpl extends AbstractHttpEvent implements HttpResponseEvent {
     private Integer statusCode;
     private String statusMsg;

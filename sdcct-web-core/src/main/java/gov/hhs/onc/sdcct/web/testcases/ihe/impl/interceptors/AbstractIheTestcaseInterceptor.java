@@ -1,4 +1,4 @@
-package gov.hhs.onc.sdcct.testcases.ihe.impl.interceptors;
+package gov.hhs.onc.sdcct.web.testcases.ihe.impl.interceptors;
 
 import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
 import gov.hhs.onc.sdcct.xml.saxon.impl.SdcctDocumentBuilder;

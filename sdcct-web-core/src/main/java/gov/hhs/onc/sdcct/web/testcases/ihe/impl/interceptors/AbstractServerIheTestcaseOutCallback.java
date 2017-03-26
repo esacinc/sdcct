@@ -1,14 +1,22 @@
-package gov.hhs.onc.sdcct.testcases.ihe.impl.interceptors;
+package gov.hhs.onc.sdcct.web.testcases.ihe.impl.interceptors;
 
 import gov.hhs.onc.sdcct.api.SdcctIssueSeverity;
 import gov.hhs.onc.sdcct.testcases.ihe.IheTestcase;
 import gov.hhs.onc.sdcct.testcases.results.ihe.IheTestcaseResult;
 import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheTestcaseSubmission;
 import gov.hhs.onc.sdcct.testcases.utils.SdcctTestcaseUtils;
+import gov.hhs.onc.sdcct.web.tomcat.impl.TomcatRequest;
+import gov.hhs.onc.sdcct.web.tomcat.impl.TomcatResponse;
+import gov.hhs.onc.sdcct.web.tomcat.utils.SdcctHttpEventUtils;
+import gov.hhs.onc.sdcct.web.tomcat.utils.SdcctTomcatUtils;
+import gov.hhs.onc.sdcct.ws.utils.SdcctWsPropertyUtils;
 import java.io.OutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -48,14 +56,21 @@ public abstract class AbstractServerIheTestcaseOutCallback<T extends IheTestcase
                         result.getMessages(SdcctIssueSeverity.INFORMATION)
                             .add(String.format(
                                 "Please check that the web service response event payload contains a SOAP fault (message=%s) that corresponds to the associated testcase (id=%s) description.",
-                                fault.getMessage(), testcase != null ? testcase.getId() : "None"));
+                                fault.getMessage(), testcase.getId()));
                     } else {
                         result.getMessages(SdcctIssueSeverity.INFORMATION)
                             .add(String.format(
-                                "Please check that the web service response event payload corresponds to what is expected in the associated testcase (id=%s) description.",
+                                "Please check that the web service response event payload (msg=%s) corresponds to what is expected in the associated testcase (id=%s) description.",
                                 fault.getMessage(), testcase != null ? testcase.getId() : "None"));
                     }
                 }
+
+                TomcatRequest servletReq =
+                    SdcctTomcatUtils.unwrapRequest(SdcctWsPropertyUtils.getProperty(inMsg, AbstractHTTPDestination.HTTP_REQUEST, HttpServletRequest.class));
+                TomcatResponse servletResp = SdcctTomcatUtils
+                    .unwrapResponse(SdcctWsPropertyUtils.getProperty(this.msg, AbstractHTTPDestination.HTTP_RESPONSE, HttpServletResponse.class));
+
+                result.setHttpResponseEvent(SdcctHttpEventUtils.createHttpResponseEvent(servletReq, servletResp));
 
                 // noinspection ConstantConditions
                 if (!result.hasMessages(SdcctIssueSeverity.ERROR) && submission.hasTestcase() && (!testcase.isNegative() && fault == null)) {

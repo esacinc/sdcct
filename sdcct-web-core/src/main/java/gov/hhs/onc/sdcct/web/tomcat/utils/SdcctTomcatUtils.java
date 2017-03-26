@@ -14,11 +14,15 @@ public final class SdcctTomcatUtils {
     }
 
     public static TomcatResponse unwrapResponse(HttpServletResponse servletResp) {
-        return ((TomcatResponseFacade) unwrapResponseInternal(servletResp)).getResponse();
+        HttpServletResponse resp = unwrapResponseInternal(servletResp);
+
+        return (resp instanceof TomcatResponseFacade) ? ((TomcatResponseFacade) unwrapResponseInternal(servletResp)).getResponse() : (TomcatResponse) resp;
     }
 
     public static TomcatRequest unwrapRequest(HttpServletRequest servletReq) {
-        return ((TomcatRequestFacade) unwrapRequestInternal(servletReq)).getRequest();
+        HttpServletRequest req = unwrapRequestInternal(servletReq);
+
+        return (req instanceof TomcatRequestFacade) ? ((TomcatRequestFacade) req).getRequest() : (TomcatRequest) req;
     }
 
     private static HttpServletResponse unwrapResponseInternal(HttpServletResponse servletResp) {

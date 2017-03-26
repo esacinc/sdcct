@@ -1,13 +1,16 @@
-package gov.hhs.onc.sdcct.testcases.ihe.impl.interceptors;
+package gov.hhs.onc.sdcct.web.testcases.ihe.impl.interceptors;
 
 import com.sun.xml.ws.encoding.soap.SOAP12Constants;
 import gov.hhs.onc.sdcct.api.SdcctIssueSeverity;
+import gov.hhs.onc.sdcct.context.SdcctPropertyNames;
+import gov.hhs.onc.sdcct.net.logging.RestEndpointType;
 import gov.hhs.onc.sdcct.testcases.ihe.IheTestcase;
 import gov.hhs.onc.sdcct.testcases.results.ihe.IheTestcaseResult;
 import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheTestcaseSubmission;
 import gov.hhs.onc.sdcct.testcases.utils.SdcctTestcaseUtils;
 import gov.hhs.onc.sdcct.transform.impl.ByteArraySource;
 import gov.hhs.onc.sdcct.validate.testcases.rfd.IheTestcaseValidationException;
+import gov.hhs.onc.sdcct.ws.utils.SdcctRestEventUtils;
 import gov.hhs.onc.sdcct.xml.saxon.impl.XdmDocument;
 import javax.xml.transform.dom.DOMSource;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -56,6 +59,8 @@ public abstract class AbstractClientIheTestcaseInInterceptor<T extends IheTestca
             String testcaseId = testcase.getId();
 
             V result = SdcctTestcaseUtils.addWsResponseEvent(inMsg, this.resultPropName, this.resultClass, inMsg);
+
+            result.setHttpResponseEvent(SdcctRestEventUtils.createHttpResponseEvent(message, SdcctPropertyNames.HTTP_CLIENT_TX_ID, RestEndpointType.CLIENT));
 
             try {
                 CachedOutputStream cachedOutputStream = message.getContent(CachedOutputStream.class);

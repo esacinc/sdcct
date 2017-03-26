@@ -38,7 +38,7 @@
         p:forms-ref="iheFormsFilled">
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
+                p:messageName-ref="iheTestcaseConstantStrSubmitFormRequest">
                 <beans:property name="messageDetails">
                     <beans:map>
                         <beans:entry key-ref="iheTestcaseConstantStrSdcSubmissionPackage"
@@ -49,10 +49,9 @@
         </beans:property>
         <beans:property name="responseInfo">
             <beans:bean parent="iheTestcaseResponseInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormResponse">
+                p:messageName-ref="iheTestcaseConstantStrSubmitFormResponse">
                 <beans:property name="messageDetails">
                     <beans:map>
-                        <beans:entry key-ref="iheTestcaseConstantStrContent" value="contains SDCSubmissionPackage with formInstanceVersionURI updated"/>
                         <beans:entry key-ref="iheTestcaseConstantStrContentType" value-ref="iheContentTypeXml"/>
                         <beans:entry key-ref="iheTestcaseConstantStrResponseCode" value="element exists"/>
                     </beans:map>
@@ -98,7 +97,7 @@
         p:forms-ref="iheFormsPartiallyFilled">
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
+                p:messageName-ref="iheTestcaseConstantStrSubmitFormRequest">
                 <beans:property name="messageDetails">
                     <beans:map>
                         <beans:entry key-ref="iheTestcaseConstantStrSdcSubmissionPackage"
@@ -109,10 +108,9 @@
         </beans:property>
         <beans:property name="responseInfo">
             <beans:bean parent="iheTestcaseResponseInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormResponse">
+                p:messageName-ref="iheTestcaseConstantStrSubmitFormResponse">
                 <beans:property name="messageDetails">
                     <beans:map>
-                        <beans:entry key-ref="iheTestcaseConstantStrContent" value="contains SDCSubmissionPackage with formInstanceVersionURI updated"/>
                         <beans:entry key-ref="iheTestcaseConstantStrContentType" value-ref="iheContentTypeXml"/>
                         <beans:entry key-ref="iheTestcaseConstantStrResponseCode" value="element exists"/>
                     </beans:map>
@@ -161,7 +159,7 @@
         </beans:property>
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
+                p:messageName-ref="iheTestcaseConstantStrSubmitFormRequest">
                 <beans:property name="messageDetails">
                     <beans:map>
                         <beans:entry key-ref="iheTestcaseConstantStrSdcSubmissionPackage"
@@ -172,7 +170,7 @@
         </beans:property>
         <beans:property name="responseInfo">
             <beans:bean parent="iheTestcaseResponseInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormResponse">
+                p:messageName-ref="iheTestcaseConstantStrSubmitFormResponse">
                 <beans:property name="messageDetails">
                     <beans:map>
                         <beans:entry key-ref="iheTestcaseConstantStrContent" value="contains SDCSubmissionPackage with formInstanceVersionURI updated"/>
@@ -219,7 +217,7 @@
         p:negative="true">
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
+                p:messageName-ref="iheTestcaseConstantStrSubmitFormRequest">
                 <beans:property name="messageDetails">
                     <beans:map>
                         <beans:entry key-ref="iheTestcaseConstantStrSdcSubmissionPackage" value="missing a FormDesign element"/>
@@ -229,7 +227,7 @@
         </beans:property>
         <beans:property name="responseInfo">
             <beans:bean parent="iheTestcaseResponseInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormResponse">
+                p:messageName-ref="iheTestcaseConstantStrSubmitFormResponse">
                 <beans:property name="messageDetails">
                     <beans:map>
                         <beans:entry key-ref="iheTestcaseConstantStrSoapFaultReasonText" value="Required info missing"/>
@@ -279,7 +277,7 @@
         p:forms-ref="iheFormsFilled">
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
+                p:messageName-ref="iheTestcaseConstantStrSubmitFormRequest">
                 <beans:property name="messageDetails">
                     <beans:map>
                         <beans:entry key-ref="iheTestcaseConstantStrSdcSubmissionPackage"
@@ -290,10 +288,9 @@
         </beans:property>
         <beans:property name="responseInfo">
             <beans:bean parent="iheTestcaseResponseInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormResponse">
+                p:messageName-ref="iheTestcaseConstantStrSubmitFormResponse">
                 <beans:property name="messageDetails">
                     <beans:map>
-                        <beans:entry key-ref="iheTestcaseConstantStrContent" value="contains SDCSubmissionPackage with formInstanceVersionURI updated"/>
                         <beans:entry key-ref="iheTestcaseConstantStrContentType" value-ref="iheContentTypeXml"/>
                         <beans:entry key-ref="iheTestcaseConstantStrResponseCode" value="element exists"/>
                     </beans:map>
@@ -342,7 +339,7 @@
         </beans:property>
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
+                p:messageName-ref="iheTestcaseConstantStrSubmitFormRequest">
                 <beans:property name="messageDetails">
                     <beans:map>
                         <beans:entry key-ref="iheTestcaseConstantStrSdcSubmissionPackage"
@@ -353,7 +350,7 @@
         </beans:property>
         <beans:property name="responseInfo">
             <beans:bean parent="iheTestcaseResponseInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormResponse">
+                p:messageName-ref="iheTestcaseConstantStrSubmitFormResponse">
                 <beans:property name="messageDetails">
                     <beans:map>
                         <beans:entry key-ref="iheTestcaseConstantStrContent" value="contains SDCSubmissionPackage with formInstanceVersionURI updated"/>

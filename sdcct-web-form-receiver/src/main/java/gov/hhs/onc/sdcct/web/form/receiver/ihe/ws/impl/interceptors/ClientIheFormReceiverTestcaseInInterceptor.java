@@ -6,9 +6,9 @@ import gov.hhs.onc.sdcct.rfd.impl.SubmitFormResponseTypeImpl;
 import gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlNames;
 import gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames;
 import gov.hhs.onc.sdcct.testcases.ihe.IheFormReceiverTestcase;
-import gov.hhs.onc.sdcct.testcases.ihe.impl.interceptors.AbstractClientIheTestcaseInInterceptor;
 import gov.hhs.onc.sdcct.testcases.results.ihe.IheFormReceiverTestcaseResult;
 import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheFormReceiverTestcaseSubmission;
+import gov.hhs.onc.sdcct.web.testcases.ihe.impl.interceptors.AbstractClientIheTestcaseInInterceptor;
 import org.springframework.stereotype.Component;
 
 @Component("interceptorClientIheFormReceiverTestcaseIn")

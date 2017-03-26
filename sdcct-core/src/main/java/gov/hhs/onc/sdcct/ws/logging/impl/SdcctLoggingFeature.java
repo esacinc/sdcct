@@ -8,7 +8,7 @@ import gov.hhs.onc.sdcct.transform.content.SdcctContentType;
 import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
 import gov.hhs.onc.sdcct.ws.WsMessageType;
 import gov.hhs.onc.sdcct.ws.logging.WsEvent;
-import gov.hhs.onc.sdcct.ws.utils.SdcctWsEventUtils;
+import gov.hhs.onc.sdcct.ws.utils.SdcctRestEventUtils;
 import gov.hhs.onc.sdcct.ws.utils.SdcctWsPropertyUtils;
 import gov.hhs.onc.sdcct.xml.saxon.impl.SdcctDocumentBuilder;
 import java.util.HashMap;
@@ -94,7 +94,7 @@ public class SdcctLoggingFeature extends AbstractFeature implements Initializing
     }
 
     public <T extends WsEvent> void processEvent(Exchange exchange, Message msg, T event, WsMessageType msgType, byte ... payloadBytes) throws Exception {
-        SdcctWsEventUtils.processEvent(exchange, msg, event, msgType, this.docBuilder, this.contentTypeCodecs, payloadBytes);
+        SdcctRestEventUtils.processEvent(exchange, msg, event, msgType, this.docBuilder, this.contentTypeCodecs, payloadBytes);
 
         this.logEvent(event);
     }

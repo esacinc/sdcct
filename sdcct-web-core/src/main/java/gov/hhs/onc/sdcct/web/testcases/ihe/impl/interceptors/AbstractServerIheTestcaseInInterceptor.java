@@ -1,7 +1,8 @@
-package gov.hhs.onc.sdcct.testcases.ihe.impl.interceptors;
+package gov.hhs.onc.sdcct.web.testcases.ihe.impl.interceptors;
 
 import com.sun.xml.ws.encoding.soap.SOAP12Constants;
 import gov.hhs.onc.sdcct.api.SdcctIssueSeverity;
+import gov.hhs.onc.sdcct.context.SdcctPropertyNames;
 import gov.hhs.onc.sdcct.net.logging.RestEndpointType;
 import gov.hhs.onc.sdcct.testcases.ihe.IheTestcase;
 import gov.hhs.onc.sdcct.testcases.results.ihe.IheTestcaseResult;
@@ -11,11 +12,15 @@ import gov.hhs.onc.sdcct.transform.content.SdcctContentType;
 import gov.hhs.onc.sdcct.transform.impl.ByteArraySource;
 import gov.hhs.onc.sdcct.utils.SdcctStreamUtils;
 import gov.hhs.onc.sdcct.validate.testcases.rfd.IheTestcaseValidationException;
+import gov.hhs.onc.sdcct.web.tomcat.impl.TomcatRequest;
+import gov.hhs.onc.sdcct.web.tomcat.utils.SdcctHttpEventUtils;
+import gov.hhs.onc.sdcct.web.tomcat.utils.SdcctTomcatUtils;
 import gov.hhs.onc.sdcct.ws.WsDirection;
 import gov.hhs.onc.sdcct.ws.WsMessageType;
 import gov.hhs.onc.sdcct.ws.logging.WsRequestEvent;
+import gov.hhs.onc.sdcct.ws.logging.impl.SdcctLoggingFeature;
 import gov.hhs.onc.sdcct.ws.logging.impl.WsRequestEventImpl;
-import gov.hhs.onc.sdcct.ws.utils.SdcctWsEventUtils;
+import gov.hhs.onc.sdcct.ws.utils.SdcctRestEventUtils;
 import gov.hhs.onc.sdcct.ws.utils.SdcctWsPropertyUtils;
 import gov.hhs.onc.sdcct.xml.saxon.impl.XdmDocument;
 import java.time.Instant;
@@ -23,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
@@ -31,6 +37,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Element;
@@ -109,8 +116,9 @@ public abstract class AbstractServerIheTestcaseInInterceptor<T extends IheTestca
                 wsRequestEvent.setDirection(WsDirection.INBOUND);
                 wsRequestEvent.setEndpointType(RestEndpointType.SERVER);
                 wsRequestEvent.setMessageType(this.wsMessageType);
+                wsRequestEvent.setTxId(SdcctLoggingFeature.buildTxId(message.getExchange(), message, wsRequestEvent, SdcctPropertyNames.WS_SERVER_TX_ID));
 
-                SdcctWsEventUtils.processEvent(message.getExchange(), message, wsRequestEvent, this.wsMessageType, this.docBuilder, this.contentTypeCodecs,
+                SdcctRestEventUtils.processEvent(message.getExchange(), message, wsRequestEvent, this.wsMessageType, this.docBuilder, this.contentTypeCodecs,
                     cachedOutputStream.getBytes());
 
                 if (result == null) {
@@ -118,6 +126,11 @@ public abstract class AbstractServerIheTestcaseInInterceptor<T extends IheTestca
                 }
 
                 result.setWsRequestEvent(wsRequestEvent);
+
+                TomcatRequest httpServletReq =
+                    SdcctTomcatUtils.unwrapRequest(SdcctWsPropertyUtils.getProperty(message, AbstractHTTPDestination.HTTP_REQUEST, HttpServletRequest.class));
+
+                result.setHttpRequestEvent(SdcctHttpEventUtils.createHttpRequestEvent(httpServletReq));
             }
         }
     }

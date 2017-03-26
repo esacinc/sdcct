@@ -17,6 +17,7 @@ public final class SdcctTestcasePropertyNames {
     public final static String IHE_FORM_MANAGER_TESTCASE_SUBMISSION = IheFormManagerTestcaseSubmission.class.getName();
     public final static String IHE_FORM_RECEIVER_TESTCASE_SUBMISSION = IheFormReceiverTestcaseSubmission.class.getName();
 
+    public final static String RFD_ANY_XML_CONTENT_TYPE = "anyXMLContentType";
     public final static String RFD_CONTENT = "content";
     public final static String RFD_CONTENT_TYPE = "contentType";
     public final static String RFD_ENCODED_RESPONSE = "encodedResponse";

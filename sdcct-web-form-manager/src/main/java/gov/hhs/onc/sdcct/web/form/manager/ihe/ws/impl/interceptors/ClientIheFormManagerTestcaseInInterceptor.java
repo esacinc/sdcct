@@ -10,9 +10,9 @@ import gov.hhs.onc.sdcct.sdc.SdcRetrieveFormPackageType;
 import gov.hhs.onc.sdcct.sdc.XmlPackage;
 import gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames;
 import gov.hhs.onc.sdcct.testcases.ihe.IheFormManagerTestcase;
-import gov.hhs.onc.sdcct.testcases.ihe.impl.interceptors.AbstractClientIheTestcaseInInterceptor;
 import gov.hhs.onc.sdcct.testcases.results.ihe.IheFormManagerTestcaseResult;
 import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheFormManagerTestcaseSubmission;
+import gov.hhs.onc.sdcct.web.testcases.ihe.impl.interceptors.AbstractClientIheTestcaseInInterceptor;
 import javax.xml.bind.JAXBElement;
 import org.springframework.stereotype.Component;
 

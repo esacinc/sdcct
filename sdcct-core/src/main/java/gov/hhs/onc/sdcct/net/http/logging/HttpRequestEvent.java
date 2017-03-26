@@ -1,10 +1,16 @@
 package gov.hhs.onc.sdcct.net.http.logging;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import gov.hhs.onc.sdcct.net.http.logging.impl.HttpRequestEventImpl;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+@JsonSubTypes({ @Type(HttpRequestEventImpl.class) })
 public interface HttpRequestEvent extends HttpEvent {
     public boolean hasAuthType();
 

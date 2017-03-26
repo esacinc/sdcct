@@ -10,7 +10,9 @@ import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheTestcaseSubmission;
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
 import gov.hhs.onc.sdcct.web.controller.JsonPostRequestMapping;
 import gov.hhs.onc.sdcct.web.controller.PathNames;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
@@ -31,12 +33,13 @@ public class IheEventController<T extends IheTestcase, U extends IheTestcaseSubm
     private final static int NUM_RECENT_TESTCASE_EVENTS = 25;
 
     @SuppressWarnings({ CompilerWarnings.UNCHECKED })
-    private final Map<Long, V> iheTestcaseEvents = Collections.synchronizedMap(new LRUMap(NUM_RECENT_TESTCASE_EVENTS));
+    private final Map<Long, List<V>> iheTestcaseEvents = Collections.synchronizedMap(new LRUMap(NUM_RECENT_TESTCASE_EVENTS));
 
     @RequestMapping(method = { RequestMethod.GET }, value = { SdcctStringUtils.SLASH + PathNames.EVENT + SdcctStringUtils.SLASH + PathNames.POLL })
     public ResponseEntity<?> poll(@RequestParam("lastSeenTxId") long txId) {
         if (!this.iheTestcaseEvents.isEmpty()) {
-            return ResponseEntity.ok(this.iheTestcaseEvents.values().stream().filter(result -> result.getTxId() > txId).collect(Collectors.toList()));
+            return ResponseEntity
+                .ok(this.iheTestcaseEvents.values().stream().flatMap(List::stream).filter(result -> result.getTxId() > txId).collect(Collectors.toList()));
         }
 
         return ResponseEntity.noContent().build();
@@ -61,6 +64,11 @@ public class IheEventController<T extends IheTestcase, U extends IheTestcaseSubm
     }
 
     private void sendResult(V testcaseResult) {
-        this.iheTestcaseEvents.put(testcaseResult.getTxId(), testcaseResult);
+        List<V> results =
+            !this.iheTestcaseEvents.containsKey(testcaseResult.getTxId()) ? new ArrayList<>() : this.iheTestcaseEvents.get(testcaseResult.getTxId());
+
+        results.add(testcaseResult);
+
+        this.iheTestcaseEvents.put(testcaseResult.getTxId(), results);
     }
 }

@@ -37,7 +37,7 @@
         p:forms-ref="iheFormsFilled">
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
+                p:messageName-ref="iheTestcaseConstantStrArchiveFormRequest">
                 <beans:property name="messageDetails">
                     <beans:map>
                         <beans:entry key-ref="iheTestcaseConstantStrSdcSubmissionPackage"
@@ -48,7 +48,7 @@
         </beans:property>
         <beans:property name="responseInfo">
             <beans:bean parent="iheTestcaseResponseInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormResponse">
+                p:messageName-ref="iheTestcaseConstantStrArchiveFormResponse">
                 <beans:property name="messageDetails">
                     <beans:map>
                         <beans:entry key-ref="iheTestcaseConstantStrResponseCode" value="element exists"/>
@@ -94,7 +94,7 @@
         p:forms-ref="iheFormsPartiallyFilled">
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
+                p:messageName-ref="iheTestcaseConstantStrArchiveFormRequest">
                 <beans:property name="messageDetails">
                     <beans:map>
                         <beans:entry key-ref="iheTestcaseConstantStrSdcSubmissionPackage"
@@ -105,7 +105,7 @@
         </beans:property>
         <beans:property name="responseInfo">
             <beans:bean parent="iheTestcaseResponseInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormResponse">
+                p:messageName-ref="iheTestcaseConstantStrArchiveFormResponse">
                 <beans:property name="messageDetails">
                     <beans:map>
                         <beans:entry key-ref="iheTestcaseConstantStrResponseCode" value="element exists"/>
@@ -152,7 +152,7 @@
         p:negative="true">
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
+                p:messageName-ref="iheTestcaseConstantStrArchiveFormRequest">
                 <beans:property name="messageDetails">
                     <beans:map>
                         <beans:entry key-ref="iheTestcaseConstantStrContent"
@@ -163,7 +163,7 @@
         </beans:property>
         <beans:property name="responseInfo">
             <beans:bean parent="iheTestcaseResponseInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormResponse">
+                p:messageName-ref="iheTestcaseConstantStrArchiveFormResponse">
                 <beans:property name="messageDetails">
                     <beans:map>
                         <beans:entry key-ref="iheTestcaseConstantStrSoapFaultReasonText" value="Required info missing"/>
@@ -209,18 +209,17 @@
         p:forms-ref="iheFormsFilled">
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
+                p:messageName-ref="iheTestcaseConstantStrArchiveFormRequest">
                 <beans:property name="messageDetails">
                     <beans:map>
-                        <beans:entry key-ref="iheTestcaseConstantStrSdcSubmissionPackage"
-                            value="contains FormDesign with a formID that corresponds to an available XML, HTML, or URI-based form"/>
+                        <beans:entry key-ref="iheTestcaseConstantStrAnyXmlContentType" value="specific content not specified by profile"/>
                     </beans:map>
                 </beans:property>
             </beans:bean>
         </beans:property>
         <beans:property name="responseInfo">
             <beans:bean parent="iheTestcaseResponseInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormResponse">
+                p:messageName-ref="iheTestcaseConstantStrArchiveFormResponse">
                 <beans:property name="messageDetails">
                     <beans:map>
                         <beans:entry key-ref="iheTestcaseConstantStrResponseCode" value="element exists"/>
@@ -266,18 +265,17 @@
         p:optional="true">
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
+                p:messageName-ref="iheTestcaseConstantStrArchiveFormRequest">
                 <beans:property name="messageDetails">
                     <beans:map>
-                        <beans:entry key-ref="iheTestcaseConstantStrSdcSubmissionPackage"
-                            value="contains FormDesign with a formID that corresponds to an available XML, HTML, or URI-based form"/>
+                        <beans:entry key-ref="iheTestcaseConstantStrAnyXmlContentType" value="specific content not specified by profile"/>
                     </beans:map>
                 </beans:property>
             </beans:bean>
         </beans:property>
         <beans:property name="responseInfo">
             <beans:bean parent="iheTestcaseResponseInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrRetrieveFormResponse">
+                p:messageName-ref="iheTestcaseConstantStrArchiveFormResponse">
                 <beans:property name="messageDetails">
                     <beans:map>
                         <beans:entry key-ref="iheTestcaseConstantStrResponseCode" value="element exists"/>

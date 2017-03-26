@@ -1,9 +1,12 @@
-package gov.hhs.onc.sdcct.testcases.ihe.impl.interceptors;
+package gov.hhs.onc.sdcct.web.testcases.ihe.impl.interceptors;
 
+import gov.hhs.onc.sdcct.context.SdcctPropertyNames;
+import gov.hhs.onc.sdcct.net.logging.RestEndpointType;
 import gov.hhs.onc.sdcct.testcases.ihe.IheTestcase;
 import gov.hhs.onc.sdcct.testcases.results.ihe.IheTestcaseResult;
 import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheTestcaseSubmission;
 import gov.hhs.onc.sdcct.testcases.utils.SdcctTestcaseUtils;
+import gov.hhs.onc.sdcct.ws.utils.SdcctRestEventUtils;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.phase.Phase;
 
@@ -25,6 +28,8 @@ public abstract class AbstractClientIheTestcaseOutInterceptor<T extends IheTestc
 
     @Override
     protected void handleMessageInternal(SoapMessage message) throws Exception {
-        SdcctTestcaseUtils.addWsRequestEvent(message.getExchange().getOutMessage(), this.resultPropName, this.resultClass);
+        V result = SdcctTestcaseUtils.addWsRequestEvent(message.getExchange().getOutMessage(), this.resultPropName, this.resultClass);
+
+        result.setHttpRequestEvent(SdcctRestEventUtils.createHttpRequestEvent(message, SdcctPropertyNames.HTTP_CLIENT_TX_ID, RestEndpointType.CLIENT));
     }
 }

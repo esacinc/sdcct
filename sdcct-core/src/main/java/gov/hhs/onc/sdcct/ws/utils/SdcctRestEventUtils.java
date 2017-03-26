@@ -4,13 +4,20 @@ import com.sun.xml.ws.encoding.soap.SOAP12Constants;
 import gov.hhs.onc.sdcct.fhir.FhirFormatType;
 import gov.hhs.onc.sdcct.json.impl.JsonCodec;
 import gov.hhs.onc.sdcct.json.impl.JsonEncodeOptionsImpl;
+import gov.hhs.onc.sdcct.net.http.logging.HttpRequestEvent;
+import gov.hhs.onc.sdcct.net.http.logging.HttpResponseEvent;
+import gov.hhs.onc.sdcct.net.http.logging.impl.HttpRequestEventImpl;
+import gov.hhs.onc.sdcct.net.http.logging.impl.HttpResponseEventImpl;
+import gov.hhs.onc.sdcct.net.logging.RestEndpointType;
 import gov.hhs.onc.sdcct.net.mime.utils.SdcctMediaTypeUtils;
 import gov.hhs.onc.sdcct.transform.content.ContentCodec;
 import gov.hhs.onc.sdcct.transform.content.ContentCodecOptions;
 import gov.hhs.onc.sdcct.transform.content.SdcctContentType;
 import gov.hhs.onc.sdcct.transform.impl.ByteArraySource;
 import gov.hhs.onc.sdcct.ws.WsMessageType;
+import gov.hhs.onc.sdcct.ws.WsPropertyNames;
 import gov.hhs.onc.sdcct.ws.logging.WsEvent;
+import gov.hhs.onc.sdcct.ws.logging.impl.SdcctLoggingFeature;
 import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
 import gov.hhs.onc.sdcct.xml.saxon.impl.SdcctDocumentBuilder;
 import gov.hhs.onc.sdcct.xml.saxon.impl.XdmDocument;
@@ -36,14 +43,19 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.OperationInfo;
+import org.apache.cxf.transport.http.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
-public final class SdcctWsEventUtils {
-    private final static Logger LOGGER = LoggerFactory.getLogger(SdcctWsEventUtils.class);
+public final class SdcctRestEventUtils {
+    private final static Logger LOGGER = LoggerFactory.getLogger(SdcctRestEventUtils.class);
+
+    private SdcctRestEventUtils() {
+    }
 
     public static <T extends WsEvent> void processEvent(Exchange exchange, Message msg, T event, WsMessageType msgType, SdcctDocumentBuilder docBuilder,
         Map<SdcctContentType, ContentCodec<?, ?>> contentTypeCodecs, byte ... payloadBytes) throws Exception {
@@ -218,5 +230,40 @@ public final class SdcctWsEventUtils {
         byte ... payloadBytes) throws Exception {
         event.setPrettyPayload(
             new String(codec.encode(codec.decode(payloadBytes, null), new JsonEncodeOptionsImpl().setOption(ContentCodecOptions.PRETTY, true)), enc));
+    }
+
+    public static HttpRequestEvent createHttpRequestEvent(Message msg, String txIdPropName, RestEndpointType endpointType) {
+        HttpRequestEvent httpEvent = new HttpRequestEventImpl();
+
+        SdcctLoggingFeature.buildTxId(msg.getExchange(), msg, httpEvent, txIdPropName);
+
+        httpEvent.setContentType(SdcctWsPropertyUtils.getProperty(msg, Message.CONTENT_TYPE));
+        httpEvent.setEndpointType(endpointType);
+        httpEvent.setHeaders(Headers.getSetProtocolHeaders(msg));
+        httpEvent.setMethod(SdcctWsPropertyUtils.getProperty(msg, Message.HTTP_REQUEST_METHOD));
+        httpEvent.setPathInfo(SdcctWsPropertyUtils.getProperty(msg, Message.PATH_INFO));
+        httpEvent.setQueryString(SdcctWsPropertyUtils.getProperty(msg, Message.QUERY_STRING));
+        httpEvent.setScheme(SdcctWsPropertyUtils.getProperty(msg, WsPropertyNames.HTTP_SCHEME));
+        httpEvent.setUri(SdcctWsPropertyUtils.getProperty(msg, Message.REQUEST_URI));
+        httpEvent.setUrl(SdcctWsPropertyUtils.getProperty(msg, Message.REQUEST_URL));
+
+        return httpEvent;
+    }
+
+    public static HttpResponseEvent createHttpResponseEvent(Message msg, String txIdPropName, RestEndpointType endpointType) {
+        HttpResponseEvent httpEvent = new HttpResponseEventImpl();
+
+        SdcctLoggingFeature.buildTxId(msg.getExchange(), msg, httpEvent, txIdPropName);
+
+        httpEvent.setContentType(SdcctWsPropertyUtils.getProperty(msg, Message.CONTENT_TYPE));
+        httpEvent.setEndpointType(endpointType);
+        httpEvent.setHeaders(Headers.getSetProtocolHeaders(msg));
+
+        Integer statusCode = SdcctWsPropertyUtils.getProperty(msg, Message.RESPONSE_CODE, Integer.class);
+
+        httpEvent.setStatusCode(statusCode);
+        httpEvent.setStatusMessage((statusCode != null) ? HttpStatus.valueOf(statusCode).getReasonPhrase() : null);
+
+        return httpEvent;
     }
 }

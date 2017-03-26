@@ -84,6 +84,7 @@
     <!--====================================================================================================
     = IHE TESTCASE STRINGS - MESSAGE DETAILS KEYS
     =====================================================================================================-->
+    <sdcct:normalized-string id="iheTestcaseConstantStrAnyXmlContentType">#{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_ANY_XML_CONTENT_TYPE }</sdcct:normalized-string>
     <sdcct:normalized-string id="iheTestcaseConstantStrContent">#{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_CONTENT }</sdcct:normalized-string>
     <sdcct:normalized-string id="iheTestcaseConstantStrContentType">#{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_CONTENT_TYPE }</sdcct:normalized-string>
     <sdcct:normalized-string id="iheTestcaseConstantStrEncodedResponse">#{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_ENCODED_RESPONSE }</sdcct:normalized-string>

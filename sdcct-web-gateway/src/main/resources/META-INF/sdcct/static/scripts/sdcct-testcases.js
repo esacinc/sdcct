@@ -192,7 +192,6 @@
                 testcaseResultBodyElem.append($.fn.sdcct.testcases.buildTestcaseItem("Message(s)", testcaseResultMsgs));
                 testcaseResultBodyElem.append($.fn.sdcct.testcases.buildTestcaseSteps("Testcase Steps", !$.isUndefined(testcase) ? testcase["steps"] : []));
                 
-                // TODO: update to include HttpRequestEvent and HttpResponseEvent
                 if (!$.isUndefined(testcaseResult["wsRequestEvent"]) || !$.isUndefined(testcaseResult["wsResponseEvent"])) {
                     var numTestcaseResults = testcaseResultsAccordion.find("h3.testcase-result-header").length;
                     testcaseResultBodyElem.append($.fn.sdcct.testcases.buildTestcaseResultEventTabs(numTestcaseResults, testcaseResult));
@@ -230,13 +229,79 @@
                 });
                 var testcaseResultEventTabsHeaderElem =
                     $("<ul/>").append($("<li/>").append($("<a/>").attr("href", "#ws-event-request-" + numTestcaseResults).text("Web Service Request Event"))).append($("<li/>").append($("<a/>").attr("href", "#ws-event-response-"
-                        + numTestcaseResults).text("Web Service Response Event")));
+                        + numTestcaseResults).text("Web Service Response Event"))).append($("<li/>").append($("<a/>").attr("href", "#http-event-request-"
+                        + numTestcaseResults).text("HTTP Request Event"))).append($("<li/>").append($("<a/>").attr("href", "#http-event-response-"
+                        + numTestcaseResults).text("HTTP Response Event")));
                 
                 testcaseResultEventElem.append(testcaseResultEventTabsHeaderElem);
                 testcaseResultEventElem.append($.fn.sdcct.testcases.buildTestcaseWsEvent("ws-event-request-" + numTestcaseResults, testcaseResult["wsRequestEvent"]));
                 testcaseResultEventElem.append($.fn.sdcct.testcases.buildTestcaseWsEvent("ws-event-response-" + numTestcaseResults, testcaseResult["wsResponseEvent"]));
+                testcaseResultEventElem.append($.fn.sdcct.testcases.buildTestcaseHttpRequestEvent("http-event-request-" + numTestcaseResults, testcaseResult["httpRequestEvent"]));
+                testcaseResultEventElem.append($.fn.sdcct.testcases.buildTestcaseHttpResponseEvent("http-event-response-" + numTestcaseResults, testcaseResult["httpResponseEvent"]));
                 
                 return testcaseResultEventElem;
+            },
+            "buildTestcaseHttpEvent": function (testcaseHttpEventElem, testcaseHttpEvent) {
+                var elem = $(this);
+                
+                testcaseHttpEventElem.append(elem.sdcct.testcases.buildTestcaseItem("Endpoint Type", testcaseHttpEvent["endpointType"]));
+                testcaseHttpEventElem.append(elem.sdcct.testcases.buildTestcaseItem("Event Type", testcaseHttpEvent["eventType"]));
+                testcaseHttpEventElem.append(elem.sdcct.testcases.buildTestcaseItem("Transaction ID", testcaseHttpEvent["txId"]));
+                testcaseHttpEventElem.append(elem.sdcct.testcases.buildTestcaseItem("Character Encoding", testcaseHttpEvent["characterEncoding"]));
+                testcaseHttpEventElem.append(elem.sdcct.testcases.buildTestcaseItem("Content Length", testcaseHttpEvent["contentLength"]));
+                testcaseHttpEventElem.append(elem.sdcct.testcases.buildTestcaseItem("Content Type", testcaseHttpEvent["contentType"]));
+                
+                var headers = testcaseHttpEvent["headers"];
+                var headersList = $("<ul/>");
+                
+                if (!$.isEmptyObject(headers)) {
+                    $.each(headers, function (key, val) {
+                        headersList.append($("<li/>").append($.fn.sdcct.testcases.buildTestcaseItem(key, val.join())));
+                    });
+                } else {
+                    headersList.append("None");
+                }
+                
+                testcaseHttpEventElem.append(elem.sdcct.testcases.buildTestcaseItem("Headers", headersList));
+                
+                return testcaseHttpEventElem;
+            },
+            "buildTestcaseHttpRequestEvent": function (testcaseHttpEventTabId, testcaseHttpEvent) {
+                var elem = $(this), testcaseHttpEventElem = $("<div/>").attr("id", testcaseHttpEventTabId);
+                
+                if ($.isUndefined(testcaseHttpEvent)) {
+                    return testcaseHttpEventElem.append("<strong><em>None</em></strong>");
+                }
+                
+                testcaseHttpEventElem = $.fn.sdcct.testcases.buildTestcaseHttpEvent(testcaseHttpEventElem, testcaseHttpEvent);
+                
+                testcaseHttpEventElem.append(elem.sdcct.testcases.buildTestcaseItem("HTTP Method", testcaseHttpEvent["method"]));
+                testcaseHttpEventElem.append(elem.sdcct.testcases.buildTestcaseItem("HTTP Protocol", testcaseHttpEvent["protocol"]));
+                testcaseHttpEventElem.append(elem.sdcct.testcases.buildTestcaseItem("HTTP Scheme", testcaseHttpEvent["scheme"]));
+                testcaseHttpEventElem.append(elem.sdcct.testcases.buildTestcaseItem("URI", testcaseHttpEvent["uri"]));
+                testcaseHttpEventElem.append(elem.sdcct.testcases.buildTestcaseItem("URL", testcaseHttpEvent["url"]));
+                testcaseHttpEventElem.append(elem.sdcct.testcases.buildTestcaseItem("Local Name", testcaseHttpEvent["localName"]));
+                testcaseHttpEventElem.append(elem.sdcct.testcases.buildTestcaseItem("Local Port", testcaseHttpEvent["localPort"]));
+                testcaseHttpEventElem.append(elem.sdcct.testcases.buildTestcaseItem("Remote Address", testcaseHttpEvent["remoteAddr"]));
+                testcaseHttpEventElem.append(elem.sdcct.testcases.buildTestcaseItem("Remote Host", testcaseHttpEvent["remoteHost"]));
+                testcaseHttpEventElem.append(elem.sdcct.testcases.buildTestcaseItem("Remote Port", testcaseHttpEvent["remotePort"]));
+                testcaseHttpEventElem.append(elem.sdcct.testcases.buildTestcaseItem("Server Name", testcaseHttpEvent["serverName"]));
+                testcaseHttpEventElem.append(elem.sdcct.testcases.buildTestcaseItem("Server Port", testcaseHttpEvent["serverPort"]));
+                
+                return testcaseHttpEventElem;
+            },
+            "buildTestcaseHttpResponseEvent": function (testcaseHttpEventTabId, testcaseHttpEvent) {
+                var elem = $(this), testcaseHttpEventElem = $("<div/>").attr("id", testcaseHttpEventTabId);
+                
+                if ($.isUndefined(testcaseHttpEvent)) {
+                    return testcaseHttpEventElem.append("<strong><em>None</em></strong>");
+                }
+                
+                testcaseHttpEventElem = $.fn.sdcct.testcases.buildTestcaseHttpEvent(testcaseHttpEventElem, testcaseHttpEvent);
+                testcaseHttpEventElem.append(elem.sdcct.testcases.buildTestcaseItem("Status Code", testcaseHttpEvent["statusCode"]));
+                testcaseHttpEventElem.append(elem.sdcct.testcases.buildTestcaseItem("Status Message", testcaseHttpEvent["statusMessage"]));
+                
+                return testcaseHttpEventElem;
             },
             "buildTestcaseWsEvent": function (testcaseWsEventTabId, testcaseWsEvent) {
                 var elem = $(this), testcaseWsEventElem = $("<div/>").attr("id", testcaseWsEventTabId);
@@ -278,10 +343,6 @@
                     "contentType": "application/json",
                     "error": function (jqXhr, status, error) {
                         clearInterval($.sdcct.poll.pollIntervalId);
-                        
-                        $.sdcct.poll.pollIntervalId = setInterval(function () {
-                            $.fn.sdcct.testcases.pollIncomingIheTestcaseEvents(resultsElem, resultsEmptyWellElem);
-                        }, $.sdcct.poll.POLL_INTERVAL);
                     },
                     "type": "GET",
                     "url": IHE_TESTCASES_EVENT_POLL_URL + "?" + LAST_SEEN_TX_ID + "=" + $.sdcct.poll.lastSeenTxId

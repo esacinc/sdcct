@@ -1,6 +1,7 @@
 package gov.hhs.onc.sdcct.net.http.logging.impl;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import gov.hhs.onc.sdcct.net.http.logging.HttpRequestEvent;
 import gov.hhs.onc.sdcct.net.logging.RestEventType;
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils.SdcctToStringBuilder;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 
+@JsonTypeName("httpRequestEvent")
 public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpRequestEvent {
     private String authType;
     private String contextPath;
