@@ -85,6 +85,39 @@ a.navbar-brand img {
     display: inline-block;
 }
 
+div.panel-heading:hover {
+    cursor: pointer;
+}
+
+div.panel-title {
+    font-size: 11px;
+}
+
+div.panel-title a:focus,
+div.panel-title a:hover {
+    text-decoration: none;
+}
+
+div.panel-title span {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+div.panel-title a span:nth-of-type(1) {
+    text-align: center;
+}
+
+div.panel-title a span:nth-of-type(1) i.fa {
+    margin-right: 10px;
+    font-size: 64px;
+}
+
+div.panel-body div.tab-content {
+    padding: 5px;
+    border: 1px solid rgb(221, 221, 221);
+    border-top: none;
+}
+
 input#testcase-ihe-endpoint-addr, input#testcase-ihe-form-id {
     width: 500px;
 }
@@ -100,14 +133,6 @@ div.form-group-addons div.input-group-addon {
     text-align: left;
     font-size: 11px;
     white-space: normal;
-}
-
-span.glyphicon.glyphicon-type-error {
-    color: #B94A48;
-}
-
-span.glyphicon.glyphicon-type-success {
-    color: #468847;
 }
 
 footer.footer {

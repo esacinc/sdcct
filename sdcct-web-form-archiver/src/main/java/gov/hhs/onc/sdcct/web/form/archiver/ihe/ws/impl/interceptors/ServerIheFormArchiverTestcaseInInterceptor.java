@@ -12,6 +12,7 @@ import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheFormArchiverTestcaseSubmis
 import gov.hhs.onc.sdcct.testcases.submissions.ihe.impl.IheFormArchiverTestcaseSubmissionImpl;
 import gov.hhs.onc.sdcct.web.testcases.ihe.impl.interceptors.AbstractServerIheTestcaseInInterceptor;
 import java.util.List;
+import javax.annotation.Nonnegative;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.springframework.stereotype.Component;
 
@@ -25,8 +26,9 @@ public class ServerIheFormArchiverTestcaseInInterceptor extends
     }
 
     @Override
-    protected IheFormArchiverTestcaseResult processRequest(AnyXmlContentType request, SoapMessage message) throws Exception {
-        return this.createResult(null, message, null);
+    protected IheFormArchiverTestcaseResult processRequest(AnyXmlContentType request, SoapMessage message, @Nonnegative long submittedTimestamp, String txId)
+        throws Exception {
+        return this.createResult(null, message, null, submittedTimestamp, txId);
     }
 
     @Override

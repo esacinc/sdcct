@@ -10,7 +10,16 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
         urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
-
+    
+    <!--====================================================================================================
+    = CACHE MANAGERS
+    =====================================================================================================-->
+    <beans:bean id="cacheManagerTestcaseResults" parent="cacheManager">
+        <beans:property name="configuration">
+            <beans:bean parent="cacheManagerConfig"/>
+        </beans:property>
+    </beans:bean>
+    
     <!--====================================================================================================
     = TESTCASE RESULTS
     =====================================================================================================-->
@@ -44,4 +53,26 @@
     <!--suppress SpringBeanConstructorArgInspection -->
     <beans:bean id="iheFormArchiverTestcaseResultImpl" class="gov.hhs.onc.sdcct.testcases.results.ihe.impl.IheFormArchiverTestcaseResultImpl"
         parent="iheFormArchiverTestcaseResult" lazy-init="true" scope="prototype"/>
+    
+    <!--====================================================================================================
+    = IHE TESTCASE RESULT HANDLER
+    =====================================================================================================-->
+    <beans:bean id="testcaseResultHandlerIhe" class="gov.hhs.onc.sdcct.testcases.results.ihe.impl.IheTestcaseResultHandlerImpl">
+        <beans:property name="resultCache">
+            <beans:bean parent="cache"
+                p:cacheManager-ref="cacheManagerTestcaseResults">
+                <beans:property name="configuration">
+                    <beans:bean parent="cacheConfig"
+                        p:maxEntriesInCache="${sdcct.testcases.ihe.results.cache.entries.max}"
+                        p:name="iheTestcaseResults"
+                        p:timeToLiveSeconds="${sdcct.testcases.ihe.results.cache.ttl}"/>
+                </beans:property>
+                <beans:property name="searchable">
+                    <beans:bean parent="cacheSearchable"
+                        p:keys="true"
+                        p:values="true"/>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+    </beans:bean>
 </beans:beans>

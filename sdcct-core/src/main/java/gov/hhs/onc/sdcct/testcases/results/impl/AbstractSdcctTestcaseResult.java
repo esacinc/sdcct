@@ -9,24 +9,32 @@ import gov.hhs.onc.sdcct.testcases.results.SdcctTestcaseResult;
 import gov.hhs.onc.sdcct.testcases.submissions.SdcctTestcaseSubmission;
 import gov.hhs.onc.sdcct.ws.logging.WsRequestEvent;
 import gov.hhs.onc.sdcct.ws.logging.WsResponseEvent;
+import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 
 public abstract class AbstractSdcctTestcaseResult<T extends SdcctTestcaseDescription, U extends SdcctTestcase<T>, V extends SdcctTestcaseSubmission<T, U>>
     extends AbstractResultBean implements SdcctTestcaseResult<T, U, V> {
     protected V submission;
+    protected String txId;
     protected HttpRequestEvent httpRequestEvent;
     protected HttpResponseEvent httpResponseEvent;
-    protected long txId;
+    protected long processedTimestamp;
     protected WsRequestEvent wsRequestEvent;
     protected WsResponseEvent wsResponseEvent;
 
     protected AbstractSdcctTestcaseResult(V submission) {
-        this.submission = submission;
+        this.txId = (this.submission = submission).getTxId();
+    }
+
+    @Nonnegative
+    @Override
+    public long getProcessedTimestamp() {
+        return this.processedTimestamp;
     }
 
     @Override
-    public V getSubmission() {
-        return this.submission;
+    public void setProcessedTimestamp(@Nonnegative long processedTimestamp) {
+        this.processedTimestamp = processedTimestamp;
     }
 
     @Override
@@ -62,18 +70,23 @@ public abstract class AbstractSdcctTestcaseResult<T extends SdcctTestcaseDescrip
     }
 
     @Override
-    public boolean hasWsRequestEvent() {
-        return this.wsRequestEvent != null;
+    public V getSubmission() {
+        return this.submission;
     }
 
     @Override
-    public long getTxId() {
+    public String getTxId() {
         return this.txId;
     }
 
     @Override
-    public void setTxId(long txId) {
+    public void setTxId(String txId) {
         this.txId = txId;
+    }
+
+    @Override
+    public boolean hasWsRequestEvent() {
+        return this.wsRequestEvent != null;
     }
 
     @Nullable

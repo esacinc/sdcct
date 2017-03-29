@@ -17,6 +17,7 @@ import gov.hhs.onc.sdcct.web.testcases.ihe.impl.interceptors.AbstractServerIheTe
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnegative;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,7 +35,8 @@ public class ServerIheFormReceiverTestcaseInInterceptor extends
     }
 
     @Override
-    protected IheFormReceiverTestcaseResult processRequest(AnyXmlContentType request, SoapMessage message) throws Exception {
+    protected IheFormReceiverTestcaseResult processRequest(AnyXmlContentType request, SoapMessage message, @Nonnegative long submittedTimestamp, String txId)
+        throws Exception {
         IheFormReceiverTestcaseResult result;
 
         if (request.getAny().get(0) instanceof SdcSubmissionPackage) {
@@ -45,12 +47,12 @@ public class ServerIheFormReceiverTestcaseInInterceptor extends
                 String formId = formDesigns.get(0).getId();
                 IheFormReceiverTestcase iheFormReceiverTestcase = this.findTestcase(request, this.iheFormReceiverTestcases, formId);
 
-                result = this.createResult(iheFormReceiverTestcase, message, formId);
+                result = this.createResult(iheFormReceiverTestcase, message, formId, submittedTimestamp, txId);
             } else {
-                result = this.createResult(null, message, null);
+                result = this.createResult(null, message, null, submittedTimestamp, txId);
             }
         } else {
-            result = this.createResult(null, message, null);
+            result = this.createResult(null, message, null, submittedTimestamp, txId);
         }
 
         return result;

@@ -82,6 +82,8 @@ public abstract class AbstractIheTestcaseProcessorItTests<U extends IheTestcase,
             Assert.assertTrue(result.hasResponse(), String.format("Testcase (id=%s) was expected to have a response.", testcaseId));
             Assert.assertEquals(result.getMessages(SdcctIssueSeverity.ERROR).size(), 0,
                 String.format("Result for testcase (id=%s) was not expected to have any error messages.", testcaseId));
+            Assert.assertEquals(result.getMessages(SdcctIssueSeverity.FATAL).size(), 0,
+                String.format("Result for testcase (id=%s) was not expected to have any fatal messages.", testcaseId));
             Assert.assertTrue(result.isSuccess(), String.format("Result for testcase (id=%s) was expected to be successful.", testcaseId));
         } else {
             Assert.assertTrue(result.hasFault(), String.format("Testcase (id=%s) was expected to have a SOAP fault.", testcaseId));

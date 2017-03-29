@@ -6,24 +6,24 @@
         <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <link type="image/png" rel="icon" th:href="@{/static/images/sdcct-logo-16x16.png}"/>
-        <link type="text/css" rel="stylesheet" th:href="@{/webjars-locator/jquery-ui/jquery-ui.css}"/>
         <link type="text/css" rel="stylesheet" th:href="@{/webjars-locator/bootstrap/css/bootstrap.min.css}"/>
         <link type="text/css" rel="stylesheet" th:href="@{/webjars-locator/font-awesome/css/font-awesome.min.css}"/>
         <link type="text/css" rel="stylesheet" th:href="@{/static/styles/sdcct-web.css}"/>
         <script type="text/javascript" th:src="@{/webjars-locator/jquery/jquery.min.js}"></script>
-        <script type="text/javascript" th:src="@{/webjars-locator/jquery-ui/jquery-ui.min.js}"></script>
         <script type="text/javascript" th:src="@{/webjars-locator/bootstrap/js/bootstrap.min.js}"></script>
         <script type="text/javascript" th:src="@{/static/scripts/sdcct-web.js}"></script>
         <script type="text/javascript" th:src="@{/static/scripts/sdcct-web-form.js}"></script>
         <script type="text/javascript" th:src="@{/static/scripts/sdcct-testcases.js}"></script>
         <script type="text/javascript" th:src="@{/static/scripts/sdcct-testcases-ihe.js}"></script>
-        <script th:inline="javascript">
+        <script type="text/javascript" th:inline="javascript">
             /*<![CDATA[*/
             var IHE_TESTCASES = [[${iheTestcases}]];
+            
             var IHE_ENDPOINT_ADDRESSES = [[${iheEndpointAddresses}]];
-            var IHE_TESTCASES_EVENT_POLL_URL = [[${iheTestcasesEventPollUrl}]];
+            
+            var IHE_TESTCASES_RESULTS_POLL_URL = [[${iheTestcasesResultsPollUrl}]];
+            
             var IHE_TESTCASES_PROCESS_URLS = [[${iheTestcasesProcessUrls}]];
-            var LAST_SEEN_TX_ID = [[${lastSeenTxId}]];
             /*]]>*/
         </script>
         <title>SDCCT - Home</title>
@@ -170,9 +170,7 @@
                             <div id="well-testcase-ihe-results-empty" class="text-muted well well-sm">
                                 <strong><em>None</em></strong>
                             </div>
-                            <div id="testcase-ihe-results" class="panel-group" aria-multiselectable="true" role="tablist">
-                                <div id="testcase-ihe-results-accordion"></div>
-                            </div>
+                            <div id="testcase-ihe-results" class="panel-group" aria-multiselectable="true" role="tablist"></div>
                         </div>
                     </form>
                 </div>

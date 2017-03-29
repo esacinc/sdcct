@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import gov.hhs.onc.sdcct.json.impl.SdcctTestcaseDeserializer;
 import gov.hhs.onc.sdcct.testcases.SdcctTestcase;
 import gov.hhs.onc.sdcct.testcases.SdcctTestcaseDescription;
+import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -19,6 +20,12 @@ public interface SdcctTestcaseSubmission<T extends SdcctTestcaseDescription, U e
 
     public void setEndpointAddress(@Nullable String endpointAddr);
 
+    @JsonProperty
+    @Nonnegative
+    public long getSubmittedTimestamp();
+
+    public void setSubmittedTimestamp(@Nonnegative long submittedTimestamp);
+
     public boolean hasTestcase();
 
     @JsonDeserialize(using = SdcctTestcaseDeserializer.class)
@@ -27,4 +34,9 @@ public interface SdcctTestcaseSubmission<T extends SdcctTestcaseDescription, U e
     public U getTestcase();
 
     public void setTestcase(@Nullable U testcase);
+
+    @JsonProperty
+    public String getTxId();
+
+    public void setTxId(String txId);
 }

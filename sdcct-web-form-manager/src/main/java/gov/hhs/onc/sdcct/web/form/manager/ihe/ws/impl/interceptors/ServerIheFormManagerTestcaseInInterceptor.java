@@ -14,6 +14,7 @@ import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheFormManagerTestcaseSubmiss
 import gov.hhs.onc.sdcct.testcases.submissions.ihe.impl.IheFormManagerTestcaseSubmissionImpl;
 import gov.hhs.onc.sdcct.web.testcases.ihe.impl.interceptors.AbstractServerIheTestcaseInInterceptor;
 import java.util.List;
+import javax.annotation.Nonnegative;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,11 +32,12 @@ public class ServerIheFormManagerTestcaseInInterceptor extends
     }
 
     @Override
-    protected IheFormManagerTestcaseResult processRequest(RetrieveFormRequestType request, SoapMessage message) throws Exception {
+    protected IheFormManagerTestcaseResult processRequest(RetrieveFormRequestType request, SoapMessage message, @Nonnegative long submittedTimestamp,
+        String txId) throws Exception {
         String formId = request.getWorkflowData().getFormId();
         IheFormManagerTestcase iheFormManagerTestcase = this.findTestcase(request, this.iheFormManagerTestcases, formId);
 
-        return this.createResult(iheFormManagerTestcase, message, formId);
+        return this.createResult(iheFormManagerTestcase, message, formId, submittedTimestamp, txId);
     }
 
     @Override

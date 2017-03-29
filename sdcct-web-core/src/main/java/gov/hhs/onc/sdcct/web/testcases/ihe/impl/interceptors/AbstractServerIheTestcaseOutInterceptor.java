@@ -2,6 +2,7 @@ package gov.hhs.onc.sdcct.web.testcases.ihe.impl.interceptors;
 
 import gov.hhs.onc.sdcct.testcases.ihe.IheTestcase;
 import gov.hhs.onc.sdcct.testcases.results.ihe.IheTestcaseResult;
+import gov.hhs.onc.sdcct.testcases.results.ihe.IheTestcaseResultHandler;
 import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheTestcaseSubmission;
 import java.io.OutputStream;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -9,9 +10,13 @@ import org.apache.cxf.interceptor.StaxOutEndingInterceptor;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractServerIheTestcaseOutInterceptor<T extends IheTestcase, U extends IheTestcaseSubmission<T>, V extends IheTestcaseResult<T, U>, W extends AbstractIheTestcaseOutCallback<T, U, V>>
     extends AbstractIheTestcaseInterceptor {
+    @Autowired
+    protected IheTestcaseResultHandler resultHandler;
+
     protected Class<V> resultClass;
     protected String resultPropName;
 

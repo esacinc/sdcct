@@ -270,6 +270,9 @@
                             <id>process-project-properties</id>
                         </execution>
                         <execution>
+                            <id>process-deps-jsw</id>
+                        </execution>
+                        <execution>
                             <id>process-resources-app</id>
                         </execution>
                         <execution>

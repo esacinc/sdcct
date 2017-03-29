@@ -3,6 +3,7 @@ package gov.hhs.onc.sdcct.web.testcases.ihe.impl.interceptors;
 import gov.hhs.onc.sdcct.api.SdcctIssueSeverity;
 import gov.hhs.onc.sdcct.testcases.ihe.IheTestcase;
 import gov.hhs.onc.sdcct.testcases.results.ihe.IheTestcaseResult;
+import gov.hhs.onc.sdcct.testcases.results.ihe.IheTestcaseResultHandler;
 import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheTestcaseSubmission;
 import gov.hhs.onc.sdcct.testcases.utils.SdcctTestcaseUtils;
 import gov.hhs.onc.sdcct.web.tomcat.impl.TomcatRequest;
@@ -17,22 +18,15 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.web.client.RestTemplate;
 
 public abstract class AbstractServerIheTestcaseOutCallback<T extends IheTestcase, U extends IheTestcaseSubmission<T>, V extends IheTestcaseResult<T, U>>
     extends AbstractIheTestcaseOutCallback<T, U, V> {
-    protected String eventEndpointAddr;
-    protected RestTemplate restTemplate;
+    protected IheTestcaseResultHandler resultHandler;
 
-    protected AbstractServerIheTestcaseOutCallback(Message msg, Class<V> resultClass, String resultPropName, String eventEndpointAddr,
-        RestTemplate restTemplate) {
+    protected AbstractServerIheTestcaseOutCallback(IheTestcaseResultHandler resultHandler, Message msg, Class<V> resultClass, String resultPropName) {
         super(msg, resultClass, resultPropName);
 
-        this.eventEndpointAddr = eventEndpointAddr;
-        this.restTemplate = restTemplate;
+        this.resultHandler = resultHandler;
     }
 
     protected void onCloseInternal(CacheAndWriteOutputStream cachedStream) throws Exception {
@@ -44,9 +38,6 @@ public abstract class AbstractServerIheTestcaseOutCallback<T extends IheTestcase
                 V result = SdcctTestcaseUtils.addWsResponseEvent(inMsg, this.resultPropName, this.resultClass, this.msg);
                 U submission = result.getSubmission();
                 T testcase = submission.getTestcase();
-
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_JSON);
 
                 Fault fault = ((Fault) this.msg.getContent(Exception.class));
                 result.setFault(fault);
@@ -77,7 +68,7 @@ public abstract class AbstractServerIheTestcaseOutCallback<T extends IheTestcase
                     result.setSuccess(true);
                 }
 
-                this.sendResult(new HttpEntity<>(result, headers));
+                this.resultHandler.addResult(result);
             }
         } finally {
             OutputStream outStream = cachedStream.getFlowThroughStream();
@@ -87,10 +78,5 @@ public abstract class AbstractServerIheTestcaseOutCallback<T extends IheTestcase
 
             this.msg.setContent(OutputStream.class, outStream);
         }
-    }
-
-    @Override
-    protected void sendResult(HttpEntity<V> httpEntity) {
-        this.restTemplate.postForEntity(this.eventEndpointAddr, httpEntity, this.resultClass);
     }
 }

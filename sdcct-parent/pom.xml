@@ -1338,6 +1338,19 @@
                             </configuration>
                         </execution>
                         <execution>
+                            <id>process-deps-jsw</id>
+                            <phase>initialize</phase>
+                            <goals>
+                                <goal>execute</goal>
+                            </goals>
+                            <inherited>true</inherited>
+                            <configuration>
+                                <scripts>
+                                    <script>file://${project.basedir.all}/sdcct-core/src/main/scripts/sdcct-process-deps-jsw.groovy</script>
+                                </scripts>
+                            </configuration>
+                        </execution>
+                        <execution>
                             <id>process-resources-app</id>
                             <phase>process-resources</phase>
                             <goals>
@@ -1347,6 +1360,19 @@
                             <configuration>
                                 <scripts>
                                     <script>file://${project.basedir.all}/sdcct-core/src/main/scripts/sdcct-process-resources-app.groovy</script>
+                                </scripts>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>process-deps-soapui</id>
+                            <phase>initialize</phase>
+                            <goals>
+                                <goal>execute</goal>
+                            </goals>
+                            <inherited>true</inherited>
+                            <configuration>
+                                <scripts>
+                                    <script>file://${project.basedir.all}/sdcct-core/src/main/scripts/sdcct-process-deps-soapui.groovy</script>
                                 </scripts>
                             </configuration>
                         </execution>

@@ -41,7 +41,7 @@ public abstract class AbstractIheTestcaseProcessor<T extends IheTestcase, U exte
     }
 
     @Override
-    public V process(U submission) {
+    protected V processInternal(U submission) {
         T testcase = submission.getTestcase();
 
         String endpointAddr = submission.getEndpointAddress();
@@ -61,7 +61,8 @@ public abstract class AbstractIheTestcaseProcessor<T extends IheTestcase, U exte
             result.setResponse(client.invoke(delegate, transaction, this.createRequest(submission))[0]);
 
             // noinspection ConstantConditions
-            if (!result.hasMessages(SdcctIssueSeverity.ERROR) && submission.hasTestcase() && !testcase.isNegative()) {
+            if (!result.hasMessages(SdcctIssueSeverity.ERROR) && !result.hasMessages(SdcctIssueSeverity.FATAL) && submission.hasTestcase() &&
+                !testcase.isNegative()) {
                 result.setSuccess(true);
             }
         } catch (Exception e) {

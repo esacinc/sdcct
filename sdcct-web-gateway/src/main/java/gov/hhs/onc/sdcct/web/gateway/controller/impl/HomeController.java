@@ -3,7 +3,6 @@ package gov.hhs.onc.sdcct.web.gateway.controller.impl;
 import gov.hhs.onc.sdcct.testcases.SpecificationRole;
 import gov.hhs.onc.sdcct.testcases.ihe.IheTestcase;
 import gov.hhs.onc.sdcct.utils.SdcctStringUtils;
-import gov.hhs.onc.sdcct.web.controller.ParameterNames;
 import gov.hhs.onc.sdcct.web.gateway.controller.SdcctModelAttributes;
 import gov.hhs.onc.sdcct.web.gateway.controller.ViewNames;
 import java.util.Comparator;
@@ -42,8 +41,8 @@ public class HomeController implements InitializingBean {
     @Value("${sdcct.testcases.form.receiver.ihe.process.url}")
     private String iheFormReceiverProcessAddr;
 
-    @Value("${sdcct.testcases.ihe.event.poll.url}")
-    private String iheTestcasesEventPollUrl;
+    @Value("${sdcct.testcases.ihe.results.poll.url}")
+    private String iheTestcasesResultsPollUrl;
 
     @Autowired
     private List<IheTestcase> iheTestcases;
@@ -54,12 +53,12 @@ public class HomeController implements InitializingBean {
 
     @RequestMapping(method = { RequestMethod.GET }, value = { SdcctStringUtils.SLASH, (SdcctStringUtils.SLASH + ViewNames.HOME) })
     public ModelAndView displayHome() throws Exception {
-        return new ModelAndView(ViewNames.HOME, new HashMap<>());
+        return new ModelAndView(ViewNames.HOME);
     }
 
-    @ModelAttribute(value = SdcctModelAttributes.IHE_TESTCASES_EVENT_POLL_URL_NAME)
-    private String getIheTestcasesEventPollUrl() {
-        return this.iheTestcasesEventPollUrl;
+    @ModelAttribute(value = SdcctModelAttributes.IHE_TESTCASES_RESULTS_POLL_URL_NAME)
+    private String getIheTestcasesResultsPollUrl() {
+        return this.iheTestcasesResultsPollUrl;
     }
 
     @ModelAttribute(value = SdcctModelAttributes.IHE_TESTCASES_NAME)
@@ -75,11 +74,6 @@ public class HomeController implements InitializingBean {
     @ModelAttribute(value = SdcctModelAttributes.IHE_ENDPOINT_ADDRESSES_NAME)
     private Map<SpecificationRole, String> getIheEndpointAddresses() {
         return this.iheEndpointAddressesMap;
-    }
-
-    @ModelAttribute(value = SdcctModelAttributes.LAST_SEEN_TX_ID)
-    private String getLastSeenTxId() {
-        return ParameterNames.LAST_SEEN_TX_ID;
     }
 
     @Override

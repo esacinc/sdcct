@@ -16,6 +16,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.HandlerMapping;
 
 public class ResourceController {
     private final static String STATIC_RESOURCE_PATH_PREFIX = "/static";
@@ -36,12 +37,12 @@ public class ResourceController {
 
     @RequestMapping(method = { RequestMethod.GET }, value = { (STATIC_RESOURCE_PATH_PREFIX + "/**") })
     public void displayStaticResource(HttpServletRequest servletReq, HttpServletResponse servletResp) throws Exception {
-        String reqUri = servletReq.getRequestURI();
+        String reqPath = ((String) servletReq.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE));
         ResourceSource staticResourceSrc = this.resourceSrcResolver.resolve(SdcctResourceUtils.extractPath(
-            this.staticDir.createRelative(StringUtils.removeStart(StringUtils.removeStart(reqUri, STATIC_RESOURCE_PATH_PREFIX), SdcctStringUtils.SLASH))));
+            this.staticDir.createRelative(StringUtils.removeStart(StringUtils.removeStart(reqPath, STATIC_RESOURCE_PATH_PREFIX), SdcctStringUtils.SLASH))));
 
         if (staticResourceSrc == null) {
-            servletResp.sendError(HttpServletResponse.SC_NOT_FOUND, String.format("Static resource not found: %s", reqUri));
+            servletResp.sendError(HttpServletResponse.SC_NOT_FOUND, String.format("Static resource not found: %s", reqPath));
 
             return;
         }

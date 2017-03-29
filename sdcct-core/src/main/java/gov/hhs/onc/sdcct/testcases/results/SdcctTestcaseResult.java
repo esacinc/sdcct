@@ -9,10 +9,17 @@ import gov.hhs.onc.sdcct.testcases.SdcctTestcaseDescription;
 import gov.hhs.onc.sdcct.testcases.submissions.SdcctTestcaseSubmission;
 import gov.hhs.onc.sdcct.ws.logging.WsRequestEvent;
 import gov.hhs.onc.sdcct.ws.logging.WsResponseEvent;
+import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 
 public interface SdcctTestcaseResult<T extends SdcctTestcaseDescription, U extends SdcctTestcase<T>, V extends SdcctTestcaseSubmission<T, U>>
     extends ResultBean {
+    @JsonProperty
+    @Nonnegative
+    public long getProcessedTimestamp();
+
+    public void setProcessedTimestamp(@Nonnegative long processedTimestamp);
+
     @JsonProperty
     public V getSubmission();
 
@@ -35,9 +42,9 @@ public interface SdcctTestcaseResult<T extends SdcctTestcaseDescription, U exten
     public boolean hasWsRequestEvent();
 
     @JsonProperty
-    public long getTxId();
+    public String getTxId();
 
-    public void setTxId(long txId);
+    public void setTxId(String txId);
 
     @JsonProperty
     @Nullable

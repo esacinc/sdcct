@@ -23,11 +23,11 @@ import gov.hhs.onc.sdcct.ws.logging.impl.WsRequestEventImpl;
 import gov.hhs.onc.sdcct.ws.utils.SdcctRestEventUtils;
 import gov.hhs.onc.sdcct.ws.utils.SdcctWsPropertyUtils;
 import gov.hhs.onc.sdcct.xml.saxon.impl.XdmDocument;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import javax.annotation.Nonnegative;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
@@ -78,6 +78,8 @@ public abstract class AbstractServerIheTestcaseInInterceptor<T extends IheTestca
 
     @Override
     protected void handleMessageInternal(SoapMessage message) throws Exception {
+        long submittedTimestamp = System.currentTimeMillis();
+        String txId = this.txIdGen.generateId(submittedTimestamp).toString();
         Message inMsg = message.getExchange().getInMessage();
         String soapActionPropValue = SdcctWsPropertyUtils.getProperty(inMsg, SoapBindingConstants.SOAP_ACTION);
 
@@ -96,7 +98,7 @@ public abstract class AbstractServerIheTestcaseInInterceptor<T extends IheTestca
 
                 W request = this.xmlCodec.decode(this.xmlCodec.encode(new DOMSource(requestElem), null), this.requestImplClass, null);
 
-                result = this.processRequest(request, message);
+                result = this.processRequest(request, message, submittedTimestamp, txId);
 
                 U submission = result.getSubmission();
                 T testcase = submission != null ? submission.getTestcase() : null;
@@ -108,7 +110,7 @@ public abstract class AbstractServerIheTestcaseInInterceptor<T extends IheTestca
                         "The testcase associated with the web service request could not be determined. Please check that the web service response event payload corresponds to the expected response for the intended testcase.");
                 }
             } catch (Exception e) {
-                result = this.createResult(null, message, null);
+                result = this.createResult(null, message, null, submittedTimestamp, txId);
 
                 throw new IheTestcaseValidationException(String.format("Unable to parse request for testcase (SOAP action=%s).", soapActionPropValue), e);
             } finally {
@@ -122,7 +124,7 @@ public abstract class AbstractServerIheTestcaseInInterceptor<T extends IheTestca
                     cachedOutputStream.getBytes());
 
                 if (result == null) {
-                    result = this.createResult(null, message, null);
+                    result = this.createResult(null, message, null, submittedTimestamp, txId);
                 }
 
                 result.setWsRequestEvent(wsRequestEvent);
@@ -131,27 +133,32 @@ public abstract class AbstractServerIheTestcaseInInterceptor<T extends IheTestca
                     SdcctTomcatUtils.unwrapRequest(SdcctWsPropertyUtils.getProperty(message, AbstractHTTPDestination.HTTP_REQUEST, HttpServletRequest.class));
 
                 result.setHttpRequestEvent(SdcctHttpEventUtils.createHttpRequestEvent(httpServletReq));
+
+                result.setProcessedTimestamp(System.currentTimeMillis());
             }
         }
     }
 
     protected abstract T findTestcase(W request, List<T> testcases, String formId);
 
-    protected V createResult(T testcase, SoapMessage message, String formId) {
+    protected V createResult(T testcase, SoapMessage message, String formId, @Nonnegative long submittedTimestamp, String txId) {
         Message inMsg = message.getExchange().getInMessage();
 
         U testcaseSubmission =
             this.beanFactory.getBean(this.submissionImplClass, testcase, SdcctWsPropertyUtils.getProperty(inMsg, Message.REQUEST_URL), formId);
+        testcaseSubmission.setSubmittedTimestamp(submittedTimestamp);
+        testcaseSubmission.setTxId(txId);
+
         V testcaseResult = this.beanFactory.getBean(this.resultImplClass, testcaseSubmission);
 
-        testcaseResult.setTxId(Instant.now().toEpochMilli());
+        testcaseResult.setTxId(txId);
 
         inMsg.put(this.resultPropName, testcaseResult);
 
         return testcaseResult;
     }
 
-    protected abstract V processRequest(W request, SoapMessage message) throws Exception;
+    protected abstract V processRequest(W request, SoapMessage message, @Nonnegative long submittedTimestamp, String txId) throws Exception;
 
     protected abstract void validateRequest(T testcase, V testcaseResult, W request);
 

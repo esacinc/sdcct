@@ -12,6 +12,12 @@
         urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
 
     <!--====================================================================================================
+    = TRANSACTION ID GENERATORS
+    =====================================================================================================-->
+    <beans:bean id="txIdGenTestcaseProcess" parent="txIdGen"
+        c:name="testcase-process"/>
+    
+    <!--====================================================================================================
     = TESTCASE DESCRIPTIONS
     =====================================================================================================-->
     <beans:bean id="sdcctTestcaseDesc" class="gov.hhs.onc.sdcct.testcases.SdcctTestcaseDescription" abstract="true"/>

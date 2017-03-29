@@ -923,28 +923,12 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>process-deps-soapui</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>execute</goal>
-                        </goals>
-                        <configuration>
-                            <scripts>
-                                <script>file://${project.build.scriptSourceDirectory}/sdcct-process-deps-soapui.groovy</script>
-                            </scripts>
-                        </configuration>
+                        <id>process-deps-jsw</id>
+                        <phase>none</phase>
                     </execution>
                     <execution>
-                        <id>process-deps-jsw</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>execute</goal>
-                        </goals>
-                        <configuration>
-                            <scripts>
-                                <script>file://${project.build.scriptSourceDirectory}/sdcct-process-deps-jsw.groovy</script>
-                            </scripts>
-                        </configuration>
+                        <id>process-deps-soapui</id>
+                        <phase>none</phase>
                     </execution>
                     <execution>
                         <id>generate-sources-jaxb-sdcct</id>

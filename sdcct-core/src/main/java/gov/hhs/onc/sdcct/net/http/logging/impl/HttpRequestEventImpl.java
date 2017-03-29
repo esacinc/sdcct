@@ -43,6 +43,8 @@ public class HttpRequestEventImpl extends AbstractHttpEvent implements HttpReque
 
         msgToStrBuilder.append("method", this.method);
         msgToStrBuilder.append("uri", this.uri);
+        msgToStrBuilder.append("url", this.url);
+        msgToStrBuilder.append("queryStr", this.queryString);
         msgToStrBuilder.append("headers", this.headers);
         msgToStrBuilder.append("localName", this.localName);
         msgToStrBuilder.append("localPort", this.localPort);

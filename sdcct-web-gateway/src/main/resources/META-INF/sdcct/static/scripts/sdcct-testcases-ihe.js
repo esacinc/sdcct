@@ -6,11 +6,17 @@
             "processIheTestcase": function (formElem) {
                 $.ajax({
                     "beforeSend": function () {
+                        formTestcasesIhe.find(".form-control").attr("disabled", "disabled");
+                        
+                        testcaseIheResults.find("div.panel div.panel-collapse").collapse("hide");
+                        
                         iheTestcaseResultsEmptyWellElem.hide();
                         iheTestcaseResultsProcessingWellElem.show();
                     },
                     "cache": false,
                     "complete": function (jqXhr, status) {
+                        formTestcasesIhe.find(".form-control").removeAttr("disabled");
+                        
                         iheTestcaseResultsProcessingWellElem.hide();
                     },
                     "contentType": "application/json",
@@ -20,8 +26,11 @@
                         $.sdcct.form.addErrors(formTestcasesIhe, $.parseJSON(jqXhr["responseText"]));
                         $.sdcct.form.inputGroupAddons(formTestcasesIhe).show();
                     },
+                    "headers": {
+                        "Accept": "application/json"
+                    },
                     "success": function (resp, respHttpStatusText, req) {
-                        $(formElem).sdcct.testcases.buildTestcaseResults(testcaseIheResultsAccordion, resp);
+                        $(formElem).sdcct.testcases.buildTestcaseResults(iheTestcaseResultsEmptyWellElem, testcaseIheResults, resp);
                     },
                     "type": formElem.attr("method"),
                     "url": formElem.attr("action")
@@ -30,7 +39,7 @@
         })
     });
     
-    var formTestcasesIhe, testcasesIheSelect, testcaseIheEndpointAddr, testcaseIheFormId, testcaseIheSubmit, testcaseIheReset, testcaseIheDesc, testcaseIheDescFormGroup, testcaseIheResults, testcaseIheSubmission, testcaseIheResultsAccordion, iheTestcaseInfo, iheRoleTested, iheRoleTestedSelection, testcaseIheSelectionGroup, testcaseIheSdcctInitiatedFormGroup, formIdOptions, iheTestcaseResultsEmptyWellElem, iheTestcaseResultsProcessingWellElem, selectedIheTestcase;
+    var formTestcasesIhe, testcasesIheSelect, testcaseIheEndpointAddr, testcaseIheFormId, testcaseIheSubmit, testcaseIheReset, testcaseIheDesc, testcaseIheDescFormGroup, testcaseIheResults, testcaseIheSubmission, iheTestcaseInfo, iheRoleTested, iheRoleTestedSelection, testcaseIheSelectionGroup, testcaseIheSdcctInitiatedFormGroup, formIdOptions, iheTestcaseResultsEmptyWellElem, iheTestcaseResultsProcessingWellElem, selectedIheTestcase;
     
     $(document).ready(function () {
         iheTestcaseInfo = {
@@ -73,17 +82,6 @@
         testcaseIheDesc = $("div#testcase-ihe-desc", formTestcasesIhe);
         testcaseIheDescFormGroup = $(".ihe-testcase-desc-form-group", formTestcasesIhe);
         testcaseIheResults = $("div#testcase-ihe-results", formTestcasesIhe);
-        testcaseIheResultsAccordion = $("div#testcase-ihe-results-accordion", testcaseIheResults);
-        
-        testcaseIheResultsAccordion.accordion({
-            "collapsible": true,
-            "heightStyle": "content",
-            "icons": {
-                "activeHeader": "",
-                "header": ""
-            }
-        });
-        testcaseIheResultsAccordion.empty();
         
         testcaseIheSelectionGroup.hide();
         testcaseIheSdcctInitiatedFormGroup.hide();
@@ -162,7 +160,7 @@
             testcaseIheSdcctInitiatedFormGroup.hide();
             testcaseIheDescFormGroup.hide();
             iheTestcaseResultsEmptyWellElem.show();
-            testcaseIheResultsAccordion.empty();
+            testcaseIheResults.empty();
             testcaseIheEndpointAddr.disable();
             testcaseIheFormId.disable();
             
@@ -170,7 +168,7 @@
         });
         
         $.sdcct.poll.pollIntervalId = setInterval(function () {
-            $.fn.sdcct.testcases.pollIncomingIheTestcaseEvents(testcaseIheResultsAccordion, iheTestcaseResultsEmptyWellElem);
-        }, $.sdcct.poll.POLL_INTERVAL);
+            $.fn.sdcct.testcases.pollTestcaseResults(iheTestcaseResultsEmptyWellElem, testcaseIheResults);
+        }, $.sdcct.poll.pollInterval);
     });
 })(jQuery);

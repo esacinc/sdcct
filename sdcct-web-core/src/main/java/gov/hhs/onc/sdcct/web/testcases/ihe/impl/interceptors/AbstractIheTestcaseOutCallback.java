@@ -8,7 +8,6 @@ import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedOutputStreamCallback;
 import org.apache.cxf.message.Message;
-import org.springframework.http.HttpEntity;
 
 public abstract class AbstractIheTestcaseOutCallback<T extends IheTestcase, U extends IheTestcaseSubmission<T>, V extends IheTestcaseResult<T, U>>
     implements CachedOutputStreamCallback {
@@ -38,6 +37,4 @@ public abstract class AbstractIheTestcaseOutCallback<T extends IheTestcase, U ex
     }
 
     protected abstract void onCloseInternal(CacheAndWriteOutputStream cachedStream) throws Exception;
-
-    protected abstract void sendResult(HttpEntity<V> httpEntity);
 }

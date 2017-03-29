@@ -22,10 +22,21 @@
     <beans:bean id="cacheManager" class="gov.hhs.onc.sdcct.data.db.cache.impl.CacheManagerFactoryBean" abstract="true"/>
     
     <!--====================================================================================================
+    = CACHE SEARCH ATTRIBUTES
+    =====================================================================================================-->
+    <beans:bean id="cacheSearchAttr" class="net.sf.ehcache.config.SearchAttribute" abstract="true"/>
+    
+    <!--====================================================================================================
+    = CACHE SEARCHABLES
+    =====================================================================================================-->
+    <beans:bean id="cacheSearchable" class="net.sf.ehcache.config.Searchable" abstract="true"
+        p:keys="false"
+        p:values="false"/>
+    
+    <!--====================================================================================================
     = CACHE CONFIGURATIONS
     =====================================================================================================-->
     <beans:bean id="cacheConfig" class="net.sf.ehcache.config.CacheConfiguration" abstract="true"
-        p:eternal="true"
         p:memoryStoreEvictionPolicyFromObject="FIFO"/>
     
     <!--====================================================================================================

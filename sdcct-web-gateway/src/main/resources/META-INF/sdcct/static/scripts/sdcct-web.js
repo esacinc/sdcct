@@ -47,9 +47,9 @@
 
     $.extend($.sdcct, {
         "poll": {
-            "pollIntervalId": undefined,
-            "POLL_INTERVAL": 5000,
-            "lastSeenTxId": 0
+            "lastPollTimestamp": new Date().getTime(),
+            "pollInterval": 15000,
+            "pollIntervalId": undefined
         },
         "roles": {
             "FORM_ARCHIVER": "FORM_ARCHIVER",

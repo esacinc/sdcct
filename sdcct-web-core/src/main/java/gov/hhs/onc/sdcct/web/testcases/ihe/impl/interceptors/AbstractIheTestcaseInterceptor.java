@@ -1,7 +1,9 @@
 package gov.hhs.onc.sdcct.web.testcases.ihe.impl.interceptors;
 
+import gov.hhs.onc.sdcct.logging.impl.TxIdGenerator;
 import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
 import gov.hhs.onc.sdcct.xml.saxon.impl.SdcctDocumentBuilder;
+import javax.annotation.Resource;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -11,7 +13,8 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractIheTestcaseInterceptor extends AbstractPhaseInterceptor<SoapMessage> implements BeanFactoryAware {
-    protected BeanFactory beanFactory;
+    @Resource(name = "txIdGenTestcaseProcess")
+    protected TxIdGenerator txIdGen;
 
     @Autowired
     protected SdcctDocumentBuilder docBuilder;
@@ -19,11 +22,11 @@ public abstract class AbstractIheTestcaseInterceptor extends AbstractPhaseInterc
     @Autowired
     protected XmlCodec xmlCodec;
 
+    protected BeanFactory beanFactory;
+
     protected AbstractIheTestcaseInterceptor(String phase) {
         super(phase);
     }
-
-    protected abstract void handleMessageInternal(SoapMessage message) throws Exception;
 
     @Override
     public void handleMessage(SoapMessage message) throws Fault {
@@ -33,6 +36,8 @@ public abstract class AbstractIheTestcaseInterceptor extends AbstractPhaseInterc
             throw new Fault(e);
         }
     }
+
+    protected abstract void handleMessageInternal(SoapMessage message) throws Exception;
 
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {

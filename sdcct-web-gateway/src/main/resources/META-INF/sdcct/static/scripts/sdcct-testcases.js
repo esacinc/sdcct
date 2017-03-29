@@ -158,24 +158,84 @@
                 
                 return testcaseItemElem;
             },
-            "buildTestcaseResults": function (testcaseResultsAccordion, testcaseResult) {
+            "buildTestcaseResults": function (testcaseResultsEmptyWellElem, testcaseResultsElem, testcaseResult) {
                 var testcaseSuccess = !$.isUndefined(testcaseResult["success"]) ? testcaseResult["success"] : false;
                 var testcaseSuccessStr = testcaseSuccess ? "success" : "error";
                 var testcaseSubmission = testcaseResult["submission"];
                 var testcase = testcaseSubmission["testcase"];
+                var testcaseTxId = testcaseResult["txId"];
                 var testcaseName = !$.isUndefined(testcase) ? testcase["name"] : "None";
                 
-                var testcaseResultHeaderElem = $("<h3/>");
-                testcaseResultHeaderElem.enableClass("testcase-result-header");
-                testcaseResultHeaderElem.enableClass("testcase-result-header-" + testcaseSuccessStr);
-                testcaseResultHeaderElem.append($.fn.sdcct.testcases.buildTestcaseItem("Testcase", testcaseName));
-                testcaseResultHeaderElem.append($.fn.sdcct.testcases.buildTestcaseItem("Endpoint Address", testcaseSubmission["endpointAddr"]));
-                testcaseResultHeaderElem.append($.fn.sdcct.testcases.buildTestcaseItem("Form ID", testcaseSubmission["formId"]));
+                var testcaseResultPanelElem = $("<div/>", {
+                    "class": ("panel panel-" + (testcaseSuccess ? "success" : "danger")),
+                    "id": ("testcase-result-panel-" + testcaseTxId)
+                });
                 
-                testcaseResultsAccordion.append(testcaseResultHeaderElem);
+                var testcaseResultPanelHeaderElem = $("<div/>", {
+                    "class": ("panel-heading testcase-result-header testcase-result-header-" + testcaseSuccessStr),
+                    "id": ("testcase-result-panel-header" + testcaseTxId),
+                    "role": "tab"
+                });
+                testcaseResultPanelElem.append(testcaseResultPanelHeaderElem);
                 
-                var testcaseResultBodyElem = $("<div/>");
-                testcaseResultBodyElem.append($.fn.sdcct.testcases.buildTestcaseItem("Success", testcaseSuccess));
+                var testcaseResultPanelTitleElem = $("<div/>", {
+                    "class": "panel-title"
+                });
+                testcaseResultPanelHeaderElem.append(testcaseResultPanelTitleElem);
+                
+                var testcaseResultPanelCloseButtonContentElem = $("<span/>", {
+                    "aria-hidden": true
+                });
+                testcaseResultPanelCloseButtonContentElem[0].innerHTML += "&#215;";
+                testcaseResultPanelTitleElem.append($("<button/>", {
+                    "aria-label": "Close",
+                    "class": "close",
+                    "type": "button"
+                }).click($.proxy(function (event) {
+                    testcaseResultPanelElem.remove();
+                    
+                    if (testcaseResultsElem.find("div.panel").length == 0) {
+                        testcaseResultsEmptyWellElem.show();
+                    }
+                }, this)).append(testcaseResultPanelCloseButtonContentElem));
+                
+                var testcaseResultPanelHeaderCollapseElem = $("<a/>", {
+                    "aria-controls": ("#testcase-result-panel-" + testcaseTxId),
+                    "data-parent": ("#" + testcaseResultsElem.attr("id")),
+                    "data-toggle": "collapse",
+                    "href": ("#testcase-result-panel-collapse-" + testcaseTxId),
+                    "role": "button"
+                }).append($("<span/>").append($("<i/>", {
+                    "class": ("fa fa-fw fa-" + (testcaseSuccess ? "check" : "times") + "-circle-o")
+                })));
+                testcaseResultPanelTitleElem.append(testcaseResultPanelHeaderCollapseElem);
+                
+                var testcaseResultPanelHeaderCollapseContentElem = $("<span/>");
+                testcaseResultPanelHeaderCollapseElem.append(testcaseResultPanelHeaderCollapseContentElem);
+                
+                testcaseResultPanelHeaderCollapseContentElem.append($.fn.sdcct.testcases.buildTestcaseItem("Transaction ID", testcaseTxId));
+                testcaseResultPanelHeaderCollapseContentElem.append($.fn.sdcct.testcases.buildTestcaseItem("Testcase", testcaseName));
+                testcaseResultPanelHeaderCollapseContentElem.append($.fn.sdcct.testcases.buildTestcaseItem("Endpoint Address", testcaseSubmission["endpointAddr"]));
+                testcaseResultPanelHeaderCollapseContentElem.append($.fn.sdcct.testcases.buildTestcaseItem("Form ID", testcaseSubmission["formId"]));
+                testcaseResultPanelHeaderCollapseContentElem.append($.fn.sdcct.testcases.buildTestcaseItem("Submitted Timestamp", new Date(
+                    testcaseSubmission["submittedTimestamp"]).toString()));
+                testcaseResultPanelHeaderCollapseContentElem.append($.fn.sdcct.testcases.buildTestcaseItem("Processed Timestamp", new Date(
+                    testcaseResult["processedTimestamp"]).toString()));
+                
+                var testcaseResultCollapseElem = $("<div/>", {
+                    "aria-labelledby": ("testcase-result-panel-header" + testcaseTxId),
+                    "class": "collapse in panel-collapse",
+                    "id": ("testcase-result-panel-collapse-" + testcaseTxId),
+                    "role": "tabpanel"
+                });
+                testcaseResultPanelElem.append(testcaseResultCollapseElem);
+                
+                var testcaseResultPanelBodyElem = $("<div/>", {
+                    "class": "panel-body"
+                });
+                testcaseResultCollapseElem.append(testcaseResultPanelBodyElem);
+                
+                testcaseResultPanelBodyElem.append($.fn.sdcct.testcases.buildTestcaseItem("Success", testcaseSuccess));
                 
                 var testcaseResultMsgs = [];
                 
@@ -189,57 +249,46 @@
                     });
                 });
                 
-                testcaseResultBodyElem.append($.fn.sdcct.testcases.buildTestcaseItem("Message(s)", testcaseResultMsgs));
-                testcaseResultBodyElem.append($.fn.sdcct.testcases.buildTestcaseSteps("Testcase Steps", !$.isUndefined(testcase) ? testcase["steps"] : []));
+                testcaseResultPanelBodyElem.append($.fn.sdcct.testcases.buildTestcaseItem("Message(s)", testcaseResultMsgs));
+                testcaseResultPanelBodyElem.append($.fn.sdcct.testcases.buildTestcaseSteps("Testcase Steps", !$.isUndefined(testcase) ? testcase["steps"] : []));
                 
                 if (!$.isUndefined(testcaseResult["wsRequestEvent"]) || !$.isUndefined(testcaseResult["wsResponseEvent"])) {
-                    var numTestcaseResults = testcaseResultsAccordion.find("h3.testcase-result-header").length;
-                    testcaseResultBodyElem.append($.fn.sdcct.testcases.buildTestcaseResultEventTabs(numTestcaseResults, testcaseResult));
+                    testcaseResultPanelBodyElem.append($.fn.sdcct.testcases.buildTestcaseResultEventTabs(testcaseTxId, testcaseResult));
                 }
                 
-                testcaseResultsAccordion.append(testcaseResultBodyElem);
-                
-                testcaseResultsAccordion.accordion("refresh");
-                testcaseResultsAccordion.accordion({
-                    "active": -1
-                });
-                
-                $("h3.testcase-result-header", testcaseResultsAccordion).each(function () {
-                    var testcaseResultHeaderElem = $(this);
-                    
-                    var testcaseResultHeaderIcon = $("span.ui-accordion-header-icon", testcaseResultHeaderElem);
-                    testcaseResultHeaderIcon.disableClass("ui-icon");
-                    testcaseResultHeaderIcon.enableClass("glyphicon");
-                    
-                    if (testcaseResultHeaderElem.hasClass("testcase-result-header-success")) {
-                        testcaseResultHeaderIcon.enableClass("glyphicon-ok-sign");
-                        testcaseResultHeaderIcon.enableClass("glyphicon-type-success");
-                    } else {
-                        testcaseResultHeaderIcon.enableClass("glyphicon-remove-sign");
-                        testcaseResultHeaderIcon.enableClass("glyphicon-type-error");
-                    }
-                });
-                
-                $(".tabs").tabs();
+                testcaseResultsElem.append(testcaseResultPanelElem);
             },
-            "buildTestcaseResultEventTabs": function (numTestcaseResults, testcaseResult) {
-                var testcaseResultEventElem = $("<div/>").attr({
-                    "id": "testcase-result-events-tabs-" + numTestcaseResults,
-                    "class": "tabs"
+            "buildTestcaseResultEventTabs": function (testcaseTxId, testcaseResult) {
+                var testcaseResultEventTabsElem = $("<div/>", {
+                    "id": ("testcase-result-event-tabs-" + testcaseTxId)
                 });
+                
                 var testcaseResultEventTabsHeaderElem =
-                    $("<ul/>").append($("<li/>").append($("<a/>").attr("href", "#ws-event-request-" + numTestcaseResults).text("Web Service Request Event"))).append($("<li/>").append($("<a/>").attr("href", "#ws-event-response-"
-                        + numTestcaseResults).text("Web Service Response Event"))).append($("<li/>").append($("<a/>").attr("href", "#http-event-request-"
-                        + numTestcaseResults).text("HTTP Request Event"))).append($("<li/>").append($("<a/>").attr("href", "#http-event-response-"
-                        + numTestcaseResults).text("HTTP Response Event")));
+                    $("<ul/>", {
+                        "class": "nav nav-tabs",
+                        "role": "tablist"
+                    }).append($.fn.sdcct.testcases.buildTestcaseResultEventTabHeaderElem(testcaseTxId, ("ws-event-request-" + testcaseTxId), "Web Service Request Event")).append($.fn.sdcct.testcases.buildTestcaseResultEventTabHeaderElem(testcaseTxId, ("ws-event-response-" + testcaseTxId), "Web Service Response Event", true)).append($.fn.sdcct.testcases.buildTestcaseResultEventTabHeaderElem(testcaseTxId, ("http-event-request-" + testcaseTxId), "HTTP Request Event")).append($.fn.sdcct.testcases.buildTestcaseResultEventTabHeaderElem(testcaseTxId, ("http-event-response-" + testcaseTxId), "HTTP Response Event"));
+                testcaseResultEventTabsElem.append(testcaseResultEventTabsHeaderElem);
                 
-                testcaseResultEventElem.append(testcaseResultEventTabsHeaderElem);
-                testcaseResultEventElem.append($.fn.sdcct.testcases.buildTestcaseWsEvent("ws-event-request-" + numTestcaseResults, testcaseResult["wsRequestEvent"]));
-                testcaseResultEventElem.append($.fn.sdcct.testcases.buildTestcaseWsEvent("ws-event-response-" + numTestcaseResults, testcaseResult["wsResponseEvent"]));
-                testcaseResultEventElem.append($.fn.sdcct.testcases.buildTestcaseHttpRequestEvent("http-event-request-" + numTestcaseResults, testcaseResult["httpRequestEvent"]));
-                testcaseResultEventElem.append($.fn.sdcct.testcases.buildTestcaseHttpResponseEvent("http-event-response-" + numTestcaseResults, testcaseResult["httpResponseEvent"]));
+                var testcaseResultEventTabsContentElem =
+                    $("<div/>", {
+                        "class": "tab-content"
+                    }).append($.fn.sdcct.testcases.buildTestcaseWsEvent(("ws-event-request-" + testcaseTxId), testcaseResult["wsRequestEvent"])).append($.fn.sdcct.testcases.buildTestcaseWsEvent(("ws-event-response-" + testcaseTxId), testcaseResult["wsResponseEvent"], true)).append($.fn.sdcct.testcases.buildTestcaseHttpRequestEvent(("http-event-request-" + testcaseTxId), testcaseResult["httpRequestEvent"])).append($.fn.sdcct.testcases.buildTestcaseHttpResponseEvent(("http-event-response-" + testcaseTxId), testcaseResult["httpResponseEvent"]));
+                testcaseResultEventTabsElem.append(testcaseResultEventTabsContentElem);
                 
-                return testcaseResultEventElem;
+                return testcaseResultEventTabsElem;
+            },
+            "buildTestcaseResultEventTabHeaderElem": function (testcaseTxId, testcaseResultEventTabId, testcaseResultEventTabHeaderText,
+                testcaseResultEventTabActive) {
+                return $("<li/>", {
+                    "class": (testcaseResultEventTabActive ? "active" : ""),
+                    "role": "presentation"
+                }).append($("<a/>", {
+                    "aria-controls": testcaseResultEventTabId,
+                    "data-toggle": "tab",
+                    "href": ("#" + testcaseResultEventTabId),
+                    "role": "tab"
+                }).text(testcaseResultEventTabHeaderText));
             },
             "buildTestcaseHttpEvent": function (testcaseHttpEventElem, testcaseHttpEvent) {
                 var elem = $(this);
@@ -266,8 +315,12 @@
                 
                 return testcaseHttpEventElem;
             },
-            "buildTestcaseHttpRequestEvent": function (testcaseHttpEventTabId, testcaseHttpEvent) {
-                var elem = $(this), testcaseHttpEventElem = $("<div/>").attr("id", testcaseHttpEventTabId);
+            "buildTestcaseHttpRequestEvent": function (testcaseHttpEventTabId, testcaseHttpEvent, testcaseResultEventTabActive) {
+                var elem = $(this), testcaseHttpEventElem = $("<div/>", {
+                    "class": ((testcaseResultEventTabActive ? "active " : "") + "tab-pane"),
+                    "id": testcaseHttpEventTabId,
+                    "role": "tabpanel"
+                });
                 
                 if ($.isUndefined(testcaseHttpEvent)) {
                     return testcaseHttpEventElem.append("<strong><em>None</em></strong>");
@@ -290,8 +343,12 @@
                 
                 return testcaseHttpEventElem;
             },
-            "buildTestcaseHttpResponseEvent": function (testcaseHttpEventTabId, testcaseHttpEvent) {
-                var elem = $(this), testcaseHttpEventElem = $("<div/>").attr("id", testcaseHttpEventTabId);
+            "buildTestcaseHttpResponseEvent": function (testcaseHttpEventTabId, testcaseHttpEvent, testcaseResultEventTabActive) {
+                var elem = $(this), testcaseHttpEventElem = $("<div/>", {
+                    "class": ((testcaseResultEventTabActive ? "active " : "") + "tab-pane"),
+                    "id": testcaseHttpEventTabId,
+                    "role": "tabpanel"
+                });
                 
                 if ($.isUndefined(testcaseHttpEvent)) {
                     return testcaseHttpEventElem.append("<strong><em>None</em></strong>");
@@ -303,8 +360,12 @@
                 
                 return testcaseHttpEventElem;
             },
-            "buildTestcaseWsEvent": function (testcaseWsEventTabId, testcaseWsEvent) {
-                var elem = $(this), testcaseWsEventElem = $("<div/>").attr("id", testcaseWsEventTabId);
+            "buildTestcaseWsEvent": function (testcaseWsEventTabId, testcaseWsEvent, testcaseResultEventTabActive) {
+                var elem = $(this), testcaseWsEventElem = $("<div/>", {
+                    "class": ((testcaseResultEventTabActive ? "active " : "") + "tab-pane"),
+                    "id": testcaseWsEventTabId,
+                    "role": "tabpanel"
+                });
                 
                 if ($.isUndefined(testcaseWsEvent)) {
                     return testcaseWsEventElem.append("<strong><em>None</em></strong>");
@@ -327,26 +388,44 @@
                 
                 return testcaseWsEventElem;
             },
-            "pollIncomingIheTestcaseEvents": function (resultsElem, resultsEmptyWellElem) {
+            "pollTestcaseResults": function (resultsEmptyWellElem, resultsElem) {
                 $.ajax({
-                    "cache": false,
-                    "complete": function (jqXhr, status) {
-                        if (jqXhr["status"] == 200) {
-                            resultsEmptyWellElem.hide();
-                            
-                            $.each($.parseJSON(jqXhr["responseText"]), function (idx, result) {
-                                $.fn.sdcct.testcases.buildTestcaseResults(resultsElem, result);
-                                $.sdcct.poll.lastSeenTxId = result["txId"];
-                            });
+                    "complete": function (jqXhr, statusText) {
+                        var statusCode = jqXhr["status"];
+                        
+                        try {
+                            if (statusCode == 200) {
+                                resultsEmptyWellElem.hide();
+                                
+                                var processedTestcaseResultTxIds = [];
+                                
+                                $.each($.parseJSON(jqXhr["responseText"]), function (resultIndex, testcaseResult) {
+                                    $.fn.sdcct.testcases.buildTestcaseResults(resultsEmptyWellElem, resultsElem, testcaseResult);
+                                    
+                                    processedTestcaseResultTxIds.push(testcaseResult["txId"]);
+                                });
+                                
+                                console.info(("Testcase result(s) poll AJAX query was successful (statusCode=" + statusCode + ", statusText=" + statusText
+                                    + "): txIds=[" + processedTestcaseResultTxIds.join(", ") + "]"));
+                            } else if (statusCode == 204) {
+                                console.info(("No testcase result(s) received from poll AJAX query (statusCode=" + statusCode + ", statusText=" + statusText + ")."));
+                            } else {
+                                console.error(("Testcase result(s) poll AJAX query failed (statusCode=" + statusCode + ", statusText=" + statusText + ")."));
+                            }
+                        } finally {
+                            $.sdcct.poll.lastPollTimestamp = new Date().getTime();
                         }
                     },
                     "contentType": "application/json",
-                    "error": function (jqXhr, status, error) {
-                        clearInterval($.sdcct.poll.pollIntervalId);
+                    "error": function (jqXhr, statusText, error) {
+                        console.error(("Testcase result(s) poll AJAX query failed (statusCode=" + jqXhr["status"] + ", statusText=" + statusText + "): " + error));
+                    },
+                    "headers": {
+                        "Accept": "application/json"
                     },
                     "type": "GET",
-                    "url": IHE_TESTCASES_EVENT_POLL_URL + "?" + LAST_SEEN_TX_ID + "=" + $.sdcct.poll.lastSeenTxId
-                })
+                    "url": (IHE_TESTCASES_RESULTS_POLL_URL + "?submittedAfterTimestamp=" + $.sdcct.poll.lastPollTimestamp)
+                });
             }
         })
     });
