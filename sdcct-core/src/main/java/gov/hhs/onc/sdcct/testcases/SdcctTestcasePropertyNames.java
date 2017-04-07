@@ -1,12 +1,12 @@
 package gov.hhs.onc.sdcct.testcases;
 
 import gov.hhs.onc.sdcct.rfd.ws.RfdWsResponseType;
-import gov.hhs.onc.sdcct.testcases.results.ihe.IheFormArchiverTestcaseResult;
-import gov.hhs.onc.sdcct.testcases.results.ihe.IheFormManagerTestcaseResult;
-import gov.hhs.onc.sdcct.testcases.results.ihe.IheFormReceiverTestcaseResult;
-import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheFormArchiverTestcaseSubmission;
-import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheFormManagerTestcaseSubmission;
-import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheFormReceiverTestcaseSubmission;
+import gov.hhs.onc.sdcct.testcases.ihe.results.IheFormArchiverTestcaseResult;
+import gov.hhs.onc.sdcct.testcases.ihe.results.IheFormManagerTestcaseResult;
+import gov.hhs.onc.sdcct.testcases.ihe.results.IheFormReceiverTestcaseResult;
+import gov.hhs.onc.sdcct.testcases.ihe.submissions.IheFormArchiverTestcaseSubmission;
+import gov.hhs.onc.sdcct.testcases.ihe.submissions.IheFormManagerTestcaseSubmission;
+import gov.hhs.onc.sdcct.testcases.ihe.submissions.IheFormReceiverTestcaseSubmission;
 
 public final class SdcctTestcasePropertyNames {
     public final static String IHE_FORM_ARCHIVER_TESTCASE_RESULT = IheFormArchiverTestcaseResult.class.getName();

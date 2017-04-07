@@ -5,9 +5,11 @@ import gov.hhs.onc.sdcct.beans.IdentifiedBean;
 import gov.hhs.onc.sdcct.beans.NamedBean;
 import gov.hhs.onc.sdcct.testcases.steps.SdcctTestcaseStep;
 import java.util.List;
+import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
+import org.springframework.core.Ordered;
 
-public interface SdcctTestcase<T extends SdcctTestcaseDescription> extends IdentifiedBean, NamedBean {
+public interface SdcctTestcase<T extends SdcctTestcaseDescription> extends IdentifiedBean, NamedBean, Ordered {
     public boolean hasDescription();
 
     @JsonProperty("desc")
@@ -39,6 +41,12 @@ public interface SdcctTestcase<T extends SdcctTestcaseDescription> extends Ident
     public boolean isOptional();
 
     public void setOptional(boolean optional);
+
+    @JsonProperty
+    @Nonnegative
+    public int getOrder();
+
+    public void setOrder(@Nonnegative int order);
 
     @JsonProperty
     public SpecificationRole getRoleTested();

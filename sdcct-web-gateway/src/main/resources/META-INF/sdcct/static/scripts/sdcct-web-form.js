@@ -4,7 +4,7 @@
             return this;
         }, {
             "addErrors": function (form, data) {
-                if (!$.isUndefined(data)) {
+                if (data) {
                     var dataErrorsGlobal = data["global"];
                     
                     if (dataErrorsGlobal) {

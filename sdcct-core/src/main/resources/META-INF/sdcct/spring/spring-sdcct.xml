@@ -52,15 +52,8 @@
     <!--====================================================================================================
     = MESSAGE SOURCES
     =====================================================================================================-->
-    <beans:bean id="messageSource" class="gov.hhs.onc.sdcct.context.impl.PropertySourcesMessageSource" primary="true"
-        p:alwaysUseMessageFormat="true">
-        <beans:property name="propertySources">
-            <beans:array>
-                <!--suppress ELValidationInJSP, SpringElInspection -->
-                <beans:value>#{ app.propertySource }</beans:value>
-            </beans:array>
-        </beans:property>
-    </beans:bean>
+    <beans:bean id="messageSource" class="gov.hhs.onc.sdcct.context.impl.PropertyResolvingMessageSource" primary="true"
+        c:propResolver-ref="environment"/>
 
     <!--====================================================================================================
     = CONVERSION SERVICES
@@ -74,6 +67,20 @@
                 <beans:bean class="gov.hhs.onc.sdcct.xml.saxon.convert.impl.SdcctDocumentUriConverter"/>
                 <beans:bean class="gov.hhs.onc.sdcct.xml.saxon.convert.impl.XdmValueConverter"/>
             </beans:set>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = VALIDATORS
+    =====================================================================================================-->
+    <beans:bean id="validator" class="gov.hhs.onc.sdcct.beans.validate.impl.SdcctValidatorFactoryBean" primary="true">
+        <beans:property name="messageInterpolator">
+            <beans:bean class="org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator">
+                <beans:constructor-arg name="userResourceBundleLocator">
+                    <beans:bean class="org.springframework.validation.beanvalidation.MessageSourceResourceBundleLocator"
+                        c:messageSource-ref="messageSource"/>
+                </beans:constructor-arg>
+            </beans:bean>
         </beans:property>
     </beans:bean>
     
@@ -100,12 +107,6 @@
     <beans:bean id="taskExecThreadPoolDynamic" parent="taskExecThreadPool" abstract="true"
         p:allowCoreThreadTimeOut="true"
         p:corePoolSize="0"/>
-
-    <beans:bean id="taskExecThreadPoolAsync" parent="taskExecThreadPoolDynamic"
-        p:keepAliveSeconds="${sdcct.task.exec.async.keep.alive.timeout}"
-        p:maxPoolSize="${sdcct.task.exec.async.pool.size.max}"
-        p:threadNamePrefix="#{ threadGroup.name }-async">
-    </beans:bean>
     
     <!--====================================================================================================
     = TASK SCHEDULERS

@@ -4,8 +4,8 @@ import gov.hhs.onc.sdcct.api.SdcctIssueSeverity;
 import gov.hhs.onc.sdcct.testcases.ihe.IheTestcase;
 import gov.hhs.onc.sdcct.testcases.ihe.IheTestcaseDescription;
 import gov.hhs.onc.sdcct.testcases.ihe.IheTestcaseProcessor;
-import gov.hhs.onc.sdcct.testcases.results.ihe.IheTestcaseResult;
-import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheTestcaseSubmission;
+import gov.hhs.onc.sdcct.testcases.ihe.results.IheTestcaseResult;
+import gov.hhs.onc.sdcct.testcases.ihe.submissions.IheTestcaseSubmission;
 import gov.hhs.onc.sdcct.transform.saxon.impl.SdcctSaxonConfiguration;
 import gov.hhs.onc.sdcct.ws.impl.JaxWsClient;
 import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
@@ -54,11 +54,11 @@ public abstract class AbstractIheTestcaseProcessorItTests<U extends IheTestcase,
 
         for (U testcase : filteredTestcases) {
             Client delegate = rfdClient.buildInvocationDelegate();
-            QName transaction = testcase.getTransaction();
+            QName op = testcase.getOperation();
             String testcaseId = testcase.getId();
 
             try {
-                Assert.assertNotNull(rfdClient.invoke(delegate, transaction, this.createRequest(testcase))[0],
+                Assert.assertNotNull(rfdClient.invoke(delegate, op, this.createRequest(testcase))[0],
                     String.format("Response for testcase (id=%s) was not expected to be null.", testcaseId));
             } catch (Exception e) {
                 Assert.assertTrue(testcase.isNegative(), String.format("Testcase (id=%s) was expected to be negative.", testcaseId));

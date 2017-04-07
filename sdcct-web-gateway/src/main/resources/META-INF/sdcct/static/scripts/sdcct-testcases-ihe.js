@@ -3,18 +3,22 @@
         "ihe": $.extend(function () {
             return this;
         }, {
+            "PROCESS_IHE_TESTCASE_ERROR_MSG_FORMAT": "Unable to process IHE testcase (id=%s, name=%s) submission (statusCode=%s, statusText=%s, error=%s):\n%s",
+            
             "processIheTestcase": function (formElem) {
+                var testcaseIheProcess = testcaseIheSubmission["testcase"], testcaseIheProcessId = testcaseIheProcess["id"], testcaseIheProcessName =
+                    testcaseIheProcess["name"];
+                
                 $.ajax({
                     "beforeSend": function () {
                         formTestcasesIhe.find(".form-control").attr("disabled", "disabled");
                         
                         testcaseIheResults.find("div.panel div.panel-collapse").collapse("hide");
                         
-                        iheTestcaseResultsEmptyWellElem.hide();
                         iheTestcaseResultsProcessingWellElem.show();
                     },
                     "cache": false,
-                    "complete": function (jqXhr, status) {
+                    "complete": function (jqXhr, statusText) {
                         formTestcasesIhe.find(".form-control").removeAttr("disabled");
                         
                         iheTestcaseResultsProcessingWellElem.hide();
@@ -22,15 +26,27 @@
                     "contentType": "application/json",
                     "data": $.encodeJson(testcaseIheSubmission),
                     "dataType": "json",
-                    "error": function (jqXhr, status, error) {
-                        $.sdcct.form.addErrors(formTestcasesIhe, $.parseJSON(jqXhr["responseText"]));
+                    "error": function (jqXhr, statusText, error) {
+                        var respText = (jqXhr["responseText"] || ""), resp, errorMsg =
+                            sprintf($.sdcct.ihe.PROCESS_IHE_TESTCASE_ERROR_MSG_FORMAT, testcaseIheProcessId, testcaseIheProcessName, jqXhr["status"], statusText, error, respText);
+                        
+                        console.error(errorMsg);
+                        
+                        if (respText) {
+                            resp = $.parseJSON(respText);
+                        } else {
+                            resp = {
+                                "global": {
+                                    "msgs": [ errorMsg ]
+                                }
+                            };
+                        }
+                        
+                        $.sdcct.form.addErrors(formTestcasesIhe, resp);
                         $.sdcct.form.inputGroupAddons(formTestcasesIhe).show();
                     },
                     "headers": {
                         "Accept": "application/json"
-                    },
-                    "success": function (resp, respHttpStatusText, req) {
-                        $(formElem).sdcct.testcases.buildTestcaseResults(iheTestcaseResultsEmptyWellElem, testcaseIheResults, resp);
                     },
                     "type": formElem.attr("method"),
                     "url": formElem.attr("action")
@@ -46,7 +62,8 @@
             "FORM_ARCHIVER": {
                 "action": IHE_TESTCASES_PROCESS_URLS[$.sdcct.roles.FORM_ARCHIVER],
                 "testcases": IHE_TESTCASES[$.sdcct.roles.FORM_ARCHIVER],
-                "testcaseSubmissionType": "iheFormArchiverTestcaseSubmission"
+                "testcaseSubmissionType": "iheFormArchiverTestcaseSubmission",
+                "testcaseType": "iheFormArchiverTestcase"
             },
             "FORM_FILLER": {
                 "testcases": IHE_TESTCASES[$.sdcct.roles.FORM_FILLER]
@@ -54,12 +71,14 @@
             "FORM_MANAGER": {
                 "action": IHE_TESTCASES_PROCESS_URLS[$.sdcct.roles.FORM_MANAGER],
                 "testcases": IHE_TESTCASES[$.sdcct.roles.FORM_MANAGER],
-                "testcaseSubmissionType": "iheFormManagerTestcaseSubmission"
+                "testcaseSubmissionType": "iheFormManagerTestcaseSubmission",
+                "testcaseType": "iheFormManagerTestcase"
             },
             "FORM_RECEIVER": {
                 "action": IHE_TESTCASES_PROCESS_URLS[$.sdcct.roles.FORM_RECEIVER],
                 "testcases": IHE_TESTCASES[$.sdcct.roles.FORM_RECEIVER],
-                "testcaseSubmissionType": "iheFormReceiverTestcaseSubmission"
+                "testcaseSubmissionType": "iheFormReceiverTestcaseSubmission",
+                "testcaseType": "iheFormReceiverTestcase"
             }
         };
         
@@ -118,9 +137,12 @@
             
             testcaseIheSubmission = {
                 "@type": iheTestcaseInfo[iheRoleTestedSelection]["testcaseSubmissionType"],
-                "testcase": testcasesIheSelect.val(),
                 "endpointAddr": testcaseIheEndpointAddr.val(),
-                "formId": testcaseIheFormId.val()
+                "formId": testcaseIheFormId.val(),
+                "testcase": {
+                    "@type": iheTestcaseInfo[iheRoleTestedSelection]["testcaseType"],
+                    "id": testcasesIheSelect.val()
+                }
             };
             
             $.sdcct.ihe.processIheTestcase(formTestcasesIhe);
@@ -132,7 +154,7 @@
             
             if (!$.isUndefined(selectedIheTestcase)) {
                 if (iheRoleTestedSelection == $.sdcct.roles.FORM_FILLER) {
-                    testcaseIheDesc.prepend($.fn.sdcct.testcases.buildTestcaseItem("Endpoint Address", IHE_ENDPOINT_ADDRESSES[selectedIheTestcase["sdcctRole"]]));
+                    testcaseIheDesc.prepend($.fn.sdcct.testcases.buildTestcaseItem("Endpoint Address", IHE_TESTCASES_ENDPOINT_ADDRESSES[selectedIheTestcase["sdcctRole"]]));
                 }
                 
                 testcaseIheDescFormGroup.show();
@@ -167,8 +189,52 @@
             $.sdcct.form.clearErrorMessages(formTestcasesIhe);
         });
         
-        $.sdcct.poll.pollIntervalId = setInterval(function () {
-            $.fn.sdcct.testcases.pollTestcaseResults(iheTestcaseResultsEmptyWellElem, testcaseIheResults);
-        }, $.sdcct.poll.pollInterval);
+        var testcasesIheResultsSockJsClient = new SockJS(IHE_TESTCASES_RESULTS_WEBSOCKET_URL);
+        testcasesIheResultsSockJsClient.debug = function (msg) {
+            console.debug(sprintf("SockJS WebSocket client: %s", msg));
+        };
+        
+        var testcasesIheResultsStompClient = Stomp.over(testcasesIheResultsSockJsClient);
+        testcasesIheResultsStompClient.debug = function (msg) {
+            console.debug(sprintf("STOMP WebSocket client: %s", msg));
+        };
+        
+        window.addEventListener("beforeunload", $.proxy(function (event) {
+            if (testcasesIheResultsStompClient) {
+                try {
+                    testcasesIheResultsStompClient.unsubscribe();
+                } catch (e) {
+                    console.warn("Unable to unsubscribe IHE testcases results STOMP WebSocket client.", e);
+                }
+                
+                try {
+                    testcasesIheResultsStompClient.disconnect();
+                } catch (e) {
+                    console.warn("Unable to disconnect IHE testcases results STOMP WebSocket client.", e);
+                }
+            }
+            
+            return null;
+        }, this), false);
+        
+        testcasesIheResultsStompClient.connect({}, $.proxy(function (frame) {
+            console.info(sprintf("IHE testcases results STOMP WebSocket client connected (url=%s):\n%s", IHE_TESTCASES_RESULTS_WEBSOCKET_URL, $.encodeJson(frame)));
+            
+            testcasesIheResultsStompClient.subscribe(IHE_TESTCASES_RESULTS_TOPIC_WEBSOCKET_ENDPOINT, $.proxy(function (msg) {
+                var testcaseResult = $.parseJSON(msg.body)["payload"], testcaseTxId = testcaseResult["txId"], testcaseSubmission = testcaseResult["submission"], testcase =
+                    testcaseSubmission["testcase"];
+                
+                $.fn.sdcct.testcases.buildTestcaseResults(iheTestcaseResultsEmptyWellElem, testcaseIheResults, testcaseResult, testcaseTxId);
+                
+                iheTestcaseResultsEmptyWellElem.hide();
+                
+                console.info(sprintf("Added IHE testcase (id=%s, name=%s) result (txId=%s, submittedTimestamp=%s, processedTimestamp=%s).", (testcase ? testcase["id"] : null), (testcase ? testcase["name"] : null), testcaseTxId, new Date(
+                    testcaseSubmission["submittedTimestamp"]).toString(), new Date(testcaseResult["processedTimestamp"]).toString()));
+            }, this));
+            
+            console.info(sprintf("IHE testcases results STOMP WebSocket client subscribed to topic (endpoint=%s).", IHE_TESTCASES_RESULTS_TOPIC_WEBSOCKET_ENDPOINT));
+        }, this), $.proxy(function (frame) {
+            console.error(sprintf("IHE testcases results STOMP WebSocket client failed to connect (url=%s):\n%s", IHE_TESTCASES_RESULTS_WEBSOCKET_URL, $.encodeJson(frame)));
+        }, this));
     });
 })(jQuery);

@@ -13,6 +13,11 @@ public interface IheTestcase extends SdcctTestcase<IheTestcaseDescription> {
     public void setContentType(RfdWsResponseType contentType);
 
     @JsonProperty
+    public QName getOperation();
+
+    public void setOperation(QName op);
+
+    @JsonProperty
     @Nullable
     public IheTestcaseRequestInfo getRequestInfo();
 
@@ -23,9 +28,4 @@ public interface IheTestcase extends SdcctTestcase<IheTestcaseDescription> {
     public IheTestcaseResponseInfo getResponseInfo();
 
     public void setResponseInfo(@Nullable IheTestcaseResponseInfo responseInfo);
-
-    @JsonProperty
-    public QName getTransaction();
-
-    public void setTransaction(QName transaction);
 }

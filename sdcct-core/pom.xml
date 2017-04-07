@@ -107,12 +107,6 @@
             <groupId>com.ryantenney.metrics</groupId>
             <artifactId>metrics-spring</artifactId>
         </dependency>
-        <!--
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-xjc</artifactId>
-        </dependency>
-        -->
         <dependency>
             <groupId>com.sun.xml.ws</groupId>
             <artifactId>jaxws-rt</artifactId>
@@ -506,19 +500,15 @@
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
+            <artifactId>jquery</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
             <artifactId>select2</artifactId>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>webjars-locator-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>jquery</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>jquery-ui</artifactId>
         </dependency>
         <dependency>
             <groupId>xerces</groupId>

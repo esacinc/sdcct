@@ -5,12 +5,16 @@ import gov.hhs.onc.sdcct.logging.impl.TxIdGenerator;
 import gov.hhs.onc.sdcct.logging.impl.TxTaskWrapper;
 import java.io.File;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.SessionTrackingMode;
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
 import org.apache.catalina.Service;
@@ -20,6 +24,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.coyote.http11.Http11NioProtocol;
@@ -27,6 +32,7 @@ import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.TaskThreadFactory;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
+import org.apache.tomcat.websocket.server.WsContextListener;
 import org.springframework.boot.context.embedded.EmbeddedServletContainer;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
@@ -84,6 +90,13 @@ public class SdcctTomcatEmbeddedServletContainerFactory extends TomcatEmbeddedSe
         @Override
         public void execute(Runnable task) {
             super.execute((task.getClass().getName().equals(SOCKET_PROCESSOR_CLASS_NAME) ? new TxTaskWrapper(this.txIdGens, task) : task));
+        }
+    }
+
+    private static class SdcctSessionConfigServletContextInitializer implements ServletContextInitializer {
+        @Override
+        public void onStartup(ServletContext servletContext) throws ServletException {
+            servletContext.setSessionTrackingModes(EnumSet.of(SessionTrackingMode.COOKIE));
         }
     }
 
@@ -147,15 +160,19 @@ public class SdcctTomcatEmbeddedServletContainerFactory extends TomcatEmbeddedSe
 
     @Override
     protected void configureContext(Context context, ServletContextInitializer[] servletContextInits) {
+        context.setCookies(true);
         context.setDistributable(true);
         context.setIgnoreAnnotations(true);
         context.setTldValidation(true);
+        context.setUseHttpOnly(false);
         context.setXmlNamespaceAware(true);
         context.setXmlValidation(true);
 
+        context.addApplicationListener(WsContextListener.class.getName());
+
         ((StandardContext) context).setWorkDir(this.workDir.getAbsolutePath());
 
-        super.configureContext(context, servletContextInits);
+        super.configureContext(context, ArrayUtils.add(servletContextInits, 0, new SdcctSessionConfigServletContextInitializer()));
     }
 
     public File getBaseDirectory() {

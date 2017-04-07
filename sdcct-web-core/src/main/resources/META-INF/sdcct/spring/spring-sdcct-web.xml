@@ -11,4 +11,18 @@
         urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
         urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
     
+    <!--====================================================================================================
+    = LISTENER REGISTRATION BEANS
+    =====================================================================================================-->
+    <beans:bean id="regBeanListener" class="org.springframework.boot.web.servlet.ServletListenerRegistrationBean" abstract="true"/>
+    
+    <!--====================================================================================================
+    = FILTER REGISTRATION BEANS
+    =====================================================================================================-->
+    <beans:bean id="regBeanFilter" class="org.springframework.boot.web.servlet.FilterRegistrationBean" abstract="true"/>
+    
+    <!--====================================================================================================
+    = SERVLET REGISTRATION BEANS
+    =====================================================================================================-->
+    <beans:bean id="regBeanServlet" class="org.springframework.boot.web.servlet.ServletRegistrationBean" abstract="true"/>
 </beans:beans>

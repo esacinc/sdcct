@@ -11,9 +11,9 @@ import javax.xml.namespace.QName;
 
 public abstract class AbstractIheTestcase extends AbstractSdcctTestcase<IheTestcaseDescription> implements IheTestcase {
     protected RfdWsResponseType contentType;
+    protected QName op;
     protected IheTestcaseRequestInfo requestInfo;
     protected IheTestcaseResponseInfo responseInfo;
-    protected QName transaction;
 
     @Override
     public RfdWsResponseType getContentType() {
@@ -23,6 +23,16 @@ public abstract class AbstractIheTestcase extends AbstractSdcctTestcase<IheTestc
     @Override
     public void setContentType(RfdWsResponseType contentType) {
         this.contentType = contentType;
+    }
+
+    @Override
+    public QName getOperation() {
+        return this.op;
+    }
+
+    @Override
+    public void setOperation(QName op) {
+        this.op = op;
     }
 
     @Nullable
@@ -45,15 +55,5 @@ public abstract class AbstractIheTestcase extends AbstractSdcctTestcase<IheTestc
     @Override
     public void setResponseInfo(IheTestcaseResponseInfo responseInfo) {
         this.responseInfo = responseInfo;
-    }
-
-    @Override
-    public QName getTransaction() {
-        return this.transaction;
-    }
-
-    @Override
-    public void setTransaction(QName transaction) {
-        this.transaction = transaction;
     }
 }

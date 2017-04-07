@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
+        urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
+    
+    <!--====================================================================================================
+    = TASK EXECUTORS
+    =====================================================================================================-->
+    <beans:bean id="taskExecutorWebSocketClientStomp" parent="taskExecThreadPoolDynamic"
+        p:corePoolSize="${sdcct.websocket.client.stomp.task.exec.pool.size.min}"
+        p:keepAliveSeconds="${sdcct.websocket.client.stomp.task.exec.keep.alive.timeout}"
+        p:maxPoolSize="${sdcct.websocket.client.stomp.task.exec.pool.size.max}"
+        p:threadNamePrefix="#{ threadGroup.name }-websocket-client-stomp-"/>
+    
+    <!--====================================================================================================
+    = TASK SCHEDULERS
+    =====================================================================================================-->
+    <beans:bean id="taskSchedulerWebSocketClientSockJs" parent="taskSchedulerThreadPool"
+        p:poolSize="${sdcct.websocket.client.sockjs.task.scheduler.pool.size}"
+        p:threadNamePrefix="#{ threadGroup.name }-websocket-client-sockjs-"/>
+    
+    <beans:bean id="taskSchedulerWebSocketClientStomp" parent="taskSchedulerThreadPool"
+        p:poolSize="${sdcct.websocket.client.stomp.task.scheduler.pool.size}"
+        p:threadNamePrefix="#{ threadGroup.name }-websocket-client-stomp-"/>
+    
+    <!--====================================================================================================
+    = WEBSOCKET SOCKJS CLIENTS
+    =====================================================================================================-->
+    <beans:bean id="websocketClientSockJsLocal" class="org.springframework.web.socket.sockjs.client.SockJsClient"
+        p:connectTimeoutScheduler-ref="taskSchedulerWebSocketClientSockJs">
+        <beans:constructor-arg name="transports">
+            <beans:list>
+                <beans:bean class="org.springframework.web.socket.sockjs.client.WebSocketTransport">
+                    <beans:constructor-arg name="webSocketClient">
+                        <beans:bean class="org.springframework.web.socket.client.standard.StandardWebSocketClient"/>
+                    </beans:constructor-arg>
+                </beans:bean>
+                <beans:bean class="org.springframework.web.socket.sockjs.client.RestTemplateXhrTransport"/>
+            </beans:list>
+        </beans:constructor-arg>
+        <beans:property name="messageCodec">
+            <beans:bean class="org.springframework.web.socket.sockjs.frame.Jackson2SockJsMessageCodec"
+                c:objectMapper-ref="objMapperTestcases"/>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
+    = WEBSOCKET STOMP CLIENTS
+    =====================================================================================================-->
+    <beans:bean id="websocketClientStompLocal" class="org.springframework.web.socket.messaging.WebSocketStompClient"
+        c:webSocketClient-ref="websocketClientSockJsLocal"
+        p:autoStartup="false"
+        p:messageConverter="#{ brokerMessagingTemplate.messageConverter }"
+        p:taskScheduler-ref="taskSchedulerWebSocketClientStomp"/>
+</beans:beans>

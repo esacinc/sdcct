@@ -19,7 +19,6 @@
     <!--====================================================================================================
     = OBJECT MAPPERS
     =====================================================================================================-->
-    <!--suppress SpringPlaceholdersInspection -->
     <beans:bean id="objMapper" class="gov.hhs.onc.sdcct.json.impl.SdcctObjectMapperFactoryBean"
         p:autoDetectFields="false"
         p:autoDetectGettersSetters="false"
@@ -35,16 +34,9 @@
         </beans:property>
         <beans:property name="modules">
             <beans:list>
-                <beans:bean class="com.fasterxml.jackson.datatype.guava.GuavaModule"/>
-                <beans:bean class="com.fasterxml.jackson.datatype.jdk8.Jdk8Module"/>
                 <beans:ref bean="moduleJaxb"/>
                 <beans:ref bean="moduleFhir"/>
             </beans:list>
-        </beans:property>
-        <beans:property name="deserializers">
-            <beans:set>
-                <beans:bean class="gov.hhs.onc.sdcct.json.impl.SdcctTestcaseDeserializer"/>
-            </beans:set>
         </beans:property>
     </beans:bean>
     

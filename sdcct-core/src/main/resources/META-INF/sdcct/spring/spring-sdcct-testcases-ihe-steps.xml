@@ -14,11 +14,11 @@
     <!--====================================================================================================
     = IHE TESTCASE STEPS
     =====================================================================================================-->
-    <beans:bean id="iheTestcaseSendingStep" class="gov.hhs.onc.sdcct.testcases.steps.ihe.IheTestcaseSendingStep" parent="sdcctTestcaseSendingStep" abstract="true"/>
-    <beans:bean id="iheTestcaseSendingStepImpl" class="gov.hhs.onc.sdcct.testcases.steps.ihe.impl.IheTestcaseSendingStepImpl" parent="iheTestcaseSendingStep" abstract="true"/>
+    <beans:bean id="iheTestcaseSendingStep" class="gov.hhs.onc.sdcct.testcases.ihe.steps.IheTestcaseSendingStep" parent="sdcctTestcaseSendingStep" abstract="true"/>
+    <beans:bean id="iheTestcaseSendingStepImpl" class="gov.hhs.onc.sdcct.testcases.ihe.steps.impl.IheTestcaseSendingStepImpl" parent="iheTestcaseSendingStep" abstract="true"/>
 
-    <beans:bean id="iheTestcaseValidationStep" class="gov.hhs.onc.sdcct.testcases.steps.ihe.IheTestcaseValidationStep" parent="sdcctTestcaseValidationStep" abstract="true"/>
-    <beans:bean id="iheTestcaseValidationStepImpl" class="gov.hhs.onc.sdcct.testcases.steps.ihe.impl.IheTestcaseValidationStepImpl" parent="iheTestcaseValidationStep"  abstract="true"/>
+    <beans:bean id="iheTestcaseValidationStep" class="gov.hhs.onc.sdcct.testcases.ihe.steps.IheTestcaseValidationStep" parent="sdcctTestcaseValidationStep" abstract="true"/>
+    <beans:bean id="iheTestcaseValidationStepImpl" class="gov.hhs.onc.sdcct.testcases.ihe.steps.impl.IheTestcaseValidationStepImpl" parent="iheTestcaseValidationStep"  abstract="true"/>
 
     <!--====================================================================================================
     = IHE TESTCASE SENDING STEPS

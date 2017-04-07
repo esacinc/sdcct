@@ -19,7 +19,7 @@
     <!--====================================================================================================
     = CACHE MANAGERS
     =====================================================================================================-->
-    <beans:bean id="cacheManager" class="gov.hhs.onc.sdcct.data.db.cache.impl.CacheManagerFactoryBean" abstract="true"/>
+    <beans:bean id="cacheManager" class="gov.hhs.onc.sdcct.data.cache.impl.CacheManagerFactoryBean" abstract="true"/>
     
     <!--====================================================================================================
     = CACHE SEARCH ATTRIBUTES
@@ -42,7 +42,7 @@
     <!--====================================================================================================
     = CACHES
     =====================================================================================================-->
-    <beans:bean id="cache" class="gov.hhs.onc.sdcct.data.db.cache.impl.CacheFactoryBean" abstract="true"
+    <beans:bean id="cache" class="gov.hhs.onc.sdcct.data.cache.impl.CacheFactoryBean" abstract="true"
         p:persistenceStrategy="NONE">
         <beans:property name="listeners">
             <beans:array>

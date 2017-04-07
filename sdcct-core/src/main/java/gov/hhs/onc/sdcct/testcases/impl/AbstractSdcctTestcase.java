@@ -5,6 +5,7 @@ import gov.hhs.onc.sdcct.testcases.SdcctTestcaseDescription;
 import gov.hhs.onc.sdcct.testcases.SpecificationRole;
 import gov.hhs.onc.sdcct.testcases.steps.SdcctTestcaseStep;
 import java.util.List;
+import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 
@@ -14,6 +15,7 @@ public abstract class AbstractSdcctTestcase<T extends SdcctTestcaseDescription> 
     protected String name;
     protected boolean neg;
     protected boolean optional;
+    protected int order;
     protected SpecificationRole roleTested;
     protected boolean sdcctInitiated;
     protected SpecificationRole sdcctRole;
@@ -79,6 +81,17 @@ public abstract class AbstractSdcctTestcase<T extends SdcctTestcaseDescription> 
     @Override
     public void setOptional(boolean optional) {
         this.optional = optional;
+    }
+
+    @Nonnegative
+    @Override
+    public int getOrder() {
+        return this.order;
+    }
+
+    @Override
+    public void setOrder(@Nonnegative int order) {
+        this.order = order;
     }
 
     @Override

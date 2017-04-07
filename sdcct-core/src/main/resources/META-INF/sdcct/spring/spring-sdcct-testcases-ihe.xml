@@ -20,6 +20,16 @@
     <beans:bean id="iheTestcaseDescImpl" class="gov.hhs.onc.sdcct.testcases.ihe.impl.IheTestcaseDescriptionImpl" parent="iheTestcaseDesc" abstract="true"/>
 
     <!--====================================================================================================
+    = TESTCASES
+    =====================================================================================================-->
+    <beans:bean id="iheTestcase" class="gov.hhs.onc.sdcct.testcases.ihe.IheTestcase" parent="sdcctTestcase" abstract="true"/>
+
+    <!--====================================================================================================
+    = TESTCASE PROCESSORS
+    =====================================================================================================-->
+    <beans:bean id="iheTestcaseProcessor" class="gov.hhs.onc.sdcct.testcases.ihe.IheTestcaseProcessor" parent="sdcctTestcaseProcessor" abstract="true"/>
+    
+    <!--====================================================================================================
     = IHE TESTCASE REQUEST INFO
     =====================================================================================================-->
     <beans:bean id="iheTestcaseRequestInfo" class="gov.hhs.onc.sdcct.testcases.ihe.IheTestcaseRequestInfo" parent="sdcctTestcaseMessageInfo" abstract="true"/>
@@ -55,47 +65,100 @@
     <!--====================================================================================================
     = IHE TESTCASE STRINGS - SPECIFICATIONS - SDC ACTOR OPTIONS
     =====================================================================================================-->
-    <sdcct:normalized-string id="iheTestcaseConstantStrFormFillerSdcXmlPackage">${sdcct.testcases.ihe.profile.name}: X.2.2 - Form Filler: SDC XML Package Option</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrFormFillerSdcHtmlPackage">${sdcct.testcases.ihe.profile.name}: X.2.3 - Form Filler: SDC HTML Package Option</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrFormFillerSdcUriPackage">${sdcct.testcases.ihe.profile.name}: X.2.4 - Form Filler: SDC URI Form Option</sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrFormFillerSdcXmlPackage">
+        ${sdcct.testcases.ihe.profile.name}: X.2.2 - Form Filler: SDC XML Package Option
+    </sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrFormFillerSdcHtmlPackage">
+        ${sdcct.testcases.ihe.profile.name}: X.2.3 - Form Filler: SDC HTML Package Option
+    </sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrFormFillerSdcUriPackage">
+        ${sdcct.testcases.ihe.profile.name}: X.2.4 - Form Filler: SDC URI Form Option
+    </sdcct:normalized-string>
 
     <!--====================================================================================================
     = IHE TESTCASE STRINGS - SPECIFICATIONS - SDC CONTENT MODULES
     =====================================================================================================-->
-    <sdcct:normalized-string id="iheTestcaseConstantStrSdcXmlPackageRequest">${sdcct.testcases.ihe.profile.name}: Q.2.1 - SDC XML Package - Request</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrSdcXmlPackageResponse">${sdcct.testcases.ihe.profile.name}: Q.2.2 - SDC XML Package - Response</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrSdcHtmlPackageRequest">${sdcct.testcases.ihe.profile.name}: Q.3.1 - SDC HTML Package - Request</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrSdcHtmlPackageResponse">${sdcct.testcases.ihe.profile.name}: Q.3.2 - SDC HTML Package - Response</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrSdcUriPackageRequest">${sdcct.testcases.ihe.profile.name}: Q.4.1 - SDC URI Form - Request</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrSdcUriPackageResponse">${sdcct.testcases.ihe.profile.name}: Q.4.2 - SDC URI Form - Response</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrSdcSubmissionRequest">${sdcct.testcases.ihe.profile.name}: Q.5.1 - SDC Submission - Request</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrSdcSubmissionResponse">${sdcct.testcases.ihe.profile.name}: Q.5.2 - SDC Submission - Response</sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrSdcXmlPackageRequest">
+        ${sdcct.testcases.ihe.profile.name}: Q.2.1 - SDC XML Package - Request
+    </sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrSdcXmlPackageResponse">
+        ${sdcct.testcases.ihe.profile.name}: Q.2.2 - SDC XML Package - Response</sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrSdcHtmlPackageRequest">
+        ${sdcct.testcases.ihe.profile.name}: Q.3.1 - SDC HTML Package - Request
+    </sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrSdcHtmlPackageResponse">
+        ${sdcct.testcases.ihe.profile.name}: Q.3.2 - SDC HTML Package - Response</sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrSdcUriPackageRequest">
+        ${sdcct.testcases.ihe.profile.name}: Q.4.1 - SDC URI Form - Request
+    </sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrSdcUriPackageResponse">
+        ${sdcct.testcases.ihe.profile.name}: Q.4.2 - SDC URI Form - Response</sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrSdcSubmissionRequest">
+        ${sdcct.testcases.ihe.profile.name}: Q.5.1 - SDC Submission - Request
+    </sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrSdcSubmissionResponse">
+        ${sdcct.testcases.ihe.profile.name}: Q.5.2 - SDC Submission - Response
+    </sdcct:normalized-string>
 
     <!--====================================================================================================
     = IHE TESTCASE STRINGS - MESSAGE NAMES
     =====================================================================================================-->
-    <sdcct:normalized-string id="iheTestcaseConstantStrRetrieveFormRequest">#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlNames).RETRIEVE_FORM_REQ }</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrRetrieveFormResponse">#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlNames).RETRIEVE_FORM_RESP }</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrSubmitFormRequest">#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlNames).SUBMIT_FORM_REQ }</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrSubmitFormResponse">#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlNames).SUBMIT_FORM_RESP }</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrArchiveFormRequest">#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlNames).ARCHIVE_FORM_REQ }</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrArchiveFormResponse">#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlNames).ARCHIVE_FORM_RESP }</sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrRetrieveFormRequest">
+        #{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlNames).RETRIEVE_FORM_REQ }
+    </sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrRetrieveFormResponse">
+        #{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlNames).RETRIEVE_FORM_RESP }
+    </sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrSubmitFormRequest">
+        #{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlNames).SUBMIT_FORM_REQ }
+    </sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrSubmitFormResponse">
+        #{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlNames).SUBMIT_FORM_RESP }
+    </sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrArchiveFormRequest">
+        #{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlNames).ARCHIVE_FORM_REQ }
+    </sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrArchiveFormResponse">
+        #{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlNames).ARCHIVE_FORM_RESP }
+    </sdcct:normalized-string>
 
     <!--====================================================================================================
     = IHE TESTCASE STRINGS - MESSAGE DETAILS KEYS
     =====================================================================================================-->
-    <sdcct:normalized-string id="iheTestcaseConstantStrAnyXmlContentType">#{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_ANY_XML_CONTENT_TYPE }</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrContent">#{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_CONTENT }</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrContentType">#{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_CONTENT_TYPE }</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrEncodedResponse">#{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_ENCODED_RESPONSE }</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrEncodedResponseContentType">#{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_ENCODED_RESPONSE_RESPONSE_CONTENT_TYPE }</sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrAnyXmlContentType">
+        #{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_ANY_XML_CONTENT_TYPE }
+    </sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrContent">
+        #{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_CONTENT }
+    </sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrContentType">
+        #{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_CONTENT_TYPE }
+    </sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrEncodedResponse">
+        #{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_ENCODED_RESPONSE }
+    </sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrEncodedResponseContentType">
+        #{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_ENCODED_RESPONSE_RESPONSE_CONTENT_TYPE }
+    </sdcct:normalized-string>
     <sdcct:normalized-string id="iheTestcaseConstantStrForm">#{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_FORM }</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrFormId">#{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_FORM_ID }</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrResponseCode">#{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_RESPONSE_CODE }</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrSdcSubmissionPackage">#{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_SDC_SUBMISSION_PACKAGE }</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrSoapFault">#{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_SOAP_FAULT }</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrSoapFaultReasonText">#{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_SOAP_FAULT_REASON_TEXT }</sdcct:normalized-string>
-    <sdcct:normalized-string id="iheTestcaseConstantStrUrl">#{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_URL }</sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrFormId">
+        #{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_FORM_ID }
+    </sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrResponseCode">
+        #{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_RESPONSE_CODE }
+    </sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrSdcSubmissionPackage">
+        #{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_SDC_SUBMISSION_PACKAGE }
+    </sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrSoapFault">
+        #{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_SOAP_FAULT }
+    </sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrSoapFaultReasonText">
+        #{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_SOAP_FAULT_REASON_TEXT }
+    </sdcct:normalized-string>
+    <sdcct:normalized-string id="iheTestcaseConstantStrUrl">
+        #{ T(gov.hhs.onc.sdcct.testcases.SdcctTestcasePropertyNames).RFD_URL }
+    </sdcct:normalized-string>
 
     <!--====================================================================================================
     = CONTENT TYPE
@@ -150,25 +213,11 @@
 
     <beans:bean id="submitFormResponseTypeXml" parent="submitFormResponseTypeImpl" lazy-init="true" scope="prototype"
         p:contentType-ref="iheContentTypeXml"/>
-
+    
     <!--====================================================================================================
-    = IHE FORMS
+    = ARCHIVE FORM RESPONSE TYPE
     =====================================================================================================-->
-    <util:list id="iheFormsPartiallyFilled">
-        <beans:ref bean="formRfdC"/>
-        <beans:ref bean="formRfdD"/>
-    </util:list>
-
-    <util:list id="iheFormsFilled">
-        <beans:ref bean="formRfdCFilled"/>
-        <beans:ref bean="formRfdDFilled"/>
-    </util:list>
-
-    <!--====================================================================================================
-    = IHE FORM IDS
-    =====================================================================================================-->
-    <util:list id="iheFormIds">
-        <beans:value>#{ formRfdC.identifier }</beans:value>
-        <beans:value>#{ formRfdD.identifier }</beans:value>
-    </util:list>
+    <beans:bean id="archiveFormResponseType" class="gov.hhs.onc.sdcct.rfd.ArchiveFormResponseType" abstract="true"/>
+    <beans:bean id="archiveFormResponseTypeImpl" class="gov.hhs.onc.sdcct.rfd.impl.ArchiveFormResponseTypeImpl" parent="archiveFormResponseType"
+        lazy-init="true" scope="prototype"/>
 </beans:beans>

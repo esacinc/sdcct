@@ -11,19 +11,24 @@
         <link type="text/css" rel="stylesheet" th:href="@{/static/styles/sdcct-web.css}"/>
         <script type="text/javascript" th:src="@{/webjars-locator/jquery/jquery.min.js}"></script>
         <script type="text/javascript" th:src="@{/webjars-locator/bootstrap/js/bootstrap.min.js}"></script>
+        <script type="text/javascript" th:src="@{/webjars-locator/sockjs-client/sockjs.min.js}"></script>
+        <script type="text/javascript" th:src="@{/webjars-locator/sprintf-js/dist/sprintf.min.js}"></script>
+        <script type="text/javascript" th:src="@{/webjars-locator/stomp-websocket/stomp.min.js}"></script>
         <script type="text/javascript" th:src="@{/static/scripts/sdcct-web.js}"></script>
         <script type="text/javascript" th:src="@{/static/scripts/sdcct-web-form.js}"></script>
         <script type="text/javascript" th:src="@{/static/scripts/sdcct-testcases.js}"></script>
         <script type="text/javascript" th:src="@{/static/scripts/sdcct-testcases-ihe.js}"></script>
         <script type="text/javascript" th:inline="javascript">
             /*<![CDATA[*/
-            var IHE_TESTCASES = [[${iheTestcases}]];
+            var IHE_TESTCASES = [[${testcasesIhe}]];
             
-            var IHE_ENDPOINT_ADDRESSES = [[${iheEndpointAddresses}]];
+            var IHE_TESTCASES_ENDPOINT_ADDRESSES = [[${testcasesIheEndpointAddresses}]];
             
-            var IHE_TESTCASES_RESULTS_POLL_URL = [[${iheTestcasesResultsPollUrl}]];
+            var IHE_TESTCASES_PROCESS_URLS = [[${testcasesIheProcessUrls}]];
             
-            var IHE_TESTCASES_PROCESS_URLS = [[${iheTestcasesProcessUrls}]];
+            var IHE_TESTCASES_RESULTS_TOPIC_WEBSOCKET_ENDPOINT = [[${testcasesIheResultsTopicWebSocketEndpoint}]];
+            
+            var IHE_TESTCASES_RESULTS_WEBSOCKET_URL = [[${testcasesIheResultsWebSocketUrl}]];
             /*]]>*/
         </script>
         <title>SDCCT - Home</title>
@@ -79,7 +84,8 @@
                     </h1>
                     <h2><strong>Purpose</strong></h2>
                     <p>
-                        The Structured Data Capture Conformance Tool (SDCCT) is an interactive tool for validating the conformance of Structured Data Capture (SDC) actors to the IHE and HL7 FHIR SDC implementation guides.
+                        The Structured Data Capture Conformance Tool (SDCCT) is an interactive tool for validating the conformance of Structured Data Capture
+                        (SDC) actors to the IHE and HL7 FHIR SDC implementation guides.
                     </p>
                     <p>
                         <a href="http://hl7.org/fhir/us/sdc/2016Sep/sdc.html">SDC FHIR Implementation Guide</a>
@@ -89,8 +95,8 @@
                     </p>
                     <h2><strong>Background</strong></h2>
                     <p>
-                        The use of electronic health record (EHR) data for secondary purposes is limited due to a lack of uniformity in data structure, transport,
-                        and definitions across EHR systems. Streamlining EHR data in a structured way can accelerate quality and safety improvements,
+                        The use of electronic health record (EHR) data for secondary purposes is limited due to a lack of uniformity in data structure,
+                        transport, and definitions across EHR systems. Streamlining EHR data in a structured way can accelerate quality and safety improvements,
                         improve population health, and foster scientific research.
                     </p>
                     <p>
@@ -100,8 +106,8 @@
                         model helps advance clinical quality and safety, population health, and research.
                     </p>
                     <p>
-                        SDC forms are an efficient mechanism to achieve interoperability with standardized structured clinical content. This project was funded by the
-                        <a href="https://aspe.hhs.gov/patient-centered-outcomes-research-trust-fund">Patient-Centered Outcomes Research (PCOR) Trust Fund</a>,
+                        SDC forms are an efficient mechanism to achieve interoperability with standardized structured clinical content. This project was funded
+                        by the <a href="https://aspe.hhs.gov/patient-centered-outcomes-research-trust-fund">Patient-Centered Outcomes Research (PCOR) Trust Fund</a>,
                         managed by the <a href="https://aspe.hhs.gov/">Office of the Assistant Secretary for Planning and Evaluation (ASPE)</a> in the U.S.
                         <a href="https://www.hhs.gov/">Department of Health and Human Services</a>.
                     </p>

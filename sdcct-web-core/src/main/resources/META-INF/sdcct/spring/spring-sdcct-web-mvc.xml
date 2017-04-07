@@ -12,23 +12,34 @@
         http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
         urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
         urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
-
+    
     <!--====================================================================================================
     = MVC
     =====================================================================================================-->
-    <mvc:annotation-driven conversion-service="conversionService">
+    <mvc:annotation-driven content-negotiation-manager="contentNegotiationManager" conversion-service="conversionService" validator="validator">
         <mvc:message-converters register-defaults="false">
             <beans:bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"
                 p:defaultCharset="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"/>
-            <beans:bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"
-                p:defaultCharset="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"
-                p:objectMapper-ref="objMapper"/>
-            <beans:bean class="org.springframework.http.converter.StringHttpMessageConverter"
-                p:defaultCharset="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"/>
             <beans:bean class="org.springframework.http.converter.ResourceHttpMessageConverter"
                 p:defaultCharset="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"/>
+            <beans:bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"
+                p:defaultCharset="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"
+                p:objectMapper-ref="objMapperTestcases"/>
         </mvc:message-converters>
     </mvc:annotation-driven>
+    
+    <!--====================================================================================================
+    = CONTENT NEGOTIATION MANAGERS
+    =====================================================================================================-->
+    <beans:bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean" primary="true"
+        p:useJaf="true">
+        <beans:property name="mediaTypes">
+            <beans:map>
+                <beans:entry key="#{ T(gov.hhs.onc.sdcct.io.SdcctFileNameExtensions).ICO }"
+                    value="#{ T(gov.hhs.onc.sdcct.net.mime.SdcctMediaTypes).IMAGE_X_ICON_VALUE }"/>
+            </beans:map>
+        </beans:property>
+    </beans:bean>
     
     <!--====================================================================================================
     = INTERCEPTORS
@@ -72,13 +83,13 @@
             </beans:bean>
         </beans:property>
     </beans:bean>
-
+    
     <!--====================================================================================================
     = SERVLET REGISTRATION BEANS
     =====================================================================================================-->
     <beans:bean id="regBeanServletDispatcher" parent="regBeanServlet"
         p:loadOnStartup="1"
-        p:name="dispatcherServlet"
+        p:name="#{ T(org.springframework.boot.context.embedded.EmbeddedWebApplicationContext).DISPATCHER_SERVLET_NAME }"
         p:order="#{ T(org.springframework.core.Ordered).HIGHEST_PRECEDENCE }">
         <beans:property name="servlet">
             <beans:bean class="org.springframework.web.servlet.DispatcherServlet"/>

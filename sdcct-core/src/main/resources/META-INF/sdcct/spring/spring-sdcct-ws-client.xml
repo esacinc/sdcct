@@ -45,11 +45,10 @@
     <beans:bean id="conduitConfigurer" class="gov.hhs.onc.sdcct.ws.impl.SdcctConduitConfigurer"
         p:bus-ref="bus">
         <beans:property name="clientPolicy">
-            <!--suppress SpringPlaceholdersInspection -->
             <beans:bean class="org.apache.cxf.transports.http.configuration.HTTPClientPolicy"
                 p:allowChunking="false"
                 p:cacheControl="no-cache, no-store, no-transform"
-                p:connection="CLOSE"
+                p:connection="#{ T(org.apache.cxf.transports.http.configuration.ConnectionType).CLOSE }"
                 p:connectionTimeout="${sdcct.ws.client.conn.timeout}"
                 p:receiveTimeout="${sdcct.ws.client.receive.timeout}"/>
         </beans:property>

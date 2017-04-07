@@ -46,11 +46,6 @@
     });
 
     $.extend($.sdcct, {
-        "poll": {
-            "lastPollTimestamp": new Date().getTime(),
-            "pollInterval": 15000,
-            "pollIntervalId": undefined
-        },
         "roles": {
             "FORM_ARCHIVER": "FORM_ARCHIVER",
             "FORM_FILLER": "FORM_FILLER",

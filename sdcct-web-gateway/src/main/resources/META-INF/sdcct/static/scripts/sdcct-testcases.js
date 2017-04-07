@@ -68,13 +68,13 @@
                         });
                     }
                     
-                    testcaseDescElem.append(elem.sdcct.testcases.buildTestcaseItem("Form IDs", formIds));
+                    testcaseDescElem.append(elem.sdcct.testcases.buildTestcaseItem("Form ID(s)", formIds));
                 }
                 
                 testcaseDescElem.append(elem.sdcct.testcases.buildTestcaseItem("Content Type", testcase["contentType"]));
                 testcaseDescElem.append(elem.sdcct.testcases.buildTestcaseItem("Negative", testcase["negative"]));
                 testcaseDescElem.append(elem.sdcct.testcases.buildTestcaseItem("Optional", testcase["optional"]));
-                testcaseDescElem.append(elem.sdcct.testcases.buildTestcaseItem("Transaction", testcase["transaction"]));
+                testcaseDescElem.append(elem.sdcct.testcases.buildTestcaseItem("Operation", testcase["operation"]));
                 testcaseDescElem.append(elem.sdcct.testcases.buildTestcaseMessageDetails("Message Request Details", testcase["requestInfo"]));
                 testcaseDescElem.append(elem.sdcct.testcases.buildTestcaseMessageDetails("Message Response Details", testcase["responseInfo"]));
                 testcaseDescElem.append(elem.sdcct.testcases.buildTestcaseItem("Underlying Specification References", testcaseDesc["specs"]));
@@ -158,18 +158,17 @@
                 
                 return testcaseItemElem;
             },
-            "buildTestcaseResults": function (testcaseResultsEmptyWellElem, testcaseResultsElem, testcaseResult) {
-                var testcaseSuccess = !$.isUndefined(testcaseResult["success"]) ? testcaseResult["success"] : false;
-                var testcaseSuccessStr = testcaseSuccess ? "success" : "error";
+            "buildTestcaseResults": function (testcaseResultsEmptyWellElem, testcaseResultsElem, testcaseResult, testcaseTxId) {
+                var testcaseSuccess = (testcaseResult["success"] ? testcaseResult["success"] : false);
+                var testcaseSuccessStr = (testcaseSuccess ? "success" : "error");
                 var testcaseSubmission = testcaseResult["submission"];
                 var testcase = testcaseSubmission["testcase"];
-                var testcaseTxId = testcaseResult["txId"];
-                var testcaseName = !$.isUndefined(testcase) ? testcase["name"] : "None";
+                var testcaseName = (testcase ? testcase["name"] : "None");
                 
                 var testcaseResultPanelElem = $("<div/>", {
                     "class": ("panel panel-" + (testcaseSuccess ? "success" : "danger")),
                     "id": ("testcase-result-panel-" + testcaseTxId)
-                });
+                }).data("submittedTimestamp", testcaseSubmission["submittedTimestamp"]);
                 
                 var testcaseResultPanelHeaderElem = $("<div/>", {
                     "class": ("panel-heading testcase-result-header testcase-result-header-" + testcaseSuccessStr),
@@ -250,13 +249,27 @@
                 });
                 
                 testcaseResultPanelBodyElem.append($.fn.sdcct.testcases.buildTestcaseItem("Message(s)", testcaseResultMsgs));
-                testcaseResultPanelBodyElem.append($.fn.sdcct.testcases.buildTestcaseSteps("Testcase Steps", !$.isUndefined(testcase) ? testcase["steps"] : []));
+                testcaseResultPanelBodyElem.append($.fn.sdcct.testcases.buildTestcaseSteps("Testcase Steps", (testcase ? testcase["steps"] : [])));
                 
                 if (!$.isUndefined(testcaseResult["wsRequestEvent"]) || !$.isUndefined(testcaseResult["wsResponseEvent"])) {
                     testcaseResultPanelBodyElem.append($.fn.sdcct.testcases.buildTestcaseResultEventTabs(testcaseTxId, testcaseResult));
                 }
                 
-                testcaseResultsElem.append(testcaseResultPanelElem);
+                var testcaseResultPanelElems = testcaseResultsElem.find("div.panel"), testcaseResultPanelElemItem, testcaseResultPanelElemInserted = false;
+                
+                for (var a = 0; a < testcaseResultPanelElems.length; a++) {
+                    if ((testcaseResultPanelElemItem = $(testcaseResultPanelElems[a])).data("submittedTimestamp") > testcaseSubmission["submittedTimestamp"]) {
+                        testcaseResultPanelElemItem.before(testcaseResultPanelElem);
+                        
+                        testcaseResultPanelElemInserted = true;
+                        
+                        break;
+                    }
+                }
+                
+                if (!testcaseResultPanelElemInserted) {
+                    testcaseResultsElem.append(testcaseResultPanelElem);
+                }
             },
             "buildTestcaseResultEventTabs": function (testcaseTxId, testcaseResult) {
                 var testcaseResultEventTabsElem = $("<div/>", {
@@ -387,45 +400,6 @@
                 testcaseWsEventElem.append(elem.sdcct.testcases.buildTestcaseItem("Payload", $("<pre/>").text(!$.isUndefined(testcaseWsEvent["prettyPayload"]) ? testcaseWsEvent["prettyPayload"] : testcaseWsEvent["payload"])));
                 
                 return testcaseWsEventElem;
-            },
-            "pollTestcaseResults": function (resultsEmptyWellElem, resultsElem) {
-                $.ajax({
-                    "complete": function (jqXhr, statusText) {
-                        var statusCode = jqXhr["status"];
-                        
-                        try {
-                            if (statusCode == 200) {
-                                resultsEmptyWellElem.hide();
-                                
-                                var processedTestcaseResultTxIds = [];
-                                
-                                $.each($.parseJSON(jqXhr["responseText"]), function (resultIndex, testcaseResult) {
-                                    $.fn.sdcct.testcases.buildTestcaseResults(resultsEmptyWellElem, resultsElem, testcaseResult);
-                                    
-                                    processedTestcaseResultTxIds.push(testcaseResult["txId"]);
-                                });
-                                
-                                console.info(("Testcase result(s) poll AJAX query was successful (statusCode=" + statusCode + ", statusText=" + statusText
-                                    + "): txIds=[" + processedTestcaseResultTxIds.join(", ") + "]"));
-                            } else if (statusCode == 204) {
-                                console.info(("No testcase result(s) received from poll AJAX query (statusCode=" + statusCode + ", statusText=" + statusText + ")."));
-                            } else {
-                                console.error(("Testcase result(s) poll AJAX query failed (statusCode=" + statusCode + ", statusText=" + statusText + ")."));
-                            }
-                        } finally {
-                            $.sdcct.poll.lastPollTimestamp = new Date().getTime();
-                        }
-                    },
-                    "contentType": "application/json",
-                    "error": function (jqXhr, statusText, error) {
-                        console.error(("Testcase result(s) poll AJAX query failed (statusCode=" + jqXhr["status"] + ", statusText=" + statusText + "): " + error));
-                    },
-                    "headers": {
-                        "Accept": "application/json"
-                    },
-                    "type": "GET",
-                    "url": (IHE_TESTCASES_RESULTS_POLL_URL + "?submittedAfterTimestamp=" + $.sdcct.poll.lastPollTimestamp)
-                });
             }
         })
     });

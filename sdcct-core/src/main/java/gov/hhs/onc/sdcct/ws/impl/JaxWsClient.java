@@ -18,6 +18,7 @@ public class JaxWsClient extends AbstractWsClient<Client, Client> {
         latch.await();
 
         if (task.hasException()) {
+            // noinspection ConstantConditions
             throw task.getException();
         }
 

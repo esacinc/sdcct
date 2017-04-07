@@ -17,8 +17,14 @@
     <beans:bean id="iheFormManagerTestcase" class="gov.hhs.onc.sdcct.testcases.ihe.IheFormManagerTestcase" parent="iheTestcase" abstract="true"/>
     <beans:bean id="iheFormManagerTestcaseImpl" class="gov.hhs.onc.sdcct.testcases.ihe.impl.IheFormManagerTestcaseImpl" parent="iheFormManagerTestcase"
         abstract="true"
-        p:formIds-ref="iheFormIds"
-        p:transaction="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).RETRIEVE_FORM_OP }"/>
+        p:operation="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).RETRIEVE_FORM_OP }">
+        <beans:property name="formIds">
+            <beans:list>
+                <beans:value>#{ formRfdC.identifier }</beans:value>
+                <beans:value>#{ formRfdD.identifier }</beans:value>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
 
     <beans:bean id="iheFormManagerTestcaseSdcctInitiated" parent="iheFormManagerTestcaseImpl" abstract="true"
         p:roleTested="FORM_MANAGER"
@@ -35,7 +41,31 @@
         p:contentType="XML"
         p:id="IHE_1"
         p:name="IHE_1 - Form Manager RetrieveFormResponse contains valid SDC XML package"
+        p:order="1"
         p:response-ref="retrieveFormResponseTypeXml">
+        <beans:property name="description">
+            <beans:bean parent="iheTestcaseDescImpl">
+                <beans:property name="instructions">
+                    <sdcct:normalized-string>
+                        Enter an endpoint address for your Form Manager and a formID corresponding to an XML form that your Form Manager has available and then
+                        click Submit. SDCCT will send a request for an XML form to your Form Manager. The response that is returned by your Form Manager will be
+                        displayed below.
+                    </sdcct:normalized-string>
+                </beans:property>
+                <beans:property name="specifications">
+                    <beans:list>
+                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormManager"/>
+                        <beans:ref bean="iheTestcaseConstantStrSdcXmlPackageResponse"/>
+                    </beans:list>
+                </beans:property>
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        This testcase verifies that your Form Manager can return an available XML form in response to a request, according to ITI-34.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
         <beans:property name="requestParams">
             <beans:bean parent="retrieveFormRequestTypeImpl">
                 <beans:property name="workflowData">
@@ -69,29 +99,6 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
-        <beans:property name="description">
-            <beans:bean parent="iheTestcaseDescImpl">
-                <beans:property name="instructions">
-                    <sdcct:normalized-string>
-                        Enter an endpoint address for your Form Manager and a formID corresponding to an XML form that your Form Manager has available and then
-                        click Submit. SDCCT will send a request for an XML form to your Form Manager. The response that is returned by your Form Manager will be
-                        displayed below.
-                    </sdcct:normalized-string>
-                </beans:property>
-                <beans:property name="specifications">
-                    <beans:list>
-                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
-                        <beans:ref bean="iheTestcaseConstantStrFormManager"/>
-                        <beans:ref bean="iheTestcaseConstantStrSdcXmlPackageResponse"/>
-                    </beans:list>
-                </beans:property>
-                <beans:property name="text">
-                    <sdcct:normalized-string>
-                        This testcase verifies that your Form Manager can return an available XML form in response to a request, according to ITI-34.
-                    </sdcct:normalized-string>
-                </beans:property>
-            </beans:bean>
-        </beans:property>
         <beans:property name="steps">
             <beans:list>
                 <beans:ref bean="retrieveFormRequestSendingStep"/>
@@ -104,7 +111,31 @@
         p:contentType="HTML"
         p:id="IHE_2"
         p:name="IHE_2 - Form Manager RetrieveFormResponse contains valid SDC HTML package"
+        p:order="2"
         p:response-ref="retrieveFormResponseTypeHtml">
+        <beans:property name="description">
+            <beans:bean parent="iheTestcaseDescImpl">
+                <beans:property name="instructions">
+                    <sdcct:normalized-string>
+                        Enter an endpoint address for your Form Manager and a formID corresponding to an HTML form that your Form Manager has available and then
+                        click Submit. SDCCT will send a request for an HTML form to your Form Manager. The response that is returned by your Form Manager will
+                        be displayed below.
+                    </sdcct:normalized-string>
+                </beans:property>
+                <beans:property name="specifications">
+                    <beans:list>
+                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormManager"/>
+                        <beans:ref bean="iheTestcaseConstantStrSdcHtmlPackageResponse"/>
+                    </beans:list>
+                </beans:property>
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        This testcase verifies that your Form Manager can return an available HTML form in response to a request, according to ITI-34.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
         <beans:property name="requestParams">
             <beans:bean parent="retrieveFormRequestTypeImpl">
                 <beans:property name="workflowData">
@@ -138,29 +169,6 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
-        <beans:property name="description">
-            <beans:bean parent="iheTestcaseDescImpl">
-                <beans:property name="instructions">
-                    <sdcct:normalized-string>
-                        Enter an endpoint address for your Form Manager and a formID corresponding to an HTML form that your Form Manager has available and then
-                        click Submit. SDCCT will send a request for an HTML form to your Form Manager. The response that is returned by your Form Manager will
-                        be displayed below.
-                    </sdcct:normalized-string>
-                </beans:property>
-                <beans:property name="specifications">
-                    <beans:list>
-                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
-                        <beans:ref bean="iheTestcaseConstantStrFormManager"/>
-                        <beans:ref bean="iheTestcaseConstantStrSdcHtmlPackageResponse"/>
-                    </beans:list>
-                </beans:property>
-                <beans:property name="text">
-                    <sdcct:normalized-string>
-                        This testcase verifies that your Form Manager can return an available HTML form in response to a request, according to ITI-34.
-                    </sdcct:normalized-string>
-                </beans:property>
-            </beans:bean>
-        </beans:property>
         <beans:property name="steps">
             <beans:list>
                 <beans:ref bean="retrieveFormRequestSendingStep"/>
@@ -177,7 +185,31 @@
         p:contentType="URL"
         p:id="IHE_3"
         p:name="IHE_3 - Form Manager RetrieveFormResponse contains URI associated with a valid SDC form"
+        p:order="3"
         p:response-ref="retrieveFormResponseTypeUri">
+        <beans:property name="description">
+            <beans:bean parent="iheTestcaseDescImpl">
+                <beans:property name="instructions">
+                    <sdcct:normalized-string>
+                        Enter an endpoint address for your Form Manager and a URI corresponding to a form that your Form Manager has available and then click
+                        Submit. SDCCT will send a request for an HTML form to your Form Manager. The response that is returned by your Form Manager will be
+                        displayed below.
+                    </sdcct:normalized-string>
+                </beans:property>
+                <beans:property name="specifications">
+                    <beans:list>
+                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormManager"/>
+                        <beans:ref bean="iheTestcaseConstantStrSdcUriPackageResponse"/>
+                    </beans:list>
+                </beans:property>
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        This testcase verifies that your Form Manager can return a form corresponding to a URI in response to a request, according to ITI-34.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
         <beans:property name="requestParams">
             <beans:bean parent="retrieveFormRequestTypeImpl">
                 <beans:property name="workflowData">
@@ -210,29 +242,6 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
-        <beans:property name="description">
-            <beans:bean parent="iheTestcaseDescImpl">
-                <beans:property name="instructions">
-                    <sdcct:normalized-string>
-                        Enter an endpoint address for your Form Manager and a URI corresponding to a form that your Form Manager has available and then click
-                        Submit. SDCCT will send a request for an HTML form to your Form Manager. The response that is returned by your Form Manager will be
-                        displayed below.
-                    </sdcct:normalized-string>
-                </beans:property>
-                <beans:property name="specifications">
-                    <beans:list>
-                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
-                        <beans:ref bean="iheTestcaseConstantStrFormManager"/>
-                        <beans:ref bean="iheTestcaseConstantStrSdcUriPackageResponse"/>
-                    </beans:list>
-                </beans:property>
-                <beans:property name="text">
-                    <sdcct:normalized-string>
-                        This testcase verifies that your Form Manager can return a form corresponding to a URI in response to a request, according to ITI-34.
-                    </sdcct:normalized-string>
-                </beans:property>
-            </beans:bean>
-        </beans:property>
         <beans:property name="steps">
             <beans:list>
                 <beans:ref bean="retrieveFormRequestSendingStep"/>
@@ -246,7 +255,31 @@
         p:contentType="XML"
         p:id="IHE_4"
         p:name="IHE_4 - Form Manager returns SOAP fault for an unavailable XML form"
-        p:negative="true">
+        p:negative="true"
+        p:order="4">
+        <beans:property name="description">
+            <beans:bean parent="iheTestcaseDescImpl">
+                <beans:property name="instructions">
+                    <sdcct:normalized-string>
+                        Enter an endpoint address for your Form Manager and a formID corresponding to an XML form that your Form Manager does not have available
+                        and then click Submit. SDCCT will send a request for this form to your Form Manager. The response that is returned by your Form Manager
+                        will be displayed below.
+                    </sdcct:normalized-string>
+                </beans:property>
+                <beans:property name="specifications">
+                    <beans:list>
+                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormManager"/>
+                    </beans:list>
+                </beans:property>
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        This testcase verifies that your Form Manager returns a SOAP fault in response to a request for an unavailable XML form, according to
+                        ITI-34.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
         <beans:property name="formIds">
             <beans:list>
                 <beans:value>${sdcct.testcases.ihe.form.id.unavailable}</beans:value>
@@ -281,29 +314,6 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
-        <beans:property name="description">
-            <beans:bean parent="iheTestcaseDescImpl">
-                <beans:property name="instructions">
-                    <sdcct:normalized-string>
-                        Enter an endpoint address for your Form Manager and a formID corresponding to an XML form that your Form Manager does not have available
-                        and then click Submit. SDCCT will send a request for this form to your Form Manager. The response that is returned by your Form Manager
-                        will be displayed below.
-                    </sdcct:normalized-string>
-                </beans:property>
-                <beans:property name="specifications">
-                    <beans:list>
-                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
-                        <beans:ref bean="iheTestcaseConstantStrFormManager"/>
-                    </beans:list>
-                </beans:property>
-                <beans:property name="text">
-                    <sdcct:normalized-string>
-                        This testcase verifies that your Form Manager returns a SOAP fault in response to a request for an unavailable XML form, according to
-                        ITI-34.
-                    </sdcct:normalized-string>
-                </beans:property>
-            </beans:bean>
-        </beans:property>
         <beans:property name="steps">
             <beans:list>
                 <beans:ref bean="retrieveFormRequestSendingStep"/>
@@ -316,7 +326,30 @@
         p:contentType="XML"
         p:id="IHE_5"
         p:name="IHE_5 - Form Manager returns SOAP fault in response to a request for an XML form with an unspecified form ID"
-        p:negative="true">
+        p:negative="true"
+        p:order="5">
+        <beans:property name="description">
+            <beans:bean parent="iheTestcaseDescImpl">
+                <beans:property name="instructions">
+                    <sdcct:normalized-string>
+                        Enter an endpoint address for your Form Manager, do not enter anything for the formID, and then click Submit. SDCCT will send a request
+                        to your Form Manager. The response that is returned by your Form Manager will be displayed below.
+                    </sdcct:normalized-string>
+                </beans:property>
+                <beans:property name="specifications">
+                    <beans:list>
+                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormManager"/>
+                    </beans:list>
+                </beans:property>
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        This testcase verifies that your Form Manager returns a SOAP fault in response to a request that does not specify a formID for an XML
+                        form, according to ITI-34.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
         <beans:property name="formIds">
             <beans:list/>
         </beans:property>
@@ -348,28 +381,6 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
-        <beans:property name="description">
-            <beans:bean parent="iheTestcaseDescImpl">
-                <beans:property name="instructions">
-                    <sdcct:normalized-string>
-                        Enter an endpoint address for your Form Manager, do not enter anything for the formID, and then click Submit. SDCCT will send a request
-                        to your Form Manager. The response that is returned by your Form Manager will be displayed below.
-                    </sdcct:normalized-string>
-                </beans:property>
-                <beans:property name="specifications">
-                    <beans:list>
-                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
-                        <beans:ref bean="iheTestcaseConstantStrFormManager"/>
-                    </beans:list>
-                </beans:property>
-                <beans:property name="text">
-                    <sdcct:normalized-string>
-                        This testcase verifies that your Form Manager returns a SOAP fault in response to a request that does not specify a formID for an XML
-                        form, according to ITI-34.
-                    </sdcct:normalized-string>
-                </beans:property>
-            </beans:bean>
-        </beans:property>
         <beans:property name="steps">
             <beans:list>
                 <beans:ref bean="retrieveFormRequestSendingStep"/>
@@ -382,7 +393,31 @@
         p:contentType="HTML"
         p:id="IHE_6"
         p:name="IHE_6 - Form Manager returns SOAP fault for an unavailable HTML form"
-        p:negative="true">
+        p:negative="true"
+        p:order="6">
+        <beans:property name="description">
+            <beans:bean parent="iheTestcaseDescImpl">
+                <beans:property name="instructions">
+                    <sdcct:normalized-string>
+                        Enter an endpoint address for your Form Manager and a formID corresponding to an HTML form that your Form Manager does not have
+                        available and then click Submit. SDCCT will send a request for this form to your Form Manager. The response that is returned by your
+                        Form Manager will be displayed below.
+                    </sdcct:normalized-string>
+                </beans:property>
+                <beans:property name="specifications">
+                    <beans:list>
+                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormManager"/>
+                    </beans:list>
+                </beans:property>
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        This testcase verifies that your Form Manager returns a SOAP fault in response to a request for an unavailable HTML form, according to
+                        ITI-34.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
         <beans:property name="formIds">
             <beans:list>
                 <beans:value>${sdcct.testcases.ihe.form.id.unavailable}</beans:value>
@@ -417,29 +452,6 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
-        <beans:property name="description">
-            <beans:bean parent="iheTestcaseDescImpl">
-                <beans:property name="instructions">
-                    <sdcct:normalized-string>
-                        Enter an endpoint address for your Form Manager and a formID corresponding to an HTML form that your Form Manager does not have
-                        available and then click Submit. SDCCT will send a request for this form to your Form Manager. The response that is returned by your
-                        Form Manager will be displayed below.
-                    </sdcct:normalized-string>
-                </beans:property>
-                <beans:property name="specifications">
-                    <beans:list>
-                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
-                        <beans:ref bean="iheTestcaseConstantStrFormManager"/>
-                    </beans:list>
-                </beans:property>
-                <beans:property name="text">
-                    <sdcct:normalized-string>
-                        This testcase verifies that your Form Manager returns a SOAP fault in response to a request for an unavailable HTML form, according to
-                        ITI-34.
-                    </sdcct:normalized-string>
-                </beans:property>
-            </beans:bean>
-        </beans:property>
         <beans:property name="steps">
             <beans:list>
                 <beans:ref bean="retrieveFormRequestSendingStep"/>
@@ -452,7 +464,30 @@
         p:contentType="HTML"
         p:id="IHE_7"
         p:name="IHE_7 - Form Manager returns SOAP fault in response to a request for an HTML form with an unspecified form ID"
-        p:negative="true">
+        p:negative="true"
+        p:order="7">
+        <beans:property name="description">
+            <beans:bean parent="iheTestcaseDescImpl">
+                <beans:property name="instructions">
+                    <sdcct:normalized-string>
+                        Enter an endpoint address for your Form Manager, do not enter anything for the formID, and then click Submit. SDCCT will send a request
+                        to your Form Manager. The response that is returned by your Form Manager will be displayed below.
+                    </sdcct:normalized-string>
+                </beans:property>
+                <beans:property name="specifications">
+                    <beans:list>
+                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormManager"/>
+                    </beans:list>
+                </beans:property>
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        This testcase verifies that your Form Manager returns a SOAP fault in response to a request that does not specify a formID for an HTML
+                        form, according to ITI-34.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
         <beans:property name="formIds">
             <beans:list/>
         </beans:property>
@@ -484,28 +519,6 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
-        <beans:property name="description">
-            <beans:bean parent="iheTestcaseDescImpl">
-                <beans:property name="instructions">
-                    <sdcct:normalized-string>
-                        Enter an endpoint address for your Form Manager, do not enter anything for the formID, and then click Submit. SDCCT will send a request
-                        to your Form Manager. The response that is returned by your Form Manager will be displayed below.
-                    </sdcct:normalized-string>
-                </beans:property>
-                <beans:property name="specifications">
-                    <beans:list>
-                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
-                        <beans:ref bean="iheTestcaseConstantStrFormManager"/>
-                    </beans:list>
-                </beans:property>
-                <beans:property name="text">
-                    <sdcct:normalized-string>
-                        This testcase verifies that your Form Manager returns a SOAP fault in response to a request that does not specify a formID for an HTML
-                        form, according to ITI-34.
-                    </sdcct:normalized-string>
-                </beans:property>
-            </beans:bean>
-        </beans:property>
         <beans:property name="steps">
             <beans:list>
                 <beans:ref bean="retrieveFormRequestSendingStep"/>
@@ -518,7 +531,31 @@
         p:contentType="URL"
         p:id="IHE_8"
         p:name="IHE_8 - Form Manager returns SOAP fault in response to a request for a form that is not available at requested URI"
-        p:negative="true">
+        p:negative="true"
+        p:order="8">
+        <beans:property name="description">
+            <beans:bean parent="iheTestcaseDescImpl">
+                <beans:property name="instructions">
+                    <sdcct:normalized-string>
+                        Enter an endpoint address for your Form Manager and a URI corresponding to a form that your Form Manager does not have available and
+                        then click Submit. SDCCT will send a request for this form to your Form Manager. The response that is returned by your Form Manager will
+                        be displayed below.
+                    </sdcct:normalized-string>
+                </beans:property>
+                <beans:property name="specifications">
+                    <beans:list>
+                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormManager"/>
+                    </beans:list>
+                </beans:property>
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        This testcase verifies that your Form Manager returns a SOAP fault in response to a request for an unavailable form corresponding to a
+                        URI, according to ITI-34.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
         <beans:property name="requestParams">
             <beans:bean parent="retrieveFormRequestTypeImpl">
                 <beans:property name="workflowData">
@@ -548,29 +585,6 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
-        <beans:property name="description">
-            <beans:bean parent="iheTestcaseDescImpl">
-                <beans:property name="instructions">
-                    <sdcct:normalized-string>
-                        Enter an endpoint address for your Form Manager and a URI corresponding to a form that your Form Manager does not have available and
-                        then click Submit. SDCCT will send a request for this form to your Form Manager. The response that is returned by your Form Manager will
-                        be displayed below.
-                    </sdcct:normalized-string>
-                </beans:property>
-                <beans:property name="specifications">
-                    <beans:list>
-                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
-                        <beans:ref bean="iheTestcaseConstantStrFormManager"/>
-                    </beans:list>
-                </beans:property>
-                <beans:property name="text">
-                    <sdcct:normalized-string>
-                        This testcase verifies that your Form Manager returns a SOAP fault in response to a request for an unavailable form corresponding to a
-                        URI, according to ITI-34.
-                    </sdcct:normalized-string>
-                </beans:property>
-            </beans:bean>
-        </beans:property>
         <beans:property name="steps">
             <beans:list>
                 <beans:ref bean="retrieveFormRequestSendingStep"/>
@@ -583,7 +597,30 @@
         p:contentType="URL"
         p:id="IHE_9"
         p:name="IHE_9 - Form Manager returns SOAP fault in response to a request for a form available at a URI with an unspecified form ID"
-        p:negative="true">
+        p:negative="true"
+        p:order="9">
+        <beans:property name="description">
+            <beans:bean parent="iheTestcaseDescImpl">
+                <beans:property name="instructions">
+                    <sdcct:normalized-string>
+                        Enter an endpoint address for your Form Manager, do not enter anything for the formID, and then click Submit. SDCCT will send a request
+                        to your Form Manager. The response that is returned by your Form Manager will be displayed below.
+                    </sdcct:normalized-string>
+                </beans:property>
+                <beans:property name="specifications">
+                    <beans:list>
+                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormManager"/>
+                    </beans:list>
+                </beans:property>
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        This testcase verifies that your Form Manager returns a SOAP fault in response to a request that does not specify a URI for a
+                        corresponding form, according to ITI-34.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
         <beans:property name="formIds">
             <beans:list/>
         </beans:property>
@@ -615,28 +652,6 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
-        <beans:property name="description">
-            <beans:bean parent="iheTestcaseDescImpl">
-                <beans:property name="instructions">
-                    <sdcct:normalized-string>
-                        Enter an endpoint address for your Form Manager, do not enter anything for the formID, and then click Submit. SDCCT will send a request
-                        to your Form Manager. The response that is returned by your Form Manager will be displayed below.
-                    </sdcct:normalized-string>
-                </beans:property>
-                <beans:property name="specifications">
-                    <beans:list>
-                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
-                        <beans:ref bean="iheTestcaseConstantStrFormManager"/>
-                    </beans:list>
-                </beans:property>
-                <beans:property name="text">
-                    <sdcct:normalized-string>
-                        This testcase verifies that your Form Manager returns a SOAP fault in response to a request that does not specify a URI for a
-                        corresponding form, according to ITI-34.
-                    </sdcct:normalized-string>
-                </beans:property>
-            </beans:bean>
-        </beans:property>
         <beans:property name="steps">
             <beans:list>
                 <beans:ref bean="retrieveFormRequestSendingStep"/>
@@ -653,7 +668,32 @@
         p:id="IHE_10"
         p:name="IHE_10 - Form Filler RetrieveFormRequest to obtain XML form"
         p:optional="true"
+        p:order="10"
         p:response-ref="retrieveFormResponseTypeXml">
+        <beans:property name="description">
+            <beans:bean parent="iheTestcaseDescImpl">
+                <beans:property name="instructions">
+                    <sdcct:normalized-string>
+                        Submit a request from your Form Filler for an XML form that the Form Manager has available, according to the message request details.
+                        The Form Filler should receive an SDC XML package from the Form Manager in the response.
+                    </sdcct:normalized-string>
+                </beans:property>
+                <beans:property name="specifications">
+                    <beans:list>
+                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormFiller"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormFillerSdcXmlPackage"/>
+                        <beans:ref bean="iheTestcaseConstantStrSdcXmlPackageRequest"/>
+                    </beans:list>
+                </beans:property>
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        This testcase verifies that your Form Filler can request and retrieve an available XML form from a Form Manager, according to ITI-34.
+                        This testcase is required if your Form Filler supports the SDC XML Package content module.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
         <beans:property name="requestParams">
             <beans:bean parent="retrieveFormRequestTypeImpl">
                 <beans:property name="workflowData">
@@ -687,30 +727,6 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
-        <beans:property name="description">
-            <beans:bean parent="iheTestcaseDescImpl">
-                <beans:property name="instructions">
-                    <sdcct:normalized-string>
-                        Submit a request from your Form Filler for an XML form that the Form Manager has available, according to the message request details.
-                        The Form Filler should receive an SDC XML package from the Form Manager in the response.
-                    </sdcct:normalized-string>
-                </beans:property>
-                <beans:property name="specifications">
-                    <beans:list>
-                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
-                        <beans:ref bean="iheTestcaseConstantStrFormFiller"/>
-                        <beans:ref bean="iheTestcaseConstantStrFormFillerSdcXmlPackage"/>
-                        <beans:ref bean="iheTestcaseConstantStrSdcXmlPackageRequest"/>
-                    </beans:list>
-                </beans:property>
-                <beans:property name="text">
-                    <sdcct:normalized-string>
-                        This testcase verifies that your Form Filler can request and retrieve an available XML form from a Form Manager, according to ITI-34.
-                        This testcase is required if your Form Filler supports the SDC XML Package content module.
-                    </sdcct:normalized-string>
-                </beans:property>
-            </beans:bean>
-        </beans:property>
         <beans:property name="steps">
             <beans:list>
                 <beans:ref bean="retrieveFormRequestValidationStep"/>
@@ -724,7 +740,32 @@
         p:id="IHE_11"
         p:name="IHE_11 - Form Filler RetrieveFormRequest to obtain HTML form"
         p:optional="true"
+        p:order="11"
         p:response-ref="retrieveFormResponseTypeHtml">
+        <beans:property name="description">
+            <beans:bean parent="iheTestcaseDescImpl">
+                <beans:property name="instructions">
+                    <sdcct:normalized-string>
+                        Submit a request from your Form Filler for an HTML form that the Form Manager has available, according to the message request details.
+                        The Form Filler should receive an SDC HTML package from the Form Manager in the response.
+                    </sdcct:normalized-string>
+                </beans:property>
+                <beans:property name="specifications">
+                    <beans:list>
+                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormFiller"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormFillerSdcHtmlPackage"/>
+                        <beans:ref bean="iheTestcaseConstantStrSdcHtmlPackageRequest"/>
+                    </beans:list>
+                </beans:property>
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        This testcase verifies that your Form Filler can request and retrieve an available HTML form from a Form Manager, according to ITI-34.
+                        This testcase is required if your Form Filler supports the SDC HTML Package content module.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
         <beans:property name="requestParams">
             <beans:bean parent="retrieveFormRequestTypeImpl">
                 <beans:property name="workflowData">
@@ -758,30 +799,6 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
-        <beans:property name="description">
-            <beans:bean parent="iheTestcaseDescImpl">
-                <beans:property name="instructions">
-                    <sdcct:normalized-string>
-                        Submit a request from your Form Filler for an HTML form that the Form Manager has available, according to the message request details.
-                        The Form Filler should receive an SDC HTML package from the Form Manager in the response.
-                    </sdcct:normalized-string>
-                </beans:property>
-                <beans:property name="specifications">
-                    <beans:list>
-                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
-                        <beans:ref bean="iheTestcaseConstantStrFormFiller"/>
-                        <beans:ref bean="iheTestcaseConstantStrFormFillerSdcHtmlPackage"/>
-                        <beans:ref bean="iheTestcaseConstantStrSdcHtmlPackageRequest"/>
-                    </beans:list>
-                </beans:property>
-                <beans:property name="text">
-                    <sdcct:normalized-string>
-                        This testcase verifies that your Form Filler can request and retrieve an available HTML form from a Form Manager, according to ITI-34.
-                        This testcase is required if your Form Filler supports the SDC HTML Package content module.
-                    </sdcct:normalized-string>
-                </beans:property>
-            </beans:bean>
-        </beans:property>
         <beans:property name="steps">
             <beans:list>
                 <beans:ref bean="retrieveFormRequestValidationStep"/>
@@ -799,7 +816,32 @@
         p:id="IHE_12"
         p:name="IHE_12 - Form Filler RetrieveFormRequest to obtain URI-based form"
         p:optional="true"
+        p:order="12"
         p:response-ref="retrieveFormResponseTypeUri">
+        <beans:property name="description">
+            <beans:bean parent="iheTestcaseDescImpl">
+                <beans:property name="instructions">
+                    <sdcct:normalized-string>
+                        Submit a request from your Form Filler for a form that the Form Manager has available and which can be accessed by a URI, according to
+                        the message request details. The Form Filler should receive an SDC URI form from the Form Manager in the response.
+                    </sdcct:normalized-string>
+                </beans:property>
+                <beans:property name="specifications">
+                    <beans:list>
+                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormFiller"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormFillerSdcUriPackage"/>
+                        <beans:ref bean="iheTestcaseConstantStrSdcUriPackageRequest"/>
+                    </beans:list>
+                </beans:property>
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        This testcase verifies that your Form Filler can request and retrieve an available form that can be accessed by a URI from a Form
+                        Manager, according to ITI-34. This testcase is required if your Form Filler supports the SDC URI Form content module.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
         <beans:property name="requestParams">
             <beans:bean parent="retrieveFormRequestTypeImpl">
                 <beans:property name="workflowData">
@@ -829,30 +871,6 @@
                         <beans:entry key-ref="iheTestcaseConstantStrContentType" value-ref="iheTestcaseConstantStrUrl"/>
                         <beans:entry key-ref="iheTestcaseConstantStrResponseCode" value="element exists"/>
                     </beans:map>
-                </beans:property>
-            </beans:bean>
-        </beans:property>
-        <beans:property name="description">
-            <beans:bean parent="iheTestcaseDescImpl">
-                <beans:property name="instructions">
-                    <sdcct:normalized-string>
-                        Submit a request from your Form Filler for a form that the Form Manager has available and which can be accessed by a URI, according to
-                        the message request details. The Form Filler should receive an SDC URI form from the Form Manager in the response.
-                    </sdcct:normalized-string>
-                </beans:property>
-                <beans:property name="specifications">
-                    <beans:list>
-                        <beans:ref bean="iheTestcaseConstantStrIti34"/>
-                        <beans:ref bean="iheTestcaseConstantStrFormFiller"/>
-                        <beans:ref bean="iheTestcaseConstantStrFormFillerSdcUriPackage"/>
-                        <beans:ref bean="iheTestcaseConstantStrSdcUriPackageRequest"/>
-                    </beans:list>
-                </beans:property>
-                <beans:property name="text">
-                    <sdcct:normalized-string>
-                        This testcase verifies that your Form Filler can request and retrieve an available form that can be accessed by a URI from a Form
-                        Manager, according to ITI-34. This testcase is required if your Form Filler supports the SDC URI Form content module.
-                    </sdcct:normalized-string>
                 </beans:property>
             </beans:bean>
         </beans:property>

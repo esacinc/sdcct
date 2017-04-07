@@ -15,9 +15,11 @@
     = IHE FORM ARCHIVER TESTCASES
     =====================================================================================================-->
     <beans:bean id="iheFormArchiverTestcase" class="gov.hhs.onc.sdcct.testcases.ihe.IheFormArchiverTestcase" parent="iheTestcase" abstract="true"/>
+    
     <beans:bean id="iheFormArchiverTestcaseImpl" class="gov.hhs.onc.sdcct.testcases.ihe.impl.IheFormArchiverTestcaseImpl" parent="iheFormArchiverTestcase"
         abstract="true"
-        p:transaction="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).ARCHIVE_FORM_OP }"/>
+        p:operation="#{ T(gov.hhs.onc.sdcct.rfd.ws.RfdWsXmlQnames).ARCHIVE_FORM_OP }"
+        p:response-ref="archiveFormResponseTypeImpl"/>
 
     <beans:bean id="iheFormArchiverTestcaseSdcctInitiated" parent="iheFormArchiverTestcaseImpl" abstract="true"
         p:roleTested="FORM_ARCHIVER"
@@ -34,28 +36,7 @@
         p:contentType="XML"
         p:id="IHE_20"
         p:name="IHE_20 - Form Archiver archives completed form"
-        p:forms-ref="iheFormsFilled">
-        <beans:property name="requestInfo">
-            <beans:bean parent="iheTestcaseRequestInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrArchiveFormRequest">
-                <beans:property name="messageDetails">
-                    <beans:map>
-                        <beans:entry key-ref="iheTestcaseConstantStrSdcSubmissionPackage"
-                            value="contains FormDesign with a formID that corresponds to an available XML, HTML, or URI-based form"/>
-                    </beans:map>
-                </beans:property>
-            </beans:bean>
-        </beans:property>
-        <beans:property name="responseInfo">
-            <beans:bean parent="iheTestcaseResponseInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrArchiveFormResponse">
-                <beans:property name="messageDetails">
-                    <beans:map>
-                        <beans:entry key-ref="iheTestcaseConstantStrResponseCode" value="element exists"/>
-                    </beans:map>
-                </beans:property>
-            </beans:bean>
-        </beans:property>
+        p:order="20">
         <beans:property name="description">
             <beans:bean parent="iheTestcaseDescImpl">
                 <beans:property name="instructions">
@@ -79,19 +60,12 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
-        <beans:property name="steps">
+        <beans:property name="forms">
             <beans:list>
-                <beans:ref bean="archiveFormRequestSendingStep"/>
-                <beans:ref bean="archiveFormResponseValidationStep"/>
+                <beans:ref bean="formRfdCFilled"/>
+                <beans:ref bean="formRfdDFilled"/>
             </beans:list>
         </beans:property>
-    </beans:bean>
-
-    <beans:bean id="iheTestcase21" parent="iheFormArchiverTestcaseSdcctInitiated"
-        p:contentType="XML"
-        p:id="IHE_21"
-        p:name="IHE_21 - Form Archiver archives partially completed form"
-        p:forms-ref="iheFormsPartiallyFilled">
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
                 p:messageName-ref="iheTestcaseConstantStrArchiveFormRequest">
@@ -113,6 +87,19 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
+        <beans:property name="steps">
+            <beans:list>
+                <beans:ref bean="archiveFormRequestSendingStep"/>
+                <beans:ref bean="archiveFormResponseValidationStep"/>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+
+    <beans:bean id="iheTestcase21" parent="iheFormArchiverTestcaseSdcctInitiated"
+        p:contentType="XML"
+        p:id="IHE_21"
+        p:name="IHE_21 - Form Archiver archives partially completed form"
+        p:order="21">
         <beans:property name="description">
             <beans:bean parent="iheTestcaseDescImpl">
                 <beans:property name="instructions">
@@ -136,6 +123,33 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
+        <beans:property name="forms">
+            <beans:list>
+                <beans:ref bean="formRfdC"/>
+                <beans:ref bean="formRfdD"/>
+            </beans:list>
+        </beans:property>
+        <beans:property name="requestInfo">
+            <beans:bean parent="iheTestcaseRequestInfoImpl"
+                p:messageName-ref="iheTestcaseConstantStrArchiveFormRequest">
+                <beans:property name="messageDetails">
+                    <beans:map>
+                        <beans:entry key-ref="iheTestcaseConstantStrSdcSubmissionPackage"
+                            value="contains FormDesign with a formID that corresponds to an available XML, HTML, or URI-based form"/>
+                    </beans:map>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+        <beans:property name="responseInfo">
+            <beans:bean parent="iheTestcaseResponseInfoImpl"
+                p:messageName-ref="iheTestcaseConstantStrArchiveFormResponse">
+                <beans:property name="messageDetails">
+                    <beans:map>
+                        <beans:entry key-ref="iheTestcaseConstantStrResponseCode" value="element exists"/>
+                    </beans:map>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
         <beans:property name="steps">
             <beans:list>
                 <beans:ref bean="archiveFormRequestSendingStep"/>
@@ -149,7 +163,26 @@
         p:contentType="XML"
         p:id="IHE_22"
         p:name="IHE_22 - Form Archiver cannot archive request contents"
-        p:negative="true">
+        p:negative="true"
+        p:order="22">
+        <beans:property name="description">
+            <beans:bean parent="iheTestcaseDescImpl">
+                <beans:property name="instructions">
+                    <sdcct:normalized-string/>
+                </beans:property>
+                <beans:property name="specifications">
+                    <beans:list>
+                        <beans:ref bean="iheTestcaseConstantStrIti36"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormArchiver"/>
+                    </beans:list>
+                </beans:property>
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        This testcase verifies that your Form Archiver returns a SOAP fault in response to a malformed ArchiveFormRequest, according to ITI-36.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
                 p:messageName-ref="iheTestcaseConstantStrArchiveFormRequest">
@@ -171,24 +204,6 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
-        <beans:property name="description">
-            <beans:bean parent="iheTestcaseDescImpl">
-                <beans:property name="instructions">
-                    <sdcct:normalized-string/>
-                </beans:property>
-                <beans:property name="specifications">
-                    <beans:list>
-                        <beans:ref bean="iheTestcaseConstantStrIti36"/>
-                        <beans:ref bean="iheTestcaseConstantStrFormArchiver"/>
-                    </beans:list>
-                </beans:property>
-                <beans:property name="text">
-                    <sdcct:normalized-string>
-                        This testcase verifies that your Form Archiver returns a SOAP fault in response to a malformed ArchiveFormRequest, according to ITI-36.
-                    </sdcct:normalized-string>
-                </beans:property>
-            </beans:bean>
-        </beans:property>
         <beans:property name="steps">
             <beans:list>
                 <beans:ref bean="archiveFormRequestSendingStep"/>
@@ -206,27 +221,7 @@
         p:id="IHE_23"
         p:name="IHE_23 - Form Filler requests archival of completed form"
         p:optional="true"
-        p:forms-ref="iheFormsFilled">
-        <beans:property name="requestInfo">
-            <beans:bean parent="iheTestcaseRequestInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrArchiveFormRequest">
-                <beans:property name="messageDetails">
-                    <beans:map>
-                        <beans:entry key-ref="iheTestcaseConstantStrAnyXmlContentType" value="specific content not specified by profile"/>
-                    </beans:map>
-                </beans:property>
-            </beans:bean>
-        </beans:property>
-        <beans:property name="responseInfo">
-            <beans:bean parent="iheTestcaseResponseInfoImpl"
-                p:messageName-ref="iheTestcaseConstantStrArchiveFormResponse">
-                <beans:property name="messageDetails">
-                    <beans:map>
-                        <beans:entry key-ref="iheTestcaseConstantStrResponseCode" value="element exists"/>
-                    </beans:map>
-                </beans:property>
-            </beans:bean>
-        </beans:property>
+        p:order="23">
         <beans:property name="description">
             <beans:bean parent="iheTestcaseDescImpl">
                 <beans:property name="instructions">
@@ -250,19 +245,12 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
-        <beans:property name="steps">
+        <beans:property name="forms">
             <beans:list>
-                <beans:ref bean="archiveFormRequestSendingStep"/>
-                <beans:ref bean="archiveFormResponseValidationStep"/>
+                <beans:ref bean="formRfdCFilled"/>
+                <beans:ref bean="formRfdDFilled"/>
             </beans:list>
         </beans:property>
-    </beans:bean>
-
-    <beans:bean id="iheTestcase24" parent="iheFormArchiverTestcaseSutInitiated"
-        p:contentType="XML"
-        p:id="IHE_24"
-        p:name="IHE_24 - Form Filler requests archival of partially completed form"
-        p:optional="true">
         <beans:property name="requestInfo">
             <beans:bean parent="iheTestcaseRequestInfoImpl"
                 p:messageName-ref="iheTestcaseConstantStrArchiveFormRequest">
@@ -283,6 +271,20 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
+        <beans:property name="steps">
+            <beans:list>
+                <beans:ref bean="archiveFormRequestSendingStep"/>
+                <beans:ref bean="archiveFormResponseValidationStep"/>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+
+    <beans:bean id="iheTestcase24" parent="iheFormArchiverTestcaseSutInitiated"
+        p:contentType="XML"
+        p:id="IHE_24"
+        p:name="IHE_24 - Form Filler requests archival of partially completed form"
+        p:optional="true"
+        p:order="24">
         <beans:property name="description">
             <beans:bean parent="iheTestcaseDescImpl">
                 <beans:property name="instructions">
@@ -303,6 +305,32 @@
                         This testcase verifies that your Form Filler can submit a valid ArchiveFormRequest for a partially completed form to a Form Archiver,
                         according to ITI-36.
                     </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+        <beans:property name="forms">
+            <beans:list>
+                <beans:ref bean="formRfdC"/>
+                <beans:ref bean="formRfdD"/>
+            </beans:list>
+        </beans:property>
+        <beans:property name="requestInfo">
+            <beans:bean parent="iheTestcaseRequestInfoImpl"
+                p:messageName-ref="iheTestcaseConstantStrArchiveFormRequest">
+                <beans:property name="messageDetails">
+                    <beans:map>
+                        <beans:entry key-ref="iheTestcaseConstantStrAnyXmlContentType" value="specific content not specified by profile"/>
+                    </beans:map>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+        <beans:property name="responseInfo">
+            <beans:bean parent="iheTestcaseResponseInfoImpl"
+                p:messageName-ref="iheTestcaseConstantStrArchiveFormResponse">
+                <beans:property name="messageDetails">
+                    <beans:map>
+                        <beans:entry key-ref="iheTestcaseConstantStrResponseCode" value="element exists"/>
+                    </beans:map>
                 </beans:property>
             </beans:bean>
         </beans:property>

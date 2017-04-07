@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
+        urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
+
+    <!--====================================================================================================
+    = TESTCASE SUBMISSIONS
+    =====================================================================================================-->
+    <beans:bean id="iheTestcaseSubmission" class="gov.hhs.onc.sdcct.testcases.ihe.submissions.IheTestcaseSubmission" parent="sdcctTestcaseSubmission"
+        abstract="true"/>
+
+    <!--====================================================================================================
+    = IHE FORM MANAGER TESTCASE SUBMISSIONS
+    =====================================================================================================-->
+    <beans:bean id="iheFormManagerTestcaseSubmission" class="gov.hhs.onc.sdcct.testcases.ihe.submissions.IheFormManagerTestcaseSubmission"
+        parent="iheTestcaseSubmission" abstract="true"/>
+    
+    <!--suppress SpringBeanConstructorArgInspection -->
+    <beans:bean id="iheFormManagerTestcaseSubmissionImpl" class="gov.hhs.onc.sdcct.testcases.ihe.submissions.impl.IheFormManagerTestcaseSubmissionImpl"
+        parent="iheFormManagerTestcaseSubmission" lazy-init="true" scope="prototype"/>
+
+    <!--====================================================================================================
+    = IHE FORM RECEIVER TESTCASE SUBMISSIONS
+    =====================================================================================================-->
+    <beans:bean id="iheFormReceiverTestcaseSubmission" class="gov.hhs.onc.sdcct.testcases.ihe.submissions.IheFormReceiverTestcaseSubmission"
+        parent="iheTestcaseSubmission" abstract="true"/>
+    
+    <!--suppress SpringBeanConstructorArgInspection -->
+    <beans:bean id="iheFormReceiverTestcaseSubmissionImpl" class="gov.hhs.onc.sdcct.testcases.ihe.submissions.impl.IheFormReceiverTestcaseSubmissionImpl"
+        parent="iheFormReceiverTestcaseSubmission" lazy-init="true" scope="prototype"/>
+
+    <!--====================================================================================================
+    = IHE FORM ARCHIVER TESTCASE SUBMISSIONS
+    =====================================================================================================-->
+    <beans:bean id="iheFormArchiverTestcaseSubmission" class="gov.hhs.onc.sdcct.testcases.ihe.submissions.IheFormArchiverTestcaseSubmission"
+        parent="iheTestcaseSubmission" abstract="true"/>
+    
+    <!--suppress SpringBeanConstructorArgInspection -->
+    <beans:bean id="iheFormArchiverTestcaseSubmissionImpl" class="gov.hhs.onc.sdcct.testcases.ihe.submissions.impl.IheFormArchiverTestcaseSubmissionImpl"
+        parent="iheFormArchiverTestcaseSubmission" lazy-init="true" scope="prototype"/>
+</beans:beans>

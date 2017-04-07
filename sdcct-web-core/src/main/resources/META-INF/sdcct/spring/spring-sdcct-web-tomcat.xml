@@ -18,9 +18,16 @@
         c:name="http-server"/>
     
     <!--====================================================================================================
+    = FILTER REGISTRATION BEANS
+    =====================================================================================================-->
+    <beans:bean id="regBeanFilterLogging" parent="regBeanFilter"
+        p:filter-ref="filterLogging"
+        p:name="loggingFilter"
+        p:order="#{ T(org.springframework.core.Ordered).HIGHEST_PRECEDENCE }"/>
+    
+    <!--====================================================================================================
     = EMBEDDED SERVLET CONTAINER FACTORIES
     =====================================================================================================-->
-    <!--suppress ELValidationInJSP SpringElInspection SpringPlaceholdersInspection -->
     <beans:bean id="embeddedServletContainerFactoryTomcat" class="gov.hhs.onc.sdcct.web.tomcat.impl.SdcctTomcatEmbeddedServletContainerFactory"
         p:baseDirectory="#{ app.homeDirectory }"
         p:connectionEndpointName="#{ threadGroup.name }-tomcat-server-http"
@@ -32,11 +39,14 @@
         p:maxConnectionThreads="${sdcct.tomcat.server.conn.thread.max}"
         p:minConnectionThreads="${sdcct.tomcat.server.conn.thread.min}"
         p:txIdGenerator-ref="txIdGenHttpServer"
+        p:persistSession="true"
         p:port="${sdcct.tomcat.server.port.http}"
         p:proxyHost="${sdcct.tomcat.server.proxy.host}"
         p:proxyPort="${sdcct.tomcat.server.proxy.port.http}"
+        p:sessionStoreDir="${sdcct.tomcat.server.session.store.dir}"
+        p:sessionTimeout="${sdcct.tomcat.server.session.timeout}"
         p:uriEncoding="#{ T(java.nio.charset.StandardCharsets).UTF_8 }"
-        p:workDirectory="${sdcct.work.dir}">
+        p:workDirectory="${sdcct.work.tomcat.dir}">
         <beans:property name="contextLifecycleListeners">
             <beans:list>
                 <beans:bean id="lifecycleListenerJreMemLeakPrevention" class="org.apache.catalina.core.JreMemoryLeakPreventionListener"/>

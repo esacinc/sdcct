@@ -18,10 +18,8 @@
         p:order="#{ (T(org.springframework.core.Ordered).HIGHEST_PRECEDENCE + 2) }">
         <beans:property name="urlMap">
             <beans:map>
-                <!--suppress SpringPlaceholdersInspection -->
                 <beans:entry key="${sdcct.ws.base.url.path}/**">
-                    <!--suppress SpringPlaceholdersInspection -->
-                    <beans:bean class="gov.hhs.onc.sdcct.web.ws.impl.WebServiceController"
+                    <beans:bean class="gov.hhs.onc.sdcct.web.ws.controller.impl.WebServiceController"
                         p:baseUrlPath="${sdcct.ws.base.url.path}"
                         p:bus-ref="bus"
                         p:txIdGenerator-ref="txIdGenWsServer"/>

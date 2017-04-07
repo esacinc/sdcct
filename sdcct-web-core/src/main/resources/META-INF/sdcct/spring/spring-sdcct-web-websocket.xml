@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:sdcct="urn:sdcct:spring"
+    xmlns:sdcct-xml="urn:sdcct:spring:xml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        urn:sdcct:spring urn:sdcct:spring:sdcct-spring.xsd
+        urn:sdcct:spring:xml urn:sdcct:spring:xml:sdcct-spring-xml.xsd">
+    
+    <!--====================================================================================================
+    = TASK EXECUTORS
+    =====================================================================================================-->
+    <beans:bean id="taskExecutorWebSocketMsgBrokerChannel" parent="taskExecThreadPoolDynamic"
+        p:corePoolSize="${sdcct.websocket.msg.broker.channel.task.exec.pool.size.min}"
+        p:keepAliveSeconds="${sdcct.websocket.msg.broker.channel.task.exec.keep.alive.timeout}"
+        p:maxPoolSize="${sdcct.websocket.msg.broker.channel.task.exec.pool.size.max}"
+        p:threadNamePrefix="#{ threadGroup.name }-websocket-msg-broker-channel-"/>
+    
+    <beans:bean id="taskExecutorWebSocketMsgBrokerChannelClientInbound" parent="taskExecThreadPoolDynamic"
+        p:corePoolSize="${sdcct.websocket.msg.broker.channel.client.inbound.task.exec.pool.size.min}"
+        p:keepAliveSeconds="${sdcct.websocket.msg.broker.channel.client.inbound.task.exec.keep.alive.timeout}"
+        p:maxPoolSize="${sdcct.websocket.msg.broker.channel.client.inbound.task.exec.pool.size.max}"
+        p:threadNamePrefix="#{ threadGroup.name }-websocket-msg-broker-channel-client-inbound-"/>
+    
+    <beans:bean id="taskExecutorWebSocketMsgBrokerChannelClientOutbound" parent="taskExecThreadPoolDynamic"
+        p:corePoolSize="${sdcct.websocket.msg.broker.channel.client.outbound.task.exec.pool.size.min}"
+        p:keepAliveSeconds="${sdcct.websocket.msg.broker.channel.client.outbound.task.exec.keep.alive.timeout}"
+        p:maxPoolSize="${sdcct.websocket.msg.broker.channel.client.outbound.task.exec.pool.size.max}"
+        p:threadNamePrefix="#{ threadGroup.name }-websocket-msg-broker-channel-client-outbound-"/>
+    
+    <!--====================================================================================================
+    = TASK SCHEDULERS
+    =====================================================================================================-->
+    <beans:bean id="taskSchedulerWebSocketMsgBroker" parent="taskSchedulerThreadPool"
+        p:poolSize="${sdcct.websocket.msg.broker.task.scheduler.pool.size}"
+        p:threadNamePrefix="#{ threadGroup.name }-websocket-msg-broker-"/>
+    
+    <!--====================================================================================================
+    = WEBSOCKET SERVER CONTAINERS
+    =====================================================================================================-->
+    <beans:bean id="websocketContainerServer" class="org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean"
+        p:asyncSendTimeout="${sdcct.websocket.container.server.send.async.timeout}"
+        p:maxBinaryMessageBufferSize="${sdcct.websocket.container.server.msg.binary.buffer.size.max}"
+        p:maxSessionIdleTimeout="${sdcct.websocket.container.server.session.idle.timeout}"
+        p:maxTextMessageBufferSize="${sdcct.websocket.container.server.msg.text.buffer.size.max}"/>
+</beans:beans>

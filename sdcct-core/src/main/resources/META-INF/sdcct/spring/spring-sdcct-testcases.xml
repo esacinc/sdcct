@@ -18,6 +18,21 @@
         c:name="testcase-process"/>
     
     <!--====================================================================================================
+    = OBJECT MAPPERS
+    =====================================================================================================-->
+    <beans:bean id="objMapperTestcases" parent="objMapper"
+        p:contentInclusion="ALWAYS"
+        p:defaultViewInclusion="false"
+        p:failOnUnknownProperties="false"
+        p:valueInclusion="ALWAYS">
+        <beans:property name="deserializers">
+            <beans:set>
+                <beans:ref bean="deserializerTestcase"/>
+            </beans:set>
+        </beans:property>
+    </beans:bean>
+    
+    <!--====================================================================================================
     = TESTCASE DESCRIPTIONS
     =====================================================================================================-->
     <beans:bean id="sdcctTestcaseDesc" class="gov.hhs.onc.sdcct.testcases.SdcctTestcaseDescription" abstract="true"/>
@@ -26,15 +41,11 @@
     = TESTCASES
     =====================================================================================================-->
     <beans:bean id="sdcctTestcase" class="gov.hhs.onc.sdcct.testcases.SdcctTestcase" abstract="true"/>
-
-    <beans:bean id="iheTestcase" class="gov.hhs.onc.sdcct.testcases.ihe.IheTestcase" parent="sdcctTestcase" abstract="true"/>
-
+    
     <beans:bean id="sdcctTestcaseMessageInfo" class="gov.hhs.onc.sdcct.testcases.SdcctTestcaseMessageInfo" abstract="true"/>
 
     <!--====================================================================================================
     = TESTCASE PROCESSORS
     =====================================================================================================-->
     <beans:bean id="sdcctTestcaseProcessor" class="gov.hhs.onc.sdcct.testcases.SdcctTestcaseProcessor" abstract="true"/>
-
-    <beans:bean id="iheTestcaseProcessor" class="gov.hhs.onc.sdcct.testcases.ihe.IheTestcaseProcessor" parent="sdcctTestcaseProcessor" abstract="true"/>
 </beans:beans>

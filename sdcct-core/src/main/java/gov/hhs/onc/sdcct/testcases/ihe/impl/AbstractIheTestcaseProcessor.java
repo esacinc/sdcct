@@ -5,8 +5,8 @@ import gov.hhs.onc.sdcct.testcases.ihe.IheTestcase;
 import gov.hhs.onc.sdcct.testcases.ihe.IheTestcaseDescription;
 import gov.hhs.onc.sdcct.testcases.ihe.IheTestcaseProcessor;
 import gov.hhs.onc.sdcct.testcases.impl.AbstractSdcctTestcaseProcessor;
-import gov.hhs.onc.sdcct.testcases.results.ihe.IheTestcaseResult;
-import gov.hhs.onc.sdcct.testcases.submissions.ihe.IheTestcaseSubmission;
+import gov.hhs.onc.sdcct.testcases.ihe.results.IheTestcaseResult;
+import gov.hhs.onc.sdcct.testcases.ihe.submissions.IheTestcaseSubmission;
 import gov.hhs.onc.sdcct.transform.saxon.impl.SdcctSaxonConfiguration;
 import gov.hhs.onc.sdcct.ws.impl.JaxWsClient;
 import gov.hhs.onc.sdcct.xml.impl.XmlCodec;
@@ -45,9 +45,9 @@ public abstract class AbstractIheTestcaseProcessor<T extends IheTestcase, U exte
         T testcase = submission.getTestcase();
 
         String endpointAddr = submission.getEndpointAddress();
-        JaxWsClient client = (JaxWsClient) this.beanFactory.getBean(this.clientBeanName, endpointAddr);
+        JaxWsClient client = ((JaxWsClient) this.beanFactory.getBean(this.clientBeanName, endpointAddr));
         Client delegate = client.buildInvocationDelegate();
-        BindingProvider bindingProvider = (BindingProvider) delegate;
+        BindingProvider bindingProvider = ((BindingProvider) delegate);
 
         V result = this.beanFactory.getBean(this.resultImplClass, submission);
         Map<String, Object> requestContext = bindingProvider.getRequestContext();
@@ -55,7 +55,7 @@ public abstract class AbstractIheTestcaseProcessor<T extends IheTestcase, U exte
         requestContext.put(this.submissionPropName, submission);
 
         // noinspection ConstantConditions
-        QName transaction = testcase.getTransaction();
+        QName transaction = testcase.getOperation();
 
         try {
             result.setResponse(client.invoke(delegate, transaction, this.createRequest(submission))[0]);
@@ -65,20 +65,16 @@ public abstract class AbstractIheTestcaseProcessor<T extends IheTestcase, U exte
                 !testcase.isNegative()) {
                 result.setSuccess(true);
             }
+        } catch (SoapFault e) {
+            result.getMessages(SdcctIssueSeverity.INFORMATION)
+                .add(String.format(
+                    "Please check that the web service response event payload contains a SOAP fault (message=%s) that corresponds to the associated testcase (id=%s) description.",
+                    e.getMessage(), testcase.getId()));
+
+            result.setFault(e);
         } catch (Exception e) {
-            if (e instanceof SoapFault) {
-                SoapFault fault;
-
-                result.setFault(fault = (SoapFault) e);
-
-                result.getMessages(SdcctIssueSeverity.INFORMATION)
-                    .add(String.format(
-                        "Please check that the web service response event payload contains a SOAP fault (message=%s) that corresponds to the associated testcase (id=%s) description.",
-                        fault.getMessage(), testcase.getId()));
-            } else {
-                result.getMessages(SdcctIssueSeverity.ERROR).add(
-                    String.format("Unable to invoke IHE %s (endpointAddr=%s, transaction=%s): %s", this.roleName, endpointAddr, transaction, e.getMessage()));
-            }
+            result.getMessages(SdcctIssueSeverity.ERROR)
+                .add(String.format("Unable to invoke IHE %s (endpointAddr=%s, transaction=%s): %s", this.roleName, endpointAddr, transaction, e.getMessage()));
         }
 
         return result;
