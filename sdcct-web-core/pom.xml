@@ -657,6 +657,18 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>revision</id>
+                        <configuration>
+                            <generateGitPropertiesFilename>${project.build.outputDirectory}/META-INF/sdcct/sdcct-web-git.properties</generateGitPropertiesFilename>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

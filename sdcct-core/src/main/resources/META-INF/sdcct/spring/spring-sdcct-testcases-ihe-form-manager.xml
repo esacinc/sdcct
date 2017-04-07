@@ -71,7 +71,7 @@
                 <beans:property name="workflowData">
                     <beans:bean parent="workflowDataTypeImpl"
                         p:encodedResponse-ref="encodedResponseXml"
-                        p:formId="ihe_a"/>
+                        p:formId="#{ formRfdC.identifier }"/>
                 </beans:property>
             </beans:bean>
         </beans:property>
@@ -141,7 +141,7 @@
                 <beans:property name="workflowData">
                     <beans:bean parent="workflowDataTypeImpl"
                         p:encodedResponse-ref="encodedResponseHtml"
-                        p:formId="ihe_a"/>
+                        p:formId="#{ formRfdC.identifier }"/>
                 </beans:property>
             </beans:bean>
         </beans:property>
@@ -699,7 +699,7 @@
                 <beans:property name="workflowData">
                     <beans:bean parent="workflowDataTypeImpl"
                         p:encodedResponse-ref="encodedResponseXml"
-                        p:formId="ihe_b"/>
+                        p:formId="#{ formRfdB.identifier }"/>
                 </beans:property>
             </beans:bean>
         </beans:property>
@@ -771,7 +771,7 @@
                 <beans:property name="workflowData">
                     <beans:bean parent="workflowDataTypeImpl"
                         p:encodedResponse-ref="encodedResponseHtml"
-                        p:formId="ihe_b"/>
+                        p:formId="#{ formRfdB.identifier }"/>
                 </beans:property>
             </beans:bean>
         </beans:property>
