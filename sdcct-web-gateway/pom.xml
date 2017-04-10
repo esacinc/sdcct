@@ -10,7 +10,7 @@
     <parent>
         <groupId>gov.hhs.onc.sdcct</groupId>
         <artifactId>sdcct-web-parent</artifactId>
-        <version>1.0-RELEASE</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath>../sdcct-web-parent</relativePath>
     </parent>
     
