@@ -63,7 +63,6 @@
         <beans:property name="forms">
             <beans:list>
                 <beans:ref bean="formRfdCFilled"/>
-                <beans:ref bean="formRfdDFilled"/>
             </beans:list>
         </beans:property>
         <beans:property name="requestInfo">
@@ -125,7 +124,6 @@
         </beans:property>
         <beans:property name="forms">
             <beans:list>
-                <beans:ref bean="formRfdC"/>
                 <beans:ref bean="formRfdD"/>
             </beans:list>
         </beans:property>
@@ -248,7 +246,6 @@
         <beans:property name="forms">
             <beans:list>
                 <beans:ref bean="formRfdCFilled"/>
-                <beans:ref bean="formRfdDFilled"/>
             </beans:list>
         </beans:property>
         <beans:property name="requestInfo">
@@ -310,7 +307,6 @@
         </beans:property>
         <beans:property name="forms">
             <beans:list>
-                <beans:ref bean="formRfdC"/>
                 <beans:ref bean="formRfdD"/>
             </beans:list>
         </beans:property>

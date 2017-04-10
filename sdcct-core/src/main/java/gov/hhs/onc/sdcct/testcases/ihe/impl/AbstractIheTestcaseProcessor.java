@@ -43,41 +43,45 @@ public abstract class AbstractIheTestcaseProcessor<T extends IheTestcase, U exte
     @Override
     protected V processInternal(U submission) {
         T testcase = submission.getTestcase();
-
         String endpointAddr = submission.getEndpointAddress();
-        JaxWsClient client = ((JaxWsClient) this.beanFactory.getBean(this.clientBeanName, endpointAddr));
-        Client delegate = client.buildInvocationDelegate();
-        BindingProvider bindingProvider = ((BindingProvider) delegate);
-
-        V result = this.beanFactory.getBean(this.resultImplClass, submission);
-        Map<String, Object> requestContext = bindingProvider.getRequestContext();
-        requestContext.put(this.resultPropName, result);
-        requestContext.put(this.submissionPropName, submission);
-
-        // noinspection ConstantConditions
-        QName transaction = testcase.getOperation();
+        JaxWsClient client = null;
 
         try {
-            result.setResponse(client.invoke(delegate, transaction, this.createRequest(submission))[0]);
+            Client delegate = (client = ((JaxWsClient) this.beanFactory.getBean(this.clientBeanName, endpointAddr))).buildInvocationDelegate();
+            BindingProvider bindingProvider = ((BindingProvider) delegate);
+
+            V result = this.beanFactory.getBean(this.resultImplClass, submission);
+            Map<String, Object> requestContext = bindingProvider.getRequestContext();
+            requestContext.put(this.resultPropName, result);
+            requestContext.put(this.submissionPropName, submission);
 
             // noinspection ConstantConditions
-            if (!result.hasMessages(SdcctIssueSeverity.ERROR) && !result.hasMessages(SdcctIssueSeverity.FATAL) && submission.hasTestcase() &&
-                !testcase.isNegative()) {
-                result.setSuccess(true);
+            QName op = testcase.getOperation();
+
+            try {
+                result.setResponse(client.invoke(delegate, op, this.createRequest(submission))[0]);
+
+                if (!result.hasMessages(SdcctIssueSeverity.FATAL) && !result.hasMessages(SdcctIssueSeverity.ERROR) && !testcase.isNegative()) {
+                    result.setSuccess(true);
+                }
+            } catch (SoapFault e) {
+                result.getMessages(SdcctIssueSeverity.INFORMATION)
+                    .add(String.format(
+                        "Please check that the web service response event payload contains a SOAP fault (message=%s) that corresponds to the associated testcase (id=%s) description.",
+                        e.getMessage(), testcase.getId()));
+
+                result.setFault(e);
+            } catch (Exception e) {
+                result.getMessages(SdcctIssueSeverity.ERROR)
+                    .add(String.format("Unable to invoke IHE %s (endpointAddr=%s, op=%s): %s", this.roleName, endpointAddr, op, e.getMessage()));
             }
-        } catch (SoapFault e) {
-            result.getMessages(SdcctIssueSeverity.INFORMATION)
-                .add(String.format(
-                    "Please check that the web service response event payload contains a SOAP fault (message=%s) that corresponds to the associated testcase (id=%s) description.",
-                    e.getMessage(), testcase.getId()));
 
-            result.setFault(e);
-        } catch (Exception e) {
-            result.getMessages(SdcctIssueSeverity.ERROR)
-                .add(String.format("Unable to invoke IHE %s (endpointAddr=%s, transaction=%s): %s", this.roleName, endpointAddr, transaction, e.getMessage()));
+            return result;
+        } finally {
+            if (client != null) {
+                client.getDelegate().destroy();
+            }
         }
-
-        return result;
     }
 
     protected W createRequest(U submission) throws Exception {

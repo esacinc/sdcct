@@ -43,7 +43,7 @@ public abstract class AbstractServerIheTestcaseOutCallback<T extends IheTestcase
                 result.setFault(fault);
 
                 if (result.hasFault()) {
-                    if (testcase != null && testcase.isNegative()) {
+                    if ((testcase != null) && testcase.isNegative()) {
                         result.getMessages(SdcctIssueSeverity.INFORMATION)
                             .add(String.format(
                                 "Please check that the web service response event payload contains a SOAP fault (message=%s) that corresponds to the associated testcase (id=%s) description.",
@@ -52,7 +52,7 @@ public abstract class AbstractServerIheTestcaseOutCallback<T extends IheTestcase
                         result.getMessages(SdcctIssueSeverity.INFORMATION)
                             .add(String.format(
                                 "Please check that the web service response event payload (msg=%s) corresponds to what is expected in the associated testcase (id=%s) description.",
-                                fault.getMessage(), testcase != null ? testcase.getId() : "None"));
+                                fault.getMessage(), ((testcase != null) ? testcase.getId() : "None")));
                     }
                 }
 

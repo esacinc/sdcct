@@ -63,7 +63,6 @@
         <beans:property name="forms">
             <beans:list>
                 <beans:ref bean="formRfdCFilled"/>
-                <beans:ref bean="formRfdDFilled"/>
             </beans:list>
         </beans:property>
         <beans:property name="requestInfo">
@@ -127,7 +126,6 @@
         </beans:property>
         <beans:property name="forms">
             <beans:list>
-                <beans:ref bean="formRfdC"/>
                 <beans:ref bean="formRfdD"/>
             </beans:list>
         </beans:property>
@@ -316,7 +314,6 @@
         <beans:property name="forms">
             <beans:list>
                 <beans:ref bean="formRfdCFilled"/>
-                <beans:ref bean="formRfdDFilled"/>
             </beans:list>
         </beans:property>
         <beans:property name="requestInfo">
@@ -333,6 +330,71 @@
         <beans:property name="responseInfo">
             <beans:bean parent="iheTestcaseResponseInfoImpl"
                 p:messageName-ref="iheTestcaseConstantStrSubmitFormResponse">
+                <beans:property name="messageDetails">
+                    <beans:map>
+                        <beans:entry key-ref="iheTestcaseConstantStrContentType" value-ref="iheContentTypeXml"/>
+                        <beans:entry key-ref="iheTestcaseConstantStrResponseCode" value="element exists"/>
+                    </beans:map>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+        <beans:property name="steps">
+            <beans:list>
+                <beans:ref bean="submitFormRequestValidationStep"/>
+                <beans:ref bean="submitFormResponseSendingStep"/>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+
+    <beans:bean id="iheTestcase18" parent="iheFormReceiverTestcaseSutInitiated"
+        p:contentType="XML"
+        p:id="IHE_18"
+        p:name="IHE_18 - Form Filler submits SDCSubmissionPackage for partially completed form"
+        p:order="18">
+        <beans:property name="description">
+            <beans:bean parent="iheTestcaseDescImpl">
+                <beans:property name="instructions">
+                    <sdcct:normalized-string>
+                        Submit a request with a partially completed form from your Form Filler to the Form Receiver, according to the message request details.
+                        Your Form Filler should receive an SDCSubmissionPackage from the Form Receiver in the response, according to the message response
+                        details.
+                    </sdcct:normalized-string>
+                </beans:property>
+                <beans:property name="specifications">
+                    <beans:list>
+                        <beans:ref bean="iheTestcaseConstantStrIti35"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormReceiver"/>
+                        <beans:ref bean="iheTestcaseConstantStrSdcSubmissionRequest"/>
+                        <beans:ref bean="iheTestcaseConstantStrFormFiller"/>
+                    </beans:list>
+                </beans:property>
+                <beans:property name="text">
+                    <sdcct:normalized-string>
+                        This testcase verifies that your Form Filler can submit a valid SubmitFormRequest containing an SDCSubmissionPackage for a partially
+                        completed form to a Form Receiver, according to ITI-35.
+                    </sdcct:normalized-string>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+        <beans:property name="forms">
+            <beans:list>
+                <beans:ref bean="formRfdD"/>
+            </beans:list>
+        </beans:property>
+        <beans:property name="requestInfo">
+            <beans:bean parent="iheTestcaseRequestInfoImpl"
+                p:messageName-ref="iheTestcaseConstantStrRetrieveFormRequest">
+                <beans:property name="messageDetails">
+                    <beans:map>
+                        <beans:entry key-ref="iheTestcaseConstantStrSdcSubmissionPackage"
+                            value="contains FormDesign with a formID that corresponds to an available XML, HTML, or URI-based form"/>
+                    </beans:map>
+                </beans:property>
+            </beans:bean>
+        </beans:property>
+        <beans:property name="responseInfo">
+            <beans:bean parent="iheTestcaseResponseInfoImpl"
+                p:messageName-ref="iheTestcaseConstantStrRetrieveFormResponse">
                 <beans:property name="messageDetails">
                     <beans:map>
                         <beans:entry key-ref="iheTestcaseConstantStrContentType" value-ref="iheContentTypeXml"/>

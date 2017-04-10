@@ -101,18 +101,21 @@ public abstract class AbstractServerIheTestcaseInInterceptor<T extends IheTestca
                 result = this.processRequest(request, message, submittedTimestamp, txId);
 
                 U submission = result.getSubmission();
-                T testcase = submission != null ? submission.getTestcase() : null;
+                T testcase = ((submission != null) ? submission.getTestcase() : null);
 
                 if (testcase != null) {
                     this.validateRequest(testcase, result, request);
                 } else {
-                    result.getMessages(SdcctIssueSeverity.INFORMATION).add(
-                        "The testcase associated with the web service request could not be determined. Please check that the web service response event payload corresponds to the expected response for the intended testcase.");
+                    result.getMessages(SdcctIssueSeverity.ERROR)
+                        .add(String.format(
+                            "The testcase associated with the web service request (soapAction=%s) could not be determined. Please check that the web service response event payload corresponds to the expected response for the intended testcase.",
+                            soapActionPropValue));
                 }
             } catch (Exception e) {
                 result = this.createResult(null, message, null, submittedTimestamp, txId);
 
-                throw new IheTestcaseValidationException(String.format("Unable to parse request for testcase (SOAP action=%s).", soapActionPropValue), e);
+                throw new IheTestcaseValidationException(
+                    String.format("Unable to parse web service request (soapAction=%s) for testcase.", soapActionPropValue), e);
             } finally {
                 WsRequestEvent wsRequestEvent = new WsRequestEventImpl();
                 wsRequestEvent.setDirection(WsDirection.INBOUND);

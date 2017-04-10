@@ -32,6 +32,8 @@ public abstract class AbstractIheTestcaseInterceptor extends AbstractPhaseInterc
     public void handleMessage(SoapMessage message) throws Fault {
         try {
             this.handleMessageInternal(message);
+        } catch (Fault e) {
+            throw e;
         } catch (Exception e) {
             throw new Fault(e);
         }

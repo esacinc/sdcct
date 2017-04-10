@@ -16,5 +16,12 @@
     =====================================================================================================-->
     <!--suppress SpringPlaceholdersInspection -->
     <beans:bean id="clientFormReceiverRfdLocal" parent="clientFormReceiverRfd"
-        c:addr="${sdcct.ws.form.receiver.rfd.url}"/>
+        c:addr="${sdcct.ws.form.receiver.rfd.url}">
+        <beans:property name="inInterceptors">
+            <beans:list/>
+        </beans:property>
+        <beans:property name="outInterceptors">
+            <beans:list/>
+        </beans:property>
+    </beans:bean>
 </beans:beans>

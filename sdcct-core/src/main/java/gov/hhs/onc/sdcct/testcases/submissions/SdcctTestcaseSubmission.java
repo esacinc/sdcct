@@ -7,6 +7,7 @@ import gov.hhs.onc.sdcct.testcases.SdcctTestcase;
 import gov.hhs.onc.sdcct.testcases.SdcctTestcaseDescription;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotEmpty;
 
 public interface SdcctTestcaseSubmission<T extends SdcctTestcaseDescription, U extends SdcctTestcase<T>> {
@@ -30,6 +31,7 @@ public interface SdcctTestcaseSubmission<T extends SdcctTestcaseDescription, U e
 
     @JsonDeserialize(using = SdcctTestcaseDeserializer.class)
     @JsonProperty
+    @NotNull
     @Nullable
     public U getTestcase();
 

@@ -556,12 +556,17 @@
                 </beans:property>
             </beans:bean>
         </beans:property>
+        <beans:property name="formIds">
+            <beans:list>
+                <beans:value>${sdcct.testcases.ihe.form.id.unavailable}</beans:value>
+            </beans:list>
+        </beans:property>
         <beans:property name="requestParams">
             <beans:bean parent="retrieveFormRequestTypeImpl">
                 <beans:property name="workflowData">
                     <beans:bean parent="workflowDataTypeImpl"
                         p:encodedResponse-ref="encodedResponseUri"
-                        p:formId=""/>
+                        p:formId="${sdcct.testcases.ihe.form.id.unavailable}"/>
                 </beans:property>
             </beans:bean>
         </beans:property>
@@ -699,7 +704,7 @@
                 <beans:property name="workflowData">
                     <beans:bean parent="workflowDataTypeImpl"
                         p:encodedResponse-ref="encodedResponseXml"
-                        p:formId="#{ formRfdB.identifier }"/>
+                        p:formId="#{ formRfdC.identifier }"/>
                 </beans:property>
             </beans:bean>
         </beans:property>
@@ -771,7 +776,7 @@
                 <beans:property name="workflowData">
                     <beans:bean parent="workflowDataTypeImpl"
                         p:encodedResponse-ref="encodedResponseHtml"
-                        p:formId="#{ formRfdB.identifier }"/>
+                        p:formId="#{ formRfdC.identifier }"/>
                 </beans:property>
             </beans:bean>
         </beans:property>
